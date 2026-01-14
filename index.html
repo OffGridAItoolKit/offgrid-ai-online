@@ -147,6 +147,72 @@
         .first-run-message p {
             margin: 8px 0;
         }
+        
+        /* Welcome online badge styling */
+        .welcome-online-badge {
+            margin: 8px auto 12px auto;
+            display: inline-flex;
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            /* Hide status text on mobile, keep only the dot */
+            .status-text {
+                display: none !important;
+            }
+            
+            /* Make status dot larger on mobile for visibility */
+            .status .status-dot {
+                width: 12px;
+                height: 12px;
+            }
+            
+            /* Compact the header on mobile */
+            .header {
+                padding: 8px 12px;
+            }
+            
+            /* Smaller title on mobile */
+            .header .title {
+                font-size: 14px;
+            }
+            
+            /* Smaller online badge in header on mobile */
+            .header .online-badge {
+                font-size: 9px;
+                padding: 2px 8px;
+                margin-left: 6px;
+            }
+            
+            /* Compact purchase CTA on mobile */
+            .purchase-cta {
+                font-size: 10px;
+                padding: 6px 10px;
+                gap: 4px;
+            }
+            
+            /* Hide the cart emoji on mobile to save space */
+            .purchase-cta::before {
+                content: '';
+            }
+        }
+        
+        /* Extra small mobile screens */
+        @media (max-width: 480px) {
+            .header .title {
+                font-size: 12px;
+            }
+            
+            .header .online-badge {
+                font-size: 8px;
+                padding: 2px 6px;
+            }
+            
+            .purchase-cta {
+                font-size: 9px;
+                padding: 5px 8px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -193,7 +259,7 @@
             </a>
             <div class="status">
                 <span class="status-dot disconnected" id="statusDot"></span>
-                <span id="statusText">Connecting...</span>
+                <span id="statusText" class="status-text">Connecting...</span>
             </div>
         </div>
     </div>
@@ -253,7 +319,8 @@
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
                     <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon" style="width: 120px; height: 120px;">
-                    <h2>Welcome to OffGrid AI ToolKit Online</h2>
+                    <h2>Welcome to OffGrid AI ToolKit</h2>
+                    <span class="online-badge welcome-online-badge">ONLINE</span>
                     <div class="welcome-subtitle">⚡ Cloud-Powered • Lightning Fast Responses</div>
                     <div class="feature-badges">
                         <div class="feature-badge">👁️ Vision</div>
@@ -303,13 +370,6 @@
                             <div class="quick-action-content">
                                 <div class="quick-action-title">Translator</div>
                                 <div class="quick-action-desc">Quick translate</div>
-                            </div>
-                        </div>
-                        <div class="quick-action" onclick="sendQuickPrompt('What are essential survival skills everyone should know?')">
-                            <div class="quick-action-icon">🎯</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Survival Tips</div>
-                                <div class="quick-action-desc">Get started</div>
                             </div>
                         </div>
                     </div>
