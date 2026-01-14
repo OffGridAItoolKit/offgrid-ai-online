@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="120" height="120">
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#daa520;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#b8860b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="brownGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#654321;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer circle -->
+  <circle cx="50" cy="50" r="48" fill="none" stroke="url(#goldGradient)" stroke-width="3"/>
+  
+  <!-- Inner circle -->
+  <circle cx="50" cy="50" r="40" fill="none" stroke="url(#brownGradient)" stroke-width="1.5"/>
+  
+  <!-- Cardinal directions -->
+  <text x="50" y="18" text-anchor="middle" fill="#daa520" font-family="Arial, sans-serif" font-size="10" font-weight="bold">N</text>
+  <text x="50" y="92" text-anchor="middle" fill="#8b4513" font-family="Arial, sans-serif" font-size="10" font-weight="bold">S</text>
+  <text x="8" y="54" text-anchor="middle" fill="#8b4513" font-family="Arial, sans-serif" font-size="10" font-weight="bold">W</text>
+  <text x="92" y="54" text-anchor="middle" fill="#8b4513" font-family="Arial, sans-serif" font-size="10" font-weight="bold">E</text>
+  
+  <!-- Compass rose - North pointer (gold) -->
+  <polygon points="50,20 45,50 50,45 55,50" fill="url(#goldGradient)"/>
+  
+  <!-- Compass rose - South pointer (brown) -->
+  <polygon points="50,80 45,50 50,55 55,50" fill="url(#brownGradient)"/>
+  
+  <!-- Compass rose - East pointer -->
+  <polygon points="80,50 50,45 55,50 50,55" fill="url(#brownGradient)"/>
+  
+  <!-- Compass rose - West pointer -->
+  <polygon points="20,50 50,45 45,50 50,55" fill="url(#brownGradient)"/>
+  
+  <!-- Center circle -->
+  <circle cx="50" cy="50" r="5" fill="url(#goldGradient)"/>
+  <circle cx="50" cy="50" r="3" fill="#2c1810"/>
+</svg>

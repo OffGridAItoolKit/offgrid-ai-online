@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffGrid AI ToolKit Online - Cloud-Powered Gemma 3</title>
+    <meta name="description" content="Experience the power of Gemma 3 AI models online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <link rel="icon" type="image/png" href="compass tilted.png">
+    <link rel="stylesheet" href="offgridai.css?v=2.0">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Online Version Specific Styles */
+        .online-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .online-badge::before {
+            content: '⚡';
+        }
+        
+        .purchase-cta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .purchase-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.4);
+        }
+        
+        .speed-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #10b981;
+            margin-left: 8px;
+        }
+        
+        .privacy-notice {
+            background: linear-gradient(135deg, rgba(44, 24, 16, 0.95) 0%, rgba(74, 44, 26, 0.95) 100%);
+            border: 1px solid #b8860b;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 13px;
+            color: #deb887;
+        }
+        
+        .privacy-notice strong {
+            color: #daa520;
+        }
+        
+        .model-speed-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #10b981;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        /* Hide offline-specific elements */
+        #qrContainer, #driveBadge, .desktop-only, #firewallModal, #mobileAccessHelper {
+            display: none !important;
+        }
+        
+        /* Adjust messages padding for online version */
+        .messages {
+            padding-right: 24px !important;
+        }
+        
+        /* Welcome screen adjustments */
+        .welcome-subtitle {
+            color: #10b981;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        /* Response time display */
+        .response-time {
+            font-size: 11px;
+            color: #10b981;
+            margin-left: 44px;
+            margin-bottom: 4px;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(44, 24, 16, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #2c1810;
+            border-top-color: #daa520;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* First run banner adjustments for online */
+        .first-run-banner {
+            background: linear-gradient(135deg, rgba(44, 24, 16, 0.98) 0%, rgba(74, 44, 26, 0.98) 100%);
+        }
+        
+        .first-run-message p {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- First Run Banner (Online Version) -->
+    <div id="firstRunBanner" class="first-run-banner" style="display: none;">
+        <div class="first-run-content">
+            <div class="first-run-logo">OffGrid AI ToolKit <span class="online-badge">ONLINE</span></div>
+            <div class="first-run-tagline">Cloud-Powered Gemma 3 • Fast Responses • Private Sessions</div>
+            <div class="first-run-message">
+                <p><strong>Welcome!</strong> This is the online demo of OffGrid AI ToolKit.</p>
+                <p>⚡ Experience lightning-fast AI responses powered by cloud infrastructure</p>
+                <p>🔒 Your conversations are NOT stored - sessions are completely ephemeral</p>
+                <p>🧠 Same Gemma 3 models as the offline USB version</p>
+                <div class="privacy-notice">
+                    <strong>Privacy First:</strong> We don't store your conversations. Each session is independent and private.
+                </div>
+            </div>
+            <div class="first-run-terms">
+                <label class="terms-checkbox">
+                    <input type="checkbox" id="acceptTermsBanner">
+                    <span>I understand this is a demo and accept the <a href="https://offgridaitoolkit.com/pages/terms-of-service" target="_blank">terms of service</a></span>
+                </label>
+            </div>
+            <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
+                Start Using OffGrid AI Online
+            </button>
+            <div class="first-run-footer">
+                Want complete privacy & offline access? <a href="https://offgridaitoolkit.com" target="_blank" style="color: #daa520; font-weight: 600;">Get the USB Version →</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-left">
+            <div class="logo" onclick="returnToHome()" style="cursor: pointer;" title="Clear chat and return to home">
+                <img src="compass tilted.png" alt="OffGrid AI" style="width: 32px; height: 32px;">
+            </div>
+            <h1 class="title">OffGrid AI ToolKit</h1>
+            <span class="online-badge">ONLINE</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="https://offgridaitoolkit.com" target="_blank" class="purchase-cta">
+                🛒 Get Offline Version
+            </a>
+            <div class="status">
+                <span class="status-dot disconnected" id="statusDot"></span>
+                <span id="statusText">Connecting...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Indicator -->
+    <div class="upload-indicator" id="uploadIndicator">
+        <div style="margin-bottom: 10px;">📸</div>
+        <div>Processing Image...</div>
+        <div style="font-size: 12px; margin-top: 5px;">Please wait</div>
+    </div>
+
+    <div class="main-container">
+        <!-- Resources Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <!-- Online Info Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">⚡ Online Version</div>
+                <div class="privacy-notice" style="margin: 0 0 12px 0; padding: 10px;">
+                    <strong>🔒 Privacy:</strong> Conversations are not stored. Each session is ephemeral.
+                </div>
+            </div>
+
+            <!-- Quick Tools Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Tools</div>
+                <button class="tool-button" onclick="clearChat()">📋 Clear Chat / Home</button>
+                <button class="tool-button" onclick="setupTranslator()">🌐 Translator</button>
+                <button class="tool-button" onclick="openImageIdentifier()">🔍 Image Identifier</button>
+            </div>
+
+            <!-- Templates Section -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Quick Prompts</div>
+                <button class="tool-button" onclick="sendQuickPrompt('What are the essential items for a 72-hour emergency kit?')">🎒 Emergency Kit</button>
+                <button class="tool-button" onclick="sendQuickPrompt('How do I purify water in the wilderness without modern tools?')">💧 Water Purification</button>
+                <button class="tool-button" onclick="sendQuickPrompt('What are the best practices for food preservation without electricity?')">🥫 Food Preservation</button>
+                <button class="tool-button" onclick="sendQuickPrompt('How can I navigate using the stars and natural landmarks?')">🧭 Navigation</button>
+            </div>
+
+            <!-- Get Offline Version -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">Get the Full Version</div>
+                <a href="https://offgridaitoolkit.com" target="_blank" class="tool-button" style="text-decoration: none; display: block; text-align: center; background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%); color: #daa520; border-color: #b8860b;">
+                    🛒 Purchase USB Version<br>
+                    <span style="font-size: 11px; color: #deb887;">100% Offline • Complete Privacy</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Toggle Sidebar Button (Mobile) -->
+        <button class="toggle-sidebar" onclick="toggleSidebar()">
+            ☰
+        </button>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="welcome" id="welcome">
+                    <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon" style="width: 120px; height: 120px;">
+                    <h2>Welcome to OffGrid AI ToolKit Online</h2>
+                    <div class="welcome-subtitle">⚡ Cloud-Powered • Lightning Fast Responses</div>
+                    <div class="feature-badges">
+                        <div class="feature-badge">👁️ Vision</div>
+                        <div class="feature-badge">⚡ Fast</div>
+                        <div class="feature-badge">🔒 Private Sessions</div>
+                    </div>
+                    <p>Experience the same Gemma 3 AI models from the USB version, now with cloud speed!</p>
+                    
+                    <!-- Desktop buttons -->
+                    <div class="quick-actions desktop-quick-actions">
+                        <div class="quick-action" onclick="sendQuickPrompt('What makes OffGrid AI ToolKit different from other AI assistants?')">
+                            <div class="quick-action-title">🎯 About OffGrid AI</div>
+                            <div class="quick-action-desc">Learn what makes us unique</div>
+                        </div>
+                        <div class="quick-action" onclick="sendQuickPrompt('Create a comprehensive emergency preparedness checklist for a family of four.')">
+                            <div class="quick-action-title">📋 Emergency Prep</div>
+                            <div class="quick-action-desc">Get started with survival planning</div>
+                        </div>
+                        <div class="quick-action" onclick="sendQuickPrompt('What are the top 10 skills every homesteader should learn?')">
+                            <div class="quick-action-title">🏡 Homesteading</div>
+                            <div class="quick-action-desc">Essential self-sufficiency skills</div>
+                        </div>
+                        <div class="quick-action" onclick="openImageIdentifier()">
+                            <div class="quick-action-title">🔍 Image Analysis</div>
+                            <div class="quick-action-desc">Identify plants, animals, & more</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile buttons -->
+                    <div class="mobile-quick-actions">
+                        <div class="quick-action" onclick="triggerImageUpload()">
+                            <div class="quick-action-icon">📸</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Take Picture</div>
+                                <div class="quick-action-desc">Camera capture</div>
+                            </div>
+                        </div>
+                        <div class="quick-action" onclick="triggerGalleryUpload()">
+                            <div class="quick-action-icon">🖼️</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Upload Image</div>
+                                <div class="quick-action-desc">From gallery</div>
+                            </div>
+                        </div>
+                        <div class="quick-action" onclick="setupTranslator()">
+                            <div class="quick-action-icon">🌐</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Translator</div>
+                                <div class="quick-action-desc">Quick translate</div>
+                            </div>
+                        </div>
+                        <div class="quick-action" onclick="sendQuickPrompt('What are essential survival skills everyone should know?')">
+                            <div class="quick-action-icon">🎯</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Survival Tips</div>
+                                <div class="quick-action-desc">Get started</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
+                <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
+                
+                <!-- Camera Icon - Takes Photo -->
+                <svg class="image-upload-btn" onclick="triggerImageUpload()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Take Photo">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                
+                <!-- Gallery Icon - Upload from Gallery -->
+                <svg class="gallery-upload-btn" onclick="triggerGalleryUpload()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Image">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                
+                <div class="image-preview" id="imagePreview">
+                    <img class="preview-image" id="previewImg" src="" alt="Preview">
+                    <div class="preview-info">
+                        <div class="preview-filename" id="previewFilename"></div>
+                    </div>
+                    <button class="remove-image" onclick="removeImage()">Remove</button>
+                </div>
+                
+                <textarea 
+                    id="messageInput" 
+                    class="message-input"
+                    placeholder="Ask anything about survival, homesteading, or upload an image..."
+                    rows="1"
+                    onkeydown="handleKeyDown(event)"
+                    oninput="autoResize(this)"
+                ></textarea>
+            </div>
+            
+            <div class="button-row">
+                <div class="model-selector">
+                    <div class="model-helper" id="modelHelper"></div>
+                    <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
+                        <span class="model-name" id="selectedModelName">Gemma 3 4B</span>
+                        <span class="model-speed-badge">⚡ ~1-2s</span>
+                        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 16px; height: 16px;">
+                            <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="model-dropdown" id="modelDropdown">
+                        <div class="model-list">
+                            <div class="model-item selected" onclick="selectModel('gemma-3-4b')">
+                                <div class="model-item-name">Gemma 3 4B <span class="model-speed-badge">⚡ Fastest</span></div>
+                                <div class="model-item-desc">~1-2 seconds • Great for quick questions</div>
+                            </div>
+                            <div class="model-item" onclick="selectModel('gemma-3-12b')">
+                                <div class="model-item-name">Gemma 3 12B <span class="model-speed-badge">⚡ Fast</span></div>
+                                <div class="model-item-desc">~1-3 seconds • Balanced performance</div>
+                            </div>
+                            <div class="model-item" onclick="selectModel('gemma-3-27b')">
+                                <div class="model-item-name">Gemma 3 27B <span class="model-speed-badge">🧠 Smartest</span></div>
+                                <div class="model-item-desc">~2-5 seconds • Maximum intelligence</div>
+                            </div>
+                            <div class="model-item" onclick="selectModel('medgemma-3-4b')">
+                                <div class="model-item-name">MedGemma 3 4B <span style="background: #ef4444;" class="model-speed-badge">🏥 Medical</span></div>
+                                <div class="model-item-desc">~1-2 seconds • Healthcare specialist</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="send-button" onclick="sendMessage()" id="sendButton">
+                    Send
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // OFFGRID AI TOOLKIT ONLINE - MAIN JAVASCRIPT
+        // ============================================
+        
+        // Configuration
+        const API_BASE = window.location.origin;
+        let selectedModel = 'gemma-3-4b';
+        let isTyping = false;
+        let selectedImage = null;
+        let conversationHistory = [];
+        let abortController = null;
+        
+        // Model display names and speeds
+        const MODEL_INFO = {
+            'gemma-3-4b': { name: 'Gemma 3 4B', speed: '~1-2s', badge: '⚡ Fastest' },
+            'gemma-3-12b': { name: 'Gemma 3 12B', speed: '~1-3s', badge: '⚡ Fast' },
+            'gemma-3-27b': { name: 'Gemma 3 27B', speed: '~2-5s', badge: '🧠 Smartest' },
+            'medgemma-3-4b': { name: 'MedGemma 3 4B', speed: '~1-2s', badge: '🏥 Medical' }
+        };
+        
+        // ============================================
+        // CONNECTION & STATUS
+        // ============================================
+        
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/api/health`, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                if (response.ok) {
+                    document.getElementById('statusDot').classList.remove('disconnected');
+                    document.getElementById('statusText').textContent = 'Connected';
+                    return true;
+                }
+            } catch (error) {
+                console.log('Connection check failed:', error);
+            }
+            
+            document.getElementById('statusDot').classList.add('disconnected');
+            document.getElementById('statusText').textContent = 'Connecting...';
+            return false;
+        }
+        
+        // ============================================
+        // MODEL SELECTION
+        // ============================================
+        
+        function toggleModelDropdown() {
+            const dropdown = document.getElementById('modelDropdown');
+            dropdown.classList.toggle('open');
+        }
+        
+        function selectModel(model) {
+            selectedModel = model;
+            const info = MODEL_INFO[model];
+            
+            document.getElementById('selectedModelName').textContent = info.name;
+            
+            // Update speed badge
+            const button = document.getElementById('modelButton');
+            const speedBadge = button.querySelector('.model-speed-badge');
+            if (speedBadge) {
+                speedBadge.textContent = `⚡ ${info.speed}`;
+            }
+            
+            // Update selected state
+            document.querySelectorAll('.model-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.target.closest('.model-item').classList.add('selected');
+            
+            // Show helper message
+            const helper = document.getElementById('modelHelper');
+            if (model === 'medgemma-3-4b') {
+                helper.textContent = '🏥 MedGemma: Specialized for medical and healthcare questions';
+                helper.classList.add('show');
+                setTimeout(() => helper.classList.remove('show'), 3000);
+            } else if (model === 'gemma-3-27b') {
+                helper.textContent = '🧠 Gemma 3 27B: Maximum intelligence for complex reasoning';
+                helper.classList.add('show');
+                setTimeout(() => helper.classList.remove('show'), 3000);
+            }
+            
+            toggleModelDropdown();
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('modelDropdown');
+            const button = document.getElementById('modelButton');
+            if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+                dropdown.classList.remove('open');
+            }
+        });
+        
+        // ============================================
+        // MESSAGE HANDLING
+        // ============================================
+        
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            const requestStartTime = Date.now();
+            
+            if ((!message && !selectedImage) || isTyping) return;
+            
+            const isConnected = await checkConnection();
+            if (!isConnected) {
+                addMessage('Cannot connect to the server. Please refresh the page and try again.', 'assistant', true);
+                return;
+            }
+            
+            // Remove welcome screen
+            const welcome = document.getElementById('welcome');
+            if (welcome) welcome.remove();
+            
+            // Add user message to UI
+            const userMessage = message || "What's in this image?";
+            if (selectedImage) {
+                addMessageWithImage(userMessage, selectedImage.dataUrl, 'user');
+            } else {
+                addMessage(userMessage, 'user');
+            }
+            
+            // Add to conversation history
+            const historyEntry = {
+                role: 'user',
+                content: userMessage
+            };
+            if (selectedImage) {
+                historyEntry.image = selectedImage.dataUrl;
+            }
+            conversationHistory.push(historyEntry);
+            
+            // Clear input
+            input.value = '';
+            autoResize(input);
+            const imageToSend = selectedImage;
+            removeImage();
+            
+            // Set typing state
+            isTyping = true;
+            document.getElementById('sendButton').disabled = true;
+            
+            const typingDiv = showTyping();
+            
+            try {
+                // Prepare messages for API
+                const messages = conversationHistory.map(msg => ({
+                    role: msg.role,
+                    content: msg.content,
+                    image: msg.image
+                }));
+                
+                const response = await fetch(`${API_BASE}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: selectedModel,
+                        messages: messages
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                typingDiv.remove();
+                
+                // Calculate and display response time
+                const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
+                
+                // Show response time indicator
+                const messagesDiv = document.getElementById('messages');
+                const timeIndicator = document.createElement('div');
+                timeIndicator.className = 'response-time';
+                timeIndicator.innerHTML = `⚡ ${data.model} • ${responseTime}s response time`;
+                messagesDiv.appendChild(timeIndicator);
+                
+                // Add assistant response
+                addMessage(data.response, 'assistant');
+                
+                // Add to conversation history
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: data.response
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                typingDiv.remove();
+                addMessage('Error: ' + error.message, 'assistant', true);
+            } finally {
+                isTyping = false;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('messageInput').focus();
+            }
+        }
+        
+        function addMessage(text, sender, isError = false) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Parse markdown for assistant messages
+            let displayText = text;
+            if (sender === 'assistant' && typeof marked !== 'undefined') {
+                displayText = marked.parse(text);
+            } else {
+                displayText = escapeHtml(text);
+            }
+            
+            const avatar = sender === 'user' ? 'U' : 'AI';
+            const errorClass = isError ? 'style="color: #ef4444;"' : '';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatar}</div>
+                <div class="message-content">
+                    <div class="message-text markdown-content" ${errorClass}>${displayText}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function addMessageWithImage(text, imageUrl, sender) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${sender === 'user' ? 'U' : 'AI'}</div>
+                <div class="message-content">
+                    <div class="message-text">${escapeHtml(text)}</div>
+                    <img class="message-image" src="${imageUrl}" alt="Uploaded image" style="max-width: 300px; border-radius: 8px; margin-top: 8px;">
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+        
+        function showTyping() {
+            const messagesDiv = document.getElementById('messages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant';
+            typingDiv.innerHTML = `
+                <div class="message-avatar">AI</div>
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            return typingDiv;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // ============================================
+        // IMAGE HANDLING
+        // ============================================
+        
+        function triggerImageUpload() {
+            document.getElementById('imageInput').click();
+        }
+        
+        function triggerGalleryUpload() {
+            document.getElementById('galleryInput').click();
+        }
+        
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                // Show loading indicator on mobile
+                if (window.innerWidth <= 768) {
+                    const indicator = document.getElementById('uploadIndicator');
+                    indicator.classList.add('active');
+                    setTimeout(() => indicator.classList.remove('active'), 2000);
+                }
+                
+                resizeImage(file, 1024, 1024, function(resizedDataUrl) {
+                    selectedImage = {
+                        base64: resizedDataUrl.split(',')[1],
+                        name: file.name,
+                        dataUrl: resizedDataUrl
+                    };
+                    showImagePreview();
+                    
+                    // Show helper for MedGemma
+                    if (selectedModel === 'medgemma-3-4b') {
+                        const helper = document.getElementById('modelHelper');
+                        helper.textContent = '🏥 MedGemma supports medical image analysis';
+                        helper.classList.add('show');
+                        setTimeout(() => helper.classList.remove('show'), 3000);
+                    }
+                });
+            }
+        }
+        
+        function resizeImage(file, maxWidth, maxHeight, callback) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    callback(canvas.toDataURL('image/jpeg', 0.85));
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function showImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            const previewImg = document.getElementById('previewImg');
+            const previewFilename = document.getElementById('previewFilename');
+            
+            previewImg.src = selectedImage.dataUrl;
+            previewFilename.textContent = selectedImage.name;
+            preview.classList.add('active');
+        }
+        
+        function removeImage() {
+            selectedImage = null;
+            document.getElementById('imagePreview').classList.remove('active');
+            document.getElementById('imageInput').value = '';
+            document.getElementById('galleryInput').value = '';
+        }
+        
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
+        
+        function clearChat() {
+            if (confirm('Clear all messages and return to home? This will start a new session.')) {
+                conversationHistory = [];
+                location.reload();
+            }
+        }
+        
+        function returnToHome() {
+            const messagesContainer = document.getElementById('messages');
+            const hasMessages = messagesContainer && messagesContainer.children.length > 1;
+            const hasWelcome = !!document.getElementById('welcome');
+            
+            if (hasMessages || !hasWelcome) {
+                if (confirm('Return to home? This will start a new session.')) {
+                    conversationHistory = [];
+                    location.reload();
+                }
+            }
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleButton = document.querySelector('.toggle-sidebar');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('mobile-visible');
+                if (toggleButton) {
+                    toggleButton.classList.toggle('menu-open');
+                }
+            } else {
+                sidebar.classList.toggle('hidden');
+            }
+        }
+        
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+        }
+        
+        function sendQuickPrompt(prompt) {
+            document.getElementById('messageInput').value = prompt;
+            sendMessage();
+        }
+        
+        function setupTranslator() {
+            const input = document.getElementById('messageInput');
+            const translatorPrompt = 'Translate "[paste or type your text here]" to [Spanish/French/Chinese/etc]';
+            
+            input.value = translatorPrompt;
+            autoResize(input);
+            
+            setTimeout(() => {
+                input.focus();
+                const start = translatorPrompt.indexOf('[paste');
+                const end = translatorPrompt.indexOf(']') + 1;
+                input.setSelectionRange(start, end);
+            }, 100);
+        }
+        
+        function openImageIdentifier() {
+            const input = document.getElementById('messageInput');
+            input.value = 'Please identify what is in this image and provide detailed information about it.';
+            autoResize(input);
+            triggerGalleryUpload();
+        }
+        
+        // ============================================
+        // FIRST RUN HANDLING
+        // ============================================
+        
+        function acceptFirstRun() {
+            localStorage.setItem('offgrid-online-initialized', 'true');
+            localStorage.setItem('offgrid-online-init-date', new Date().toISOString());
+            
+            const banner = document.getElementById('firstRunBanner');
+            if (banner) {
+                banner.style.transition = 'opacity 0.3s ease';
+                banner.style.opacity = '0';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 300);
+            }
+        }
+        
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('OffGrid AI ToolKit Online - Initializing...');
+            
+            // Check first run
+            if (!localStorage.getItem('offgrid-online-initialized')) {
+                const banner = document.getElementById('firstRunBanner');
+                const checkbox = document.getElementById('acceptTermsBanner');
+                const button = document.getElementById('acceptBannerBtn');
+                
+                if (banner && checkbox && button) {
+                    banner.style.display = 'block';
+                    
+                    checkbox.addEventListener('change', function() {
+                        button.disabled = !this.checked;
+                        button.style.opacity = this.checked ? '1' : '0.5';
+                        button.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+                    });
+                }
+            }
+            
+            // Initialize connection check
+            checkConnection();
+            setInterval(checkConnection, 10000);
+            
+            // Focus input
+            document.getElementById('messageInput').focus();
+            
+            // Fix initial textarea height
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                autoResize(messageInput);
+            }
+            
+            console.log('OffGrid AI ToolKit Online - Ready!');
+        });
+    </script>
+</body>
+</html>
