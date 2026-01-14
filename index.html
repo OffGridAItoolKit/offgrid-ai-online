@@ -161,6 +161,22 @@
                 display: none !important;
             }
             
+            /* Hide ONLINE badge in header on mobile */
+            .header .online-badge {
+                display: none !important;
+            }
+            
+            /* Hide the Cloud-Powered subtitle on mobile */
+            .welcome-subtitle {
+                display: none !important;
+            }
+            
+            /* Smaller compass on mobile */
+            .welcome .welcome-icon {
+                width: 75px !important;
+                height: 75px !important;
+            }
+            
             /* Make status dot larger on mobile for visibility */
             .status .status-dot {
                 width: 12px;
@@ -175,13 +191,6 @@
             /* Smaller title on mobile */
             .header .title {
                 font-size: 14px;
-            }
-            
-            /* Smaller online badge in header on mobile */
-            .header .online-badge {
-                font-size: 9px;
-                padding: 2px 8px;
-                margin-left: 6px;
             }
             
             /* Compact purchase CTA on mobile */
@@ -203,9 +212,10 @@
                 font-size: 12px;
             }
             
-            .header .online-badge {
-                font-size: 8px;
-                padding: 2px 6px;
+            /* Even smaller compass on very small screens */
+            .welcome .welcome-icon {
+                width: 60px !important;
+                height: 60px !important;
             }
             
             .purchase-cta {
