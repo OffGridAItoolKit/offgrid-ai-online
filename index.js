@@ -57,49 +57,35 @@ const GEMMA_MODELS = {
 // MIDDLEWARE
 // =============================================================================
 
-// CORS Configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS 
-    ? process.env.ALLOWED_ORIGINS.split(',') 
-    : ['http://localhost:3000'];
-
+// CORS Configuration - Allow all origins for demo
 app.use(cors({
-    origin: function(origin, callback) {
-        // Allow requests with no origin (mobile apps, curl, etc.)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(null, true); // Allow all origins in development
-        }
-    },
+    origin: true,
     credentials: true
 }));
 
 // JSON body parser with size limit for images
 app.use(express.json({ limit: '10mb' }));
 
-// Trust proxy for rate limiting behind reverse proxies (cPanel, nginx, etc.)
-// Set to 1 to trust first proxy hop (typical for cPanel/nginx setups)
+// Trust proxy for rate limiting behind reverse proxies
 app.set('trust proxy', 1);
 
 // Rate limiting
 const limiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60000, // 1 minute
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 30, // 30 requests per minute
+    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 60000,
+    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 30,
     message: { 
         error: 'Too many requests. Please wait a moment before trying again.',
         retryAfter: 60
     },
     standardHeaders: true,
     legacyHeaders: false,
-    // Skip validation in development, enable proper proxy config in production
     validate: { trustProxy: false, xForwardedForHeader: false }
 });
 
 app.use('/api/', limiter);
 
-// Serve static files from public directory
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve static files from the same directory as index.js (flat structure)
+app.use(express.static(__dirname));
 
 // Request logging (minimal for privacy)
 app.use((req, res, next) => {
@@ -316,7 +302,7 @@ app.post('/api/stream', async (req, res) => {
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            res.write(`data: ${JSON.stringify({ error: errorData.error?.message || 'API error' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ error: errorData.error?.message || 'Stream error' })}\n\n`);
             res.end();
             return;
         }
@@ -329,7 +315,7 @@ app.post('/api/stream', async (req, res) => {
             const { done, value } = await reader.read();
             if (done) break;
             
-            const chunk = decoder.decode(value);
+            const chunk = decoder.decode(value, { stream: true });
             const lines = chunk.split('\n');
             
             for (const line of lines) {
@@ -356,38 +342,35 @@ app.post('/api/stream', async (req, res) => {
         
     } catch (error) {
         console.error('Stream endpoint error:', error);
-        res.write(`data: ${JSON.stringify({ error: 'Streaming error occurred' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ error: 'Stream error occurred' })}\n\n`);
         res.end();
     }
 });
 
-// =============================================================================
-// CATCH-ALL ROUTE (SPA Support)
-// =============================================================================
-
+// Catch-all route - serve index.html for SPA
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // =============================================================================
-// START SERVER
+// SERVER STARTUP
 // =============================================================================
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log('');
     console.log('╔═══════════════════════════════════════════════════════════╗');
-    console.log('║     OffGrid AI ToolKit Online - Server Started            ║');
+    console.log('║       OffGrid AI ToolKit Online - Server Started          ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  Local:   http://localhost:${PORT}                          ║`);
     console.log(`║  Network: http://0.0.0.0:${PORT}                            ║`);
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Available Models:                                        ║');
-    Object.entries(GEMMA_MODELS).forEach(([key, model]) => {
-        const line = `║    • ${model.name.padEnd(20)} (${key})`;
-        console.log(line.padEnd(60) + '║');
-    });
+    console.log('║    • Gemma 3 27B (gemma-3-27b)                            ║');
+    console.log('║    • Gemma 3 12B (gemma-3-12b)                            ║');
+    console.log('║    • Gemma 3 4B  (gemma-3-4b)                             ║');
+    console.log('║    • MedGemma 3 4B (medgemma-3-4b)                        ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
-    console.log(`║  API Key: ${OPENROUTER_API_KEY ? '✓ Configured' : '✗ NOT CONFIGURED'}                           ║`);
+    console.log(`║  API Key: ${OPENROUTER_API_KEY ? '✓ Configured' : '✗ Missing'}                               ║`);
     console.log('╚═══════════════════════════════════════════════════════════╝');
     console.log('');
 });
