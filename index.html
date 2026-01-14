@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OffGrid AI ToolKit Online - Cloud-Powered Gemma 3</title>
     <meta name="description" content="Experience the power of Gemma 3 AI models online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
-    <link rel="icon" type="image/png" href="compass tilted.png">
+    <link rel="icon" type="image/png" href="compasstilted.png">
     <link rel="stylesheet" href="offgridai.css?v=2.0">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
@@ -31,21 +31,23 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
-            color: white;
+            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%);
+            color: #daa520;
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 13px;
             font-weight: 600;
             text-decoration: none;
             transition: all 0.3s ease;
-            border: none;
+            border: 2px solid #b8860b;
             cursor: pointer;
         }
         
         .purchase-cta:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(184, 134, 11, 0.4);
+            background: linear-gradient(135deg, #3d2216 0%, #5a3c2a 100%);
+            color: #f0c040;
         }
         
         .speed-indicator {
@@ -180,7 +182,7 @@
     <div class="header">
         <div class="header-left">
             <div class="logo" onclick="returnToHome()" style="cursor: pointer;" title="Clear chat and return to home">
-                <img src="compass tilted.png" alt="OffGrid AI" style="width: 32px; height: 32px;">
+                <img src="compasstilted.png" alt="OffGrid AI" style="width: 32px; height: 32px;">
             </div>
             <h1 class="title">OffGrid AI ToolKit</h1>
             <span class="online-badge">ONLINE</span>
@@ -358,7 +360,7 @@
                     <div class="model-helper" id="modelHelper"></div>
                     <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
                         <span class="model-name" id="selectedModelName">Gemma 3 4B</span>
-                        <span class="model-speed-badge">⚡ ~1-2s</span>
+                        <span class="model-speed-badge">⚡ Fastest</span>
                         <svg viewBox="0 0 16 16" fill="currentColor" style="width: 16px; height: 16px;">
                             <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
                         </svg>
@@ -368,19 +370,19 @@
                         <div class="model-list">
                             <div class="model-item selected" onclick="selectModel('gemma-3-4b')">
                                 <div class="model-item-name">Gemma 3 4B <span class="model-speed-badge">⚡ Fastest</span></div>
-                                <div class="model-item-desc">~1-2 seconds • Great for quick questions</div>
+                                <div class="model-item-desc">Great for quick questions</div>
                             </div>
                             <div class="model-item" onclick="selectModel('gemma-3-12b')">
                                 <div class="model-item-name">Gemma 3 12B <span class="model-speed-badge">⚡ Fast</span></div>
-                                <div class="model-item-desc">~1-3 seconds • Balanced performance</div>
+                                <div class="model-item-desc">Balanced performance</div>
                             </div>
                             <div class="model-item" onclick="selectModel('gemma-3-27b')">
                                 <div class="model-item-name">Gemma 3 27B <span class="model-speed-badge">🧠 Smartest</span></div>
-                                <div class="model-item-desc">~2-5 seconds • Maximum intelligence</div>
+                                <div class="model-item-desc">Maximum intelligence</div>
                             </div>
                             <div class="model-item" onclick="selectModel('medgemma-3-4b')">
                                 <div class="model-item-name">MedGemma 3 4B <span style="background: #ef4444;" class="model-speed-badge">🏥 Medical</span></div>
-                                <div class="model-item-desc">~1-2 seconds • Healthcare specialist</div>
+                                <div class="model-item-desc">Healthcare specialist</div>
                             </div>
                         </div>
                     </div>
@@ -406,12 +408,12 @@
         let conversationHistory = [];
         let abortController = null;
         
-        // Model display names and speeds
+        // Model display names and labels
         const MODEL_INFO = {
-            'gemma-3-4b': { name: 'Gemma 3 4B', speed: '~1-2s', badge: '⚡ Fastest' },
-            'gemma-3-12b': { name: 'Gemma 3 12B', speed: '~1-3s', badge: '⚡ Fast' },
-            'gemma-3-27b': { name: 'Gemma 3 27B', speed: '~2-5s', badge: '🧠 Smartest' },
-            'medgemma-3-4b': { name: 'MedGemma 3 4B', speed: '~1-2s', badge: '🏥 Medical' }
+            'gemma-3-4b': { name: 'Gemma 3 4B', label: 'Fastest', badge: '⚡ Fastest' },
+            'gemma-3-12b': { name: 'Gemma 3 12B', label: 'Fast', badge: '⚡ Fast' },
+            'gemma-3-27b': { name: 'Gemma 3 27B', label: 'Smartest', badge: '🧠 Smartest' },
+            'medgemma-3-4b': { name: 'MedGemma 3 4B', label: 'Medical', badge: '🏥 Medical' }
         };
         
         // ============================================
@@ -458,7 +460,7 @@
             const button = document.getElementById('modelButton');
             const speedBadge = button.querySelector('.model-speed-badge');
             if (speedBadge) {
-                speedBadge.textContent = `⚡ ${info.speed}`;
+                speedBadge.textContent = info.badge;
             }
             
             // Update selected state
