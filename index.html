@@ -90,6 +90,16 @@
             display: none !important;
         }
         
+        /* Disabled model item styling */
+        .model-item-disabled {
+            cursor: pointer;
+            background: rgba(107, 114, 128, 0.1) !important;
+        }
+        
+        .model-item-disabled:hover {
+            background: rgba(107, 114, 128, 0.2) !important;
+        }
+        
         /* Adjust messages padding for online version */
         .messages {
             padding-right: 24px !important;
@@ -429,8 +439,8 @@
                 <div class="model-selector">
                     <div class="model-helper" id="modelHelper"></div>
                     <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
-                        <span class="model-name" id="selectedModelName">Gemma 3 4B</span>
-                        <span class="model-speed-badge">⚡ Fastest</span>
+                        <span class="model-name" id="selectedModelName">Gemma 3 12B</span>
+                        <span class="model-speed-badge">⚡ Fast</span>
                         <svg viewBox="0 0 16 16" fill="currentColor" style="width: 16px; height: 16px;">
                             <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
                         </svg>
@@ -438,11 +448,11 @@
                     
                     <div class="model-dropdown" id="modelDropdown">
                         <div class="model-list">
-                            <div class="model-item selected" onclick="selectModel('gemma-3-4b')">
+                            <div class="model-item" onclick="selectModel('gemma-3-4b')">
                                 <div class="model-item-name">Gemma 3 4B <span class="model-speed-badge">⚡ Fastest</span></div>
                                 <div class="model-item-desc">Great for quick questions</div>
                             </div>
-                            <div class="model-item" onclick="selectModel('gemma-3-12b')">
+                            <div class="model-item selected" onclick="selectModel('gemma-3-12b')">
                                 <div class="model-item-name">Gemma 3 12B <span class="model-speed-badge">⚡ Fast</span></div>
                                 <div class="model-item-desc">Balanced performance</div>
                             </div>
@@ -450,9 +460,9 @@
                                 <div class="model-item-name">Gemma 3 27B <span class="model-speed-badge">🧠 Smartest</span></div>
                                 <div class="model-item-desc">Maximum intelligence</div>
                             </div>
-                            <div class="model-item" onclick="selectModel('medgemma-3-4b')">
-                                <div class="model-item-name">MedGemma 3 4B <span style="background: #ef4444;" class="model-speed-badge">🏥 Medical</span></div>
-                                <div class="model-item-desc">Healthcare specialist</div>
+                            <div class="model-item model-item-disabled" onclick="showOfflineOnlyAlert()">
+                                <div class="model-item-name" style="opacity: 0.5;">MedGemma 3 4B <span style="background: #6b7280;" class="model-speed-badge">🔒 Offline Only</span></div>
+                                <div class="model-item-desc" style="opacity: 0.5;">Available in USB Version</div>
                             </div>
                         </div>
                     </div>
@@ -472,7 +482,7 @@
         
         // Configuration
         const API_BASE = window.location.origin;
-        let selectedModel = 'gemma-3-4b';
+        let selectedModel = 'gemma-3-12b';
         let isTyping = false;
         let selectedImage = null;
         let conversationHistory = [];
@@ -518,6 +528,17 @@
         function toggleModelDropdown() {
             const dropdown = document.getElementById('modelDropdown');
             dropdown.classList.toggle('open');
+        }
+        
+        function showOfflineOnlyAlert() {
+            // Show alert about MedGemma being offline-only
+            const helper = document.getElementById('modelHelper');
+            helper.innerHTML = '🔒 <strong>MedGemma</strong> is exclusively available in the <a href="https://offgridaitoolkit.com" target="_blank" style="color: #daa520; text-decoration: underline;">USB Offline Version</a>';
+            helper.classList.add('show');
+            setTimeout(() => helper.classList.remove('show'), 5000);
+            
+            // Close dropdown
+            document.getElementById('modelDropdown').classList.remove('open');
         }
         
         function selectModel(model) {
