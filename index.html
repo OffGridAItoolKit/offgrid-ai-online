@@ -445,8 +445,8 @@
                 <div class="model-selector">
                     <div class="model-helper" id="modelHelper"></div>
                     <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
-                        <span class="model-name" id="selectedModelName">Gemma 3 4B</span>
-                        <span class="model-speed-badge">⚡ Fastest</span>
+                        <span class="model-name" id="selectedModelName">Gemma 3 12B</span>
+                        <span class="model-speed-badge">⚡ Fast</span>
                         <svg viewBox="0 0 16 16" fill="currentColor" style="width: 16px; height: 16px;">
                             <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
                         </svg>
@@ -454,11 +454,11 @@
                     
                     <div class="model-dropdown" id="modelDropdown">
                         <div class="model-list">
-                            <div class="model-item selected" onclick="selectModel('gemma-3-4b')">
+                            <div class="model-item" onclick="selectModel('gemma-3-4b')">
                                 <div class="model-item-name">Gemma 3 4B <span class="model-speed-badge">⚡ Fastest</span></div>
                                 <div class="model-item-desc">Great for quick questions</div>
                             </div>
-                            <div class="model-item" onclick="selectModel('gemma-3-12b')">
+                            <div class="model-item selected" onclick="selectModel('gemma-3-12b')">
                                 <div class="model-item-name">Gemma 3 12B <span class="model-speed-badge">⚡ Fast</span></div>
                                 <div class="model-item-desc">Balanced performance</div>
                             </div>
@@ -488,7 +488,7 @@
         
         // Configuration
         const API_BASE = window.location.origin;
-        let selectedModel = 'gemma-3-4b';
+        let selectedModel = 'gemma-3-12b';
         let isTyping = false;
         let selectedImage = null;
         let conversationHistory = [];
