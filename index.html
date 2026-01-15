@@ -101,6 +101,16 @@
             font-weight: 600;
         }
         
+        /* Disabled model styling */
+        .disabled-model {
+            opacity: 0.5;
+            cursor: not-allowed !important;
+        }
+        
+        .disabled-model:hover {
+            background: transparent !important;
+        }
+        
         /* Hide offline-specific elements */
         #qrContainer, #driveBadge, .desktop-only, #firewallModal, #mobileAccessHelper {
             display: none !important;
@@ -466,9 +476,9 @@
                                 <div class="model-item-name">Gemma 3 27B <span class="model-speed-badge">🧠 Smartest</span></div>
                                 <div class="model-item-desc">Maximum intelligence</div>
                             </div>
-                            <div class="model-item" onclick="selectModel('medgemma-3-4b')">
-                                <div class="model-item-name">MedGemma 3 4B <span style="background: #ef4444;" class="model-speed-badge">🏥 Medical</span></div>
-                                <div class="model-item-desc">Healthcare specialist</div>
+                            <div class="model-item disabled-model" onclick="showOfflineOnlyAlert()">
+                                <div class="model-item-name">MedGemma 3 4B <span style="background: #6b7280;" class="model-speed-badge">🔒 Offline Only</span></div>
+                                <div class="model-item-desc">Available in USB Version</div>
                             </div>
                         </div>
                     </div>
@@ -567,6 +577,15 @@
                 setTimeout(() => helper.classList.remove('show'), 3000);
             }
             
+            toggleModelDropdown();
+        }
+        
+        // Show alert for offline-only models
+        function showOfflineOnlyAlert() {
+            const helper = document.getElementById('modelHelper');
+            helper.textContent = '🔒 MedGemma is only available in the offline USB version. Get yours at offgridaitoolkit.com!';
+            helper.classList.add('show');
+            setTimeout(() => helper.classList.remove('show'), 4000);
             toggleModelDropdown();
         }
         
