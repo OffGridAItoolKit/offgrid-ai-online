@@ -494,10 +494,17 @@
                 display: none;
             }
             
-            /* Reduce compass icon by 30% on mobile */
+            /* Reduce compass icon by 30% on mobile and reduce margin */
             .welcome-icon {
                 width: 84px !important;
                 height: 84px !important;
+                margin-bottom: 8px !important;
+            }
+            
+            /* Reduce welcome heading margin on mobile */
+            .welcome h2 {
+                margin-top: 0 !important;
+                margin-bottom: 8px !important;
             }
             
             /* Hide desktop quick actions on mobile */
@@ -776,7 +783,7 @@
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
                     <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon" style="width: 120px; height: 120px;">
-                    <h2>Welcome to OffGrid AI ToolKit</h2>
+                    <h2><span class="desktop-only">Welcome to </span>OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
                     <div class="welcome-subtitle"><span class="desktop-only">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</span><span class="mobile-only">⚡ Cloud-Powered • 🔒 No Data Stored</span></div>
                     <div class="feature-badges">
