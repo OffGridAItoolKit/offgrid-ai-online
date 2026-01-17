@@ -309,7 +309,7 @@
         
         .info-content p {
             margin: 12px 0;
-            color: #f5e6d3;
+            color: #f5f0e8;
         }
         
         .info-content ul {
@@ -319,7 +319,7 @@
         
         .info-content li {
             margin: 8px 0;
-            color: #deb887;
+            color: #f0e6d6;
         }
         
         .info-content strong {
@@ -419,7 +419,7 @@
         .info-content .use-case-item p {
             margin: 0;
             font-size: 0.95em;
-            color: #deb887;
+            color: #f0e6d6;
         }
         
         .info-content .benchmark-table {
@@ -440,7 +440,7 @@
         .info-content .benchmark-table td {
             padding: 10px;
             border-bottom: 1px solid rgba(184, 134, 11, 0.1);
-            color: #deb887;
+            color: #f0e6d6;
         }
         
         .info-content .benchmark-table tr:hover {
@@ -788,43 +788,41 @@
                 title: "How OffGrid AI Works",
                 content: `
                     <div class="info-content">
-                        <h3>⚡ Simple & Powerful</h3>
-                        <p>OffGrid AI ToolKit is a complete AI system that runs entirely from a USB drive. No installation, no internet required, and your conversations never leave your computer.</p>
+                        <h3>🔧 The Technology Behind OffGrid AI</h3>
+                        <p>OffGrid AI ToolKit represents a breakthrough in portable AI - a complete artificial intelligence system running entirely from a USB flash drive. Here's what makes it work:</p>
+                        
+                        <h3>🧠 Gemma 3: Google's Latest Open-Source AI</h3>
+                        <p>We chose <strong>Google's Gemma 3 models</strong> after extensive testing against 15+ model families. Gemma 3 offers the best combination of intelligence, speed, and multimodal capabilities for offline use. These are the same models powering this online demo.</p>
                         
                         <div class="highlight-box">
-                            <strong>3 Simple Steps:</strong>
-                            <ol>
-                                <li><strong>Plug in</strong> the USB 3.2 flash drive to any Windows computer</li>
-                                <li><strong>Double-click</strong> one file (Launch OffGrid AI ToolKit.exe)</li>
-                                <li><strong>Start chatting</strong> with your private AI assistant</li>
-                            </ol>
+                            <strong>Technical Stack:</strong>
+                            <ul>
+                                <li><strong>AI Models:</strong> Gemma 3 (4B, 12B, 27B) + MedGemma - 31GB of optimized AI</li>
+                                <li><strong>Inference Engine:</strong> Ollama - local AI processing with zero cloud dependency</li>
+                                <li><strong>Interface:</strong> Electron app with dynamic path resolution for any USB drive letter</li>
+                                <li><strong>Web Server:</strong> Caddy - zero-config server enabling mobile access</li>
+                            </ul>
                         </div>
                         
-                        <h3>🔒 Complete Privacy</h3>
-                        <p>Your conversations, questions, and data stay on YOUR device. Nothing is sent to corporate servers, nothing is tracked, and there's no digital footprint. When you unplug the USB, it's like the AI was never there.</p>
+                        <h3>👁️ Multimodal Vision Capabilities</h3>
+                        <p>Unlike text-only AI, Gemma 3 can <strong>analyze images</strong> - identify plants and animals, diagnose vehicle issues from dashboard photos, read technical diagrams, and assess medical conditions. The image processing pipeline automatically optimizes photos (12MP → 200KB) for 10x faster inference without quality loss.</p>
                         
-                        <h3>🧠 Multiple AI Models</h3>
-                        <p>The toolkit includes different Gemma 3 models you can switch between:</p>
-                        <ul>
-                            <li><strong>4B Model:</strong> Quick answers for basic queries</li>
-                            <li><strong>12B Model:</strong> Perfect balance of speed and intelligence</li>
-                            <li><strong>27B Model:</strong> Maximum reasoning for complex scenarios</li>
-                            <li><strong>MedGemma:</strong> Specialized medical knowledge (USB version only)</li>
-                        </ul>
+                        <h3>📱 Mobile-Desktop Bridge Architecture</h3>
+                        <p>A clever engineering solution: your <strong>computer handles the heavy AI processing</strong> (requiring 6-32GB RAM), while your <strong>phone becomes a wireless interface</strong> via local WiFi. Scan a QR code and access the AI from your phone's browser - no internet required, just local network.</p>
                         
-                        <h3>👁️ Vision Capabilities</h3>
-                        <p>Upload images and the AI will analyze them - identify plants, animals, diagnose vehicle issues, read technical diagrams, and more. Perfect for field use.</p>
+                        <h3>🔒 Zero-Installation Privacy</h3>
+                        <p>The entire system uses <strong>dynamic environment configuration</strong> - no registry entries, no system files, no traces left behind. When you unplug the USB, it's like the AI was never there. Your conversations stay on YOUR device.</p>
                         
-                        <h3>📱 Mobile Access</h3>
-                        <p>Connect your phone to the same WiFi, scan a QR code, and access the AI from your phone's browser. Your phone becomes the interface while your computer does the processing.</p>
+                        <h3>📚 500+ Ready-Made Prompts</h3>
+                        <p>We developed a <strong>click-to-prompt system</strong> with 500+ field-tested prompts for survival, medical, technical, and educational scenarios. Single-click insertion - no typing required.</p>
                         
                         <div class="cta-box">
-                            <h4>🛒 Want Complete Offline Privacy?</h4>
-                            <p>Get the USB version for 100% offline operation with no internet required.</p>
+                            <h4>🛒 Experience True Technological Independence</h4>
+                            <p>Get the USB version for 100% offline operation - no internet, no subscriptions, no surveillance.</p>
                             <a href="https://offgridaitoolkit.com" target="_blank" class="cta-button">Get the USB Version →</a>
                         </div>
                         
-                        <p class="continue-prompt">💬 Have questions? Just ask in the chat below!</p>
+                        <p class="continue-prompt">🧪 Try it now - ask about water purification, shelter building, or upload an image!</p>
                     </div>
                 `
             },
@@ -833,55 +831,75 @@
                 content: `
                     <div class="info-content">
                         <h3>🎯 Real-World Applications</h3>
-                        <p>OffGrid AI ToolKit is designed for people who need reliable AI assistance anywhere, anytime - even without internet.</p>
+                        <p>OffGrid AI ToolKit is designed for people who need reliable AI assistance anywhere, anytime - even without internet. Here are the communities we serve:</p>
                         
                         <div class="use-case-item">
-                            <h4>🏕️ Overlanders & Adventurers</h4>
-                            <p>Vehicle diagnostics from dashboard photos, wildlife tracking, gear optimization, weather pattern analysis, and emergency navigation assistance.</p>
+                            <h4>🚐 Overlanders & Adventurers</h4>
+                            <p><strong>Scenario:</strong> You're 50 miles from the nearest town when your engine starts overheating. No cell service, no mechanic - just you and the desert.</p>
+                            <p style="margin-top: 8px;"><strong>Try these prompts:</strong></p>
+                            <ul>
+                                <li>"What should I check if my engine is overheating in the desert?"</li>
+                                <li>"Create a 7-day meal plan using only non-refrigerated ingredients"</li>
+                            </ul>
                         </div>
                         
                         <div class="use-case-item">
                             <h4>🌲 Survivalists & Preppers</h4>
-                            <p>Water procurement strategies, plant/mushroom identification, shelter construction guides, food preservation methods, and emergency planning.</p>
+                            <p><strong>Scenario:</strong> Grid's down, stores are empty, and you need to make decisions about water, food, and shelter with no outside help.</p>
+                            <p style="margin-top: 8px;"><strong>Try these prompts:</strong></p>
+                            <ul>
+                                <li>"What are 3 ways to purify water without electricity?"</li>
+                                <li>"How do I build a debris shelter that stays warm overnight?"</li>
+                            </ul>
                         </div>
                         
                         <div class="use-case-item">
-                            <h4>🏥 Healthcare Professionals</h4>
-                            <p>Clinical documentation assistance, multi-lingual patient instructions, wound assessment documentation, drug interaction checks, and training materials.</p>
+                            <h4>⚕️ Healthcare & First Responders</h4>
+                            <p><strong>Scenario:</strong> Remote clinic, limited supplies, and a patient presenting symptoms you need to assess quickly and accurately.</p>
+                            <p style="margin-top: 8px;"><strong>Try these prompts:</strong></p>
+                            <ul>
+                                <li>"What signs indicate a wound is becoming seriously infected?"</li>
+                                <li>"How do you safely remove a tick and treat the bite?"</li>
+                            </ul>
                         </div>
                         
                         <div class="use-case-item">
                             <h4>🔧 Trades & Technical Work</h4>
-                            <p>Diagnostic support, code compliance reference, parts identification from photos, complex calculations, and safety protocol guidance.</p>
+                            <p><strong>Scenario:</strong> You're on a job site with no internet, facing an electrical issue that needs code-compliant resolution.</p>
+                            <p style="margin-top: 8px;"><strong>Try these prompts:</strong></p>
+                            <ul>
+                                <li>"What's the proper wire gauge for a 30-amp circuit at 50 feet?"</li>
+                                <li>"Explain the difference between series and parallel wiring"</li>
+                            </ul>
                         </div>
                         
                         <div class="use-case-item">
                             <h4>🌍 Field Researchers & NGOs</h4>
-                            <p>Data pattern analysis, species identification, report generation, cultural translation, and resource mapping in remote locations.</p>
+                            <p><strong>Scenario:</strong> Remote location, no connectivity, and you need to identify species, analyze data, or generate reports.</p>
+                            <p style="margin-top: 8px;"><strong>Try these prompts:</strong></p>
+                            <ul>
+                                <li>"What factors should I consider when choosing a water sampling location?"</li>
+                                <li>"Create a simple data collection template for wildlife observations"</li>
+                            </ul>
                         </div>
                         
                         <div class="use-case-item">
                             <h4>👨‍🏫 Remote Educators</h4>
-                            <p>Lesson planning without internet, hands-on science activities, curriculum development, and educational content creation.</p>
-                        </div>
-                        
-                        <div class="highlight-box">
-                            <strong>Perfect for anyone who:</strong>
+                            <p><strong>Scenario:</strong> Teaching in an area without reliable internet, needing to create engaging lessons with limited resources.</p>
+                            <p style="margin-top: 8px;"><strong>Try these prompts:</strong></p>
                             <ul>
-                                <li>Works in areas with unreliable internet</li>
-                                <li>Values complete privacy and data control</li>
-                                <li>Needs AI assistance in emergency situations</li>
-                                <li>Wants to own their AI tools without subscriptions</li>
+                                <li>"Create a hands-on science lesson about water cycles using outdoor materials"</li>
+                                <li>"Explain photosynthesis in a way a 10-year-old would understand"</li>
                             </ul>
                         </div>
                         
                         <div class="cta-box">
                             <h4>🛒 Ready to Go Off-Grid?</h4>
-                            <p>Get the USB version for complete offline capability.</p>
+                            <p>Get the USB version for complete offline capability - works anywhere, anytime.</p>
                             <a href="https://offgridaitoolkit.com" target="_blank" class="cta-button">Purchase USB Version →</a>
                         </div>
                         
-                        <p class="continue-prompt">💬 Tell me about your use case and I'll show you how OffGrid AI can help!</p>
+                        <p class="continue-prompt">🧪 Try any of the prompts above, or ask your own survival question!</p>
                     </div>
                 `
             },
@@ -890,13 +908,17 @@
                 content: `
                     <div class="info-content">
                         <h3>📊 Why We Chose Gemma 3</h3>
-                        <p>We tested 15+ model families with 300+ survival-focused prompts. Standard benchmarks don't test what matters for real-world survival situations, so we built our own rigorous testing methodology.</p>
+                        <p>We tested <strong>15+ model families with 300+ survival-focused prompts</strong>. Standard AI benchmarks test academic knowledge - they don't measure what matters for real-world survival situations. So we built our own rigorous testing methodology.</p>
+                        
+                        <h3>👁️ Multimodal Was Essential</h3>
+                        <p>A key requirement was <strong>vision capabilities</strong> - the ability to analyze images. Many powerful models are text-only. Gemma 3 offers full multimodal support, enabling plant identification, wound assessment, vehicle diagnostics from photos, and more. This was a deciding factor.</p>
                         
                         <div class="highlight-box">
                             <strong>Our Testing Categories:</strong>
                             <ul>
-                                <li><strong>Survival & Emergency Knowledge:</strong> Water purification, shelter building, navigation, first aid</li>
-                                <li><strong>Intelligence & Problem Solving:</strong> Logic puzzles, adaptive reasoning, scenario analysis</li>
+                                <li><strong>Survival & Emergency Knowledge:</strong> Water purification, shelter building, navigation, first aid, food preservation</li>
+                                <li><strong>Intelligence & Problem Solving:</strong> Logic puzzles, adaptive reasoning, scenario analysis, multi-step planning</li>
+                                <li><strong>Practical Application:</strong> Real-world scenarios where accuracy can mean the difference between safety and danger</li>
                             </ul>
                         </div>
                         
@@ -932,27 +954,33 @@
                                 <td>9.0/10</td>
                                 <td>9.16</td>
                             </tr>
+                            <tr>
+                                <td>Llama 3.2 11b</td>
+                                <td>8.8/10</td>
+                                <td>8.7/10</td>
+                                <td>8.75</td>
+                            </tr>
                         </table>
                         
-                        <h3>🔬 Key Finding</h3>
-                        <p><strong>Gemma models consistently outperformed all others</strong> for real-world applications. They're not just regurgitating facts - they're thinking through scenarios and adapting to unique situations.</p>
+                        <h3>🔬 Key Findings</h3>
+                        <p><strong>Gemma models consistently outperformed all others</strong> for real-world survival applications. They don't just regurgitate facts - they think through scenarios, adapt to unique situations, and provide actionable guidance. The combination of accuracy, reasoning ability, and multimodal vision made Gemma 3 the clear choice.</p>
                         
-                        <h3>✅ What We Test For</h3>
+                        <h3>✅ What We Tested For</h3>
                         <ul>
-                            <li><strong>Accuracy:</strong> Factually correct information</li>
-                            <li><strong>Reasoning:</strong> Logical problem-solving ability</li>
-                            <li><strong>Clarity:</strong> Easy to understand responses</li>
+                            <li><strong>Accuracy:</strong> Factually correct, potentially life-saving information</li>
+                            <li><strong>Reasoning:</strong> Logical problem-solving and adaptive thinking</li>
+                            <li><strong>Clarity:</strong> Easy to understand under stress</li>
                             <li><strong>Safety:</strong> Appropriate warnings and disclaimers</li>
-                            <li><strong>Offline Fit:</strong> Works well without internet context</li>
+                            <li><strong>Offline Fit:</strong> Works well without internet context or real-time data</li>
                         </ul>
                         
                         <div class="cta-box">
                             <h4>🛒 Experience the Difference</h4>
-                            <p>Try the same models that topped our benchmarks.</p>
+                            <p>Try the same models that topped our benchmarks - now available offline.</p>
                             <a href="https://offgridaitoolkit.com" target="_blank" class="cta-button">Get the USB Version →</a>
                         </div>
                         
-                        <p class="continue-prompt">💬 Want to test the AI yourself? Ask me a survival question!</p>
+                        <p class="continue-prompt">🧪 Test it yourself - ask about wilderness first aid, shelter building, or water purification!</p>
                     </div>
                 `
             },
@@ -961,34 +989,38 @@
                 content: `
                     <div class="info-content">
                         <h3>🧠 Model Selection Guide</h3>
-                        <p>OffGrid AI includes multiple Gemma 3 models. Each has different strengths - here's how to choose:</p>
+                        <p>OffGrid AI includes multiple Gemma 3 models optimized for different use cases. Each has different strengths - here's how to choose:</p>
                         
                         <div class="model-card">
                             <h4>Gemma 3 4B <span class="badge badge-fast">⚡ Fastest</span></h4>
                             <p><strong>Best for:</strong> Quick questions, simple lookups, basic guidance</p>
-                            <p><strong>Speed:</strong> 2-5 seconds response time</p>
+                            <p><strong>Speed:</strong> 2-5 seconds response time (online) | 30-90 seconds (USB)</p>
+                            <p><strong>RAM Required:</strong> 6-8GB</p>
                             <p><strong>Use when:</strong> You need fast answers and don't require deep analysis</p>
                         </div>
                         
                         <div class="model-card">
                             <h4>Gemma 3 12B <span class="badge badge-fast">⚡ Fast</span> <span class="badge badge-smart">🎯 Recommended</span></h4>
                             <p><strong>Best for:</strong> Most tasks - perfect balance of speed and intelligence</p>
-                            <p><strong>Speed:</strong> 5-15 seconds response time</p>
+                            <p><strong>Speed:</strong> 5-15 seconds response time (online) | 2-3 minutes (USB)</p>
+                            <p><strong>RAM Required:</strong> 12-16GB</p>
                             <p><strong>Use when:</strong> You want reliable, thorough answers without long waits</p>
                         </div>
                         
                         <div class="model-card">
                             <h4>Gemma 3 27B <span class="badge badge-smart">🧠 Smartest</span></h4>
                             <p><strong>Best for:</strong> Complex scenarios, detailed analysis, critical decisions</p>
-                            <p><strong>Speed:</strong> 15-45 seconds response time</p>
-                            <p><strong>Use when:</strong> Accuracy matters more than speed</p>
+                            <p><strong>Speed:</strong> 15-45 seconds response time (online) | ~10 minutes (USB)</p>
+                            <p><strong>RAM Required:</strong> 32GB+</p>
+                            <p><strong>Use when:</strong> Accuracy matters more than speed - life-or-death decisions</p>
                         </div>
                         
-                        <div class="model-card">
-                            <h4>MedGemma 4B <span class="badge badge-medical">🏥 Medical</span></h4>
+                        <div class="model-card" style="border-color: #ef4444; background: rgba(239, 68, 68, 0.1);">
+                            <h4>MedGemma 4B <span class="badge badge-medical">🏥 Medical</span> <span class="badge" style="background: #6b7280; color: white;">USB Only</span></h4>
                             <p><strong>Best for:</strong> Health questions, medical image analysis, clinical documentation</p>
-                            <p><strong>Note:</strong> Available only in the USB version for complete privacy</p>
-                            <p><strong>Use when:</strong> You need medical-specific knowledge and guidance</p>
+                            <p><strong>Speed:</strong> 30-90 seconds (USB only)</p>
+                            <p><strong>RAM Required:</strong> 6-8GB</p>
+                            <p><strong>⚠️ Note:</strong> MedGemma is <strong>only available in the USB version</strong> to ensure complete privacy for sensitive medical queries. Not available in this online demo.</p>
                         </div>
                         
                         <div class="highlight-box">
@@ -996,15 +1028,15 @@
                         </div>
                         
                         <h3>🔄 Easy Model Switching</h3>
-                        <p>You can switch models anytime using the dropdown at the bottom of the chat. Your conversation continues seamlessly.</p>
+                        <p>You can switch models anytime using the dropdown at the bottom of the chat. Your conversation continues seamlessly - try switching mid-conversation to compare responses.</p>
                         
                         <div class="cta-box">
                             <h4>🛒 Get All Models + MedGemma</h4>
-                            <p>The USB version includes all models plus the medical-specialized MedGemma.</p>
+                            <p>The USB version includes all models plus the medical-specialized MedGemma for complete offline capability.</p>
                             <a href="https://offgridaitoolkit.com" target="_blank" class="cta-button">Purchase USB Version →</a>
                         </div>
                         
-                        <p class="continue-prompt">💬 Try switching models using the dropdown below and see the difference!</p>
+                        <p class="continue-prompt">🧪 Try the 12B model now - ask about emergency preparedness or survival skills!</p>
                     </div>
                 `
             }
