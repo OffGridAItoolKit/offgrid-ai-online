@@ -237,8 +237,8 @@
         }
         
         .prompt-item:hover {
-            background: rgba(184, 134, 11, 0.15);
-            color: #1a0f05;
+            background: rgba(45, 24, 16, 0.85);
+            color: #ffffff;
         }
         
         .prompt-item-image {
@@ -459,6 +459,25 @@
             margin-top: 20px;
             padding-top: 16px;
             border-top: 1px solid rgba(184, 134, 11, 0.2);
+        }
+        
+        .info-content .clear-chat-info-btn {
+            display: inline-block;
+            background: transparent;
+            color: #b8860b;
+            border: 2px solid #b8860b;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 16px;
+            text-decoration: none;
+        }
+        
+        .info-content .clear-chat-info-btn:hover {
+            background: #b8860b;
+            color: #1a0f05;
         }
     </style>
 </head>
@@ -829,6 +848,7 @@
                         </div>
                         
                         <p class="continue-prompt">🧪 Try it now - ask about water purification, shelter building, or upload an image!</p>
+                        <button class="clear-chat-info-btn" onclick="clearChat()">📋 Clear Chat / Return Home</button>
                     </div>
                 `
             },
@@ -906,6 +926,7 @@
                         </div>
                         
                         <p class="continue-prompt">🧪 Try any of the prompts above, or ask your own survival question!</p>
+                        <button class="clear-chat-info-btn" onclick="clearChat()">📋 Clear Chat / Return Home</button>
                     </div>
                 `
             },
@@ -987,6 +1008,7 @@
                         </div>
                         
                         <p class="continue-prompt">🧪 Test it yourself - ask about wilderness first aid, shelter building, or water purification!</p>
+                        <button class="clear-chat-info-btn" onclick="clearChat()">📋 Clear Chat / Return Home</button>
                     </div>
                 `
             },
@@ -1043,6 +1065,7 @@
                         </div>
                         
                         <p class="continue-prompt">🧪 Try the 12B model now - ask about emergency preparedness or survival skills!</p>
+                        <button class="clear-chat-info-btn" onclick="clearChat()">📋 Clear Chat / Return Home</button>
                     </div>
                 `
             }
