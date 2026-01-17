@@ -479,6 +479,126 @@
             background: #b8860b;
             color: #1a0f05;
         }
+        
+        /* ============================================
+           MOBILE RESPONSIVE STYLES
+           ============================================ */
+        @media (max-width: 768px) {
+            /* Hide ONLINE badge in header on mobile */
+            .header .online-badge {
+                display: none;
+            }
+            
+            /* Hide status text, show only dot on mobile */
+            .status-text {
+                display: none;
+            }
+            
+            /* Reduce compass icon by 30% on mobile */
+            .welcome-icon {
+                width: 84px !important;
+                height: 84px !important;
+            }
+            
+            /* Hide desktop quick actions on mobile */
+            .desktop-quick-actions {
+                display: none !important;
+            }
+            
+            /* Show mobile quick actions */
+            .mobile-quick-actions {
+                display: flex !important;
+                flex-direction: column;
+                gap: 12px;
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .mobile-quick-actions .quick-action {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 16px;
+                background: rgba(218, 165, 32, 0.08);
+                border: 1px solid rgba(218, 165, 32, 0.3);
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            
+            .mobile-quick-actions .quick-action:hover {
+                background: rgba(218, 165, 32, 0.15);
+                border-color: #daa520;
+            }
+            
+            .mobile-quick-actions .quick-action-icon {
+                font-size: 32px;
+                width: 48px;
+                height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(218, 165, 32, 0.1);
+                border-radius: 10px;
+            }
+            
+            .mobile-quick-actions .quick-action-content {
+                text-align: left;
+            }
+            
+            .mobile-quick-actions .quick-action-title {
+                font-weight: 600;
+                color: #2d1810;
+                font-size: 16px;
+            }
+            
+            .mobile-quick-actions .quick-action-desc {
+                color: #6b5c4a;
+                font-size: 13px;
+            }
+            
+            /* Adjust header padding on mobile */
+            .header {
+                padding: 8px 12px;
+            }
+            
+            /* Make purchase CTA smaller on mobile */
+            .purchase-cta {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            /* Welcome title smaller on mobile */
+            .welcome h2 {
+                font-size: 1.4rem;
+            }
+            
+            /* Welcome subtitle adjustments */
+            .welcome-subtitle {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Hide mobile quick actions on desktop */
+        @media (min-width: 769px) {
+            .mobile-quick-actions {
+                display: none !important;
+            }
+            .mobile-only {
+                display: none !important;
+            }
+        }
+        
+        /* Mobile visibility classes */
+        @media (max-width: 768px) {
+            .desktop-only {
+                display: none !important;
+            }
+            .mobile-only {
+                display: inline !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -658,7 +778,7 @@
                     <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon" style="width: 120px; height: 120px;">
                     <h2>Welcome to OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
-                    <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</div>
+                    <div class="welcome-subtitle"><span class="desktop-only">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</span><span class="mobile-only">⚡ Cloud-Powered • 🔒 No Data Stored</span></div>
                     <div class="feature-badges">
                         <div class="feature-badge">👁️ Vision</div>
                         <div class="feature-badge">⚡ Fast</div>
