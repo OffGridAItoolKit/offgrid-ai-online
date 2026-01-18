@@ -24,6 +24,7 @@
     <link rel="icon" type="image/png" href="compasstilted.png">
     <link rel="stylesheet" href="offgridai.css?v=2.0">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <style>
         /* Online Version Specific Styles */
         .online-badge {
@@ -481,9 +482,51 @@
         }
         
         /* ============================================
+           QR CODE STYLES
+           ============================================ */
+        .qr-code-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #faf8f5;
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .qr-code-container canvas {
+            display: block;
+            margin: 0 auto 8px auto;
+        }
+        
+        .qr-code-label {
+            font-size: 12px;
+            color: #2d1810;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .qr-code-label::before {
+            content: '📱 ';
+        }
+        
+        .qr-code-url {
+            font-size: 10px;
+            color: #6b5c4a;
+        }
+        
+        /* ============================================
            MOBILE RESPONSIVE STYLES
            ============================================ */
         @media (max-width: 768px) {
+            /* Hide QR code on mobile */
+            .qr-code-container {
+                display: none !important;
+            }
+            
             /* Hide ONLINE badge in header on mobile */
             .header .online-badge {
                 display: none;
@@ -777,6 +820,13 @@
                     <span style="font-size: 11px; font-weight: 400;">100% Offline • Complete Privacy</span>
                 </a>
             </div>
+        </div>
+
+        <!-- QR Code for Mobile Access -->
+        <div class="qr-code-container" id="qrCodeContainer">
+            <canvas id="qrCode"></canvas>
+            <div class="qr-code-label">Scan for mobile</div>
+            <div class="qr-code-url">https://offgridtoolkit.ai/</div>
         </div>
 
         <div class="chat-container">
@@ -1786,6 +1836,24 @@
             // Initialize connection check
             checkConnection();
             setInterval(checkConnection, 10000);
+            
+            // Generate QR Code for mobile access
+            if (typeof QRCode !== 'undefined') {
+                const qrCanvas = document.getElementById('qrCode');
+                if (qrCanvas) {
+                    QRCode.toCanvas(qrCanvas, 'https://offgridtoolkit.ai/', {
+                        width: 120,
+                        margin: 1,
+                        color: {
+                            dark: '#2d1810',
+                            light: '#faf8f5'
+                        }
+                    }, function (error) {
+                        if (error) console.error('QR Code generation error:', error);
+                        else console.log('QR Code generated successfully');
+                    });
+                }
+            }
             
             // Focus input
             document.getElementById('messageInput').focus();
