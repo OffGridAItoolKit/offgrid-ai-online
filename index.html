@@ -1321,7 +1321,7 @@
         
         function toggleModelDropdown() {
             const dropdown = document.getElementById('modelDropdown');
-            dropdown.classList.toggle('show');
+            dropdown.classList.toggle('open');
         }
         
         function selectModel(model) {
@@ -1361,7 +1361,7 @@
             const button = document.getElementById('modelButton');
             
             if (!button.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.remove('show');
+                dropdown.classList.remove('open');
             }
         });
         
