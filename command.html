@@ -143,14 +143,7 @@
             box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
         }
 
-        .welcome-description {
-            color: #6b4423;
-            font-size: 14px;
-            font-weight: 500;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            max-width: 540px;
-        }
+        /* welcome-description removed - info moved to command-banner */
 
         /* Command Council compact banner */
         .command-banner {
@@ -158,8 +151,8 @@
             border: 1px solid #b8860b;
             border-radius: 12px;
             padding: 14px 24px;
-            margin-bottom: 8px;
-            max-width: 540px;
+            margin-bottom: 0;
+            max-width: 620px;
             width: 100%;
             cursor: pointer;
             transition: all 0.2s;
@@ -188,7 +181,8 @@
         .welcome-input-area {
             width: 100%;
             max-width: 620px;
-            margin-top: 20px;
+            margin-top: 10px;
+            margin-bottom: 16px;
         }
 
         .welcome-input-area .input-container {
@@ -206,10 +200,10 @@
             gap: 8px;
             width: 100%;
             padding: 10px 14px;
-            background: rgba(184, 134, 11, 0.1);
-            border: 1px solid rgba(184, 134, 11, 0.25);
-            border-radius: 8px;
-            color: #deb887;
+            background: white;
+            border: 1px solid #b8860b;
+            border-radius: 6px;
+            color: #2c1810;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
@@ -218,9 +212,8 @@
         }
 
         .new-chat-btn:hover {
-            background: rgba(184, 134, 11, 0.2);
+            background: #f9fafb;
             border-color: #daa520;
-            color: #daa520;
         }
 
         .new-chat-btn svg {
@@ -867,7 +860,7 @@
             margin-bottom: 4px;
             cursor: pointer;
             font-size: 11px;
-            color: #deb887;
+            color: #2c1810;
             transition: all 0.2s;
             line-height: 1.4;
         }
@@ -1487,7 +1480,6 @@
                         <div class="roster-item-desc">Creative solutions. Unconventional thinking and rapid problem-solving.</div>
                     </div>
                 </div>
-                <div class="roster-footer">In Command mode, all 4 models compete. A Chairman is elected per query through anonymous peer review.</div>
             </div>
 
             <div class="sidebar-section">
@@ -1512,14 +1504,6 @@
                         <div class="feature-badge" onclick="selectModelAndFocus('navigator')">🧭 Navigator</div>
                         <div class="feature-badge" onclick="selectModelAndFocus('ranger')">🏕️ Ranger</div>
                     </div>
-                    <p class="welcome-description">Choose a single model or use <strong>Command mode</strong> for a peer-reviewed council consensus. Each query triggers anonymous scoring and the highest-ranked model becomes Chairman.</p>
-
-                    <!-- Command Council banner (desktop) -->
-                    <div class="command-banner desktop-only" onclick="selectModelAndFocus('command')">
-                        <div class="command-banner-title">⭐ Command • Chairman Council</div>
-                        <div class="command-banner-desc">All 4 models answer → anonymous peer review → Chairman elected → best answer synthesized</div>
-                    </div>
-
                     <!-- Inline Input Area (shown on welcome screen, centered) -->
                     <div class="welcome-input-area desktop-only" id="welcomeInputArea">
                         <div class="input-container">
@@ -1616,6 +1600,12 @@
                                 <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Command Council banner (desktop, below input) -->
+                    <div class="command-banner desktop-only" onclick="selectModelAndFocus('command')">
+                        <div class="command-banner-title">⭐ Command • Chairman Council</div>
+                        <div class="command-banner-desc">Choose a single model above, or use <strong style="color: #daa520;">Command mode</strong> for a peer-reviewed council consensus. All 4 models answer → anonymous peer review → a Chairman is elected per query → best answer synthesized.</div>
                     </div>
 
                     <!-- Mobile action cards -->
