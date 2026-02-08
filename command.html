@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OffGrid Command Center — Multi-Model AI Council</title>
     <meta name="description" content="OffGrid Command Center: Access GPT-4o, Claude, Gemini, and Grok through one interface. Command mode synthesizes the best answer from all four AI models.">
     
@@ -14,14 +14,422 @@
     <meta property="og:image" content="https://offgridtoolkit.ai/og-image.png">
     
     <link rel="icon" type="image/png" href="compasstilted.png">
-    <link rel="stylesheet" href="offgridai.css?v=3.0">
+    <link rel="stylesheet" href="offgridai.css?v=4.0">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* ============================================
-           COMMAND CENTER SPECIFIC STYLES
+           COMMAND CENTER v2 — REDESIGNED STYLES
            ============================================ */
 
-        /* Premium badge */
+        /* ---- Layout: Centered Chat Column ---- */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #faf8f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar: full height, updated */
+        .sidebar {
+            width: 260px;
+            flex-shrink: 0;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            padding-right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            background: #faf8f5;
+        }
+
+        /* Center the chat content */
+        .message {
+            max-width: 720px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* ---- Welcome Screen: Centered, Clean ---- */
+        .welcome {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .welcome-icon {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 16px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .welcome-icon:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+        .welcome h2 {
+            font-family: 'Inter', sans-serif;
+            font-size: 26px;
+            font-weight: 800;
+            color: #2c1810;
+            margin-bottom: 6px;
+        }
+
+        .welcome-subtitle {
+            color: #daa520;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .feature-badges {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .feature-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #2c1810;
+            color: #daa520;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #b8860b;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feature-badge:hover {
+            background: #3d2216;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+        }
+
+        .welcome-description {
+            color: #6b4423;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            max-width: 540px;
+        }
+
+        /* Command Council compact banner */
+        .command-banner {
+            background: linear-gradient(135deg, #2c1810 0%, #3d2216 100%);
+            border: 1px solid #b8860b;
+            border-radius: 12px;
+            padding: 14px 24px;
+            margin-bottom: 8px;
+            max-width: 540px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .command-banner:hover {
+            border-color: #daa520;
+            box-shadow: 0 4px 16px rgba(184, 134, 11, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .command-banner-title {
+            font-family: 'Black Ops One', cursive;
+            font-size: 14px;
+            color: #daa520;
+            margin-bottom: 4px;
+        }
+
+        .command-banner-desc {
+            font-size: 12px;
+            color: #cd853f;
+            line-height: 1.4;
+        }
+
+        /* ---- Input Area: Modern, Centered, Floating ---- */
+        .input-area {
+            padding: 16px 24px 20px;
+            background: transparent;
+            border-top: none;
+            position: relative;
+        }
+
+        .input-container {
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #ffffff;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 16px;
+            padding: 12px 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(184, 134, 11, 0.08);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-container:focus-within {
+            border-color: #daa520;
+            box-shadow: 0 4px 20px rgba(184, 134, 11, 0.12), 0 0 0 2px rgba(184, 134, 11, 0.1);
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 8px 4px;
+            border: none;
+            border-radius: 0;
+            font-size: 15px;
+            resize: none;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            line-height: 1.5;
+            max-height: 150px;
+            overflow-y: auto;
+            color: #111827;
+        }
+
+        .message-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .message-input:focus {
+            box-shadow: none;
+        }
+
+        /* Plus button (attachment menu) */
+        .attach-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #d1d5db;
+            background: #f9fafb;
+            color: #6b5c4a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .attach-btn:hover {
+            background: #f3f4f6;
+            border-color: #b8860b;
+            color: #b8860b;
+        }
+
+        /* Attachment menu dropdown */
+        .attach-menu {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            background: white;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            z-index: 1000;
+            min-width: 200px;
+        }
+
+        .attach-menu.open {
+            display: block;
+        }
+
+        .attach-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 13px;
+            color: #2c1810;
+            font-weight: 500;
+        }
+
+        .attach-menu-item:hover {
+            background: #faf8f5;
+        }
+
+        .attach-menu-item:not(:last-child) {
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .attach-menu-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Gallery upload button (image icon on right) */
+        .gallery-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .gallery-btn:hover {
+            color: #b8860b;
+        }
+
+        /* Button row */
+        .button-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .button-row-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Model selector */
+        .model-selector {
+            position: relative;
+        }
+
+        .model-button {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            color: #4a3728;
+        }
+
+        .model-button:hover {
+            border-color: #b8860b;
+            background: rgba(184, 134, 11, 0.05);
+        }
+
+        .send-button {
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #daa520 0%, #cd853f 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+        }
+
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Image preview */
+        .image-preview {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 4px;
+        }
+
+        .image-preview.active {
+            display: flex;
+        }
+
+        .preview-image {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .preview-info {
+            flex: 1;
+        }
+
+        .preview-filename {
+            font-size: 13px;
+            font-weight: 500;
+            color: #2c1810;
+        }
+
+        .remove-image {
+            padding: 4px 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* ---- Premium badge ---- */
         .command-badge {
             display: inline-flex;
             align-items: center;
@@ -41,7 +449,6 @@
             content: '⭐';
         }
 
-        /* Override online-badge for Command Center */
         .online-badge {
             display: inline-flex;
             align-items: center;
@@ -85,7 +492,7 @@
             color: #f0c040;
         }
 
-        /* Model indicator colors */
+        /* ---- Model indicator colors ---- */
         .model-indicator {
             display: inline-flex;
             align-items: center;
@@ -102,17 +509,66 @@
         .model-indicator.ranger { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
         .model-indicator.command { background: linear-gradient(135deg, rgba(184, 134, 11, 0.2), rgba(218, 165, 32, 0.2)); color: #daa520; border: 1px solid rgba(184, 134, 11, 0.3); }
 
-        /* Model item colors in dropdown */
+        /* Model dropdown items */
+        .model-dropdown {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            right: auto;
+            min-width: 280px;
+            background: white;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            display: none;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .model-dropdown.open {
+            display: block;
+        }
+
+        .model-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .model-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .model-item:hover {
+            background: #faf8f5;
+        }
+
+        .model-item.selected {
+            background: linear-gradient(135deg, #faf8f5 0%, #f5e6d3 100%);
+        }
+
         .model-item.scout-item:hover, .model-item.scout-item.selected { border-left: 3px solid #3b82f6; }
         .model-item.medic-item:hover, .model-item.medic-item.selected { border-left: 3px solid #ef4444; }
         .model-item.navigator-item:hover, .model-item.navigator-item.selected { border-left: 3px solid #10b981; }
         .model-item.ranger-item:hover, .model-item.ranger-item.selected { border-left: 3px solid #a855f7; }
         .model-item.command-item:hover, .model-item.command-item.selected { border-left: 3px solid #daa520; background: linear-gradient(135deg, #faf8f5 0%, #f5e6d3 100%); }
 
-        /* Command mode special styling */
         .model-item.command-item {
             background: linear-gradient(135deg, rgba(184, 134, 11, 0.05) 0%, rgba(218, 165, 32, 0.08) 100%);
             border-top: 2px solid rgba(184, 134, 11, 0.2);
+        }
+
+        .model-item-name {
+            font-weight: 500;
+            color: #2c1810;
+            font-size: 13px;
+        }
+
+        .model-item-desc {
+            font-size: 11px;
+            color: #6b4423;
         }
 
         .model-item-badge {
@@ -132,7 +588,16 @@
         .badge-ranger { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
         .badge-command { background: linear-gradient(135deg, #b8860b, #daa520); color: #1a0f05; }
 
-        /* Response time display */
+        .model-speed-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* ---- Response time ---- */
         .response-time {
             font-size: 11px;
             color: #10b981;
@@ -140,7 +605,7 @@
             margin-bottom: 4px;
         }
 
-        /* Council progress indicator */
+        /* ---- Council progress indicator ---- */
         .council-progress {
             display: flex;
             flex-direction: column;
@@ -149,7 +614,8 @@
             background: linear-gradient(135deg, rgba(44, 24, 16, 0.05), rgba(184, 134, 11, 0.05));
             border: 1px solid rgba(184, 134, 11, 0.2);
             border-radius: 12px;
-            margin: 8px 0;
+            margin: 8px auto;
+            max-width: 720px;
         }
 
         .council-progress-title {
@@ -171,14 +637,8 @@
             transition: all 0.3s ease;
         }
 
-        .council-step.active {
-            color: #2c1810;
-            font-weight: 600;
-        }
-
-        .council-step.complete {
-            color: #10b981;
-        }
+        .council-step.active { color: #2c1810; font-weight: 600; }
+        .council-step.complete { color: #10b981; }
 
         .council-step-icon {
             width: 20px;
@@ -293,215 +753,120 @@
             color: #daa520;
         }
 
-        /* Welcome screen adjustments */
-        .welcome-subtitle {
-            color: #daa520;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        /* Model speed badge override */
-        .model-speed-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        /* Hide offline-specific elements */
-        #qrContainer, #driveBadge, .desktop-only-hide, #firewallModal, #mobileAccessHelper {
-            display: none !important;
-        }
-
-        /* Adjust messages padding */
-        .messages {
-            padding-right: 24px !important;
-        }
-
-        /* Loading overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(44, 24, 16, 0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        /* Model info cards for welcome screen */
-        .model-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        /* ---- Sidebar: Collapsible Prompts ---- */
+        .prompts-toggle {
             width: 100%;
-            max-width: 640px;
-            margin-top: 16px;
-        }
-
-        .model-card-mini {
-            padding: 14px;
             background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .model-card-mini:hover {
-            border-color: #b8860b;
-            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .model-card-mini.card-scout { border-left: 3px solid #3b82f6; }
-        .model-card-mini.card-medic { border-left: 3px solid #ef4444; }
-        .model-card-mini.card-navigator { border-left: 3px solid #10b981; }
-        .model-card-mini.card-ranger { border-left: 3px solid #a855f7; }
-
-        .model-card-mini-icon {
-            font-size: 20px;
+            border: 1px solid #b8860b;
+            border-radius: 6px;
+            padding: 10px 12px;
             margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #2c1810;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-weight: 500;
         }
 
-        .model-card-mini-name {
-            font-weight: 700;
-            font-size: 14px;
+        .prompts-toggle:hover {
+            background: #f9fafb;
+            border-color: #daa520;
+        }
+
+        .prompts-toggle-arrow {
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+
+        .prompts-toggle.open .prompts-toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .prompts-list {
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px 0;
+            scrollbar-width: thin;
+            scrollbar-color: #b8860b transparent;
+        }
+
+        .prompts-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .prompts-list::-webkit-scrollbar-thumb {
+            background-color: #b8860b;
+            border-radius: 2px;
+        }
+
+        .prompts-list.open {
+            display: block;
+        }
+
+        .prompt-item {
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #deb887;
+            transition: all 0.2s;
+            line-height: 1.4;
+        }
+
+        .prompt-item:hover {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: #daa520;
             color: #2c1810;
         }
 
-        .model-card-mini-desc {
+        /* Sidebar model roster — updated descriptions */
+        .roster-item {
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #deb887;
+            margin-bottom: 6px;
+        }
+
+        .roster-item-name {
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .roster-item-desc {
             font-size: 11px;
-            color: #6b5c4a;
+            line-height: 1.3;
             margin-top: 2px;
         }
 
-        /* Command card spans full width */
-        .command-card-full {
-            grid-column: 1 / -1;
-            padding: 16px;
-            background: linear-gradient(135deg, #2c1810 0%, #4a2c1a 100%);
-            border: 2px solid #b8860b;
-            border-radius: 10px;
+        .roster-item.scout { background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); }
+        .roster-item.scout .roster-item-name { color: #3b82f6; }
+        .roster-item.medic { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .roster-item.medic .roster-item-name { color: #ef4444; }
+        .roster-item.navigator { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .roster-item.navigator .roster-item-name { color: #10b981; }
+        .roster-item.ranger { background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); }
+        .roster-item.ranger .roster-item-name { color: #a855f7; }
+
+        .roster-footer {
+            font-size: 10px;
+            color: #8b7355;
+            font-style: italic;
+            margin-top: 8px;
+            line-height: 1.4;
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            color: #daa520;
         }
 
-        .command-card-full:hover {
-            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .command-card-full-title {
-            font-family: 'Black Ops One', 'Inter', sans-serif;
-            font-size: 16px;
-            margin-bottom: 4px;
-        }
-
-        .command-card-full-desc {
-            font-size: 12px;
-            color: #deb887;
-        }
-
-        /* Back to free version link */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: #deb887;
-            font-size: 12px;
-            text-decoration: none;
-            padding: 4px 10px;
-            border-radius: 6px;
-            transition: all 0.2s;
-        }
-
-        .back-link:hover {
-            color: #daa520;
-            background: rgba(184, 134, 11, 0.1);
-        }
-
-        /* ============================================
-           MOBILE RESPONSIVE STYLES
-           ============================================ */
-        @media (max-width: 768px) {
-            .header .online-badge,
-            .header .command-badge {
-                display: none;
-            }
-
-            .status-text {
-                display: none;
-            }
-
-            .welcome-icon {
-                width: 84px !important;
-                height: 84px !important;
-                margin-bottom: 8px !important;
-            }
-
-            .welcome h2 {
-                margin-top: 0 !important;
-                margin-bottom: 8px !important;
-                font-size: 1.3rem;
-            }
-
-            .model-cards {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .purchase-cta {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-
-            .welcome-subtitle {
-                font-size: 0.85rem;
-            }
-
-            .council-progress {
-                padding: 12px;
-            }
-
-            .back-link {
-                display: none;
-            }
-
-            /* Enlarge compass on mobile */
-            .welcome-icon {
-                width: 110px !important;
-                height: 110px !important;
-            }
-        }
-
-        @media (min-width: 769px) {
-            .mobile-only {
-                display: none !important;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .desktop-only {
-                display: none !important;
-            }
-            .mobile-only {
-                display: inline !important;
-            }
-        }
-
-        /* First Run Banner */
+        /* ---- First Run Banner ---- */
         .first-run-banner {
             position: fixed;
             top: 0;
@@ -604,7 +969,7 @@
             font-style: italic;
         }
 
-        .model-roster {
+        .model-roster-fr {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
@@ -632,6 +997,262 @@
                 display: none !important;
             }
         }
+
+        /* ============================================
+           MOBILE STYLES
+           ============================================ */
+        
+        /* Mobile quick action cards */
+        .mobile-actions {
+            display: none;
+        }
+
+        .mobile-action-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: white;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mobile-action-card:hover {
+            border-color: #daa520;
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.2);
+        }
+
+        .mobile-action-icon {
+            font-size: 22px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #faf8f5;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+
+        .mobile-action-text {
+            flex: 1;
+        }
+
+        .mobile-action-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: #2c1810;
+        }
+
+        .mobile-action-desc {
+            font-size: 12px;
+            color: #6b5c4a;
+        }
+
+        /* Voice recording indicator */
+        .voice-recording {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+        }
+
+        .voice-recording.active {
+            display: flex;
+        }
+
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: voicePulse 1s infinite;
+        }
+
+        @keyframes voicePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+
+        .voice-recording-text {
+            font-size: 13px;
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .voice-stop-btn {
+            padding: 6px 14px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background: #faf8f5;
+            }
+
+            .sidebar {
+                display: none !important;
+            }
+
+            .main-container {
+                height: calc(100vh - 56px);
+            }
+
+            .header {
+                padding: 10px 12px;
+                height: 56px;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 50;
+            }
+
+            .title {
+                font-size: 13px;
+            }
+
+            .messages {
+                padding: 12px !important;
+                padding-bottom: 170px !important;
+                padding-top: 70px !important;
+                padding-right: 12px !important;
+            }
+
+            .message {
+                max-width: 100% !important;
+            }
+
+            .welcome {
+                padding: 10px 16px;
+                padding-top: 60px;
+                justify-content: flex-start;
+            }
+
+            .welcome h2 {
+                font-size: 20px;
+            }
+
+            .welcome-icon {
+                width: 80px;
+                height: 80px;
+                margin-bottom: 10px;
+            }
+
+            .welcome-description {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            .feature-badges {
+                margin-bottom: 10px;
+            }
+
+            .feature-badge {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+
+            .command-banner {
+                display: none;
+            }
+
+            .mobile-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                width: 100%;
+                max-width: 400px;
+                margin-bottom: 10px;
+            }
+
+            /* Input area mobile */
+            .input-area {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 10px 12px;
+                background: #faf8f5;
+                z-index: 100;
+                border-top: 1px solid rgba(184, 134, 11, 0.2);
+            }
+
+            .input-container {
+                padding: 8px 12px;
+                border-radius: 16px;
+                gap: 6px;
+            }
+
+            .message-input {
+                font-size: 16px !important;
+                min-height: 24px;
+                max-height: 80px !important;
+            }
+
+            .model-button {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+
+            .send-button {
+                padding: 6px 16px;
+                font-size: 13px;
+            }
+
+            .model-dropdown {
+                bottom: calc(100% + 4px) !important;
+                min-width: 240px;
+            }
+
+            .desktop-only {
+                display: none !important;
+            }
+
+            .back-link {
+                display: none !important;
+            }
+        }
+
+        /* Hide mobile-only on desktop */
+        .mobile-only {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-only {
+                display: inline !important;
+            }
+        }
+
+        .back-link {
+            color: #deb887;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: #daa520;
+        }
+
+        /* Hidden file inputs */
+        .image-upload-input {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -645,7 +1266,7 @@
                 <p>⭐ Access 4 leading AI models: GPT-4o, Claude, Gemini Pro, and Grok</p>
                 <p>🎖️ <strong>Command Mode</strong> runs anonymous peer review — each model scores the others, a Chairman is elected, and the best answer is synthesized</p>
                 <p>⚡ Real-time streaming responses</p>
-                <div class="model-roster">
+                <div class="model-roster-fr">
                     <span class="model-roster-item scout">🔭 Scout</span>
                     <span class="model-roster-item medic">🏥 Medic</span>
                     <span class="model-roster-item navigator">🧭 Navigator</span>
@@ -680,13 +1301,13 @@
             <span class="online-badge">COMMAND</span>
         </div>
         <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="/" class="back-link">← Free Version</a>
+            <a href="/" class="back-link desktop-only">← Free Version</a>
             <a href="https://offgridaitoolkit.com" target="_blank" class="purchase-cta">
-                🛒 Get Offline Version
+                🛒 <span class="desktop-only">Get Offline Version</span><span class="mobile-only">Offline</span>
             </a>
             <div class="status">
                 <span class="status-dot disconnected" id="statusDot"></span>
-                <span id="statusText" class="status-text">Connecting...</span>
+                <span id="statusText" class="status-text desktop-only">Connecting...</span>
             </div>
         </div>
     </div>
@@ -699,7 +1320,7 @@
     </div>
 
     <div class="main-container">
-        <!-- Sidebar -->
+        <!-- Sidebar (desktop only) -->
         <div class="sidebar" id="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-title">⭐ Command Center</div>
@@ -716,25 +1337,44 @@
             </div>
 
             <div class="sidebar-section">
+                <div class="sidebar-title">Sample Prompts</div>
+                <button class="prompts-toggle" id="promptsToggle" onclick="togglePrompts()">
+                    <span>💡 Try a Prompt</span>
+                    <span class="prompts-toggle-arrow">▼</span>
+                </button>
+                <div class="prompts-list" id="promptsList">
+                    <div class="prompt-item" onclick="usePrompt(this)">What are the top 5 items for a wilderness survival kit?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Compare the pros and cons of solar vs wind power for off-grid living</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">How do I purify water in the wild without a filter?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Create a 3-day emergency meal plan using only shelf-stable foods</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">What are the warning signs of hypothermia and how do I treat it?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Explain the Rule of 3s in survival situations</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">How do I navigate using the stars if I have no compass?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">What's the best way to signal for rescue in a remote area?</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
                 <div class="sidebar-title">Model Roster</div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <div style="padding: 8px 10px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 6px; font-size: 12px; color: #deb887;">
-                        <strong style="color: #3b82f6;">🔭 Scout</strong> (GPT-4o)<br>
-                        <span style="font-size: 11px;">Vision Specialist</span>
+                    <div class="roster-item scout">
+                        <div class="roster-item-name">🔭 Scout <span style="font-weight: 400;">(GPT-4o)</span></div>
+                        <div class="roster-item-desc">Vision specialist. Best for image analysis, visual tasks, and multimodal queries.</div>
                     </div>
-                    <div style="padding: 8px 10px; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 6px; font-size: 12px; color: #deb887;">
-                        <strong style="color: #ef4444;">🏥 Medic</strong> (Claude 4.5 Sonnet)<br>
-                        <span style="font-size: 11px;">Safety & Analysis</span>
+                    <div class="roster-item medic">
+                        <div class="roster-item-name">🏥 Medic <span style="font-weight: 400;">(Claude 4.5 Sonnet)</span></div>
+                        <div class="roster-item-desc">Safety and analysis. Thorough, careful reasoning with attention to nuance.</div>
                     </div>
-                    <div style="padding: 8px 10px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 6px; font-size: 12px; color: #deb887;">
-                        <strong style="color: #10b981;">🧭 Navigator</strong> (Gemini 2.5 Pro)<br>
-                        <span style="font-size: 11px;">Research & Planning</span>
+                    <div class="roster-item navigator">
+                        <div class="roster-item-name">🧭 Navigator <span style="font-weight: 400;">(Gemini 2.5 Pro)</span></div>
+                        <div class="roster-item-desc">Research and planning. Deep analysis, strategy, and long-context reasoning.</div>
                     </div>
-                    <div style="padding: 8px 10px; background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: 6px; font-size: 12px; color: #deb887;">
-                        <strong style="color: #a855f7;">🏕️ Ranger</strong> (Grok 3 Mini)<br>
-                        <span style="font-size: 11px;">Creative Solutions</span>
+                    <div class="roster-item ranger">
+                        <div class="roster-item-name">🏕️ Ranger <span style="font-weight: 400;">(Grok 3 Mini)</span></div>
+                        <div class="roster-item-desc">Creative solutions. Unconventional thinking and rapid problem-solving.</div>
                     </div>
                 </div>
+                <div class="roster-footer">In Command mode, all 4 models compete. A Chairman is elected per query through anonymous peer review.</div>
             </div>
 
             <div class="sidebar-section">
@@ -750,43 +1390,53 @@
         <div class="chat-container">
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
-                    <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon" style="width: 120px; height: 120px;">
+                    <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon">
                     <h2>OffGrid Command Center</h2>
                     <div class="welcome-subtitle">⭐ Multi-Model AI Council • Premium Intelligence</div>
                     <div class="feature-badges">
-                        <div class="feature-badge">🔭 Scout</div>
-                        <div class="feature-badge">🏥 Medic</div>
-                        <div class="feature-badge">🧭 Navigator</div>
-                        <div class="feature-badge">🏕️ Ranger</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('scout')">🔭 Scout</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('medic')">🏥 Medic</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('navigator')">🧭 Navigator</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('ranger')">🏕️ Ranger</div>
                     </div>
-                    <p>Choose a single model or use <strong>Command mode</strong> for a peer-reviewed council consensus. Each query triggers anonymous scoring — the highest-ranked model becomes Chairman.</p>
+                    <p class="welcome-description">Choose a single model or use <strong>Command mode</strong> for a peer-reviewed council consensus. Each query triggers anonymous scoring and the highest-ranked model becomes Chairman.</p>
 
-                    <!-- Model cards -->
-                    <div class="model-cards">
-                        <div class="model-card-mini card-scout" onclick="selectModelAndFocus('scout')">
-                            <div class="model-card-mini-icon">🔭</div>
-                            <div class="model-card-mini-name">Scout <span style="font-weight: 400; font-size: 11px; color: #6b5c4a;">(GPT-4o)</span></div>
-                            <div class="model-card-mini-desc">Vision Specialist — best for image analysis and visual tasks</div>
+                    <!-- Command Council banner (desktop) -->
+                    <div class="command-banner desktop-only" onclick="selectModelAndFocus('command')">
+                        <div class="command-banner-title">⭐ Command • Chairman Council</div>
+                        <div class="command-banner-desc">All 4 models answer → anonymous peer review → Chairman elected → best answer synthesized</div>
+                    </div>
+
+                    <!-- Mobile action cards -->
+                    <div class="mobile-actions">
+                        <div class="mobile-action-card" onclick="triggerImageUpload()">
+                            <div class="mobile-action-icon">📸</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Take Picture</div>
+                                <div class="mobile-action-desc">Camera capture</div>
+                            </div>
                         </div>
-                        <div class="model-card-mini card-medic" onclick="selectModelAndFocus('medic')">
-                            <div class="model-card-mini-icon">🏥</div>
-                            <div class="model-card-mini-name">Medic <span style="font-weight: 400; font-size: 11px; color: #6b5c4a;">(Claude 4.5)</span></div>
-                            <div class="model-card-mini-desc">Safety & Analysis — thorough, careful reasoning</div>
+                        <div class="mobile-action-card" onclick="triggerGalleryUpload()">
+                            <div class="mobile-action-icon">🖼️</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Upload Image</div>
+                                <div class="mobile-action-desc">From gallery</div>
+                            </div>
                         </div>
-                        <div class="model-card-mini card-navigator" onclick="selectModelAndFocus('navigator')">
-                            <div class="model-card-mini-icon">🧭</div>
-                            <div class="model-card-mini-name">Navigator <span style="font-weight: 400; font-size: 11px; color: #6b5c4a;">(Gemini 2.5)</span></div>
-                            <div class="model-card-mini-desc">Research & Planning — deep analysis and strategy</div>
+                        <div class="mobile-action-card" id="voiceInputCard" onclick="startVoiceInput()">
+                            <div class="mobile-action-icon">🎙️</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Voice Input</div>
+                                <div class="mobile-action-desc">Speak your prompt</div>
+                            </div>
                         </div>
-                        <div class="model-card-mini card-ranger" onclick="selectModelAndFocus('ranger')">
-                            <div class="model-card-mini-icon">🏕️</div>
-                            <div class="model-card-mini-name">Ranger <span style="font-weight: 400; font-size: 11px; color: #6b5c4a;">(Grok 3)</span></div>
-                            <div class="model-card-mini-desc">Creative Solutions — unconventional thinking</div>
-                        </div>
-                        <div class="command-card-full" onclick="selectModelAndFocus('command')">
-                            <div class="command-card-full-title">⭐ Command • Chairman Council</div>
-                            <div class="command-card-full-desc">All 4 models answer → anonymous peer review → Chairman elected → best answer synthesized</div>
-                        </div>
+                    </div>
+
+                    <!-- Voice recording indicator -->
+                    <div class="voice-recording" id="voiceRecording">
+                        <div class="voice-pulse"></div>
+                        <span class="voice-recording-text">Listening...</span>
+                        <button class="voice-stop-btn" onclick="stopVoiceInput()">Stop</button>
                     </div>
                 </div>
             </div>
@@ -796,27 +1446,36 @@
     <!-- Input Area -->
     <div class="input-area">
         <div class="input-container">
+            <!-- Image preview -->
+            <div class="image-preview" id="imagePreview">
+                <img class="preview-image" id="previewImg" src="" alt="Preview">
+                <div class="preview-info">
+                    <div class="preview-filename" id="previewFilename"></div>
+                </div>
+                <button class="remove-image" onclick="removeImage()">Remove</button>
+            </div>
+
+            <!-- Hidden file inputs -->
+            <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
+            <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
+            <input type="file" id="docInput" class="image-upload-input" accept=".pdf,.doc,.docx,.txt" onchange="handleDocSelect(event)">
+
             <div class="input-wrapper">
-                <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
-                <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
-
-                <svg class="image-upload-btn" onclick="triggerImageUpload()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Take Photo">
-                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                    <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-
-                <svg class="gallery-upload-btn" onclick="triggerGalleryUpload()" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Image">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
-
-                <div class="image-preview" id="imagePreview">
-                    <img class="preview-image" id="previewImg" src="" alt="Preview">
-                    <div class="preview-info">
-                        <div class="preview-filename" id="previewFilename"></div>
+                <!-- Plus button -->
+                <div class="attach-btn desktop-only" onclick="toggleAttachMenu()" title="Attach files">+</div>
+                <div class="attach-menu" id="attachMenu">
+                    <div class="attach-menu-item" onclick="triggerGalleryUpload(); closeAttachMenu();">
+                        <span class="attach-menu-icon">🖼️</span>
+                        <span>Upload Image</span>
                     </div>
-                    <button class="remove-image" onclick="removeImage()">Remove</button>
+                    <div class="attach-menu-item" onclick="triggerImageUpload(); closeAttachMenu();">
+                        <span class="attach-menu-icon">📸</span>
+                        <span>Take Photo</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
+                        <span class="attach-menu-icon">📄</span>
+                        <span>Upload Document</span>
+                    </div>
                 </div>
 
                 <textarea 
@@ -827,40 +1486,51 @@
                     onkeydown="handleKeyDown(event)"
                     oninput="autoResize(this)"
                 ></textarea>
+
+                <!-- Gallery icon (right side, desktop) -->
+                <div class="gallery-btn desktop-only" onclick="triggerGalleryUpload()" title="Upload image">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </div>
             </div>
 
+            <!-- Button row -->
             <div class="button-row">
-                <div class="model-selector">
-                    <div class="model-helper" id="modelHelper"></div>
-                    <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
-                        <span class="model-name" id="selectedModelName">⭐ Command</span>
-                        <span class="model-speed-badge badge-command">Council</span>
-                        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 16px; height: 16px;">
-                            <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
-                        </svg>
-                    </button>
+                <div class="button-row-left">
+                    <div class="model-selector">
+                        <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
+                            <span class="model-name" id="selectedModelName">⭐ Command</span>
+                            <span class="model-speed-badge badge-command" id="selectedModelBadge">Council</span>
+                            <svg viewBox="0 0 16 16" fill="currentColor" style="width: 12px; height: 12px;">
+                                <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
+                            </svg>
+                        </button>
 
-                    <div class="model-dropdown" id="modelDropdown">
-                        <div class="model-list">
-                            <div class="model-item scout-item" onclick="selectModel('scout')">
-                                <div class="model-item-name">🔭 Scout (GPT-4o) <span class="model-item-badge badge-scout">Vision</span></div>
-                                <div class="model-item-desc">Vision Specialist — image analysis & visual tasks</div>
-                            </div>
-                            <div class="model-item medic-item" onclick="selectModel('medic')">
-                                <div class="model-item-name">🏥 Medic (Claude 4.5 Sonnet) <span class="model-item-badge badge-medic">Safety</span></div>
-                                <div class="model-item-desc">Safety & Analysis — thorough, careful reasoning</div>
-                            </div>
-                            <div class="model-item navigator-item" onclick="selectModel('navigator')">
-                                <div class="model-item-name">🧭 Navigator (Gemini 2.5 Pro) <span class="model-item-badge badge-navigator">Research</span></div>
-                                <div class="model-item-desc">Research & Planning — deep analysis & strategy</div>
-                            </div>
-                            <div class="model-item ranger-item" onclick="selectModel('ranger')">
-                                <div class="model-item-name">🏕️ Ranger (Grok 3 Mini) <span class="model-item-badge badge-ranger">Creative</span></div>
-                                <div class="model-item-desc">Creative Solutions — unconventional thinking</div>
-                            </div>
-                            <div class="model-item command-item selected" onclick="selectModel('command')">
-                                <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
-                                <div class="model-item-desc">Peer-reviewed consensus — anonymous scoring elects a Chairman per query</div>
+                        <div class="model-dropdown" id="modelDropdown">
+                            <div class="model-list">
+                                <div class="model-item scout-item" onclick="selectModel('scout')">
+                                    <div class="model-item-name">🔭 Scout (GPT-4o) <span class="model-item-badge badge-scout">Vision</span></div>
+                                    <div class="model-item-desc">Vision Specialist — image analysis & visual tasks</div>
+                                </div>
+                                <div class="model-item medic-item" onclick="selectModel('medic')">
+                                    <div class="model-item-name">🏥 Medic (Claude 4.5 Sonnet) <span class="model-item-badge badge-medic">Safety</span></div>
+                                    <div class="model-item-desc">Safety & Analysis — thorough, careful reasoning</div>
+                                </div>
+                                <div class="model-item navigator-item" onclick="selectModel('navigator')">
+                                    <div class="model-item-name">🧭 Navigator (Gemini 2.5 Pro) <span class="model-item-badge badge-navigator">Research</span></div>
+                                    <div class="model-item-desc">Research & Planning — deep analysis & strategy</div>
+                                </div>
+                                <div class="model-item ranger-item" onclick="selectModel('ranger')">
+                                    <div class="model-item-name">🏕️ Ranger (Grok 3 Mini) <span class="model-item-badge badge-ranger">Creative</span></div>
+                                    <div class="model-item-desc">Creative Solutions — unconventional thinking</div>
+                                </div>
+                                <div class="model-item command-item selected" onclick="selectModel('command')">
+                                    <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
+                                    <div class="model-item-desc">Peer-reviewed consensus — anonymous scoring elects a Chairman per query</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -875,7 +1545,7 @@
 
     <script>
         // ============================================
-        // OFFGRID COMMAND CENTER - MAIN JAVASCRIPT
+        // OFFGRID COMMAND CENTER v2 - MAIN JAVASCRIPT
         // ============================================
 
         const API_BASE = window.location.origin;
@@ -887,11 +1557,9 @@
         let chairmanKey = null;
         let chairmanName = null;
         let chairmanEmoji = null;
+        let voiceRecognition = null;
 
-        /**
-         * Build an HTML scores table from the council scoring data.
-         * Shows each model's Accuracy, Insight, and Council Score with the Chairman highlighted.
-         */
+        // Build scores HTML table
         function buildScoresHtml(scores, chairmanLabel) {
             if (!scores) return '';
             const labels = Object.keys(scores).sort();
@@ -900,7 +1568,7 @@
                 const s = scores[label];
                 const isChairman = (label === chairmanLabel);
                 const rowClass = isChairman ? 'chairman-row' : '';
-                const crown = isChairman ? ' \ud83d\udc51' : '';
+                const crown = isChairman ? ' 👑' : '';
                 rows += `<tr class="${rowClass}">
                     <td>${s.emoji} ${s.model}${crown}</td>
                     <td>${s.accPoints}</td>
@@ -909,12 +1577,12 @@
                 </tr>`;
             }
             return `
-                <div class="scores-table-title">\ud83d\udcca Peer Review Scores (Borda Count)</div>
+                <div class="scores-table-title">📊 Peer Review Scores (Borda Count)</div>
                 <table class="scores-table">
                     <thead><tr><th>Model</th><th>Accuracy</th><th>Insight</th><th>Score</th></tr></thead>
                     <tbody>${rows}</tbody>
                 </table>
-                <div class="scores-formula">Score = 2\u00d7Accuracy + 1\u00d7Insight &nbsp;|&nbsp; Chairman = highest score</div>
+                <div class="scores-formula">Score = 2×Accuracy + 1×Insight &nbsp;|&nbsp; Chairman = highest score</div>
             `;
         }
 
@@ -974,7 +1642,8 @@
 
                 if (response.ok) {
                     document.getElementById('statusDot').className = 'status-dot connected';
-                    document.getElementById('statusText').textContent = 'Connected';
+                    const statusText = document.getElementById('statusText');
+                    if (statusText) statusText.textContent = 'Connected';
                     return true;
                 }
             } catch (error) {
@@ -982,7 +1651,8 @@
             }
 
             document.getElementById('statusDot').className = 'status-dot disconnected';
-            document.getElementById('statusText').textContent = 'Disconnected';
+            const statusText = document.getElementById('statusText');
+            if (statusText) statusText.textContent = 'Disconnected';
             return false;
         }
 
@@ -990,27 +1660,21 @@
         // MODEL SELECTION
         // ============================================
 
-        function toggleModelDropdown() {
-            const dropdown = document.getElementById('modelDropdown');
-            dropdown.classList.toggle('open');
-        }
-
         function selectModel(model) {
             selectedModel = model;
             const config = MODEL_CONFIG[model];
 
             document.getElementById('selectedModelName').textContent = config.shortName;
-            const badgeEl = document.querySelector('#modelButton .model-speed-badge');
-            badgeEl.textContent = config.badge;
-            badgeEl.className = 'model-speed-badge ' + config.badgeClass;
+            const badge = document.getElementById('selectedModelBadge');
+            badge.textContent = config.badge;
+            badge.className = `model-speed-badge ${config.badgeClass}`;
 
-            // Update selected state
-            document.querySelectorAll('.model-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            if (event && event.target) {
-                event.target.closest('.model-item')?.classList.add('selected');
-            }
+            // Update selected state in dropdown
+            document.querySelectorAll('.model-item').forEach(item => item.classList.remove('selected'));
+            const items = document.querySelectorAll('.model-item');
+            const modelKeys = ['scout', 'medic', 'navigator', 'ranger', 'command'];
+            const idx = modelKeys.indexOf(model);
+            if (idx >= 0 && items[idx]) items[idx].classList.add('selected');
 
             toggleModelDropdown();
         }
@@ -1018,35 +1682,55 @@
         function selectModelAndFocus(model) {
             selectedModel = model;
             const config = MODEL_CONFIG[model];
-
             document.getElementById('selectedModelName').textContent = config.shortName;
-            const badgeEl = document.querySelector('#modelButton .model-speed-badge');
-            badgeEl.textContent = config.badge;
-            badgeEl.className = 'model-speed-badge ' + config.badgeClass;
+            const badge = document.getElementById('selectedModelBadge');
+            badge.textContent = config.badge;
+            badge.className = `model-speed-badge ${config.badgeClass}`;
 
-            // Update selected state in dropdown
-            document.querySelectorAll('.model-item').forEach(item => {
-                item.classList.remove('selected');
-            });
+            document.querySelectorAll('.model-item').forEach(item => item.classList.remove('selected'));
             const items = document.querySelectorAll('.model-item');
-            const modelOrder = ['scout', 'medic', 'navigator', 'ranger', 'command'];
-            const idx = modelOrder.indexOf(model);
+            const modelKeys = ['scout', 'medic', 'navigator', 'ranger', 'command'];
+            const idx = modelKeys.indexOf(model);
             if (idx >= 0 && items[idx]) items[idx].classList.add('selected');
 
             document.getElementById('messageInput').focus();
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
+        function toggleModelDropdown() {
             const dropdown = document.getElementById('modelDropdown');
-            const button = document.getElementById('modelButton');
-            if (button && dropdown && !button.contains(event.target) && !dropdown.contains(event.target)) {
+            dropdown.classList.toggle('open');
+        }
+
+        // ============================================
+        // ATTACHMENT MENU
+        // ============================================
+
+        function toggleAttachMenu() {
+            const menu = document.getElementById('attachMenu');
+            menu.classList.toggle('open');
+        }
+
+        function closeAttachMenu() {
+            document.getElementById('attachMenu').classList.remove('open');
+        }
+
+        // Close menus on outside click
+        document.addEventListener('click', function(e) {
+            const attachMenu = document.getElementById('attachMenu');
+            const attachBtn = e.target.closest('.attach-btn');
+            if (!attachBtn && attachMenu && !attachMenu.contains(e.target)) {
+                attachMenu.classList.remove('open');
+            }
+
+            const dropdown = document.getElementById('modelDropdown');
+            const modelBtn = e.target.closest('.model-button');
+            if (!modelBtn && dropdown && !dropdown.contains(e.target)) {
                 dropdown.classList.remove('open');
             }
         });
 
         // ============================================
-        // MESSAGING
+        // SEND MESSAGE
         // ============================================
 
         async function sendMessage() {
@@ -1094,8 +1778,6 @@
             isTyping = true;
             document.getElementById('sendButton').disabled = true;
 
-            const config = MODEL_CONFIG[selectedModel];
-
             if (selectedModel === 'command') {
                 await sendCommandMessage(userMessage, imageToSend, requestStartTime);
             } else {
@@ -1110,7 +1792,6 @@
         async function sendSingleModelMessage(userMessage, imageToSend, requestStartTime) {
             const config = MODEL_CONFIG[selectedModel];
 
-            // Create streaming message container
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message assistant';
@@ -1167,13 +1848,12 @@
                         if (line.startsWith('data: ')) {
                             const data = line.slice(6);
                             if (data === '[DONE]') {
-                                // Streaming complete
+                                // done
                             } else {
                                 try {
                                     const parsed = JSON.parse(data);
                                     if (parsed.content) {
                                         fullResponse += parsed.content;
-                                        // Render markdown
                                         if (typeof marked !== 'undefined') {
                                             streamingContent.innerHTML = marked.parse(fullResponse) + '<span class="streaming-cursor"></span>';
                                         } else {
@@ -1181,9 +1861,7 @@
                                         }
                                         messagesDiv.scrollTop = messagesDiv.scrollHeight;
                                     }
-                                    if (parsed.error) {
-                                        throw new Error(parsed.error);
-                                    }
+                                    if (parsed.error) throw new Error(parsed.error);
                                 } catch (e) {
                                     if (e.message && !e.message.includes('JSON')) throw e;
                                 }
@@ -1192,31 +1870,24 @@
                     }
                 }
 
-                // Remove cursor, finalize
                 if (typeof marked !== 'undefined') {
                     streamingContent.innerHTML = marked.parse(fullResponse);
                 } else {
                     streamingContent.textContent = fullResponse;
                 }
 
-                // Show response time
                 const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
                 const timeIndicator = document.createElement('div');
                 timeIndicator.className = 'response-time';
                 timeIndicator.innerHTML = `⚡ ${config.shortName} • ${responseTime}s`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
 
-                // Add to history
-                conversationHistory.push({
-                    role: 'assistant',
-                    content: fullResponse
-                });
+                conversationHistory.push({ role: 'assistant', content: fullResponse });
 
             } catch (error) {
                 console.error('Stream error:', error);
                 streamingContent.innerHTML = `<span style="color: #ef4444;">Error: ${error.message}</span>`;
             } finally {
-                // Remove streaming ID to prevent conflicts
                 streamingContent.removeAttribute('id');
                 isTyping = false;
                 document.getElementById('sendButton').disabled = false;
@@ -1231,13 +1902,11 @@
         async function sendCommandMessage(userMessage, imageToSend, requestStartTime) {
             const messagesDiv = document.getElementById('messages');
 
-            // Reset council state for this request
             councilScores = null;
             chairmanKey = null;
             chairmanName = null;
             chairmanEmoji = null;
 
-            // Show council progress
             const progressDiv = document.createElement('div');
             progressDiv.className = 'council-progress';
             progressDiv.id = 'councilProgress';
@@ -1275,7 +1944,6 @@
             messagesDiv.appendChild(progressDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-            // Animate all 4 models as active (parallel)
             setTimeout(() => {
                 document.getElementById('step-medic')?.classList.add('active');
                 document.getElementById('step-navigator')?.classList.add('active');
@@ -1300,19 +1968,17 @@
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
 
-                // Stream the council synthesis response
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let fullResponse = '';
                 let synthesisStarted = false;
 
-                // Create the final message container
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message assistant';
                 const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 messageDiv.innerHTML = `
-                    <div class="message-avatar" style="background: #daa520; color: #1a0f05; font-weight: 700;">⭐</div>
+                    <div class="message-avatar" style="background: #daa520; color: white;">AI</div>
                     <div class="message-content">
                         <div class="model-indicator command">⭐ Command Council</div>
                         <div class="message-text markdown-content" id="councilStreamingContent"></div>
@@ -1330,108 +1996,87 @@
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
                             const data = line.slice(6);
-                            if (data === '[DONE]') {
-                                // Complete
-                            } else {
-                                try {
-                                    const parsed = JSON.parse(data);
+                            if (data === '[DONE]') continue;
 
-                                    // Handle progress updates
-                                    if (parsed.progress) {
-                                        const stepEl = document.getElementById('step-' + parsed.progress);
-                                        if (stepEl) {
-                                            stepEl.classList.remove('active');
-                                            stepEl.classList.add('complete');
-                                            stepEl.querySelector('span').textContent = parsed.message || stepEl.querySelector('span').textContent.replace('analyzing...', 'complete \u2713');
-                                        }
+                            try {
+                                const parsed = JSON.parse(data);
 
-                                        // Activate the next phase
-                                        if (parsed.progress === 'scout' || parsed.progress === 'medic' || parsed.progress === 'navigator' || parsed.progress === 'ranger') {
-                                            // Models completing — check if all 4 done to activate review
-                                            const modelSteps = ['scout', 'medic', 'navigator', 'ranger'];
-                                            const allDone = modelSteps.every(k => document.getElementById('step-' + k)?.classList.contains('complete'));
-                                            if (allDone) {
-                                                document.getElementById('step-review')?.classList.add('active');
-                                            }
-                                        }
+                                // Handle progress events
+                                if (parsed.progress) {
+                                    const key = parsed.progress;
+                                    const stepEl = document.getElementById(`step-${key}`);
+                                    if (stepEl) {
+                                        stepEl.classList.remove('active');
+                                        stepEl.classList.add('complete');
+                                        stepEl.querySelector('span').textContent = parsed.message;
+                                    }
 
-                                        // Chairman selected — store scores for display
-                                        if (parsed.progress === 'chairman') {
-                                            councilScores = parsed.scores || null;
-                                            chairmanKey = parsed.chairmanKey || null;
-                                            document.getElementById('step-review')?.classList.remove('active');
-                                            document.getElementById('step-review')?.classList.add('complete');
-                                            // Show scores inline in the progress panel
-                                            if (councilScores) {
-                                                const scoresHtml = buildScoresHtml(councilScores, parsed.chairmanLabel);
-                                                const scoresDiv = document.createElement('div');
-                                                scoresDiv.className = 'council-scores-panel';
-                                                scoresDiv.innerHTML = scoresHtml;
-                                                const progressEl = document.getElementById('councilProgress');
-                                                if (progressEl) progressEl.appendChild(scoresDiv);
-                                            }
-                                            document.getElementById('step-chairman')?.classList.add('active');
-                                            // Brief delay then mark chairman complete
-                                            setTimeout(() => {
-                                                document.getElementById('step-chairman')?.classList.remove('active');
-                                                document.getElementById('step-chairman')?.classList.add('complete');
-                                            }, 800);
-                                        }
+                                    if (key === 'chairman' && parsed.scores) {
+                                        councilScores = parsed.scores;
+                                        chairmanKey = parsed.chairmanKey;
+                                        const scoresPanel = document.createElement('div');
+                                        scoresPanel.className = 'council-scores-panel';
+                                        scoresPanel.innerHTML = buildScoresHtml(parsed.scores, parsed.chairmanLabel);
+                                        const progressEl = document.getElementById('councilProgress');
+                                        if (progressEl) progressEl.appendChild(scoresPanel);
+                                    }
 
-                                        // When synthesis starts, show the message container
-                                        if (parsed.progress === 'synthesis') {
-                                            document.getElementById('step-synthesis')?.classList.add('active');
-                                            // Brief delay to let user see the scores, then transition
-                                            setTimeout(() => {
-                                                progressDiv.remove();
-                                                messagesDiv.appendChild(messageDiv);
-                                                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                                                synthesisStarted = true;
-                                                const el = document.getElementById('councilStreamingContent');
-                                                if (el) el.innerHTML = '<span class="streaming-cursor"></span>';
-                                            }, 1200);
+                                    if (key === 'review' || key === 'chairman' || key === 'synthesis') {
+                                        const stepEl2 = document.getElementById(`step-${key}`);
+                                        if (stepEl2 && key !== 'synthesis') {
+                                            stepEl2.classList.add('active');
                                         }
                                     }
 
-                                    // Handle council metadata (scores for the response footer)
-                                    if (parsed.councilMeta) {
-                                        councilScores = parsed.councilMeta.scores;
-                                        chairmanKey = parsed.councilMeta.chairmanKey;
-                                        chairmanName = parsed.councilMeta.chairmanName;
-                                        chairmanEmoji = parsed.councilMeta.chairmanEmoji;
-                                    }
+                                    if (key === 'synthesis') {
+                                        const stepSynth = document.getElementById('step-synthesis');
+                                        if (stepSynth) stepSynth.classList.add('active');
 
-                                    // Handle streaming content
-                                    if (parsed.content) {
-                                        if (!synthesisStarted) {
-                                            // Synthesis started before our timeout fired — force show
+                                        setTimeout(() => {
                                             const progressEl = document.getElementById('councilProgress');
                                             if (progressEl) progressEl.remove();
                                             if (!messageDiv.parentNode) messagesDiv.appendChild(messageDiv);
                                             synthesisStarted = true;
                                             const el = document.getElementById('councilStreamingContent');
-                                            if (el && !el.innerHTML.includes('streaming-cursor')) {
-                                                el.innerHTML = '<span class="streaming-cursor"></span>';
-                                            }
-                                        }
-                                        fullResponse += parsed.content;
-                                        const el = document.getElementById('councilStreamingContent');
-                                        if (el) {
-                                            if (typeof marked !== 'undefined') {
-                                                el.innerHTML = marked.parse(fullResponse) + '<span class="streaming-cursor"></span>';
-                                            } else {
-                                                el.textContent = fullResponse;
-                                            }
-                                        }
-                                        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                                            if (el) el.innerHTML = '<span class="streaming-cursor"></span>';
+                                        }, 1500);
                                     }
-
-                                    if (parsed.error) {
-                                        throw new Error(parsed.error);
-                                    }
-                                } catch (e) {
-                                    if (e.message && !e.message.includes('JSON')) throw e;
                                 }
+
+                                // Handle council metadata
+                                if (parsed.councilMeta) {
+                                    chairmanKey = parsed.councilMeta.chairmanKey;
+                                    chairmanName = parsed.councilMeta.chairmanName;
+                                    chairmanEmoji = parsed.councilMeta.chairmanEmoji;
+                                }
+
+                                // Handle streaming content
+                                if (parsed.content) {
+                                    if (!synthesisStarted) {
+                                        const progressEl = document.getElementById('councilProgress');
+                                        if (progressEl) progressEl.remove();
+                                        if (!messageDiv.parentNode) messagesDiv.appendChild(messageDiv);
+                                        synthesisStarted = true;
+                                        const el = document.getElementById('councilStreamingContent');
+                                        if (el && !el.innerHTML.includes('streaming-cursor')) {
+                                            el.innerHTML = '<span class="streaming-cursor"></span>';
+                                        }
+                                    }
+                                    fullResponse += parsed.content;
+                                    const el = document.getElementById('councilStreamingContent');
+                                    if (el) {
+                                        if (typeof marked !== 'undefined') {
+                                            el.innerHTML = marked.parse(fullResponse) + '<span class="streaming-cursor"></span>';
+                                        } else {
+                                            el.textContent = fullResponse;
+                                        }
+                                    }
+                                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                                }
+
+                                if (parsed.error) throw new Error(parsed.error);
+                            } catch (e) {
+                                if (e.message && !e.message.includes('JSON')) throw e;
                             }
                         }
                     }
@@ -1448,15 +2093,11 @@
                     el.removeAttribute('id');
                 }
 
-                // If progress div still exists (fallback), remove it
                 if (document.getElementById('councilProgress')) {
                     document.getElementById('councilProgress').remove();
-                    if (!synthesisStarted) {
-                        messagesDiv.appendChild(messageDiv);
-                    }
+                    if (!synthesisStarted) messagesDiv.appendChild(messageDiv);
                 }
 
-                // Response time with Chairman info
                 const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
                 const timeIndicator = document.createElement('div');
                 timeIndicator.className = 'response-time';
@@ -1464,11 +2105,7 @@
                 timeIndicator.innerHTML = `⭐ Command Council • ${responseTime}s (4 models + peer review)${chairmanInfo}`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
 
-                // Add to history
-                conversationHistory.push({
-                    role: 'assistant',
-                    content: fullResponse
-                });
+                conversationHistory.push({ role: 'assistant', content: fullResponse });
 
             } catch (error) {
                 console.error('Council error:', error);
@@ -1574,6 +2211,14 @@
             }
         }
 
+        function handleDocSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // For now, just notify the user
+                alert('Document upload support coming soon. For now, please paste text directly into the chat.');
+            }
+        }
+
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -1618,6 +2263,60 @@
         }
 
         // ============================================
+        // VOICE INPUT (Mobile)
+        // ============================================
+
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Please use Chrome or Safari.');
+                return;
+            }
+
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.continuous = false;
+            voiceRecognition.interimResults = true;
+            voiceRecognition.lang = 'en-US';
+
+            const recording = document.getElementById('voiceRecording');
+            const input = document.getElementById('messageInput');
+
+            recording.classList.add('active');
+
+            voiceRecognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                input.value = transcript;
+                autoResize(input);
+            };
+
+            voiceRecognition.onend = function() {
+                recording.classList.remove('active');
+                voiceRecognition = null;
+                input.focus();
+            };
+
+            voiceRecognition.onerror = function(event) {
+                console.error('Voice recognition error:', event.error);
+                recording.classList.remove('active');
+                voiceRecognition = null;
+                if (event.error === 'not-allowed') {
+                    alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+                }
+            };
+
+            voiceRecognition.start();
+        }
+
+        function stopVoiceInput() {
+            if (voiceRecognition) {
+                voiceRecognition.stop();
+            }
+        }
+
+        // ============================================
         // UI FUNCTIONS
         // ============================================
 
@@ -1638,15 +2337,6 @@
                     conversationHistory = [];
                     location.reload();
                 }
-            }
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('mobile-visible');
-            } else {
-                sidebar.classList.toggle('hidden');
             }
         }
 
@@ -1682,6 +2372,20 @@
             triggerGalleryUpload();
         }
 
+        function togglePrompts() {
+            const toggle = document.getElementById('promptsToggle');
+            const list = document.getElementById('promptsList');
+            toggle.classList.toggle('open');
+            list.classList.toggle('open');
+        }
+
+        function usePrompt(el) {
+            const input = document.getElementById('messageInput');
+            input.value = el.textContent;
+            autoResize(input);
+            input.focus();
+        }
+
         // ============================================
         // FIRST RUN HANDLING
         // ============================================
@@ -1705,7 +2409,7 @@
         // ============================================
 
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('OffGrid Command Center - Initializing...');
+            console.log('OffGrid Command Center v2 - Initializing...');
 
             // Check first run
             if (!localStorage.getItem('offgrid-command-initialized')) {
@@ -1736,7 +2440,20 @@
                 autoResize(messageInput);
             }
 
-            console.log('OffGrid Command Center - Ready!');
+            // Check voice support and update card
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                const voiceCard = document.getElementById('voiceInputCard');
+                if (voiceCard) {
+                    voiceCard.querySelector('.mobile-action-desc').textContent = 'Not supported in this browser';
+                    voiceCard.style.opacity = '0.5';
+                    voiceCard.onclick = function() {
+                        alert('Voice input requires Chrome or Safari on HTTPS.');
+                    };
+                }
+            }
+
+            console.log('OffGrid Command Center v2 - Ready!');
         });
     </script>
 </body>
