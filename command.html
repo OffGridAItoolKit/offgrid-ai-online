@@ -184,6 +184,51 @@
             line-height: 1.4;
         }
 
+        /* ---- Welcome Input Area (centered on welcome screen, desktop) ---- */
+        .welcome-input-area {
+            width: 100%;
+            max-width: 620px;
+            margin-top: 20px;
+        }
+
+        .welcome-input-area .input-container {
+            max-width: 100%;
+        }
+
+        .welcome-input-area .attach-menu {
+            min-width: 240px;
+        }
+
+        /* New Chat button (replaces Quick Tools) */
+        .new-chat-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(184, 134, 11, 0.1);
+            border: 1px solid rgba(184, 134, 11, 0.25);
+            border-radius: 8px;
+            color: #deb887;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+        }
+
+        .new-chat-btn:hover {
+            background: rgba(184, 134, 11, 0.2);
+            border-color: #daa520;
+            color: #daa520;
+        }
+
+        .new-chat-btn svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
         /* ---- Input Area: Modern, Centered, Floating ---- */
         .input-area {
             padding: 16px 24px 20px;
@@ -1105,6 +1150,8 @@
         @media (max-width: 768px) {
             body {
                 background: #faf8f5;
+                /* Enable pull-to-refresh */
+                overscroll-behavior-y: contain;
             }
 
             .sidebar {
@@ -1113,6 +1160,7 @@
 
             .main-container {
                 height: calc(100vh - 56px);
+                margin-top: 56px;
             }
 
             .header {
@@ -1123,21 +1171,21 @@
                 left: 0;
                 right: 0;
                 z-index: 50;
+                justify-content: space-between;
             }
 
             .title {
-                font-size: 13px;
-            }
-
-            /* Center COMMAND badge in mobile header */
-            .header {
-                justify-content: space-between;
-                position: fixed;
+                font-size: 11px;
+                max-width: 80px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
             .header-left {
-                gap: 8px;
+                gap: 6px;
                 flex: 0 0 auto;
+                max-width: 120px;
             }
 
             .header-left .online-badge {
@@ -1153,8 +1201,8 @@
 
             .messages {
                 padding: 12px !important;
-                padding-bottom: 170px !important;
-                padding-top: 70px !important;
+                padding-bottom: 140px !important;
+                padding-top: 12px !important;
                 padding-right: 12px !important;
             }
 
@@ -1163,25 +1211,25 @@
             }
 
             .welcome {
-                padding: 10px 16px;
-                padding-top: 56px;
+                padding: 8px 16px;
+                padding-top: 10px;
                 justify-content: flex-start;
             }
 
             .welcome h2 {
-                font-size: 18px;
+                font-size: 17px;
                 margin-bottom: 2px;
             }
 
             .welcome-subtitle {
-                font-size: 12px;
-                margin-bottom: 8px;
+                font-size: 11px;
+                margin-bottom: 6px;
             }
 
             .welcome-icon {
-                width: 50px;
-                height: 50px;
-                margin-bottom: 8px;
+                width: 44px;
+                height: 44px;
+                margin-bottom: 6px;
             }
 
             .welcome-description {
@@ -1189,7 +1237,7 @@
             }
 
             .feature-badges {
-                margin-bottom: 6px;
+                margin-bottom: 10px;
             }
 
             .feature-badge {
@@ -1204,38 +1252,39 @@
             .mobile-actions {
                 display: flex;
                 flex-direction: column;
-                gap: 8px;
+                gap: 6px;
                 width: 100%;
                 max-width: 400px;
-                margin-bottom: 10px;
+                margin-bottom: 0;
             }
 
             .mobile-action-card {
-                padding: 10px 14px;
-                gap: 12px;
+                padding: 8px 12px;
+                gap: 10px;
             }
 
             .mobile-action-icon {
-                font-size: 18px;
-                width: 36px;
-                height: 36px;
+                font-size: 16px;
+                width: 32px;
+                height: 32px;
             }
 
             .mobile-action-title {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .mobile-action-desc {
-                font-size: 11px;
+                font-size: 10px;
             }
 
-            /* Input area mobile */
+            /* Input area mobile - always visible */
             .input-area {
+                display: block !important;
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 right: 0;
-                padding: 10px 12px;
+                padding: 8px 10px;
                 background: #faf8f5;
                 z-index: 100;
                 border-top: 1px solid rgba(184, 134, 11, 0.2);
@@ -1274,6 +1323,20 @@
 
             .back-link {
                 display: none !important;
+            }
+
+            /* Pull-to-refresh indicator */
+            .pull-refresh-indicator {
+                display: none;
+                text-align: center;
+                padding: 12px;
+                color: #b8860b;
+                font-size: 13px;
+                font-weight: 500;
+            }
+
+            .pull-refresh-indicator.visible {
+                display: block;
             }
         }
 
@@ -1381,12 +1444,10 @@
                 </div>
             </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Quick Tools</div>
-                <button class="tool-button" onclick="clearChat()">📋 Clear Chat / Home</button>
-                <button class="tool-button" onclick="setupTranslator()">🌐 Translator</button>
-                <button class="tool-button" onclick="openImageIdentifier()">🔍 Image Identifier</button>
-            </div>
+            <button class="new-chat-btn" onclick="clearChat()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                New Chat
+            </button>
 
             <div class="sidebar-section">
                 <div class="sidebar-title">Sample Prompts</div>
@@ -1459,6 +1520,104 @@
                         <div class="command-banner-desc">All 4 models answer → anonymous peer review → Chairman elected → best answer synthesized</div>
                     </div>
 
+                    <!-- Inline Input Area (shown on welcome screen, centered) -->
+                    <div class="welcome-input-area desktop-only" id="welcomeInputArea">
+                        <div class="input-container">
+                            <!-- Image preview -->
+                            <div class="image-preview" id="imagePreviewWelcome"></div>
+
+                            <div class="input-wrapper">
+                                <div class="attach-btn" onclick="toggleAttachMenu()" title="Attach files">+</div>
+                                <div class="attach-menu" id="attachMenuWelcome">
+                                    <div class="attach-menu-item" onclick="triggerGalleryUpload(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">🖼️</span>
+                                        <span>Upload Image</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📄</span>
+                                        <span>Upload Document</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupTranslator(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">🌐</span>
+                                        <span>Translate</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupTranscribe(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">✍️</span>
+                                        <span>Transcribe Text from Image</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupFactCheck(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">✅</span>
+                                        <span>Fact Check</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupSummarize(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📝</span>
+                                        <span>Summarize</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="openImageIdentifier(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">🔍</span>
+                                        <span>Identify Image</span>
+                                    </div>
+                                </div>
+
+                                <textarea 
+                                    id="messageInputWelcome" 
+                                    class="message-input"
+                                    placeholder="Ask the Command Center anything..."
+                                    rows="1"
+                                    onkeydown="handleKeyDown(event)"
+                                    oninput="autoResize(this)"
+                                ></textarea>
+
+                                <div class="gallery-btn" onclick="triggerGalleryUpload()" title="Upload image">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="button-row">
+                                <div class="button-row-left">
+                                    <div class="model-selector">
+                                        <button class="model-button" id="modelButtonWelcome" onclick="toggleModelDropdown()">
+                                            <span class="model-name" id="selectedModelNameWelcome">⭐ Command</span>
+                                            <span class="model-speed-badge badge-command" id="selectedModelBadgeWelcome">Council</span>
+                                            <svg viewBox="0 0 16 16" fill="currentColor" style="width: 12px; height: 12px;">
+                                                <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
+                                            </svg>
+                                        </button>
+                                        <div class="model-dropdown" id="modelDropdownWelcome">
+                                            <div class="model-list">
+                                                <div class="model-item scout-item" onclick="selectModel('scout')">
+                                                    <div class="model-item-name">🔭 Scout (GPT-4o) <span class="model-item-badge badge-scout">Vision</span></div>
+                                                    <div class="model-item-desc">Vision Specialist — image analysis & visual tasks</div>
+                                                </div>
+                                                <div class="model-item medic-item" onclick="selectModel('medic')">
+                                                    <div class="model-item-name">🏥 Medic (Claude 4.5 Sonnet) <span class="model-item-badge badge-medic">Safety</span></div>
+                                                    <div class="model-item-desc">Safety & Analysis — thorough, careful reasoning</div>
+                                                </div>
+                                                <div class="model-item navigator-item" onclick="selectModel('navigator')">
+                                                    <div class="model-item-name">🧭 Navigator (Gemini 2.5 Pro) <span class="model-item-badge badge-navigator">Research</span></div>
+                                                    <div class="model-item-desc">Research & Planning — deep analysis & strategy</div>
+                                                </div>
+                                                <div class="model-item ranger-item" onclick="selectModel('ranger')">
+                                                    <div class="model-item-name">🏕️ Ranger (Grok 3 Mini) <span class="model-item-badge badge-ranger">Creative</span></div>
+                                                    <div class="model-item-desc">Creative Solutions — unconventional thinking</div>
+                                                </div>
+                                                <div class="model-item command-item selected" onclick="selectModel('command')">
+                                                    <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
+                                                    <div class="model-item-desc">Peer-reviewed consensus — anonymous scoring elects a Chairman per query</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Mobile action cards -->
                     <div class="mobile-actions">
                         <div class="mobile-action-card" onclick="triggerImageUpload()">
@@ -1494,7 +1653,7 @@
             </div>
 
             <!-- Input Area -->
-            <div class="input-area">
+            <div class="input-area" id="bottomInputArea" style="display: none;">
         <div class="input-container">
             <!-- Image preview -->
             <div class="image-preview" id="imagePreview">
@@ -1518,13 +1677,29 @@
                         <span class="attach-menu-icon">🖼️</span>
                         <span>Upload Image</span>
                     </div>
-                    <div class="attach-menu-item" onclick="triggerImageUpload(); closeAttachMenu();">
-                        <span class="attach-menu-icon">📸</span>
-                        <span>Take Photo</span>
-                    </div>
                     <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
                         <span class="attach-menu-icon">📄</span>
                         <span>Upload Document</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="setupTranslator(); closeAttachMenu();">
+                        <span class="attach-menu-icon">🌐</span>
+                        <span>Translate</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="setupTranscribe(); closeAttachMenu();">
+                        <span class="attach-menu-icon">✍️</span>
+                        <span>Transcribe Text from Image</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="setupFactCheck(); closeAttachMenu();">
+                        <span class="attach-menu-icon">✅</span>
+                        <span>Fact Check</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="setupSummarize(); closeAttachMenu();">
+                        <span class="attach-menu-icon">📝</span>
+                        <span>Summarize</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="openImageIdentifier(); closeAttachMenu();">
+                        <span class="attach-menu-icon">🔍</span>
+                        <span>Identify Image</span>
                     </div>
                 </div>
 
@@ -1712,45 +1887,58 @@
         // MODEL SELECTION
         // ============================================
 
-        function selectModel(model) {
-            selectedModel = model;
+        function syncModelUI(model) {
             const config = MODEL_CONFIG[model];
-
-            document.getElementById('selectedModelName').textContent = config.shortName;
-            const badge = document.getElementById('selectedModelBadge');
-            badge.textContent = config.badge;
-            badge.className = `model-speed-badge ${config.badgeClass}`;
-
-            // Update selected state in dropdown
+            // Sync both bottom and welcome model selectors
+            ['', 'Welcome'].forEach(suffix => {
+                const nameEl = document.getElementById('selectedModelName' + suffix);
+                const badgeEl = document.getElementById('selectedModelBadge' + suffix);
+                if (nameEl) nameEl.textContent = config.shortName;
+                if (badgeEl) {
+                    badgeEl.textContent = config.badge;
+                    badgeEl.className = `model-speed-badge ${config.badgeClass}`;
+                }
+            });
+            // Update selected state in all dropdowns
             document.querySelectorAll('.model-item').forEach(item => item.classList.remove('selected'));
-            const items = document.querySelectorAll('.model-item');
             const modelKeys = ['scout', 'medic', 'navigator', 'ranger', 'command'];
             const idx = modelKeys.indexOf(model);
-            if (idx >= 0 && items[idx]) items[idx].classList.add('selected');
+            document.querySelectorAll('.model-dropdown').forEach(dd => {
+                const items = dd.querySelectorAll('.model-item');
+                if (idx >= 0 && items[idx]) items[idx].classList.add('selected');
+            });
+        }
 
-            toggleModelDropdown();
+        function selectModel(model) {
+            selectedModel = model;
+            syncModelUI(model);
+            // Close all dropdowns
+            document.querySelectorAll('.model-dropdown').forEach(dd => dd.classList.remove('open'));
         }
 
         function selectModelAndFocus(model) {
             selectedModel = model;
-            const config = MODEL_CONFIG[model];
-            document.getElementById('selectedModelName').textContent = config.shortName;
-            const badge = document.getElementById('selectedModelBadge');
-            badge.textContent = config.badge;
-            badge.className = `model-speed-badge ${config.badgeClass}`;
-
-            document.querySelectorAll('.model-item').forEach(item => item.classList.remove('selected'));
-            const items = document.querySelectorAll('.model-item');
-            const modelKeys = ['scout', 'medic', 'navigator', 'ranger', 'command'];
-            const idx = modelKeys.indexOf(model);
-            if (idx >= 0 && items[idx]) items[idx].classList.add('selected');
-
-            document.getElementById('messageInput').focus();
+            syncModelUI(model);
+            getActiveInput().focus();
         }
 
         function toggleModelDropdown() {
-            const dropdown = document.getElementById('modelDropdown');
-            dropdown.classList.toggle('open');
+            // Toggle the closest dropdown to the clicked button
+            // Close all first, then open the relevant one
+            const allDropdowns = document.querySelectorAll('.model-dropdown');
+            const anyOpen = Array.from(allDropdowns).some(dd => dd.classList.contains('open'));
+            allDropdowns.forEach(dd => dd.classList.remove('open'));
+            if (!anyOpen) {
+                // Open the one relevant to the current context
+                const welcome = document.getElementById('welcome');
+                if (welcome && window.innerWidth > 768) {
+                    const wd = document.getElementById('modelDropdownWelcome');
+                    if (wd) wd.classList.add('open');
+                } else {
+                    const bd = document.getElementById('modelDropdown');
+                    if (bd) bd.classList.add('open');
+                }
+            }
         }
 
         // ============================================
@@ -1758,26 +1946,36 @@
         // ============================================
 
         function toggleAttachMenu() {
-            const menu = document.getElementById('attachMenu');
-            menu.classList.toggle('open');
+            // Close all attach menus first
+            const allMenus = document.querySelectorAll('.attach-menu');
+            const anyOpen = Array.from(allMenus).some(m => m.classList.contains('open'));
+            allMenus.forEach(m => m.classList.remove('open'));
+            if (!anyOpen) {
+                const welcome = document.getElementById('welcome');
+                if (welcome && window.innerWidth > 768) {
+                    const wm = document.getElementById('attachMenuWelcome');
+                    if (wm) wm.classList.add('open');
+                } else {
+                    const bm = document.getElementById('attachMenu');
+                    if (bm) bm.classList.add('open');
+                }
+            }
         }
 
         function closeAttachMenu() {
-            document.getElementById('attachMenu').classList.remove('open');
+            document.querySelectorAll('.attach-menu').forEach(m => m.classList.remove('open'));
         }
 
         // Close menus on outside click
         document.addEventListener('click', function(e) {
-            const attachMenu = document.getElementById('attachMenu');
             const attachBtn = e.target.closest('.attach-btn');
-            if (!attachBtn && attachMenu && !attachMenu.contains(e.target)) {
-                attachMenu.classList.remove('open');
+            if (!attachBtn) {
+                document.querySelectorAll('.attach-menu').forEach(m => m.classList.remove('open'));
             }
 
-            const dropdown = document.getElementById('modelDropdown');
             const modelBtn = e.target.closest('.model-button');
-            if (!modelBtn && dropdown && !dropdown.contains(e.target)) {
-                dropdown.classList.remove('open');
+            if (!modelBtn) {
+                document.querySelectorAll('.model-dropdown').forEach(dd => dd.classList.remove('open'));
             }
         });
 
@@ -1786,8 +1984,14 @@
         // ============================================
 
         async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
+            // Read from whichever input is active (welcome or bottom)
+            const welcomeInput = document.getElementById('messageInputWelcome');
+            const bottomInput = document.getElementById('messageInput');
+            const activeInput = getActiveInput();
+            const message = activeInput.value.trim();
+            // Sync both inputs
+            if (welcomeInput) welcomeInput.value = '';
+            if (bottomInput) bottomInput.value = message;
             const requestStartTime = Date.now();
 
             if ((!message && !selectedImage) || isTyping) return;
@@ -1798,9 +2002,13 @@
                 return;
             }
 
-            // Remove welcome screen
+            // Remove welcome screen and show bottom input
             const welcome = document.getElementById('welcome');
-            if (welcome) welcome.remove();
+            if (welcome) {
+                welcome.remove();
+                const bottomInputArea = document.querySelector('.input-area');
+                if (bottomInputArea) bottomInputArea.style.display = '';
+            }
 
             // Add user message to UI
             const userMessage = message || "What's in this image?";
@@ -1821,8 +2029,7 @@
             conversationHistory.push(historyEntry);
 
             // Clear input
-            input.value = '';
-            autoResize(input);
+            if (bottomInput) { bottomInput.value = ''; autoResize(bottomInput); }
             const imageToSend = selectedImage;
             removeImage();
 
@@ -2404,8 +2611,20 @@
             textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
         }
 
+        // Get the currently active/visible input element
+        function getActiveInput() {
+            const welcomeInput = document.getElementById('messageInputWelcome');
+            const bottomInput = document.getElementById('messageInput');
+            // If welcome screen is visible and we're on desktop, use welcome input
+            const welcome = document.getElementById('welcome');
+            if (welcome && welcomeInput && window.innerWidth > 768) {
+                return welcomeInput;
+            }
+            return bottomInput;
+        }
+
         function setupTranslator() {
-            const input = document.getElementById('messageInput');
+            const input = getActiveInput();
             const translatorPrompt = 'Translate "[paste or type your text here]" to [Spanish/French/Chinese/etc]';
             input.value = translatorPrompt;
             autoResize(input);
@@ -2417,8 +2636,41 @@
             }, 100);
         }
 
+        function setupTranscribe() {
+            const input = getActiveInput();
+            input.value = 'Please transcribe all handwritten or printed text visible in this image. Preserve the original formatting as closely as possible.';
+            autoResize(input);
+            triggerGalleryUpload();
+        }
+
+        function setupFactCheck() {
+            const input = getActiveInput();
+            const prompt = 'Fact check the following: [paste claim or text here]';
+            input.value = prompt;
+            autoResize(input);
+            setTimeout(() => {
+                input.focus();
+                const start = prompt.indexOf('[paste');
+                const end = prompt.indexOf(']') + 1;
+                input.setSelectionRange(start, end);
+            }, 100);
+        }
+
+        function setupSummarize() {
+            const input = getActiveInput();
+            const prompt = 'Summarize the following text in a clear, concise format with key points: [paste text here]';
+            input.value = prompt;
+            autoResize(input);
+            setTimeout(() => {
+                input.focus();
+                const start = prompt.indexOf('[paste');
+                const end = prompt.indexOf(']') + 1;
+                input.setSelectionRange(start, end);
+            }, 100);
+        }
+
         function openImageIdentifier() {
-            const input = document.getElementById('messageInput');
+            const input = getActiveInput();
             input.value = 'Please identify what is in this image and provide detailed information about it.';
             autoResize(input);
             triggerGalleryUpload();
@@ -2432,7 +2684,7 @@
         }
 
         function usePrompt(el) {
-            const input = document.getElementById('messageInput');
+            const input = getActiveInput();
             input.value = el.textContent;
             autoResize(input);
             input.focus();
@@ -2484,12 +2736,11 @@
             checkConnection();
             setInterval(checkConnection, 10000);
 
-            // Focus input
-            document.getElementById('messageInput').focus();
-
-            const messageInput = document.getElementById('messageInput');
-            if (messageInput) {
-                autoResize(messageInput);
+            // Focus the appropriate input
+            const activeInput = getActiveInput();
+            if (activeInput) {
+                activeInput.focus();
+                autoResize(activeInput);
             }
 
             // Check voice support and update card
@@ -2503,6 +2754,43 @@
                         alert('Voice input requires Chrome or Safari on HTTPS.');
                     };
                 }
+            }
+
+            // Pull-to-refresh for mobile
+            if (window.innerWidth <= 768) {
+                let touchStartY = 0;
+                let pulling = false;
+                const messagesEl = document.getElementById('messages');
+
+                messagesEl.addEventListener('touchstart', function(e) {
+                    if (messagesEl.scrollTop <= 0) {
+                        touchStartY = e.touches[0].clientY;
+                        pulling = true;
+                    }
+                }, { passive: true });
+
+                messagesEl.addEventListener('touchmove', function(e) {
+                    if (!pulling) return;
+                    const diff = e.touches[0].clientY - touchStartY;
+                    if (diff > 80 && messagesEl.scrollTop <= 0) {
+                        // Show visual feedback
+                        messagesEl.style.transform = `translateY(${Math.min(diff * 0.3, 40)}px)`;
+                        messagesEl.style.transition = 'none';
+                    }
+                }, { passive: true });
+
+                messagesEl.addEventListener('touchend', function(e) {
+                    if (!pulling) return;
+                    pulling = false;
+                    const currentTransform = messagesEl.style.transform;
+                    messagesEl.style.transition = 'transform 0.3s ease';
+                    messagesEl.style.transform = 'translateY(0)';
+                    // If pulled far enough, clear chat
+                    if (currentTransform && parseInt(currentTransform.replace(/[^0-9.-]/g, '')) > 20) {
+                        conversationHistory = [];
+                        location.reload();
+                    }
+                }, { passive: true });
             }
 
             console.log('OffGrid Command Center v2 - Ready!');

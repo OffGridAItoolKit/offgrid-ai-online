@@ -1873,6 +1873,42 @@ if (typeof QRCode !== 'undefined') {
                 autoResize(messageInput);
             }
             
+            // Pull-to-refresh for mobile
+            if (window.innerWidth <= 768) {
+                let touchStartY = 0;
+                let pulling = false;
+                const messagesEl = document.getElementById('messages');
+
+                if (messagesEl) {
+                    messagesEl.addEventListener('touchstart', function(e) {
+                        if (messagesEl.scrollTop <= 0) {
+                            touchStartY = e.touches[0].clientY;
+                            pulling = true;
+                        }
+                    }, { passive: true });
+
+                    messagesEl.addEventListener('touchmove', function(e) {
+                        if (!pulling) return;
+                        const diff = e.touches[0].clientY - touchStartY;
+                        if (diff > 80 && messagesEl.scrollTop <= 0) {
+                            messagesEl.style.transform = `translateY(${Math.min(diff * 0.3, 40)}px)`;
+                            messagesEl.style.transition = 'none';
+                        }
+                    }, { passive: true });
+
+                    messagesEl.addEventListener('touchend', function(e) {
+                        if (!pulling) return;
+                        pulling = false;
+                        const currentTransform = messagesEl.style.transform;
+                        messagesEl.style.transition = 'transform 0.3s ease';
+                        messagesEl.style.transform = 'translateY(0)';
+                        if (currentTransform && parseInt(currentTransform.replace(/[^0-9.-]/g, '')) > 20) {
+                            location.reload();
+                        }
+                    }, { passive: true });
+                }
+            }
+
             console.log('OffGrid AI ToolKit Online - Ready!');
         });
     </script>
