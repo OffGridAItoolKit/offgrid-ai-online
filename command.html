@@ -209,6 +209,59 @@
             50% { transform: scale(1.15); }
         }
 
+        /* Council Scores Panel */
+        .council-scores-panel {
+            margin-top: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(184, 134, 11, 0.25);
+            border-radius: 8px;
+        }
+
+        .scores-table-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #2c1810;
+            margin-bottom: 8px;
+        }
+
+        .scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .scores-table th {
+            background: rgba(44, 24, 16, 0.08);
+            color: #2c1810;
+            padding: 6px 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(184, 134, 11, 0.3);
+        }
+
+        .scores-table td {
+            padding: 5px 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            color: #4a3728;
+        }
+
+        .scores-table tr.chairman-row {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.12), rgba(218, 165, 32, 0.12));
+        }
+
+        .scores-table tr.chairman-row td {
+            color: #2c1810;
+            font-weight: 600;
+        }
+
+        .scores-formula {
+            font-size: 10px;
+            color: #8b7355;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
         /* Streaming cursor */
         .streaming-cursor {
             display: inline-block;
@@ -590,7 +643,7 @@
             <div class="first-run-message">
                 <p><strong>Welcome to the Command Center!</strong></p>
                 <p>⭐ Access 4 leading AI models: GPT-4o, Claude, Gemini Pro, and Grok</p>
-                <p>🎖️ <strong>Command Mode</strong> consults ALL models and synthesizes the best answer</p>
+                <p>🎖️ <strong>Command Mode</strong> runs anonymous peer review — each model scores the others, a Chairman is elected, and the best answer is synthesized</p>
                 <p>⚡ Real-time streaming responses</p>
                 <div class="model-roster">
                     <span class="model-roster-item scout">🔭 Scout</span>
@@ -706,7 +759,7 @@
                         <div class="feature-badge">🧭 Navigator</div>
                         <div class="feature-badge">🏕️ Ranger</div>
                     </div>
-                    <p>Choose a single model or use <strong>Command mode</strong> for a council consensus from all four.</p>
+                    <p>Choose a single model or use <strong>Command mode</strong> for a peer-reviewed council consensus. Each query triggers anonymous scoring — the highest-ranked model becomes Chairman.</p>
 
                     <!-- Model cards -->
                     <div class="model-cards">
@@ -731,8 +784,8 @@
                             <div class="model-card-mini-desc">Creative Solutions — unconventional thinking</div>
                         </div>
                         <div class="command-card-full" onclick="selectModelAndFocus('command')">
-                            <div class="command-card-full-title">⭐ Command • Council Consensus</div>
-                            <div class="command-card-full-desc">Consults all 4 models and synthesizes the single best answer</div>
+                            <div class="command-card-full-title">⭐ Command • Chairman Council</div>
+                            <div class="command-card-full-desc">All 4 models answer → anonymous peer review → Chairman elected → best answer synthesized</div>
                         </div>
                     </div>
                 </div>
@@ -807,7 +860,7 @@
                             </div>
                             <div class="model-item command-item selected" onclick="selectModel('command')">
                                 <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
-                                <div class="model-item-desc">Council Consensus — synthesizes the best from all 4 models</div>
+                                <div class="model-item-desc">Peer-reviewed consensus — anonymous scoring elects a Chairman per query</div>
                             </div>
                         </div>
                     </div>
@@ -830,6 +883,40 @@
         let isTyping = false;
         let selectedImage = null;
         let conversationHistory = [];
+        let councilScores = null;
+        let chairmanKey = null;
+        let chairmanName = null;
+        let chairmanEmoji = null;
+
+        /**
+         * Build an HTML scores table from the council scoring data.
+         * Shows each model's Accuracy, Insight, and Council Score with the Chairman highlighted.
+         */
+        function buildScoresHtml(scores, chairmanLabel) {
+            if (!scores) return '';
+            const labels = Object.keys(scores).sort();
+            let rows = '';
+            for (const label of labels) {
+                const s = scores[label];
+                const isChairman = (label === chairmanLabel);
+                const rowClass = isChairman ? 'chairman-row' : '';
+                const crown = isChairman ? ' \ud83d\udc51' : '';
+                rows += `<tr class="${rowClass}">
+                    <td>${s.emoji} ${s.model}${crown}</td>
+                    <td>${s.accPoints}</td>
+                    <td>${s.insightPoints}</td>
+                    <td><strong>${s.councilScore}</strong></td>
+                </tr>`;
+            }
+            return `
+                <div class="scores-table-title">\ud83d\udcca Peer Review Scores (Borda Count)</div>
+                <table class="scores-table">
+                    <thead><tr><th>Model</th><th>Accuracy</th><th>Insight</th><th>Score</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+                <div class="scores-formula">Score = 2\u00d7Accuracy + 1\u00d7Insight &nbsp;|&nbsp; Chairman = highest score</div>
+            `;
+        }
 
         const MODEL_CONFIG = {
             scout: {
@@ -1144,6 +1231,12 @@
         async function sendCommandMessage(userMessage, imageToSend, requestStartTime) {
             const messagesDiv = document.getElementById('messages');
 
+            // Reset council state for this request
+            councilScores = null;
+            chairmanKey = null;
+            chairmanName = null;
+            chairmanEmoji = null;
+
             // Show council progress
             const progressDiv = document.createElement('div');
             progressDiv.className = 'council-progress';
@@ -1166,9 +1259,17 @@
                     <div class="council-step-icon">🏕️</div>
                     <span>Ranger (Grok 3) analyzing...</span>
                 </div>
+                <div class="council-step" id="step-review">
+                    <div class="council-step-icon">🤝</div>
+                    <span>Anonymous peer review...</span>
+                </div>
+                <div class="council-step" id="step-chairman">
+                    <div class="council-step-icon">🏆</div>
+                    <span>Selecting Chairman...</span>
+                </div>
                 <div class="council-step" id="step-synthesis">
                     <div class="council-step-icon">⭐</div>
-                    <span>Synthesizing council consensus...</span>
+                    <span>Synthesizing from Chairman + advisors...</span>
                 </div>
             `;
             messagesDiv.appendChild(progressDiv);
@@ -1241,24 +1342,78 @@
                                         if (stepEl) {
                                             stepEl.classList.remove('active');
                                             stepEl.classList.add('complete');
-                                            stepEl.querySelector('span').textContent = parsed.message || stepEl.querySelector('span').textContent.replace('analyzing...', 'complete ✓');
+                                            stepEl.querySelector('span').textContent = parsed.message || stepEl.querySelector('span').textContent.replace('analyzing...', 'complete \u2713');
+                                        }
+
+                                        // Activate the next phase
+                                        if (parsed.progress === 'scout' || parsed.progress === 'medic' || parsed.progress === 'navigator' || parsed.progress === 'ranger') {
+                                            // Models completing — check if all 4 done to activate review
+                                            const modelSteps = ['scout', 'medic', 'navigator', 'ranger'];
+                                            const allDone = modelSteps.every(k => document.getElementById('step-' + k)?.classList.contains('complete'));
+                                            if (allDone) {
+                                                document.getElementById('step-review')?.classList.add('active');
+                                            }
+                                        }
+
+                                        // Chairman selected — store scores for display
+                                        if (parsed.progress === 'chairman') {
+                                            councilScores = parsed.scores || null;
+                                            chairmanKey = parsed.chairmanKey || null;
+                                            document.getElementById('step-review')?.classList.remove('active');
+                                            document.getElementById('step-review')?.classList.add('complete');
+                                            // Show scores inline in the progress panel
+                                            if (councilScores) {
+                                                const scoresHtml = buildScoresHtml(councilScores, parsed.chairmanLabel);
+                                                const scoresDiv = document.createElement('div');
+                                                scoresDiv.className = 'council-scores-panel';
+                                                scoresDiv.innerHTML = scoresHtml;
+                                                const progressEl = document.getElementById('councilProgress');
+                                                if (progressEl) progressEl.appendChild(scoresDiv);
+                                            }
+                                            document.getElementById('step-chairman')?.classList.add('active');
+                                            // Brief delay then mark chairman complete
+                                            setTimeout(() => {
+                                                document.getElementById('step-chairman')?.classList.remove('active');
+                                                document.getElementById('step-chairman')?.classList.add('complete');
+                                            }, 800);
                                         }
 
                                         // When synthesis starts, show the message container
                                         if (parsed.progress === 'synthesis') {
                                             document.getElementById('step-synthesis')?.classList.add('active');
-                                            // Remove progress and add message
-                                            progressDiv.remove();
-                                            messagesDiv.appendChild(messageDiv);
-                                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                                            synthesisStarted = true;
-                                            const el = document.getElementById('councilStreamingContent');
-                                            if (el) el.innerHTML = '<span class="streaming-cursor"></span>';
+                                            // Brief delay to let user see the scores, then transition
+                                            setTimeout(() => {
+                                                progressDiv.remove();
+                                                messagesDiv.appendChild(messageDiv);
+                                                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                                                synthesisStarted = true;
+                                                const el = document.getElementById('councilStreamingContent');
+                                                if (el) el.innerHTML = '<span class="streaming-cursor"></span>';
+                                            }, 1200);
                                         }
                                     }
 
+                                    // Handle council metadata (scores for the response footer)
+                                    if (parsed.councilMeta) {
+                                        councilScores = parsed.councilMeta.scores;
+                                        chairmanKey = parsed.councilMeta.chairmanKey;
+                                        chairmanName = parsed.councilMeta.chairmanName;
+                                        chairmanEmoji = parsed.councilMeta.chairmanEmoji;
+                                    }
+
                                     // Handle streaming content
-                                    if (parsed.content && synthesisStarted) {
+                                    if (parsed.content) {
+                                        if (!synthesisStarted) {
+                                            // Synthesis started before our timeout fired — force show
+                                            const progressEl = document.getElementById('councilProgress');
+                                            if (progressEl) progressEl.remove();
+                                            if (!messageDiv.parentNode) messagesDiv.appendChild(messageDiv);
+                                            synthesisStarted = true;
+                                            const el = document.getElementById('councilStreamingContent');
+                                            if (el && !el.innerHTML.includes('streaming-cursor')) {
+                                                el.innerHTML = '<span class="streaming-cursor"></span>';
+                                            }
+                                        }
                                         fullResponse += parsed.content;
                                         const el = document.getElementById('councilStreamingContent');
                                         if (el) {
@@ -1301,11 +1456,12 @@
                     }
                 }
 
-                // Response time
+                // Response time with Chairman info
                 const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
                 const timeIndicator = document.createElement('div');
                 timeIndicator.className = 'response-time';
-                timeIndicator.innerHTML = `⭐ Command Council • ${responseTime}s (4 models consulted)`;
+                const chairmanInfo = chairmanName ? ` | Chairman: ${chairmanEmoji} ${chairmanName}` : '';
+                timeIndicator.innerHTML = `⭐ Command Council • ${responseTime}s (4 models + peer review)${chairmanInfo}`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
 
                 // Add to history

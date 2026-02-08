@@ -7,7 +7,7 @@
  * Includes:
  * - Original Gemma 3 model routing (free demo)
  * - Command Center multi-model routing (Scout, Medic, Navigator, Ranger)
- * - Command Council mode (parallel calls + synthesis)
+ * - Command Council mode (parallel calls + competitive ranking + synthesis)
  * - Response streaming for all endpoints
  */
 
@@ -187,7 +187,7 @@ function buildOpenRouterMessages(messages, multimodal = true) {
 /**
  * Make a non-streaming request to OpenRouter and return the text response
  */
-async function callOpenRouter(modelId, messages, maxTokens = 4096) {
+async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7) {
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -200,7 +200,7 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096) {
             model: modelId,
             messages: messages,
             max_tokens: maxTokens,
-            temperature: 0.7
+            temperature: temperature
         })
     });
 
@@ -216,7 +216,7 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096) {
 /**
  * Make a streaming request to OpenRouter and pipe SSE chunks to Express response
  */
-async function streamOpenRouter(modelId, messages, res, maxTokens = 4096) {
+async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temperature = 0.7) {
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -229,7 +229,7 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096) {
             model: modelId,
             messages: messages,
             max_tokens: maxTokens,
-            temperature: 0.7,
+            temperature: temperature,
             stream: true
         })
     });
@@ -272,8 +272,232 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096) {
     }
 }
 
+/**
+ * Utility: parse (possibly noisy) JSON from a model response.
+ * If parsing fails, returns null.
+ */
+function safeParseJSON(text) {
+    if (!text || typeof text !== 'string') return null;
+    const firstBrace = text.indexOf('{');
+    const lastBrace = text.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
+    const candidate = text.slice(firstBrace, lastBrace + 1);
+    try {
+        return JSON.parse(candidate);
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Utility: simple Fisher-Yates shuffle
+ */
+function shuffleArray(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+/**
+ * Build Stage 2 reviewer messages for anonymous peer review.
+ * Each reviewer sees:
+ * - Original user query
+ * - Answer A, B, C, D (no model identities)
+ */
+function buildReviewerMessages(userQuery, answersByLabel, labelOrder) {
+    const orderedLabels = labelOrder || Object.keys(answersByLabel);
+    let answersBlock = '';
+    for (const label of orderedLabels) {
+        answersBlock += `Answer ${label}:\n${answersByLabel[label]}\n\n`;
+    }
+
+    const systemPrompt = `
+You are part of an anonymous review panel evaluating multiple answers to the same user question.
+
+Important rules:
+- You do NOT know which model wrote which answer.
+- Do NOT try to guess which model wrote what.
+- Focus only on the content quality.
+- You are evaluating for a human user who cares about both correctness and creativity.
+
+You must:
+1. Rank the answers by Accuracy (most accurate to least accurate).
+2. Rank the answers by Insight (most insightful / helpful to least).
+3. Give a brief explanation for your top choice in each category.
+
+Definitions:
+- Accuracy: factual correctness, lack of hallucinations, correct use of terminology, and appropriate caveats where the answer is uncertain.
+- Insight: depth of reasoning, helpful structure, non-obvious but valid ideas, and practical usefulness to the user.
+
+Do NOT write a new answer to the question. You are only judging the answers provided.
+
+Respond ONLY with a valid JSON object in this exact structure:
+
+{
+  "accuracy_ranking": ["A", "B", "C", "D"],
+  "insight_ranking": ["C", "B", "A", "D"],
+  "top_accuracy_explanation": "Short explanation of why the top-ranked answer is most accurate.",
+  "top_insight_explanation": "Short explanation of why the top-ranked answer is most insightful."
+}
+`;
+
+    const userContent = `Original user question:
+
+${userQuery}
+
+Candidate answers (in random order):
+
+${answersBlock}
+
+Now provide your rankings and explanations as described.`;
+
+    return [
+        { role: 'system', content: systemPrompt.trim() },
+        { role: 'user', content: userContent }
+    ];
+}
+
+/**
+ * Run Stage 2 peer review and compute Chairman using Borda-style scoring.
+ * 
+ * Inputs:
+ *  - userQuery: string
+ *  - labeledResults: [{ label, key, name, emoji, response }]
+ * 
+ * Returns:
+ *  {
+ *    chairmanLabel,
+ *    chairmanResult,   // the chosen result object
+ *    scores: { [label]: { accPoints, insightPoints, councilScore } },
+ *    rawReviews: [ ... ] // optional debugging info
+ *  }
+ */
+async function runCouncilReview(userQuery, labeledResults) {
+    const labels = labeledResults.map(r => r.label);
+    const answersByLabel = {};
+    for (const r of labeledResults) {
+        answersByLabel[r.label] = r.response || '';
+    }
+
+    const modelKeys = ['scout', 'medic', 'navigator', 'ranger'];
+    const N = labels.length;
+    const accPoints = {};
+    const insightPoints = {};
+    const rawReviews = [];
+
+    labels.forEach(label => {
+        accPoints[label] = 0;
+        insightPoints[label] = 0;
+    });
+
+    // Stage 2: each model acts as a reviewer, anonymously
+    const reviewPromises = modelKeys.map(async (reviewKey) => {
+        const reviewModel = COMMAND_MODELS[reviewKey];
+        // Randomize label order per reviewer to reduce positional bias
+        const shuffledLabels = shuffleArray(labels);
+        const reviewMessages = buildReviewerMessages(userQuery, answersByLabel, shuffledLabels);
+
+        try {
+            const reviewText = await callOpenRouter(reviewModel.id, reviewMessages, 1024, 0.2);
+            const parsed = safeParseJSON(reviewText);
+
+            if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(parsed.insight_ranking)) {
+                console.warn(`[Council Review] ${reviewModel.shortName} returned invalid review JSON.`);
+                return { reviewer: reviewKey, success: false, raw: reviewText };
+            }
+
+            // Borda scoring: best gets N-1 points, worst gets 0
+            const ar = parsed.accuracy_ranking;
+            const ir = parsed.insight_ranking;
+
+            // Accuracy points
+            ar.forEach((label, idx) => {
+                if (labels.includes(label)) {
+                    accPoints[label] += (N - 1 - idx);
+                }
+            });
+
+            // Insight points
+            ir.forEach((label, idx) => {
+                if (labels.includes(label)) {
+                    insightPoints[label] += (N - 1 - idx);
+                }
+            });
+
+            rawReviews.push({
+                reviewer: reviewKey,
+                modelName: reviewModel.name,
+                accuracy_ranking: ar,
+                insight_ranking: ir,
+                top_accuracy_explanation: parsed.top_accuracy_explanation,
+                top_insight_explanation: parsed.top_insight_explanation
+            });
+
+            return { reviewer: reviewKey, success: true };
+        } catch (error) {
+            console.error(`[Council Review] ${reviewModel.shortName} review error:`, error.message);
+            return { reviewer: reviewKey, success: false, error: error.message };
+        }
+    });
+
+    await Promise.all(reviewPromises);
+
+    // Combine accuracy + insight into CouncilScore
+    const scores = {};
+    const wAcc = 2; // Accuracy weight
+    const wIns = 1; // Insight weight
+
+    labels.forEach(label => {
+        const a = accPoints[label];
+        const i = insightPoints[label];
+        const councilScore = wAcc * a + wIns * i;
+        scores[label] = { accPoints: a, insightPoints: i, councilScore };
+    });
+
+    // Select Chairman by highest CouncilScore, with tie-breakers
+    let chairmanLabel = labels[0];
+    for (const label of labels) {
+        const current = scores[label];
+        const best = scores[chairmanLabel];
+        if (!best) {
+            chairmanLabel = label;
+            continue;
+        }
+        if (current.councilScore > best.councilScore) {
+            chairmanLabel = label;
+        } else if (current.councilScore === best.councilScore) {
+            // Tie-breaker 1: higher accuracy points
+            if (current.accPoints > best.accPoints) {
+                chairmanLabel = label;
+            } else if (current.accPoints === best.accPoints) {
+                // Tie-breaker 2: higher insight points
+                if (current.insightPoints > best.insightPoints) {
+                    chairmanLabel = label;
+                } else if (current.insightPoints === best.insightPoints) {
+                    // Tie-breaker 3: alphabetical label (deterministic)
+                    if (label < chairmanLabel) {
+                        chairmanLabel = label;
+                    }
+                }
+            }
+        }
+    }
+
+    const chairmanResult = labeledResults.find(r => r.label === chairmanLabel);
+
+    return {
+        chairmanLabel,
+        chairmanResult,
+        scores,
+        rawReviews
+    };
+}
+
 // =============================================================================
-// ORIGINAL API ROUTES (Free Demo - Gemma 3)
+/** ORIGINAL API ROUTES (Free Demo - Gemma 3) */
 // =============================================================================
 
 /**
@@ -385,7 +609,7 @@ app.post('/api/stream', async (req, res) => {
 });
 
 // =============================================================================
-// COMMAND CENTER API ROUTES (Premium - Multi-Model)
+/** COMMAND CENTER API ROUTES (Premium - Multi-Model) */
 // =============================================================================
 
 /**
@@ -440,14 +664,15 @@ app.post('/api/command/stream', async (req, res) => {
 
 /**
  * POST /api/command/council
- * Command Council mode - parallel calls to all 4 models, then synthesis
+ * Command Council mode - parallel calls to all 4 models, then competitive ranking + synthesis
  * 
  * Flow:
  * 1. Send user query to Scout, Medic, Navigator, Ranger in parallel
  * 2. Collect all 4 responses
- * 3. Send progress updates via SSE
- * 4. Synthesize the best answer using GPT-4o as the "chairman"
- * 5. Stream the synthesized response to the client
+ * 3. Run anonymous peer review (each model ranks all answers for accuracy & insight)
+ * 4. Compute Chairman using Borda-style scoring
+ * 5. Use Scout (GPT-4o) as Command editor to synthesize final answer
+ * 6. Stream the synthesized response to the client
  */
 app.post('/api/command/council', async (req, res) => {
     try {
@@ -466,8 +691,6 @@ app.post('/api/command/council', async (req, res) => {
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         
-        const openRouterMessages = buildOpenRouterMessages(messages, true);
-        
         // Extract the user's original query (last user message)
         const lastUserMessage = messages.filter(m => m.role === 'user').pop();
         const userQuery = lastUserMessage?.content || '';
@@ -476,6 +699,8 @@ app.post('/api/command/council', async (req, res) => {
         
         // Step 1: Make parallel calls to all 4 models
         const modelKeys = ['scout', 'medic', 'navigator', 'ranger'];
+        const baseMessages = buildOpenRouterMessages(messages, true);
+        
         const promises = modelKeys.map(async (key) => {
             const model = COMMAND_MODELS[key];
             try {
@@ -489,7 +714,7 @@ app.post('/api/command/council', async (req, res) => {
                 })}\n\n`);
                 
                 console.log(`[Council] ${model.shortName} responded (${response.length} chars)`);
-                return { key, name: model.name, emoji: model.emoji, response };
+                return { key, name: model.name, shortName: model.shortName, emoji: model.emoji, response };
             } catch (error) {
                 console.error(`[Council] ${model.shortName} error:`, error.message);
                 
@@ -498,33 +723,125 @@ app.post('/api/command/council', async (req, res) => {
                     message: `${model.emoji} ${model.shortName} error (skipped)` 
                 })}\n\n`);
                 
-                return { key, name: model.name, emoji: model.emoji, response: `[Error: ${error.message}]` };
+                return { key, name: model.name, shortName: model.shortName, emoji: model.emoji, response: `[Error: ${error.message}]` };
             }
         });
         
         const results = await Promise.all(promises);
-        
-        // Step 2: Signal synthesis phase
+
+        // Assign labels A, B, C, D to each result in a deterministic order
+        const labeledResults = results.map((r, idx) => ({
+            label: String.fromCharCode(65 + idx), // 'A', 'B', 'C', ...
+            ...r
+        }));
+
+        // Step 2: Run competitive peer review to select Chairman
+        res.write(`data: ${JSON.stringify({ 
+            progress: 'review', 
+            message: '🤝 Running anonymous peer review (accuracy + insight)...' 
+        })}\n\n`);
+
+        const reviewOutcome = await runCouncilReview(userQuery, labeledResults);
+        const { chairmanLabel, chairmanResult, scores } = reviewOutcome;
+
+        // Build a scores summary for the frontend
+        const scoresSummary = {};
+        for (const r of labeledResults) {
+            const s = scores[r.label];
+            scoresSummary[r.label] = {
+                model: r.shortName,
+                emoji: r.emoji,
+                key: r.key,
+                accPoints: s.accPoints,
+                insightPoints: s.insightPoints,
+                councilScore: s.councilScore
+            };
+        }
+
+        res.write(`data: ${JSON.stringify({ 
+            progress: 'chairman', 
+            message: `🏆 Chairman selected: ${chairmanResult.emoji} ${chairmanResult.shortName} (Answer ${chairmanLabel})`,
+            chairmanKey: chairmanResult.key,
+            chairmanLabel: chairmanLabel,
+            scores: scoresSummary
+        })}\n\n`);
+
+        console.log('[Council] Chairman selected:', {
+            label: chairmanLabel,
+            modelKey: chairmanResult.key,
+            modelName: chairmanResult.name,
+            scores
+        });
+
+        // Step 3: Signal synthesis phase
         res.write(`data: ${JSON.stringify({ 
             progress: 'synthesis', 
-            message: '⭐ Synthesizing council consensus...' 
+            message: '⭐ Synthesizing Command answer from Chairman + advisors...' 
         })}\n\n`);
         
-        // Step 3: Build the synthesis prompt
+        // Step 4: Build the synthesis prompt
+        const chairmanBlock = `Chairman answer (selected as best by peer review):
+[Model: ${chairmanResult.name}]
+[Label: ${chairmanLabel}]
+${chairmanResult.response}`;
+
+        const advisorBlocks = labeledResults
+            .filter(r => r.label !== chairmanLabel)
+            .map(r => `Advisor answer:
+[Model: ${r.name}]
+[Label: ${r.label}]
+${r.response}`)
+            .join('\n\n---\n\n');
+
         const synthesisMessages = [
             {
                 role: 'system',
-                content: 'You are the Command Center chairman. Your job is to synthesize the single best, most comprehensive, and safest answer from the responses of four AI assistants. Provide a clear, well-structured response. Do not mention the debate, the other models, or the council process in your final response. Just deliver the best answer directly.'
+                content: `
+You are the Command Center editor-in-chief.
+
+You are given:
+- The user's original question.
+- One "Chairman" answer that was ranked highest by a peer-review process for accuracy and insight.
+- Several "advisor" answers from other models that may contain useful details, edge cases, or alternative perspectives.
+
+Your job:
+1. Use the Chairman answer as the primary spine of your response.
+2. Incorporate genuinely helpful improvements, clarifications, and edge cases from the advisor answers.
+3. Resolve any conflicts explicitly and conservatively (do not blindly merge contradictions).
+4. Clearly mark uncertainty where it matters, especially in safety-critical domains.
+5. Write a single, decisive, well-structured answer that is at least as accurate and insightful as the Chairman answer, and ideally better.
+
+Do NOT mention the council process, voting, peer review, or other models in your final answer.
+Just speak directly to the user with the best possible response.
+`.trim()
             },
             {
                 role: 'user',
-                content: `User query: ${userQuery}\n\nFour AI assistants provided these answers:\n\n${results.map(r => `${r.emoji} ${r.name}:\n${r.response}`).join('\n\n---\n\n')}\n\nBased on these, synthesize the single best, most comprehensive, and safest answer. Do not mention the debate or the other models in your final response.`
+                content: `
+User query:
+${userQuery}
+
+${chairmanBlock}
+
+${advisorBlocks ? '\n\n---\n\n' + advisorBlocks : ''}
+
+Based on these, write the final Command answer as described.
+`.trim()
             }
         ];
         
-        // Step 4: Stream the synthesis response
-        console.log('[Council] Starting synthesis stream...');
-        await streamOpenRouter(COMMAND_MODELS.scout.id, synthesisMessages, res, 4096);
+        // Step 5: Stream the synthesis response (using Scout/GPT-4o as the editor)
+        console.log('[Council] Starting synthesis stream (Command editor)...');
+        // Send the council metadata before streaming begins
+        res.write(`data: ${JSON.stringify({ 
+            councilMeta: {
+                chairmanKey: chairmanResult.key,
+                chairmanName: chairmanResult.shortName,
+                chairmanEmoji: chairmanResult.emoji,
+                scores: scoresSummary
+            }
+        })}\n\n`);
+        await streamOpenRouter(COMMAND_MODELS.scout.id, synthesisMessages, res, 4096, 0.5);
         
         res.write('data: [DONE]\n\n');
         res.end();
