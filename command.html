@@ -41,6 +41,10 @@
         .sidebar {
             width: 260px;
             flex-shrink: 0;
+            height: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .chat-container {
@@ -183,9 +187,10 @@
         /* ---- Input Area: Modern, Centered, Floating ---- */
         .input-area {
             padding: 16px 24px 20px;
-            background: transparent;
+            background: #faf8f5;
             border-top: none;
             position: relative;
+            flex-shrink: 0;
         }
 
         .input-container {
@@ -1124,6 +1129,28 @@
                 font-size: 13px;
             }
 
+            /* Center COMMAND badge in mobile header */
+            .header {
+                justify-content: space-between;
+                position: fixed;
+            }
+
+            .header-left {
+                gap: 8px;
+                flex: 0 0 auto;
+            }
+
+            .header-left .online-badge {
+                display: none;
+            }
+
+            .header-center-mobile {
+                display: flex !important;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+
             .messages {
                 padding: 12px !important;
                 padding-bottom: 170px !important;
@@ -1137,27 +1164,32 @@
 
             .welcome {
                 padding: 10px 16px;
-                padding-top: 60px;
+                padding-top: 56px;
                 justify-content: flex-start;
             }
 
             .welcome h2 {
-                font-size: 20px;
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .welcome-subtitle {
+                font-size: 12px;
+                margin-bottom: 8px;
             }
 
             .welcome-icon {
-                width: 80px;
-                height: 80px;
-                margin-bottom: 10px;
+                width: 50px;
+                height: 50px;
+                margin-bottom: 8px;
             }
 
             .welcome-description {
-                font-size: 13px;
-                margin-bottom: 16px;
+                display: none;
             }
 
             .feature-badges {
-                margin-bottom: 10px;
+                margin-bottom: 6px;
             }
 
             .feature-badge {
@@ -1172,10 +1204,29 @@
             .mobile-actions {
                 display: flex;
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
                 width: 100%;
                 max-width: 400px;
                 margin-bottom: 10px;
+            }
+
+            .mobile-action-card {
+                padding: 10px 14px;
+                gap: 12px;
+            }
+
+            .mobile-action-icon {
+                font-size: 18px;
+                width: 36px;
+                height: 36px;
+            }
+
+            .mobile-action-title {
+                font-size: 14px;
+            }
+
+            .mobile-action-desc {
+                font-size: 11px;
             }
 
             /* Input area mobile */
@@ -1300,6 +1351,7 @@
             <h1 class="title">OffGrid <span class="desktop-only">Command Center</span><span class="mobile-only">Command</span></h1>
             <span class="online-badge">COMMAND</span>
         </div>
+        <div class="header-center-mobile" style="display: none;"><span class="online-badge" style="margin-left: 0;">COMMAND</span></div>
         <div style="display: flex; align-items: center; gap: 12px;">
             <a href="/" class="back-link desktop-only">← Free Version</a>
             <a href="https://offgridaitoolkit.com" target="_blank" class="purchase-cta">
@@ -1440,11 +1492,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Input Area -->
-    <div class="input-area">
+            <!-- Input Area -->
+            <div class="input-area">
         <div class="input-container">
             <!-- Image preview -->
             <div class="image-preview" id="imagePreview">
@@ -1539,6 +1589,8 @@
                 <button class="send-button" onclick="sendMessage()" id="sendButton">
                     Send
                 </button>
+            </div>
+            </div>
             </div>
         </div>
     </div>
