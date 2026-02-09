@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>OffGrid Command Center — Multi-Model AI Council</title>
-    <meta name="description" content="OffGrid Command Center: Access GPT-4o, Claude, Gemini, and Grok through one interface. Command mode synthesizes the best answer from all four AI models.">
+    <meta name="description" content="OffGrid Command Center: Access GPT 5.2, Claude, Gemini, and Grok through one interface. Command mode synthesizes the best answer from all four AI models.">
     
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://offgridtoolkit.ai/command">
     <meta property="og:title" content="OffGrid Command Center — Multi-Model AI Council">
-    <meta property="og:description" content="Access GPT-4o, Claude, Gemini, and Grok through one interface. Command mode synthesizes the best answer from all four AI models.">
+    <meta property="og:description" content="Access GPT 5.2, Claude, Gemini, and Grok through one interface. Command mode synthesizes the best answer from all four AI models.">
     <meta property="og:image" content="https://offgridtoolkit.ai/og-image.png">
     
     <link rel="icon" type="image/png" href="compasstilted.png">
@@ -866,7 +866,7 @@
 
         .prompt-item {
             padding: 8px 10px;
-            background: rgba(255, 255, 255, 0.8);
+            background: #ffffff;
             border: 1px solid rgba(184, 134, 11, 0.3);
             border-radius: 6px;
             margin-bottom: 4px;
@@ -878,7 +878,7 @@
         }
 
         .prompt-item:hover {
-            background: rgba(255, 255, 255, 0.95);
+            background: #fff8e7;
             border-color: #daa520;
             color: #2c1810;
         }
@@ -1222,19 +1222,19 @@
             }
 
             .welcome h2 {
-                font-size: 17px;
-                margin-bottom: 2px;
+                font-size: 19px;
+                margin-bottom: 3px;
             }
 
             .welcome-subtitle {
-                font-size: 11px;
+                font-size: 12px;
                 margin-bottom: 6px;
             }
 
             .welcome-icon {
-                width: 44px;
-                height: 44px;
-                margin-bottom: 6px;
+                width: 38px;
+                height: 38px;
+                margin-bottom: 4px;
             }
 
             .welcome-description {
@@ -1242,7 +1242,7 @@
             }
 
             .feature-badges {
-                margin-bottom: 10px;
+                margin-bottom: 12px;
             }
 
             .feature-badge {
@@ -1264,22 +1264,22 @@
             }
 
             .mobile-action-card {
-                padding: 8px 12px;
-                gap: 10px;
+                padding: 10px 14px;
+                gap: 12px;
             }
 
             .mobile-action-icon {
-                font-size: 16px;
-                width: 32px;
-                height: 32px;
+                font-size: 18px;
+                width: 36px;
+                height: 36px;
             }
 
             .mobile-action-title {
-                font-size: 13px;
+                font-size: 14px;
             }
 
             .mobile-action-desc {
-                font-size: 10px;
+                font-size: 11px;
             }
 
             /* Input area mobile - always visible */
@@ -1382,7 +1382,7 @@
             <div class="first-run-tagline">Multi-Model AI Council • Premium Intelligence</div>
             <div class="first-run-message">
                 <p><strong>Welcome to the Command Center!</strong></p>
-                <p>⭐ Access 4 leading AI models: GPT-4o, Claude, Gemini Pro, and Grok</p>
+                <p>⭐ Access 4 leading AI models: GPT 5.2, Claude, Gemini Pro, and Grok</p>
                 <p>🎖️ <strong>Command Mode</strong> runs anonymous peer review — each model scores the others, a Chairman is elected, and the best answer is synthesized</p>
                 <p>⚡ Real-time streaming responses</p>
                 <div class="model-roster-fr">
@@ -1469,6 +1469,15 @@
                     <div class="prompt-item" onclick="usePrompt(this)">Explain the Rule of 3s in survival situations</div>
                     <div class="prompt-item" onclick="usePrompt(this)">How do I navigate using the stars if I have no compass?</div>
                     <div class="prompt-item" onclick="usePrompt(this)">What's the best way to signal for rescue in a remote area?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">I'm stranded for 10 days in the wilderness with limited gear. Build a day-by-day survival plan covering shelter, water, food, fire, and risk management.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">A grid-down event has just started with no clear restoration timeline. Walk me through the first 72 hours of decisions a prepared household should make.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Design the most effective bug-out bag under a strict 30 lb weight limit and explain the tradeoffs behind every major choice.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">My vehicle has broken down in a remote area far from help. How do I decide whether to stay with the vehicle or attempt to travel for assistance?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Design a 12-month food and resource strategy for a small homestead that minimizes dependence on outside supply chains.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">I found an unknown plant while hiking. Walk me through the safest decision process before considering whether it's edible.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">In a remote setting with no emergency services, how should I triage and prioritize care for multiple injuries after an accident?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Build a medical kit optimized for long-term off-grid living and explain how training level changes what should be included.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">In a long-term societal collapse scenario, what items would have the strongest long-term bartering value, why certain goods outperform others in collapse conditions, and how bartering priorities change over time.</div>
                 </div>
             </div>
 
@@ -1476,7 +1485,7 @@
                 <div class="sidebar-title">Model Roster</div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <div class="roster-item scout">
-                        <div class="roster-item-name">🔭 Scout <span style="font-weight: 400;">(GPT-4o)</span></div>
+                        <div class="roster-item-name">🔭 Scout <span style="font-weight: 400;">(GPT 5.2)</span></div>
                         <div class="roster-item-desc">Vision specialist. Best for image analysis, visual tasks, and multimodal queries.</div>
                     </div>
                     <div class="roster-item medic">
@@ -1488,7 +1497,7 @@
                         <div class="roster-item-desc">Research and planning. Deep analysis, strategy, and long-context reasoning.</div>
                     </div>
                     <div class="roster-item ranger">
-                        <div class="roster-item-name">🏕️ Ranger <span style="font-weight: 400;">(Grok 3 Mini)</span></div>
+                        <div class="roster-item-name">🏕️ Ranger <span style="font-weight: 400;">(Grok 4.1)</span></div>
                         <div class="roster-item-desc">Creative solutions. Unconventional thinking and rapid problem-solving.</div>
                     </div>
                 </div>
@@ -1541,17 +1550,21 @@
                                         <span class="attach-menu-icon">✍️</span>
                                         <span>Transcribe Text from Image</span>
                                     </div>
-                                    <div class="attach-menu-item" onclick="setupFactCheck(); closeAttachMenu();">
+                                    <div class="attach-menu-item" onclick="setupFactCheckClaim(); closeAttachMenu();">
                                         <span class="attach-menu-icon">✅</span>
-                                        <span>Fact Check</span>
+                                        <span>Fact Check Claim</span>
                                     </div>
-                                    <div class="attach-menu-item" onclick="setupSummarize(); closeAttachMenu();">
+                                    <div class="attach-menu-item" onclick="setupFactCheckDoc(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📊</span>
+                                        <span>Fact Check Document</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupSummarizeText(); closeAttachMenu();">
                                         <span class="attach-menu-icon">📝</span>
-                                        <span>Summarize</span>
+                                        <span>Summarize Text</span>
                                     </div>
-                                    <div class="attach-menu-item" onclick="openImageIdentifier(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">🔍</span>
-                                        <span>Identify Image</span>
+                                    <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📖</span>
+                                        <span>Summarize Document</span>
                                     </div>
                                 </div>
 
@@ -1586,20 +1599,20 @@
                                         <div class="model-dropdown" id="modelDropdownWelcome">
                                             <div class="model-list">
                                                 <div class="model-item scout-item" onclick="selectModel('scout')">
-                                                    <div class="model-item-name">🔭 Scout (GPT-4o) <span class="model-item-badge badge-scout">Vision</span></div>
-                                                    <div class="model-item-desc">Vision Specialist — image analysis & visual tasks</div>
+                                                    <div class="model-item-name">🔭 Scout (GPT 5.2) <span class="model-item-badge badge-scout">Vision</span></div>
+                                                    <div class="model-item-desc">Vision specialist, image analysis, visual tasks, and multimodal queries</div>
                                                 </div>
                                                 <div class="model-item medic-item" onclick="selectModel('medic')">
                                                     <div class="model-item-name">🏥 Medic (Claude 4.5 Sonnet) <span class="model-item-badge badge-medic">Safety</span></div>
-                                                    <div class="model-item-desc">Safety & Analysis — thorough, careful reasoning</div>
+                                                    <div class="model-item-desc">Safety and analysis, thorough, careful reasoning with attention to nuance</div>
                                                 </div>
                                                 <div class="model-item navigator-item" onclick="selectModel('navigator')">
                                                     <div class="model-item-name">🧭 Navigator (Gemini 2.5 Pro) <span class="model-item-badge badge-navigator">Research</span></div>
-                                                    <div class="model-item-desc">Research & Planning — deep analysis & strategy</div>
+                                                    <div class="model-item-desc">Research and planning, deep analysis, strategy, and long-context reasoning</div>
                                                 </div>
                                                 <div class="model-item ranger-item" onclick="selectModel('ranger')">
-                                                    <div class="model-item-name">🏕️ Ranger (Grok 3 Mini) <span class="model-item-badge badge-ranger">Creative</span></div>
-                                                    <div class="model-item-desc">Creative Solutions — unconventional thinking</div>
+                                                    <div class="model-item-name">🏕️ Ranger (Grok 4.1) <span class="model-item-badge badge-ranger">Creative</span></div>
+                                                    <div class="model-item-desc">Creative solutions, unconventional thinking and rapid problem-solving</div>
                                                 </div>
                                                 <div class="model-item command-item selected" onclick="selectModel('command')">
                                                     <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
@@ -1691,17 +1704,21 @@
                         <span class="attach-menu-icon">✍️</span>
                         <span>Transcribe Text from Image</span>
                     </div>
-                    <div class="attach-menu-item" onclick="setupFactCheck(); closeAttachMenu();">
+                    <div class="attach-menu-item" onclick="setupFactCheckClaim(); closeAttachMenu();">
                         <span class="attach-menu-icon">✅</span>
-                        <span>Fact Check</span>
+                        <span>Fact Check Claim</span>
                     </div>
-                    <div class="attach-menu-item" onclick="setupSummarize(); closeAttachMenu();">
+                    <div class="attach-menu-item" onclick="setupFactCheckDoc(); closeAttachMenu();">
+                        <span class="attach-menu-icon">📊</span>
+                        <span>Fact Check Document</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="setupSummarizeText(); closeAttachMenu();">
                         <span class="attach-menu-icon">📝</span>
-                        <span>Summarize</span>
+                        <span>Summarize Text</span>
                     </div>
-                    <div class="attach-menu-item" onclick="openImageIdentifier(); closeAttachMenu();">
-                        <span class="attach-menu-icon">🔍</span>
-                        <span>Identify Image</span>
+                    <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
+                        <span class="attach-menu-icon">📖</span>
+                        <span>Summarize Document</span>
                     </div>
                 </div>
 
@@ -1739,20 +1756,20 @@
                         <div class="model-dropdown" id="modelDropdown">
                             <div class="model-list">
                                 <div class="model-item scout-item" onclick="selectModel('scout')">
-                                    <div class="model-item-name">🔭 Scout (GPT-4o) <span class="model-item-badge badge-scout">Vision</span></div>
-                                    <div class="model-item-desc">Vision Specialist — image analysis & visual tasks</div>
+                                    <div class="model-item-name">🔭 Scout (GPT 5.2) <span class="model-item-badge badge-scout">Vision</span></div>
+                                    <div class="model-item-desc">Vision specialist, image analysis, visual tasks, and multimodal queries</div>
                                 </div>
                                 <div class="model-item medic-item" onclick="selectModel('medic')">
                                     <div class="model-item-name">🏥 Medic (Claude 4.5 Sonnet) <span class="model-item-badge badge-medic">Safety</span></div>
-                                    <div class="model-item-desc">Safety & Analysis — thorough, careful reasoning</div>
+                                    <div class="model-item-desc">Safety and analysis, thorough, careful reasoning with attention to nuance</div>
                                 </div>
                                 <div class="model-item navigator-item" onclick="selectModel('navigator')">
                                     <div class="model-item-name">🧭 Navigator (Gemini 2.5 Pro) <span class="model-item-badge badge-navigator">Research</span></div>
-                                    <div class="model-item-desc">Research & Planning — deep analysis & strategy</div>
+                                    <div class="model-item-desc">Research and planning, deep analysis, strategy, and long-context reasoning</div>
                                 </div>
                                 <div class="model-item ranger-item" onclick="selectModel('ranger')">
-                                    <div class="model-item-name">🏕️ Ranger (Grok 3 Mini) <span class="model-item-badge badge-ranger">Creative</span></div>
-                                    <div class="model-item-desc">Creative Solutions — unconventional thinking</div>
+                                    <div class="model-item-name">🏕️ Ranger (Grok 4.1) <span class="model-item-badge badge-ranger">Creative</span></div>
+                                    <div class="model-item-desc">Creative solutions, unconventional thinking and rapid problem-solving</div>
                                 </div>
                                 <div class="model-item command-item selected" onclick="selectModel('command')">
                                     <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
@@ -1817,7 +1834,7 @@
 
         const MODEL_CONFIG = {
             scout: {
-                name: '🔭 Scout (GPT-4o)',
+                name: '🔭 Scout (GPT 5.2)',
                 shortName: '🔭 Scout',
                 badge: 'Vision',
                 badgeClass: 'badge-scout',
@@ -1841,7 +1858,7 @@
                 color: '#10b981'
             },
             ranger: {
-                name: '🏕️ Ranger (Grok 3)',
+                name: '🏕️ Ranger (Grok 4.1)',
                 shortName: '🏕️ Ranger',
                 badge: 'Creative',
                 badgeClass: 'badge-ranger',
@@ -2175,7 +2192,7 @@
                 <div class="council-progress-title">⭐ Command Council Deliberating...</div>
                 <div class="council-step active" id="step-scout">
                     <div class="council-step-icon">🔭</div>
-                    <span>Scout (GPT-4o) analyzing...</span>
+                    <span>Scout (GPT 5.2) analyzing...</span>
                 </div>
                 <div class="council-step" id="step-medic">
                     <div class="council-step-icon">🏥</div>
@@ -2187,7 +2204,7 @@
                 </div>
                 <div class="council-step" id="step-ranger">
                     <div class="council-step-icon">🏕️</div>
-                    <span>Ranger (Grok 3) analyzing...</span>
+                    <span>Ranger (Grok 4.1) analyzing...</span>
                 </div>
                 <div class="council-step" id="step-review">
                     <div class="council-step-icon">🤝</div>
@@ -2645,9 +2662,9 @@
             triggerGalleryUpload();
         }
 
-        function setupFactCheck() {
+        function setupFactCheckClaim() {
             const input = getActiveInput();
-            const prompt = 'Fact check the following: [paste claim or text here]';
+            const prompt = 'Fact check the following claim: [paste or type your claim here]';
             input.value = prompt;
             autoResize(input);
             setTimeout(() => {
@@ -2658,7 +2675,14 @@
             }, 100);
         }
 
-        function setupSummarize() {
+        function setupFactCheckDoc() {
+            const input = getActiveInput();
+            input.value = 'Fact check the following document. Identify any inaccurate claims, unsupported statements, or misleading information and provide corrections with sources where possible.';
+            autoResize(input);
+            document.getElementById('docInput').click();
+        }
+
+        function setupSummarizeText() {
             const input = getActiveInput();
             const prompt = 'Summarize the following text in a clear, concise format with key points: [paste text here]';
             input.value = prompt;
@@ -2669,6 +2693,13 @@
                 const end = prompt.indexOf(']') + 1;
                 input.setSelectionRange(start, end);
             }, 100);
+        }
+
+        function setupSummarizeDoc() {
+            const input = getActiveInput();
+            input.value = 'Summarize the following document in a clear, concise format. Include the main points, key findings, and any important conclusions.';
+            autoResize(input);
+            document.getElementById('docInput').click();
         }
 
         function openImageIdentifier() {

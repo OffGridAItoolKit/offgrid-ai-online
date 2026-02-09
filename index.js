@@ -62,8 +62,8 @@ const GEMMA_MODELS = {
 // Command Center Models (Premium)
 const COMMAND_MODELS = {
     'scout': {
-        id: 'openai/gpt-4o',
-        name: 'Scout (GPT-4o)',
+        id: 'openai/gpt-5.2',
+        name: 'Scout (GPT 5.2)',
         shortName: 'Scout',
         emoji: '🔭',
         description: 'Vision Specialist',
@@ -71,7 +71,7 @@ const COMMAND_MODELS = {
     },
     'medic': {
         id: 'anthropic/claude-sonnet-4',
-        name: 'Medic (Claude Sonnet 4)',
+        name: 'Medic (Claude 4.5 Sonnet)',
         shortName: 'Medic',
         emoji: '🏥',
         description: 'Safety & Analysis',
@@ -86,12 +86,12 @@ const COMMAND_MODELS = {
         multimodal: true
     },
     'ranger': {
-        id: 'x-ai/grok-3-mini',
-        name: 'Ranger (Grok 3 Mini)',
+        id: 'x-ai/grok-4.1-fast',
+        name: 'Ranger (Grok 4.1)',
         shortName: 'Ranger',
         emoji: '🏕️',
         description: 'Creative Solutions',
-        multimodal: false
+        multimodal: true
     }
 };
 
@@ -890,10 +890,10 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('║    • MedGemma 3 4B (medgemma-3-4b)                        ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Command Center Models:                                   ║');
-    console.log('║    🔭 Scout    (GPT-4o)          - Vision Specialist      ║');
-    console.log('║    🏥 Medic    (Claude Sonnet 4)  - Safety & Analysis     ║');
+    console.log('║    🔭 Scout    (GPT 5.2)          - Vision Specialist      ║');
+    console.log('║    🏥 Medic    (Claude 4.5 Sonnet) - Safety & Analysis     ║');
     console.log('║    🧭 Navigator (Gemini 2.5 Pro)  - Research & Planning   ║');
-    console.log('║    🏕️  Ranger   (Grok 3 Mini)     - Creative Solutions    ║');
+    console.log('║    🏕️  Ranger   (Grok 4.1)        - Creative Solutions    ║');
     console.log('║    ⭐ Command  (Council Consensus) - All 4 + Synthesis    ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  API Key: ${OPENROUTER_API_KEY ? '✓ Configured' : '✗ Missing'}                               ║`);
