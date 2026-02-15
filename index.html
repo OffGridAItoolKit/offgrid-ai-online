@@ -627,19 +627,19 @@
                             <div class="welcome-button-row">
                                 <div class="welcome-model-selector">
                                     <button class="welcome-model-button" id="welcomeModelButton" onclick="toggleWelcomeModelDropdown()">
-                                        <span class="model-name" id="welcomeSelectedModelName">Gemma 3 4B</span>
-                                        <span class="model-speed-badge" id="welcomeSpeedBadge">⚡ Fastest</span>
+                                        <span class="model-name" id="welcomeSelectedModelName">Gemma 3 12B</span>
+                                        <span class="model-speed-badge" id="welcomeSpeedBadge">⚡ Fast</span>
                                         <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px;">
                                             <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
                                         </svg>
                                     </button>
                                     <div class="welcome-model-dropdown" id="welcomeModelDropdown">
                                         <div class="welcome-model-list">
-                                            <div class="welcome-model-item selected" onclick="selectWelcomeModel('gemma-3-4b', 'Gemma 3 4B', '⚡ Fastest')">
+                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-4b', 'Gemma 3 4B', '⚡ Fastest')">
                                                 <div class="welcome-model-item-name">Gemma 3 4B</div>
                                                 <div class="welcome-model-item-desc">⚡ Fastest • ~1-2 seconds</div>
                                             </div>
-                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-12b', 'Gemma 3 12B', '⚡ Fast')">
+                                            <div class="welcome-model-item selected" onclick="selectWelcomeModel('gemma-3-12b', 'Gemma 3 12B', '⚡ Fast')">
                                                 <div class="welcome-model-item-name">Gemma 3 12B</div>
                                                 <div class="welcome-model-item-desc">⚡ Fast • ~1-3 seconds</div>
                                             </div>
@@ -720,7 +720,7 @@
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
         
-        let selectedModel = 'gemma-3-4b';
+        let selectedModel = 'gemma-3-12b';
         let isTyping = false;
         let selectedImage = null;
         let conversationHistory = [];
@@ -928,7 +928,7 @@
             messageDiv.innerHTML = `
                 <div class="message-avatar">AI</div>
                 <div class="message-content">
-                    <div class="message-text markdown-content">${info.content}</div>
+                    <div class="message-text markdown-content">${info.content.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ')}</div>
                 </div>
             `;
             messagesDiv.appendChild(messageDiv);
@@ -1370,6 +1370,8 @@
             let displayText = text;
             if (sender === 'assistant' && typeof marked !== 'undefined') {
                 displayText = marked.parse(text);
+                // Make all links open in new tab
+                displayText = displayText.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ');
             } else {
                 displayText = escapeHtml(text);
             }
