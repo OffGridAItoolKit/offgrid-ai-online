@@ -363,7 +363,7 @@ body {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
-    padding-right: 180px; /* Make room for QR code */
+    padding-right: 24px; /* Online version: no QR code */
     display: flex;
     flex-direction: column;
     gap: 24px;
@@ -725,75 +725,97 @@ body {
 
 /* Input Area */
 .input-area {
-    border-top: 2px solid #b8860b;
-    padding: 16px 24px;
-    background: linear-gradient(135deg, #f9fafb 0%, #faf8f5 100%);
+    border-top: none;
+    padding: 16px 24px 20px;
+    background: transparent;
+    position: relative;
+    flex-shrink: 0;
 }
 
 .input-container {
-    max-width: 900px;
+    max-width: 720px;
     margin: 0 auto;
+    background: white;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    border-radius: 16px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(184, 134, 11, 0.08);
+}
+
+.input-container:focus-within {
+    border-color: rgba(184, 134, 11, 0.5);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(184, 134, 11, 0.15);
+}
+
+.button-row {
     display: flex;
-    gap: 12px;
-    align-items: flex-end;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0e6d6;
 }
 
 .input-wrapper {
-    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     position: relative;
 }
 
 .message-input {
-    width: 100%;
-    padding: 12px 48px 12px 44px;
-    border: 1px solid #b8860b;
-    border-radius: 8px;
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
     font-size: 15px;
     resize: none;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background: white;
+    background: transparent;
     font-family: inherit;
     line-height: 1.5;
     max-height: 120px;
     overflow-y: hidden;
+    color: #2c1810;
+}
+
+.message-input::placeholder {
+    color: #9ca3af;
 }
 
 .message-input:focus {
-    border-color: #daa520;
-    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.1);
+    outline: none;
 }
 
-/* Image Upload Button (Camera) */
+/* Image Upload Button (Camera/+) */
 .image-upload-btn {
-    position: absolute;
-    left: 12px;
-    bottom: 12px;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-    color: #6b4423;
+    color: #8b7355;
     transition: color 0.2s;
+    flex-shrink: 0;
+    opacity: 0.7;
 }
 
 .image-upload-btn:hover {
     color: #b8860b;
+    opacity: 1;
 }
 
 /* Gallery Upload Button */
 .gallery-upload-btn {
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-    color: #6b4423;
+    color: #8b7355;
     transition: color 0.2s;
+    flex-shrink: 0;
+    opacity: 0.7;
 }
 
 .gallery-upload-btn:hover {
     color: #b8860b;
+    opacity: 1;
 }
 
 .image-upload-input {
@@ -802,14 +824,11 @@ body {
 
 /* Image Preview */
 .image-preview {
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 0;
-    background: white;
-    border: 1px solid #b8860b;
+    background: #faf8f5;
+    border: 1px solid #e5d9c3;
     border-radius: 8px;
     padding: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
     display: none;
     align-items: center;
     gap: 8px;
@@ -849,7 +868,6 @@ body {
 /* Model Selector */
 .model-selector {
     position: relative;
-    min-width: 200px;
 }
 
 /* Model Helper Text */
@@ -883,18 +901,18 @@ body {
 }
 
 .model-button {
-    width: 100%;
-    padding: 12px 16px;
-    background: white;
-    border: 1px solid #b8860b;
+    padding: 6px 14px;
+    background: #faf8f5;
+    border: 1px solid #e5d9c3;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 6px;
     transition: all 0.2s;
+    color: #6b4423;
+    font-weight: 500;
 }
 
 .model-button:hover {
@@ -906,11 +924,11 @@ body {
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;
-    right: 0;
+    min-width: 280px;
     background: white;
     border: 1px solid #b8860b;
-    border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
     display: none;
     overflow: hidden;
     z-index: 1000;
@@ -921,15 +939,17 @@ body {
 }
 
 .model-list {
-    max-height: 200px;
+    max-height: 300px;
     overflow-y: auto;
+    padding: 6px;
 }
 
 .model-item {
-    padding: 12px 16px;
+    padding: 10px 14px;
     cursor: pointer;
-    transition: background 0.2s;
-    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.15s;
+    border-radius: 8px;
+    margin-bottom: 2px;
 }
 
 .model-item:hover {
@@ -942,27 +962,31 @@ body {
 }
 
 .model-item-name {
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 13px;
     color: #2c1810;
+    white-space: nowrap;
 }
 
 .model-item-desc {
-    font-size: 12px;
-    color: #6b4423;
+    font-size: 11px;
+    color: #8b7355;
+    margin-top: 2px;
+    white-space: nowrap;
 }
 
 /* Send Button */
 .send-button {
-    padding: 12px 20px;
+    padding: 8px 28px;
     background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    box-shadow: 0 2px 6px rgba(184, 134, 11, 0.3);
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
 }
 
 .send-button:hover:not(:disabled) {
@@ -1002,6 +1026,10 @@ body {
 /* Hide desktop-only items on mobile */
 @media (max-width: 768px) {
     .desktop-only {
+        display: none !important;
+    }
+    
+    .desktop-only-inline {
         display: none !important;
     }
     
@@ -1202,10 +1230,10 @@ body {
         left: 0;
         right: 0;
         padding: 10px;
-        background: linear-gradient(135deg, #f9fafb 0%, #faf8f5 100%);
-        border-top: 2px solid #b8860b;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(8px);
+        border-top: none;
         z-index: 100;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
     }
     
     .input-container {
@@ -1214,6 +1242,11 @@ body {
         gap: 8px;
         align-items: stretch;
         max-width: 100%;
+        background: white;
+        border: 1px solid rgba(184, 134, 11, 0.3);
+        border-radius: 16px;
+        padding: 10px 12px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     }
     
     .input-wrapper {
@@ -1225,9 +1258,10 @@ body {
         width: 100% !important;
         min-height: 40px !important;
         max-height: 80px !important;
-        padding: 10px 12px 10px 40px !important;
+        padding: 8px 4px !important;
         font-size: 16px !important;
-        border-radius: 20px !important;
+        border-radius: 0 !important;
+        border: none !important;
     }
     
     .image-preview {
@@ -1677,15 +1711,20 @@ body {
         font-size: 13px;
     }
 }
-/* Hide hamburger menu on mobile - OffGrid AI ToolKit */
+/* Online version: Show hamburger menu on mobile for sidebar access */
 @media (max-width: 768px) {
     .toggle-sidebar {
-        display: none !important;
+        display: flex !important;
     }
     
-    /* Ensure sidebar stays hidden on mobile */
+    /* Sidebar slides in from left on mobile */
     .sidebar {
-        display: none !important;
+        display: block !important;
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.mobile-visible {
+        transform: translateX(0);
     }
     
     /* Adjust chat container to use full width */
@@ -1728,17 +1767,503 @@ body {
         display: none !important;
     }
 }
-/* Hide first-run terms popup on mobile/tablet - not needed since mobile 
-   access is only possible after desktop user has already accepted terms */
-@media (max-width: 768px) {
-    .first-run-banner {
-        display: none !important;
+/* Online version: first-run banner shows on all devices */
+/* (Removed mobile/tablet hide rules - online version needs terms on all devices) */
+/* ============================================ */
+/* OVERHAUL: Welcome Screen Centered Input Box  */
+/* ============================================ */
+
+.welcome-input-area {
+    width: 100%;
+    max-width: 650px;
+    margin: 20px auto 24px auto;
+}
+
+.welcome-input-container {
+    background: white;
+    border: 2px solid #daa520;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 20px rgba(184, 134, 11, 0.15);
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.welcome-input-container:focus-within {
+    border-color: #b8860b;
+    box-shadow: 0 6px 30px rgba(184, 134, 11, 0.25);
+}
+
+.welcome-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.welcome-message-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    font-family: inherit;
+    resize: none;
+    line-height: 1.5;
+    padding: 8px 4px;
+    background: transparent;
+    color: #2c1810;
+    max-height: 100px;
+    overflow-y: hidden;
+}
+
+.welcome-message-input::placeholder {
+    color: #9ca3af;
+}
+
+.welcome-upload-btn,
+.welcome-gallery-btn {
+    cursor: pointer;
+    color: #8b7355;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.welcome-upload-btn:hover,
+.welcome-gallery-btn:hover {
+    color: #b8860b;
+    opacity: 1;
+}
+
+.welcome-button-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f0e6d6;
+}
+
+.welcome-model-selector {
+    position: relative;
+}
+
+.welcome-model-button {
+    padding: 6px 14px;
+    background: #faf8f5;
+    border: 1px solid #e5d9c3;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    color: #6b4423;
+    font-weight: 500;
+}
+
+.welcome-model-button:hover {
+    border-color: #daa520;
+    background: #f5e6d3;
+}
+
+/* Welcome model dropdown */
+.welcome-model-dropdown {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 6px;
+    background: white;
+    border: 1px solid #e5d9c3;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    min-width: 280px;
+    z-index: 100;
+    overflow: hidden;
+}
+
+.welcome-model-dropdown.open {
+    display: block;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.welcome-model-list {
+    padding: 6px;
+}
+
+.welcome-model-item {
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.welcome-model-item:hover {
+    background: #faf5ed;
+}
+
+.welcome-model-item.selected {
+    background: #f5e6d3;
+}
+
+.welcome-model-item-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2c1810;
+}
+
+.welcome-model-item-desc {
+    font-size: 11px;
+    color: #8b7355;
+    margin-top: 2px;
+}
+
+.welcome-send-button {
+    padding: 8px 28px;
+    background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+}
+
+.welcome-send-button:hover {
+    background: linear-gradient(135deg, #daa520 0%, #cd853f 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(184, 134, 11, 0.4);
+}
+
+/* Transition: hide welcome input when chat starts */
+.welcome-input-area.hidden {
+    display: none;
+}
+
+/* Bottom input area: slides in when injected */
+.input-area {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    border-top: none;
+    background: transparent;
+}
+
+.input-area.slide-in {
+    animation: inputSlideIn 0.4s ease forwards;
+}
+
+@keyframes inputSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-/* Also hide on tablets to cover larger mobile devices */
-@media (max-width: 1024px) and (orientation: portrait) {
-    .first-run-banner {
-        display: none !important;
+/* Mobile responsive for welcome input */
+@media (max-width: 768px) {
+    .welcome-input-area {
+        max-width: 95%;
+        margin: 16px auto 20px auto;
     }
+    
+    .welcome-input-container {
+        padding: 12px;
+    }
+    
+    .welcome-message-input {
+        font-size: 14px;
+    }
+    
+    .welcome-model-dropdown {
+        min-width: 200px;
+    }
+}
+
+/* ============================================ */
+/* OVERHAUL: Left Sidebar ONLINE Section        */
+/* ============================================ */
+
+.sidebar-section.online-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.sidebar-section.online-section .sidebar-title {
+    color: #daa520;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+}
+
+.online-link-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid #b8860b;
+    border-radius: 6px;
+    color: #2c1810;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    margin-bottom: 6px;
+}
+
+.online-link-btn:hover {
+    background: #f9fafb;
+    border-color: #daa520;
+    box-shadow: 0 2px 6px rgba(184, 134, 11, 0.2);
+    color: #2c1810;
+    text-decoration: none;
+}
+
+.online-link-btn .link-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.online-link-btn .link-text {
+    flex: 1;
+}
+
+.online-link-btn .external-icon {
+    font-size: 10px;
+    color: #b8860b;
+    opacity: 0.6;
+}
+
+/* ============================================ */
+/* OVERHAUL: QR Code - Static offgridtoolkit.ai */
+/* ============================================ */
+
+#qrContainer .qr-subtitle {
+    font-size: 11px;
+    color: #6b4423;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+#qrContainer .qr-url {
+    font-size: 10px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+/* ============================================ */
+/* OVERHAUL: One-Time Access PIN System         */
+/* ============================================ */
+
+.pin-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(184, 134, 11, 0.3);
+    text-align: center;
+}
+
+.pin-label {
+    color: #f5e6d3;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.pin-sublabel {
+    color: #daa520;
+    font-size: 12px;
+    margin-bottom: 14px;
+    display: block;
+}
+
+.pin-input-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.pin-digit {
+    width: 48px;
+    height: 52px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Inter', monospace;
+    border: 2px solid rgba(184, 134, 11, 0.4);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    color: #daa520;
+    outline: none;
+    transition: all 0.2s;
+    caret-color: #daa520;
+}
+
+.pin-digit:focus {
+    border-color: #daa520;
+    box-shadow: 0 0 12px rgba(184, 134, 11, 0.3);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.pin-digit.error {
+    border-color: #ef4444;
+    animation: pinShake 0.4s ease;
+}
+
+.pin-digit.success {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.pin-error-msg {
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 8px;
+    visibility: hidden;
+    height: 0;
+    overflow: hidden;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.pin-error-msg.visible {
+    visibility: visible;
+    height: auto;
+    margin-top: 8px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes pinShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+}
+
+/* ============================================ */
+/* OVERHAUL: Unified Knowledge Base Styles      */
+/* ============================================ */
+
+.saved-conversation-item .source-badge {
+    display: inline-block;
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.saved-conversation-item .source-badge.json-source {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.saved-conversation-item .source-badge.md-source {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.saved-conversation-item .source-badge.cc-source {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* ============================================
+   PLUS MENU (+) STYLES
+   ============================================ */
+
+.plus-menu-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.plus-menu {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    background: white;
+    border: 1px solid #e5d9c3;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    min-width: 260px;
+    z-index: 1001;
+    overflow: hidden;
+    padding: 6px;
+}
+
+.plus-menu.open {
+    display: block;
+    animation: dropdownFadeIn 0.2s ease;
+}
+
+.plus-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.15s;
+    font-size: 14px;
+    color: #2c1810;
+    white-space: nowrap;
+}
+
+.plus-menu-item:hover {
+    background: #faf5ed;
+}
+
+.plus-menu-icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.plus-menu-label {
+    font-weight: 500;
+}
+
+/* Mobile plus menu */
+@media (max-width: 768px) {
+    .plus-menu {
+        min-width: 220px;
+        bottom: calc(100% + 8px);
+    }
+    
+    .plus-menu-item {
+        padding: 10px 14px;
+        font-size: 13px;
+    }
+}
+
+/* Online section subtitle */
+.online-subtitle {
+    font-size: 11px;
+    color: #daa520;
+    font-style: italic;
+    margin-top: -4px;
+    margin-bottom: 10px;
+    padding-left: 2px;
+    letter-spacing: 0.3px;
 }

@@ -16,6 +16,7 @@ const express = require('express');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -866,9 +867,44 @@ app.get('/command', (req, res) => {
     res.sendFile(path.join(__dirname, 'command.html'));
 });
 
-// Catch-all route - serve index.html for SPA
+// =============================================================================
+// DUAL-EXPERIENCE ROUTING
+// =============================================================================
+// /        = Prospect experience (free demo, sales messaging, CTAs)
+// /online  = Customer experience (ad-free, premium feel, no sales messaging)
+//
+// Both routes serve the same index.html but inject a config flag that the
+// frontend reads to conditionally show/hide elements.
+// =============================================================================
+
+function serveWithExperience(req, res, isCustomer) {
+    const htmlPath = path.join(__dirname, 'index.html');
+    fs.readFile(htmlPath, 'utf8', (err, html) => {
+        if (err) {
+            console.error('Error reading index.html:', err);
+            return res.status(500).send('Server error');
+        }
+        // Inject the experience config right before </head>
+        const configScript = `<script>window.OFFGRID_CONFIG = { isCustomer: ${isCustomer}, experience: '${isCustomer ? 'online' : 'demo'}' };</script>`;
+        const injectedHtml = html.replace('</head>', configScript + '\n</head>');
+        res.setHeader('Content-Type', 'text/html');
+        res.send(injectedHtml);
+    });
+}
+
+// Customer experience - ad-free online toolkit
+app.get('/online', (req, res) => {
+    serveWithExperience(req, res, true);
+});
+
+// Prospect experience - free demo with sales messaging
+app.get('/', (req, res) => {
+    serveWithExperience(req, res, false);
+});
+
+// Catch-all route - serve prospect experience for any other path
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    serveWithExperience(req, res, false);
 });
 
 // =============================================================================
@@ -897,7 +933,10 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('║    ⭐ Command  (Council Consensus) - All 4 + Synthesis    ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  API Key: ${OPENROUTER_API_KEY ? '✓ Configured' : '✗ Missing'}                               ║`);
-    console.log('║  Command Center: /command                                 ║');
+    console.log('║  Routes:                                                  ║');
+    console.log('║    /         → Prospect Demo (sales messaging)            ║');
+    console.log('║    /online   → Customer ToolKit (ad-free)                 ║');
+    console.log('║    /command  → Command Center (premium)                   ║');
     console.log('╚═══════════════════════════════════════════════════════════╝');
     console.log('');
 });

@@ -1,11 +1,11 @@
 {
   "name": "offgrid-ai-online",
-  "version": "1.0.0",
+  "version": "5.1.0",
   "description": "OffGrid AI ToolKit Online - Cloud-powered demonstration of Gemma 3 models",
-  "main": "server/index.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "node server/index.js"
+    "start": "node index.js",
+    "dev": "node index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
