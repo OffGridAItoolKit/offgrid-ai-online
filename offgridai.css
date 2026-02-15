@@ -1060,13 +1060,12 @@ body {
         max-width: 400px;
         margin: -10px auto 0 auto;
     }
-    
-    .mobile-quick-actions .quick-action {
+     .mobile-quick-actions .quick-action {
         display: flex;
         align-items: center;
         gap: 16px;
         padding: 16px;
-        background: linear-gradient(135deg, #2c1810 0%, #3d2216 100%);
+        background: white;
         border: 1px solid #b8860b;
         border-radius: 8px;
         cursor: pointer;
