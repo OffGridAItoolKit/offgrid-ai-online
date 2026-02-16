@@ -2081,7 +2081,7 @@
             </button>
 
             <button class="save-kb-button" id="saveToKbBtn" onclick="showSaveModal()" disabled>💾 Save to Knowledge Base</button>
-            <button class="image-studio-tab" onclick="openImageStudio()">🎨 Image Studio <span style="font-weight: 400; font-size: 11px; opacity: 0.7;">• Nano Banana Pro</span></button>
+            <button class="image-studio-tab" onclick="openImageStudio()">🎨 Image Studio</button>
 
             <div class="sidebar-section">
                 <div class="sidebar-title">Sample Prompts</div>
@@ -3779,8 +3779,8 @@
             overlay.id = 'imageStudioModal';
             overlay.innerHTML = `
                 <div class="image-studio-modal">
-                    <h3>\ud83c\udfa8 Image Studio <span style="font-weight: 400; font-size: 14px; color: #a855f7;">Nano Banana Pro</span></h3>
-                    <div class="studio-subtitle">Generate images using AI. Powered by Nano Banana Pro (Gemini 3 Pro).</div>
+                    <h3>\ud83c\udfa8 Image Studio</h3>
+                    <div class="studio-subtitle">Generate images using AI. A Command Center premium feature.</div>
 
                     <div class="example-prompts-section">
                         <div class="example-prompts-label">Try an example</div>
@@ -3832,6 +3832,7 @@
                     <div id="studioResult"></div>
 
                     <div class="studio-privacy"><span class="lock-icon">\ud83d\udd12</span> Images are generated on-demand and never stored on our servers.</div>
+                    <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Nano Banana Pro (Gemini 3 Pro)</div>
                 </div>
             `;
             document.body.appendChild(overlay);
