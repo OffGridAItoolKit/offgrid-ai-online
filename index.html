@@ -211,6 +211,278 @@
             border-left: 3px solid #3b82f6;
         }
         
+        /* ============================================ */
+        /* Save to KB Styles                          */
+        /* ============================================ */
+        
+        /* Save to KB button in sidebar */
+        .save-kb-button {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #10b981;
+            font-weight: 600;
+            text-align: left;
+        }
+        .save-kb-button:hover {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.25) 100%);
+            border-color: #10b981;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .save-kb-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .save-kb-button:disabled:hover {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: none;
+        }
+        
+        /* Save to KB modal (for demo users) */
+        .kb-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .kb-modal {
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f05 100%);
+            border: 2px solid #b8860b;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+        .kb-modal-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        .kb-modal h3 {
+            color: #daa520;
+            font-size: 20px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        .kb-modal p {
+            color: #deb887;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .kb-modal-cta {
+            display: inline-block;
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: #1a0f05;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .kb-modal-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+        .kb-modal-close {
+            display: block;
+            margin-top: 16px;
+            color: #8b7355;
+            font-size: 13px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: color 0.2s;
+        }
+        .kb-modal-close:hover {
+            color: #deb887;
+        }
+        
+        /* Save modal (for authenticated users) */
+        .save-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .save-modal {
+            background: #ffffff;
+            border: 2px solid #b8860b;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+        .save-modal h3 {
+            color: #2c1810;
+            font-size: 18px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .save-modal .save-modal-subtitle {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .save-modal label {
+            display: block;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .save-modal input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .save-modal input[type="text"]:focus {
+            outline: none;
+            border-color: #b8860b;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+        .save-modal select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            background: white;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .save-modal select:focus {
+            outline: none;
+            border-color: #b8860b;
+        }
+        .save-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .save-modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .save-modal-btn.primary {
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: #1a0f05;
+        }
+        .save-modal-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+        }
+        .save-modal-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .save-modal-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        /* Directory status indicator */
+        .dir-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+        .dir-status.set {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #059669;
+        }
+        .dir-status.unset {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #b45309;
+        }
+        .dir-status-btn {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            transition: all 0.2s;
+        }
+        .dir-status-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        /* Save toast */
+        .save-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            z-index: 10001;
+            animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 90%;
+        }
+        .save-toast .toast-subtitle {
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+        
+        /* Privacy micro-copy */
+        .privacy-microcopy {
+            font-size: 11px;
+            color: #9ca3af;
+            text-align: center;
+            padding: 4px 0 0 0;
+        }
+        .privacy-microcopy .lock-icon {
+            color: #10b981;
+        }
+        
         /* Copy toast */
         .copy-toast {
             position: fixed;
@@ -411,6 +683,7 @@
                 <button class="tool-button" onclick="clearChat()">📋 Clear Chat / Home</button>
                 <button class="tool-button" onclick="setupTranslator()">🌐 Translator</button>
                 <button class="tool-button" onclick="openImageIdentifier()">🔍 Image Identifier</button>
+                <button class="save-kb-button" id="saveToKbBtn" onclick="handleSaveToKB()" disabled>💾 Save to Knowledge Base</button>
             </div>
 
             <!-- Quick Prompts Accordion Section -->
@@ -1156,6 +1429,7 @@
                         </div>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
+                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> This conversation is ephemeral and exists only in your browser.</div>
                 </div>
             </div>`;
         }
@@ -1354,6 +1628,10 @@
                     role: 'assistant',
                     content: data.response
                 });
+                
+                // Enable Save to KB button
+                const saveBtn = document.getElementById('saveToKbBtn');
+                if (saveBtn) saveBtn.disabled = false;
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -1716,6 +1994,325 @@
             setTimeout(() => {
                 if (toast.parentNode) toast.remove();
             }, 2000);
+        }
+        
+        // ============================================
+        // SAVE TO KNOWLEDGE BASE
+        // ============================================
+        
+        let kbDirectoryHandle = null; // File System Access API handle
+        
+        function handleSaveToKB() {
+            if (conversationHistory.length === 0) return;
+            
+            if (!CONFIG.isCustomer) {
+                // Demo user: show upsell modal
+                showKBUpsellModal();
+            } else {
+                // Authenticated user: show save dialog
+                showSaveModal();
+            }
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById('sidebar');
+                const toggleButton = document.querySelector('.toggle-sidebar');
+                if (sidebar) sidebar.classList.remove('mobile-visible');
+                if (toggleButton) toggleButton.classList.remove('menu-open');
+            }
+        }
+        
+        function showKBUpsellModal() {
+            const overlay = document.createElement('div');
+            overlay.className = 'kb-modal-overlay';
+            overlay.id = 'kbUpsellModal';
+            overlay.innerHTML = `
+                <div class="kb-modal">
+                    <div class="kb-modal-icon">📚</div>
+                    <h3>Save to Your Knowledge Base</h3>
+                    <p>The Knowledge Base is a powerful feature of the <strong>OffGrid AI ToolKit USB drive</strong>. Save conversations, build a personal reference library, and access it all offline — anywhere, anytime.</p>
+                    <p style="font-size: 12px; color: #8b7355;">With the USB version, your saved knowledge stays on <em>your</em> drive. No cloud. No accounts. Just your data, under your control.</p>
+                    <a href="https://offgridaitoolkit.com" target="_blank" class="kb-modal-cta">🛒 Get the USB Version</a>
+                    <button class="kb-modal-close" onclick="closeKBUpsellModal()">Maybe later</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeKBUpsellModal();
+            });
+        }
+        
+        function closeKBUpsellModal() {
+            const modal = document.getElementById('kbUpsellModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
+            }
+        }
+        
+        function showSaveModal() {
+            // Auto-generate title from first user message
+            const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+            const autoTitle = firstUserMsg
+                ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
+                : 'Conversation';
+            
+            const hasFileSystemAccess = ('showDirectoryPicker' in window);
+            
+            let dirStatusHTML = '';
+            if (hasFileSystemAccess) {
+                if (kbDirectoryHandle) {
+                    dirStatusHTML = `
+                        <div class="dir-status set">
+                            <span>📁 Saving to: <strong>${kbDirectoryHandle.name}</strong></span>
+                            <button class="dir-status-btn" onclick="pickKBDirectory()">Change</button>
+                        </div>`;
+                } else {
+                    dirStatusHTML = `
+                        <div class="dir-status unset">
+                            <span>📁 No save folder selected</span>
+                            <button class="dir-status-btn" onclick="pickKBDirectory()">Choose Folder</button>
+                        </div>`;
+                }
+            }
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'save-modal-overlay';
+            overlay.id = 'saveModal';
+            overlay.innerHTML = `
+                <div class="save-modal">
+                    <h3>💾 Save to Knowledge Base</h3>
+                    <div class="save-modal-subtitle">Saved directly to your computer — never to our servers.</div>
+                    ${dirStatusHTML}
+                    <label for="saveTitle">Title</label>
+                    <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
+                    <label for="saveCategory">Category</label>
+                    <select id="saveCategory">
+                        <option value="General">General</option>
+                        <option value="Survival">Survival & Emergency</option>
+                        <option value="Medical">Medical & First Aid</option>
+                        <option value="Navigation">Navigation & Outdoors</option>
+                        <option value="Technical">Technical & Trades</option>
+                        <option value="Food">Food & Water</option>
+                        <option value="Shelter">Shelter & Construction</option>
+                        <option value="Education">Education & Reference</option>
+                    </select>
+                    <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
+                    <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
+                    <div class="save-modal-actions">
+                        <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
+                        <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">📄 Export PDF</button>
+                        <button class="save-modal-btn primary" onclick="executeSave()">💾 Save .md</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeSaveModal();
+            });
+            
+            // Focus the title input
+            setTimeout(() => {
+                const titleInput = document.getElementById('saveTitle');
+                if (titleInput) {
+                    titleInput.focus();
+                    titleInput.select();
+                }
+            }, 100);
+        }
+        
+        function closeSaveModal() {
+            const modal = document.getElementById('saveModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
+            }
+        }
+        
+        async function pickKBDirectory() {
+            try {
+                kbDirectoryHandle = await window.showDirectoryPicker({
+                    mode: 'readwrite',
+                    startIn: 'documents'
+                });
+                // Refresh the modal to show the new directory
+                closeSaveModal();
+                setTimeout(() => showSaveModal(), 250);
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Directory picker error:', err);
+                }
+            }
+        }
+        
+        function generateMarkdownContent(title, category, tags) {
+            const now = new Date();
+            const isoDate = now.toISOString();
+            const tagsArray = tags
+                ? tags.split(',').map(t => t.trim()).filter(t => t)
+                : [];
+            
+            // Build YAML frontmatter
+            let frontmatter = '---\n';
+            frontmatter += `title: "${title.replace(/"/g, '\\"')}"\n`;
+            frontmatter += `date: ${isoDate}\n`;
+            frontmatter += `source: online\n`;
+            frontmatter += `model: ${selectedModel}\n`;
+            frontmatter += `category: ${category}\n`;
+            if (tagsArray.length > 0) {
+                frontmatter += `tags:\n`;
+                tagsArray.forEach(tag => {
+                    frontmatter += `  - ${tag}\n`;
+                });
+            }
+            frontmatter += '---\n\n';
+            
+            // Build conversation content
+            let content = `# ${title}\n\n`;
+            content += `*Saved from OffGrid AI Online on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
+            content += `**Model:** ${MODEL_DISPLAY[selectedModel]?.name || selectedModel}\n\n`;
+            content += '---\n\n';
+            
+            conversationHistory.forEach((msg, index) => {
+                if (msg.role === 'user') {
+                    content += `## 🧑 User\n\n`;
+                    content += `${msg.content}\n\n`;
+                    if (msg.image) {
+                        content += `![Uploaded Image](${msg.image})\n\n`;
+                    }
+                } else if (msg.role === 'assistant') {
+                    content += `## 🤖 OffGrid AI\n\n`;
+                    content += `${msg.content}\n\n`;
+                }
+                if (index < conversationHistory.length - 1) {
+                    content += '---\n\n';
+                }
+            });
+            
+            return frontmatter + content;
+        }
+        
+        function generateFilename(title) {
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            const safeTitle = title
+                .replace(/[^a-zA-Z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 50)
+                .replace(/-+$/, '');
+            return `${dateStr}_${safeTitle}.md`;
+        }
+        
+        async function executeSave() {
+            const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
+            const category = document.getElementById('saveCategory')?.value || 'General';
+            const tags = document.getElementById('saveTags')?.value || '';
+            
+            const markdownContent = generateMarkdownContent(title, category, tags);
+            const filename = generateFilename(title);
+            
+            closeSaveModal();
+            
+            // Try File System Access API first
+            if (kbDirectoryHandle) {
+                try {
+                    const fileHandle = await kbDirectoryHandle.getFileHandle(filename, { create: true });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(markdownContent);
+                    await writable.close();
+                    showSaveToast(`Saved: ${filename}`, `Saved directly to your computer — never to our servers.`);
+                    return;
+                } catch (err) {
+                    console.error('File System Access write failed, falling back to download:', err);
+                    // Fall through to download method
+                }
+            }
+            
+            // Fallback: standard browser download
+            const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showSaveToast(`Downloaded: ${filename}`, `Saved directly to your computer — never to our servers.`);
+        }
+        
+        async function exportAsPDF() {
+            const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
+            const category = document.getElementById('saveCategory')?.value || 'General';
+            const tags = document.getElementById('saveTags')?.value || '';
+            
+            const markdownContent = generateMarkdownContent(title, category, tags);
+            
+            closeSaveModal();
+            showSaveToast('Generating PDF...', 'Please wait');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/export-pdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ markdown: markdownContent, title: title })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('PDF generation failed');
+                }
+                
+                const data = await response.json();
+                
+                // Open styled HTML in a new window for print-to-PDF
+                const printWindow = window.open('', '_blank');
+                if (printWindow) {
+                    printWindow.document.write(data.html);
+                    printWindow.document.close();
+                    
+                    // Auto-trigger print dialog after content loads
+                    printWindow.onload = function() {
+                        setTimeout(() => {
+                            printWindow.print();
+                        }, 500);
+                    };
+                    
+                    showSaveToast('PDF ready!', 'Use your browser\'s print dialog to save as PDF. Saved directly to your computer \u2014 never to our servers.');
+                } else {
+                    // Popup blocked - fall back to download
+                    const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = data.filename.replace('.pdf', '.html');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showSaveToast('Downloaded HTML version', 'Open the file and use File > Print > Save as PDF');
+                }
+                
+            } catch (error) {
+                console.error('PDF export error:', error);
+                // Remove the "generating" toast
+                const existingToast = document.querySelector('.save-toast');
+                if (existingToast) existingToast.remove();
+                showSaveToast('PDF export failed', 'Please try saving as Markdown instead.');
+            }
+        }
+        
+        function showSaveToast(message, subtitle) {
+            const existingToast = document.querySelector('.save-toast');
+            if (existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'save-toast';
+            toast.innerHTML = `${message}${subtitle ? `<div class="toast-subtitle">${subtitle}</div>` : ''}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 3000);
         }
         
         // ============================================
