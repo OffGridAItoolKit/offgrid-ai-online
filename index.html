@@ -529,6 +529,52 @@
         /* Customer-only elements hidden when prospect */
         body.is-prospect .customer-only { display: none !important; }
         
+        /* Hide hamburger menu on mobile for customers */
+        body.is-customer .toggle-sidebar { display: none !important; }
+        
+        /* Voice recording indicator */
+        .voice-recording {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 10px;
+            margin: 10px auto;
+            max-width: 250px;
+            justify-content: center;
+        }
+        .voice-recording.active {
+            display: flex;
+        }
+        .voice-pulse {
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        @keyframes voicePulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        .voice-recording-text {
+            font-size: 13px;
+            color: #ef4444;
+            font-weight: 600;
+        }
+        .voice-stop-btn {
+            padding: 4px 12px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
         /* Info content styles */
         .info-content h3 { color: #b8860b; margin: 20px 0 10px; font-size: 16px; }
         .info-content p { color: #3d2216; line-height: 1.6; margin-bottom: 12px; }
@@ -946,8 +992,8 @@
                         </div>
                     </div>
 
-                    <!-- Desktop quick actions -->
-                    <div class="quick-actions desktop-quick-actions">
+                    <!-- Desktop quick actions (Prospect: info boxes) -->
+                    <div class="quick-actions desktop-quick-actions prospect-only">
                         <div class="quick-action" onclick="showInfoContent('howItWorks')">
                             <div class="quick-action-title">⚙️ How It Works</div>
                             <div class="quick-action-desc">Technology & privacy</div>
@@ -965,9 +1011,21 @@
                             <div class="quick-action-desc">Choose the right one</div>
                         </div>
                     </div>
+
+                    <!-- Desktop quick actions (Customer: KB + Prompts) -->
+                    <div class="quick-actions desktop-quick-actions customer-only" style="grid-template-columns: 1fr 1fr;">
+                        <div class="quick-action" onclick="openKnowledgeBase()" style="border-color: #b8860b;">
+                            <div class="quick-action-title">📚 Open Knowledge Base</div>
+                            <div class="quick-action-desc">Your offline survival library</div>
+                        </div>
+                        <div class="quick-action" onclick="window.location.href='/online/ready-made-prompts'" style="border-color: #b8860b;">
+                            <div class="quick-action-title">💡 Ready-Made Prompts</div>
+                            <div class="quick-action-desc">Expert prompts for your library</div>
+                        </div>
+                    </div>
                     
-                    <!-- Mobile quick actions -->
-                    <div class="mobile-quick-actions">
+                    <!-- Mobile quick actions (Prospect) -->
+                    <div class="mobile-quick-actions prospect-only">
                         <div class="quick-action" onclick="triggerGalleryUpload()">
                             <div class="quick-action-icon">🖼️</div>
                             <div class="quick-action-content">
@@ -983,6 +1041,38 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Mobile quick actions (Customer) -->
+                    <div class="mobile-quick-actions customer-only">
+                        <div class="quick-action" onclick="triggerGalleryUpload()">
+                            <div class="quick-action-icon">🖼️</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Upload Image</div>
+                                <div class="quick-action-desc">From gallery</div>
+                            </div>
+                        </div>
+                        <div class="quick-action" id="voiceInputCard" onclick="startVoiceInput()">
+                            <div class="quick-action-icon">🎙️</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Voice Input</div>
+                                <div class="quick-action-desc">Speak your prompt</div>
+                            </div>
+                        </div>
+                        <div class="quick-action" onclick="openKnowledgeBase()">
+                            <div class="quick-action-icon">📚</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Open Knowledge Base</div>
+                                <div class="quick-action-desc">Your offline survival library</div>
+                            </div>
+                        </div>
+                        <div class="quick-action" onclick="window.location.href='/online/ready-made-prompts'">
+                            <div class="quick-action-icon">💡</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Ready-Made Prompts</div>
+                                <div class="quick-action-desc">Expert prompts for your library</div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <!-- Purchase CTA on welcome (Prospect only) -->
                     <div class="prospect-only" style="margin-top: 20px;">
@@ -991,6 +1081,13 @@
                         </a>
                     </div>
                 </div>
+            </div>
+
+            <!-- Voice recording indicator (Customer only) -->
+            <div class="voice-recording customer-only" id="voiceRecording">
+                <div class="voice-pulse"></div>
+                <span class="voice-recording-text">Listening...</span>
+                <button class="voice-stop-btn" onclick="stopVoiceInput()">Stop</button>
             </div>
 
             <!-- Bottom input bar: NOT in DOM on welcome screen. Injected dynamically by transitionToChat() -->
@@ -1013,6 +1110,7 @@
         let isTyping = false;
         let selectedImage = null;
         let conversationHistory = [];
+        let voiceRecognition = null;
         const API_BASE = '';  // Same origin - Express proxy
         
         // Model display names and speed badges
@@ -1884,6 +1982,66 @@
             sendMessage();
         }
         
+        // ============================================
+        // VOICE INPUT (Customer only)
+        // ============================================
+        
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Please use Chrome or Safari.');
+                return;
+            }
+
+            // Transition to chat if on welcome screen
+            const welcome = document.getElementById('welcome');
+            if (welcome) {
+                transitionToChat();
+            }
+
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.continuous = false;
+            voiceRecognition.interimResults = true;
+            voiceRecognition.lang = 'en-US';
+
+            const recording = document.getElementById('voiceRecording');
+            const input = document.getElementById('messageInput');
+
+            recording.classList.add('active');
+
+            voiceRecognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                input.value = transcript;
+                autoResize(input);
+            };
+
+            voiceRecognition.onend = function() {
+                recording.classList.remove('active');
+                voiceRecognition = null;
+                input.focus();
+            };
+
+            voiceRecognition.onerror = function(event) {
+                console.error('Voice recognition error:', event.error);
+                recording.classList.remove('active');
+                voiceRecognition = null;
+                if (event.error === 'not-allowed') {
+                    alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+                }
+            };
+
+            voiceRecognition.start();
+        }
+
+        function stopVoiceInput() {
+            if (voiceRecognition) {
+                voiceRecognition.stop();
+            }
+        }
+        
         function setupTranslator() {
             // Transition to chat view if on welcome screen
             const welcome = document.getElementById('welcome');
@@ -2111,6 +2269,29 @@
                     titleInput.select();
                 }
             }, 100);
+        }
+        
+        async function openKnowledgeBase() {
+            // Open the user's Saved Knowledge Base folder using File System Access API
+            if ('showDirectoryPicker' in window) {
+                try {
+                    const dirHandle = await window.showDirectoryPicker({
+                        id: 'offgrid-kb',
+                        mode: 'read',
+                        startIn: 'documents'
+                    });
+                    // Store the handle for future saves
+                    kbDirectoryHandle = dirHandle;
+                    showSaveToast(`Opened: ${dirHandle.name}`, 'Your Knowledge Base folder is ready for saving.');
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Error opening Knowledge Base:', err);
+                    }
+                }
+            } else {
+                // Fallback for browsers that don't support showDirectoryPicker
+                alert('Your browser does not support the File System Access API. Please use Chrome or Edge to open your Knowledge Base folder directly.');
+            }
         }
         
         function closeSaveModal() {
@@ -2403,6 +2584,40 @@
                         }
                     }, { passive: true });
                 }
+            }
+
+            // Check voice support and update card (Customer only)
+            if (CONFIG.isCustomer) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SpeechRecognition) {
+                    const voiceCard = document.getElementById('voiceInputCard');
+                    if (voiceCard) {
+                        const descEl = voiceCard.querySelector('.quick-action-desc');
+                        if (descEl) descEl.textContent = 'Not supported in this browser';
+                        voiceCard.style.opacity = '0.5';
+                        voiceCard.onclick = function() {
+                            alert('Voice input requires Chrome or Safari on HTTPS.');
+                        };
+                    }
+                }
+            }
+
+            // Check for ready-made prompt from prompts page
+            const readyPrompt = sessionStorage.getItem('offgrid-ready-prompt');
+            if (readyPrompt) {
+                sessionStorage.removeItem('offgrid-ready-prompt');
+                // Wait a moment for the page to fully render, then populate the input
+                setTimeout(() => {
+                    const welcomeInput = document.getElementById('welcomeMessageInput');
+                    const chatInput = document.getElementById('messageInput');
+                    if (welcomeInput && document.getElementById('welcome') && document.getElementById('welcome').style.display !== 'none') {
+                        welcomeInput.value = readyPrompt;
+                        welcomeInput.focus();
+                    } else if (chatInput) {
+                        chatInput.value = readyPrompt;
+                        chatInput.focus();
+                    }
+                }, 500);
             }
 
             console.log('OffGrid AI ToolKit Online - Ready!');

@@ -1123,8 +1123,18 @@ function serveWithExperience(req, res, isCustomer) {
     });
 }
 
+// Ready-Made Prompts page (customer feature)
+app.get('/online/ready-made-prompts', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ready-made-prompts.html'));
+});
+
 // Customer experience - ad-free online toolkit
 app.get('/online', (req, res) => {
+    serveWithExperience(req, res, true);
+});
+
+// Mobile route
+app.get('/mobile', (req, res) => {
     serveWithExperience(req, res, true);
 });
 

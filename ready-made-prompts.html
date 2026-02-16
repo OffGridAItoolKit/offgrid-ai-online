@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ready-Made Prompts - OffGrid AI Online</title>
+    <meta name="description" content="Hundreds of expert prompts for building your offline Knowledge Base. Click to copy or send directly to OffGrid AI.">
+    <link rel="icon" type="image/png" href="compasstilted.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #fdf6ec 0%, #f5e6d3 50%, #ede0d4 100%);
+            color: #3d2216;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #2c1810 0%, #3d2216 100%);
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .header-left img {
+            width: 32px;
+            height: 32px;
+        }
+        .header-title {
+            font-family: 'Georgia', serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: #daa520;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+        .online-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .online-badge::before { content: '⚡'; }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-link {
+            color: #daa520;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .back-link:hover {
+            background: rgba(218, 165, 32, 0.1);
+            border-color: #daa520;
+        }
+        
+        /* Hero section */
+        .hero {
+            text-align: center;
+            padding: 40px 24px 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-family: 'Georgia', serif;
+            font-size: 32px;
+            color: #2c1810;
+            margin-bottom: 12px;
+        }
+        .hero p {
+            font-size: 16px;
+            color: #6b5c4a;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .hero-badges {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .hero-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid;
+        }
+        .hero-badge.kb {
+            background: rgba(184, 134, 11, 0.1);
+            border-color: #b8860b;
+            color: #8b6914;
+        }
+        .hero-badge.privacy {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: #10b981;
+            color: #059669;
+        }
+        
+        /* Search & Filter */
+        .controls {
+            max-width: 900px;
+            margin: 0 auto 20px;
+            padding: 0 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 16px;
+            border: 2px solid #d4c4a8;
+            border-radius: 10px;
+            font-size: 14px;
+            background: white;
+            color: #3d2216;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus {
+            border-color: #b8860b;
+        }
+        .search-box::placeholder {
+            color: #9ca3af;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #d4c4a8;
+            border-radius: 10px;
+            background: white;
+            color: #6b5c4a;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            border-color: #b8860b;
+            background: rgba(184, 134, 11, 0.1);
+            color: #8b6914;
+        }
+        .prompt-count {
+            font-size: 13px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        
+        /* Category sections */
+        .categories {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+        .category {
+            margin-bottom: 32px;
+        }
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d4c4a8;
+            cursor: pointer;
+            user-select: none;
+        }
+        .category-header:hover {
+            border-bottom-color: #b8860b;
+        }
+        .category-icon {
+            font-size: 24px;
+        }
+        .category-title {
+            font-family: 'Georgia', serif;
+            font-size: 20px;
+            color: #2c1810;
+            font-weight: 700;
+            flex: 1;
+        }
+        .category-count {
+            font-size: 13px;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+        .category-toggle {
+            font-size: 18px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+        .category.collapsed .category-toggle {
+            transform: rotate(-90deg);
+        }
+        .category.collapsed .subcategories {
+            display: none;
+        }
+        
+        /* Subcategories */
+        .subcategory {
+            margin-bottom: 20px;
+        }
+        .subcategory-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #8b6914;
+            margin-bottom: 10px;
+            padding-left: 4px;
+        }
+        
+        /* Prompt cards */
+        .prompt-grid {
+            display: grid;
+            gap: 10px;
+        }
+        .prompt-card {
+            background: white;
+            border: 1px solid #e5ddd0;
+            border-radius: 10px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            position: relative;
+        }
+        .prompt-card:hover {
+            border-color: #b8860b;
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15);
+            transform: translateY(-1px);
+        }
+        .prompt-card.copied {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        .prompt-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #3d2216;
+        }
+        .prompt-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .prompt-action-btn {
+            padding: 4px 10px;
+            border: 1px solid #d4c4a8;
+            border-radius: 6px;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .prompt-action-btn:hover {
+            border-color: #b8860b;
+            background: rgba(184, 134, 11, 0.1);
+        }
+        .prompt-action-btn.use {
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: white;
+            border-color: #b8860b;
+        }
+        .prompt-action-btn.use:hover {
+            opacity: 0.9;
+        }
+        .prompt-badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .prompt-badge.all-models {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+        .prompt-badge.advanced {
+            background: rgba(184, 134, 11, 0.1);
+            color: #8b6914;
+        }
+        .prompt-badge.vision {
+            background: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+        }
+        
+        /* KB suggestion badge */
+        .kb-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(184, 134, 11, 0.1);
+            color: #8b6914;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+        
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #2c1810;
+            color: #f5e6d3;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .toast.visible {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 24px;
+            border-top: 1px solid #d4c4a8;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .footer p {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+        .footer a {
+            color: #b8860b;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .header-title { font-size: 13px; }
+            .hero h1 { font-size: 24px; }
+            .hero p { font-size: 14px; }
+            .hero { padding: 24px 16px 20px; }
+            .controls { padding: 0 16px; }
+            .categories { padding: 0 16px 40px; }
+            .prompt-card { padding: 12px 14px; flex-direction: column; }
+            .prompt-actions { align-self: flex-end; }
+            .category-title { font-size: 17px; }
+            .desktop-only { display: none !important; }
+        }
+        
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+            font-size: 16px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <img src="compasstilted.png" alt="OffGrid AI">
+            <span class="header-title">OffGrid AI ToolKit</span>
+            <span class="online-badge">ONLINE</span>
+        </div>
+        <div class="header-right">
+            <a href="/online" class="back-link">← Back to Chat</a>
+        </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>💡 Ready-Made Prompts</h1>
+        <p>Expert prompts designed for building your offline Knowledge Base. Click any prompt to copy it, or send it directly to OffGrid AI.</p>
+        <div class="hero-badges">
+            <span class="hero-badge kb">📚 Save to Knowledge Base</span>
+            <span class="hero-badge privacy">🔒 Private Sessions</span>
+        </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="controls">
+        <input type="text" class="search-box" id="searchBox" placeholder="Search prompts..." oninput="filterPrompts()">
+        <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" data-filter="kb" onclick="setFilter('kb', this)">📚 KB Builders</button>
+        <button class="filter-btn" data-filter="vision" onclick="setFilter('vision', this)">📷 Vision</button>
+        <span class="prompt-count" id="promptCount"></span>
+    </div>
+
+    <!-- Categories -->
+    <div class="categories" id="categoriesContainer">
+    </div>
+
+    <!-- No results -->
+    <div class="no-results" id="noResults">
+        No prompts found. Try a different search term.
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>All prompts have been field-tested across multiple Gemma 3 models.</p>
+        <p><a href="/online">← Return to OffGrid AI Online</a> · <a href="https://offgridaitoolkit.com" target="_blank">Get the USB Version</a></p>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ============================================
+        // PROMPT DATA
+        // ============================================
+        
+        const PROMPT_CATEGORIES = [
+            {
+                icon: '⚡',
+                title: 'Quick Start',
+                subcategories: [
+                    {
+                        title: 'Try These First',
+                        prompts: [
+                            { text: 'What are the best ways to purify water from a desert stream using minimal gear', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What should I do first if my car breaks down in a remote area', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Create a 3-day emergency kit checklist for my family', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'If I only have a knife, how should I prioritize its uses in a survival situation', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'List 5 ways to start a fire without matches', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'What are signs my vehicle battery is failing', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I signal for help without a phone', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the safest way to store fuel long term', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How can I navigate using only the sun and stars if my GPS dies', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'Which common backyard plants are edible or medicinal', badge: 'all', kb: 'Water & Food' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '💧',
+                title: 'Water & Shelter',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'How can I build a debris hut shelter in 2 hours', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'Determine survival water requirements by temperature', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What are the signs of dehydration progression from mild to severe', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'List priorities: shelter vs water vs fire in different climates', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What are the risks and precautions when collecting rainwater directly from the environment', badge: 'all', kb: 'Water & Food' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher Recommended',
+                        prompts: [
+                            { text: 'Create a decision tree for water purification methods based on available resources', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What are 5 ways to collect dew for emergency drinking water', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I safely build a small snow cave shelter in consolidated snow', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'Explain how to build a raised bed to avoid cold ground', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'What natural materials provide the best insulation', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'How do I locate underground water sources in arid regions without tools', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What are the safest methods to store water long term in improvised containers', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I prevent condensation and dripping inside a natural or tarp shelter', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'What improvised techniques can I use to desalinate seawater for drinking', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I waterproof a shelter roof using only natural materials', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'How can I construct a solar still step by step to collect clean water', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What shelter designs provide the best balance between ventilation and warmth', badge: 'advanced', kb: 'Shelter & Fire' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🔥',
+                title: 'Fire & Warmth',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'How do I make char cloth for fire starting', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'What are 5 ways to start a fire without matches or a lighter', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How to identify the best wood for a fire or building a shelter', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How do I dry wet clothing by a fire without burning or damaging the fabric', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What improvised insulation methods can I use to retain body heat overnight', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'What are the signs of hypothermia, and how do I treat it', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I safely warm up someone with severe hypothermia', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What are the most efficient fire layouts (teepee, log cabin, lean-to, star fire)', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How can I create a windbreak to keep a fire lit in high winds', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How do I recognize and collect the driest wood types after heavy rain', badge: 'all', kb: 'Shelter & Fire' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher Recommended',
+                        prompts: [
+                            { text: 'Create a decision tree for fire starting methods in wet conditions', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'What are the best methods to keep a fire going through the night', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'What is the safest way to build a small cooking fire indoors or in a cave', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'What improvised containers can I use to carry hot coals for later', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'How do I safely combine stones and fire for long term heat storage', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'How do I reflect heat from a fire into my shelter', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'How do I test if rocks are safe to heat by a fire without risk of explosion', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'List natural tinder ranked by effectiveness in damp conditions', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'Explain the Dakota fire hole and when to use it', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'How do I build a fire that will last all night unattended', badge: 'advanced', kb: 'Shelter & Fire' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🌿',
+                title: 'Food, Foraging & Wilderness',
+                subcategories: [
+                    {
+                        title: 'All Prompts (12B Recommended)',
+                        prompts: [
+                            { text: 'Which common backyard plants are edible or medicinal', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What are 5 edible plants in the Arizona desert, and how can I safely identify them', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Is it safe to eat cactus fruit? Which species are edible', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I identify animal tracks to avoid predators while hiking', badge: 'advanced', kb: 'Navigation & Orientation' },
+                            { text: 'What are 5 edible wild plants in my region and how should they be prepared', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What mushrooms are most dangerous to avoid in my region', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How can I safely prepare acorns or other wild nuts for food', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What insects can provide safe protein in a survival situation', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How can I tell if berries are poisonous? What universal rules apply', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I safely test if a wild plant is edible', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I build and bait simple traps for small game', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Upload photo: Identify this mushroom and edibility status', badge: 'vision', kb: 'Water & Food' },
+                            { text: 'Upload photo: What plant is this, and is it safe to touch or eat', badge: 'vision', kb: 'Water & Food' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🧭',
+                title: 'Navigation Without Technology',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'How can I navigate using only the sun and stars if my GPS dies', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'Explain how to find north using a stick and the sun\'s shadow', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'What are natural landmarks that can help with orientation', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'How do I navigate in forest, urban, desert, or swamp terrain without a compass', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'Explain how moss growth can and cannot help with navigation', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'What star constellations are most reliable for navigation', badge: 'all', kb: 'Navigation & Orientation' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher Recommended',
+                        prompts: [
+                            { text: 'How do I create a makeshift compass in the field', badge: 'advanced', kb: 'Navigation & Orientation' },
+                            { text: 'How do I navigate by the moon\'s position', badge: 'advanced', kb: 'Navigation & Orientation' },
+                            { text: 'How do I use rivers and drainage patterns to orient myself', badge: 'advanced', kb: 'Navigation & Orientation' },
+                            { text: 'How do I prevent walking in circles if lost in dense forest', badge: 'advanced', kb: 'Navigation & Orientation' },
+                            { text: 'Upload photo: What mountain is this near my location', badge: 'vision', kb: 'Navigation & Orientation' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🩹',
+                title: 'First Aid & Medical',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'How do I treat a deep cut when professional medical help is not available', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What are the symptoms of hypothermia and how can it be reversed', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I recognize and treat heat stroke in extreme desert environments', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What is the safest way to splint a broken arm with improvised materials', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I identify and treat dehydration quickly in the field', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What is the difference between heat exhaustion and heat stroke', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I stop severe bleeding with improvised tools', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What natural items can be used to reduce swelling or pain', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I recognize the symptoms of shock and treat it', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'Create a decision tree for wound treatment in the field', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What are the signs of infection in a wound', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'Create an improvised stretcher with available materials', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What are red flag symptoms requiring immediate evacuation', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I safely treat and monitor a suspected concussion', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What improvised methods can I use to stabilize a sprained ankle', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How can I reduce the risk of infection when cleaning wounds', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'What are safe ways to cool down the body if no shade or water is available', badge: 'all', kb: 'Medical & First Aid' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher Recommended',
+                        prompts: [
+                            { text: 'How can I identify and respond to snake bites in my region', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Upload photo: Describe this wound and suggest treatment approach', badge: 'vision', kb: 'Medical & First Aid' },
+                            { text: 'Upload photo: Does this rash look like poison ivy or oak', badge: 'vision', kb: 'Medical & First Aid' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🏙️',
+                title: 'Urban Survival & Grid Down',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'What should I do if civil unrest breaks out and I am stuck in a city apartment', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I respond to an unexpected house invasion when off grid', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the best way to shelter in place for 72 hours with no water or power', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I prepare for an evacuation with only 10 minutes notice', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the safest way to move through a city during riots', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I secure food and water in an extended urban blackout', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What is the best way to cook indoors without power safely', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I stay safe from looters in a prolonged power outage', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the safest way to manage waste when city services fail', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I prepare a small urban apartment for a two week lockdown', badge: 'all', kb: 'Emergency Plans' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '⚡',
+                title: 'Energy & Power',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'How can I set up a basic solar system to power a small fridge and lights', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What is the best way to store gasoline for emergencies and how long does it last', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What is the safest way to use a portable generator during a blackout', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How can I extend the life of a car battery in an off grid setup', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I safely wire a solar panel to charge a battery bank', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What is the best way to ration battery power during long blackouts', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I safely store propane canisters for long term use', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I set up a wind turbine for off grid backup power', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I make a DIY solar oven from simple materials', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher Recommended',
+                        prompts: [
+                            { text: 'What is the safest way to run an extension cord from a generator', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Translate this solar wiring diagram into step by step instructions', badge: 'vision', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🔧',
+                title: 'Practical DIY & Improvisation',
+                subcategories: [
+                    {
+                        title: '12B or Higher Recommended',
+                        prompts: [
+                            { text: 'How can I build a temporary shelter using only a tarp, rope, and natural materials', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'What are 3 ways to create a makeshift water filter from common debris', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How can I reinforce a door using only household items during civil unrest', badge: 'advanced', kb: 'Emergency Plans' },
+                            { text: 'How can I improvise cooking equipment using only rocks and sticks', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'How do I create a simple water carrying container from natural materials', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'What is a safe way to collect rainwater from a roof without proper gutters', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How can I make cordage from natural fibers in the wild', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'How do I fashion fishing hooks and line from household or natural items', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Explain how to build a heat reflecting wall for a campfire', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'How can I improvise footwear protection if my boots fail', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Translate this DIY survival guide page into simpler language', badge: 'vision', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🔒',
+                title: 'Security & Defense',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'What are non lethal ways to protect your home during a grid outage', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How can I secure my bug out location from unwanted visitors', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the best way to set up early warning systems with improvised tools', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I use lighting strategically for deterrence in an off grid home', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What role does community defense play in survival situations', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I create a layered defense plan without weapons', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What are smart ways to conceal my food and water supplies', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I train children in safety without causing fear', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I practice operational security in an off grid community', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What is the best way to discourage trespassers with minimal confrontation', badge: 'all', kb: 'Emergency Plans' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🏕️',
+                title: 'Overlander: Camp Setup',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'Give me a step by step checklist for setting up camp quickly before dark', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'What is the best way to orient my tent for wind and sun protection', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How can I set up a shade tarp effectively in rocky terrain', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'Suggest 5 ways to keep my tent cooler during hot desert nights', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'What is the most efficient way to set up a ground tarp in muddy conditions', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How do I secure a rooftop tent in high winds', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'Suggest creative ways to create extra seating using gear I already have', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What is the best way to set up a safe camp kitchen in a small campsite', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'How do I quickly set up a bug free zone using mosquito nets or tarps', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Give me 3 methods to improve campsite lighting with limited gear', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: 'Vision Prompts',
+                        prompts: [
+                            { text: 'Upload photo: Evaluate if this campsite location shows signs of flooding risk', badge: 'vision', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Does this tarp wall look positioned correctly to block wind', badge: 'vision', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🚙',
+                title: 'Vehicle Diagnostics & Repair',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'My vehicle is making a strange noise when driving. Help me diagnose it', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Create a pre trip inspection checklist for overlanding in rough terrain', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'Walk me through diagnosing why my engine will not start', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What tools and socket sizes do I need for tightening a loose battery terminal', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'What is the safest way to temporarily fix a leaky radiator hose', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Explain how to free a stuck brake caliper with common overland tools', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What are the top 15 tools every overlander should carry for field repairs', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'How do I improvise a funnel for refilling fluids in the field', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher / Vision',
+                        prompts: [
+                            { text: 'Calculate fuel consumption for a long overlanding route with elevation changes', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'What is the best way to reseat a tire bead in the field', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'List 5 common trail fixes I should know for suspension issues', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'How do I use a ratchet strap to temporarily secure a broken suspension component', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'How can I use duct tape and zip ties to secure a loose exhaust pipe', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Can you identify this part under the hood', badge: 'vision', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: This dashboard light just came on. What does it mean', badge: 'vision', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Translate this mechanic manual page into simpler instructions', badge: 'vision', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: What tool do I need to remove this part', badge: 'vision', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Does this field repair look safe enough to drive', badge: 'vision', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🍳',
+                title: 'Cooking & Food Management',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'What are 5 creative ways to cook if I forgot my skillet', badge: 'all', kb: 'Water & Food' },
+                            { text: 'How can I bake bread over a campfire with minimal gear', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What are 3 ways to store meat safely without refrigeration', badge: 'all', kb: 'Water & Food' },
+                            { text: 'How do I prepare coffee in the field without a coffee maker', badge: 'all', kb: 'Water & Food' },
+                            { text: 'List 10 one pot meals perfect for overlanding', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What is the safest way to cook inside a tent vestibule in bad weather', badge: 'all', kb: 'Water & Food' },
+                            { text: 'How do I sterilize utensils if soap is not available', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What are 3 alternatives for cooking fuel if I run out of propane', badge: 'all', kb: 'Water & Food' }
+                        ]
+                    },
+                    {
+                        title: 'Vision Prompts',
+                        prompts: [
+                            { text: 'Upload photo: Translate this recipe page into simple field cooking steps', badge: 'vision', kb: 'Water & Food' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '📡',
+                title: 'Emergency Communications',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'Draft emergency message with GPS coordinates for satellite (160 character limit)', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Create standardized check in messages for different scenarios', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Generate international emergency phrases in Spanish for mechanical help', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Write SOS message prioritizing critical info for limited transmission', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Draft structured distress call for radio use (HAM or GMRS)', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'List the top 5 details to always include in an SOS message', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Explain how to keep messages concise when using satellite devices', badge: 'all', kb: 'Emergency Plans' }
+                        ]
+                    },
+                    {
+                        title: 'Vision Prompts',
+                        prompts: [
+                            { text: 'Upload photo: Translate this radio manual page into simpler English', badge: 'vision', kb: 'Emergency Plans' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🦎',
+                title: 'Wildlife & Environmental Awareness',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'How do I identify safe versus toxic mushrooms in my area', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What is the best way to recognize animal tracks at a campsite', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'What are 3 signs of predator activity in the wilderness', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: '12B or Higher / Vision',
+                        prompts: [
+                            { text: 'What are 5 edible plants I can find in the Arizona desert', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Explain how to tell if wild berries are safe to eat', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What are common poisonous plants I should avoid in the Southwest', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I test if a plant is safe using a field test method', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Upload photo: Identify this cactus and tell me if it is edible', badge: 'vision', kb: 'Water & Food' },
+                            { text: 'Upload photo: Are these berries safe to eat or toxic', badge: 'vision', kb: 'Water & Food' },
+                            { text: 'Upload photo: What animal made these tracks', badge: 'vision', kb: 'Navigation & Orientation' },
+                            { text: 'Upload photo: Can you identify this cactus', badge: 'vision', kb: 'Water & Food' },
+                            { text: 'Upload photo: Describe this plant and suggest possible uses', badge: 'vision', kb: 'Water & Food' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🛡️',
+                title: 'Security & Crisis Response',
+                subcategories: [
+                    {
+                        title: 'Works on All Models',
+                        prompts: [
+                            { text: 'What is the safest way to secure my gear at camp overnight', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'How do I deter wildlife from approaching my vehicle', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'List 5 safe non lethal ways to protect my camp from intruders', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the best response if someone suspicious approaches my camp', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I discreetly secure valuables in my vehicle', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Explain how to set up a perimeter alarm using basic gear', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What should I do if stranded in a remote area without communications', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What are 3 safe ways to signal for help in the wilderness', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'How do I shelter in place if civil unrest erupts nearby', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'What is the best way to de escalate conflict with strangers on the trail', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: 'Vision Prompts',
+                        prompts: [
+                            { text: 'Upload photo: Does this campsite location look hidden enough', badge: 'vision', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Identify weak points in this camp fence or barrier', badge: 'vision', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🌦️',
+                title: 'Weather Adaptation',
+                subcategories: [
+                    {
+                        title: 'All Prompts',
+                        prompts: [
+                            { text: 'What are 3 improvised snow shelters I can build if caught unprepared', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'Explain how to keep gear dry in high humidity conditions', badge: 'all', kb: 'Gear & Checklists' },
+                            { text: 'What are 5 ways to waterproof a tent seam without commercial sealant', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'What is the best way to anchor gear against sudden gusts of wind', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Give me 3 ways to divert water away from camp in a flash rainstorm', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Upload photo: Does this storm cloud formation suggest rain is imminent', badge: 'vision', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🏡',
+                title: 'Homesteading',
+                subcategories: [
+                    {
+                        title: 'Crops & Garden',
+                        prompts: [
+                            { text: 'My tomato plants have yellow spots on the leaves. Diagnose the problem and suggest organic treatments', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Create a month-by-month planting calendar for my growing zone focusing on preservation crops', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'What are the best companion planting strategies for a small garden', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'How do I build a simple cold frame to extend my growing season', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What are natural pest control methods that actually work', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: 'Livestock & Animals',
+                        prompts: [
+                            { text: 'My chickens have stopped laying eggs suddenly. What are the likely causes and solutions', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Create a comprehensive guide to raising backyard chickens from chicks to laying hens', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'What are the signs of common livestock illnesses I should watch for', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'How do I safely introduce new animals to an existing flock or herd', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: 'Water & Power Systems',
+                        prompts: [
+                            { text: 'Design a rainwater collection system for a 1500 sq ft roof in an area with 20 inches annual rainfall', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Calculate solar panel requirements for running a refrigerator, well pump, and basic lighting off-grid', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'How do I maintain a well pump system for reliable off-grid water', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'What is the most cost-effective way to heat a homestead without grid power', badge: 'advanced', kb: 'Skills & Reference' }
+                        ]
+                    },
+                    {
+                        title: 'Food Preservation',
+                        prompts: [
+                            { text: 'Create a comprehensive guide to water bath canning for beginners', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What are the safest methods for smoking and preserving meat without electricity', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'How do I build and manage a root cellar for year-round food storage', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'What foods can be safely dehydrated and how long do they last', badge: 'all', kb: 'Water & Food' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '⚕️',
+                title: 'Healthcare & First Responders',
+                subcategories: [
+                    {
+                        title: 'Medical Reference',
+                        prompts: [
+                            { text: 'Calculate the correct amoxicillin dose for a 35-pound child with otitis media', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Patient presents with chest pain, shortness of breath, and leg swelling. What is your differential', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Create a patient education handout about diabetes management in simple language', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'List common drug interactions with warfarin that patients should avoid', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Explain the FAST stroke assessment tool with examples for each component', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'Create a comprehensive field first aid manual covering the 10 most common wilderness injuries', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Write a guide to recognizing and treating allergic reactions in the field', badge: 'advanced', kb: 'Medical & First Aid' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '📚',
+                title: 'Education & Homeschool',
+                subcategories: [
+                    {
+                        title: 'Lesson Planning & Tutoring',
+                        prompts: [
+                            { text: 'Create a week of hands-on science experiments about electricity for 6th graders using household items', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'My 8-year-old is struggling with multiplication. Design fun, progressive exercises to build confidence', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Generate a reading comprehension worksheet about pioneers for 4th grade with questions and vocabulary', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Adapt this algebra lesson for a student with dyslexia, including visual aids and memory tricks', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Design a history unit on Ancient Egypt with crafts, writing prompts, and a final project', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Create a nature-based science curriculum for elementary students that can be taught entirely outdoors', badge: 'advanced', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '✝️',
+                title: 'Faith & Mission Work',
+                subcategories: [
+                    {
+                        title: 'Ministry Resources',
+                        prompts: [
+                            { text: 'Create a sermon outline on perseverance with 5 supporting verses', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Translate this prayer into Spanish and French', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Generate a youth lesson on the Fruits of the Spirit', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'List all Bible verses about forgiveness with brief explanations', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Write a devotional about finding peace in difficult times', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'Create a Bible study guide on the book of James for small groups', badge: 'advanced', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🔒',
+                title: 'Privacy & Sensitive Work',
+                subcategories: [
+                    {
+                        title: 'Document Processing',
+                        prompts: [
+                            { text: 'Anonymize this interview transcript while preserving key facts', badge: 'all', kb: 'Other' },
+                            { text: 'Extract all dates and obligations from this contract', badge: 'advanced', kb: 'Other' },
+                            { text: 'Rewrite these notes removing all personally identifiable information', badge: 'all', kb: 'Other' },
+                            { text: 'Summarize this document highlighting potential legal risks', badge: 'advanced', kb: 'Other' },
+                            { text: 'Create a neutral summary of this sensitive situation', badge: 'all', kb: 'Other' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🏔️',
+                title: 'Wilderness & Outdoor Adventures',
+                subcategories: [
+                    {
+                        title: 'Backcountry Essentials',
+                        prompts: [
+                            { text: 'I found a plant with white berries and serrated leaves. Is it safe to eat', badge: 'all', kb: 'Water & Food' },
+                            { text: 'What animal makes a track that looks like this? Describe the track you found', badge: 'all', kb: 'Navigation & Orientation' },
+                            { text: 'The clouds are building to the west and the wind is shifting. What weather should I expect', badge: 'all', kb: 'Skills & Reference' },
+                            { text: 'I need to build an emergency shelter with only a tarp and paracord. Walk me through it', badge: 'all', kb: 'Shelter & Fire' },
+                            { text: 'How do I purify water from this stream using only what I have in my pack', badge: 'all', kb: 'Water & Food' },
+                            { text: 'Create a comprehensive packing checklist for a 5-day backcountry hiking trip', badge: 'advanced', kb: 'Gear & Checklists' },
+                            { text: 'What are the Leave No Trace principles and how do I practice them effectively', badge: 'all', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🚨',
+                title: 'Emergency Scenarios',
+                subcategories: [
+                    {
+                        title: 'Crisis Response',
+                        prompts: [
+                            { text: 'I have a deep cut on my forearm and I am 2 hours from the nearest hospital. How do I stop the bleeding and prevent infection', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'Power has been out for 3 days. How do I safely preserve the food in my refrigerator and determine what is still safe to eat', badge: 'all', kb: 'Water & Food' },
+                            { text: 'My car broke down in a remote area with no cell service. Walk me through basic diagnostics and temporary fixes', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'I think someone has been poisoned by a household chemical. What immediate steps should I take', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'There is a wildfire approaching. Create a prioritized evacuation checklist with timing estimates', badge: 'all', kb: 'Emergency Plans' },
+                            { text: 'Create a comprehensive family emergency communication plan for when cell networks are down', badge: 'advanced', kb: 'Emergency Plans' },
+                            { text: 'Write a complete 72-hour emergency preparedness guide for a family of four', badge: 'advanced', kb: 'Emergency Plans' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🔬',
+                title: 'Field Research & NGO',
+                subcategories: [
+                    {
+                        title: 'Field Operations',
+                        prompts: [
+                            { text: 'My diesel generator is producing black smoke and losing power. Provide a diagnostic flowchart', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Write a safety briefing for working at heights on a construction site without fall protection equipment', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'I found an injured wild animal. How do I safely assess and provide basic care until wildlife rescue arrives', badge: 'all', kb: 'Medical & First Aid' },
+                            { text: 'Create a daily equipment inspection checklist for a backhoe operating in muddy conditions', badge: 'advanced', kb: 'Gear & Checklists' },
+                            { text: 'Lightning risk assessment: When should we stop outdoor work based on distance and timing', badge: 'advanced', kb: 'Skills & Reference' }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '📚',
+                title: 'Knowledge Base Builders',
+                subcategories: [
+                    {
+                        title: 'Comprehensive Guides (Save These!)',
+                        prompts: [
+                            { text: 'Create a comprehensive water purification guide covering all methods from boiling to chemical treatment to solar disinfection', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Write a complete field-ready first aid protocol for treating burns of all degrees', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Create a detailed guide to edible and medicinal plants of North America with identification tips', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Write a comprehensive navigation manual covering compass use, celestial navigation, and natural wayfinding', badge: 'advanced', kb: 'Navigation & Orientation' },
+                            { text: 'Create a complete emergency communications handbook including radio protocols, signal methods, and message templates', badge: 'advanced', kb: 'Emergency Plans' },
+                            { text: 'Write a detailed shelter construction guide covering 10 different shelter types for various environments', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'Create a comprehensive fire-making manual covering every method from friction to chemical ignition', badge: 'advanced', kb: 'Shelter & Fire' },
+                            { text: 'Write a complete off-grid solar power guide from planning to installation to maintenance', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Create a detailed food preservation encyclopedia covering canning, smoking, drying, and fermenting', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Write a comprehensive vehicle emergency repair manual for common breakdowns in remote areas', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Create a complete knot-tying reference guide with uses for each knot in survival situations', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Write a detailed weather reading and prediction guide using natural indicators', badge: 'advanced', kb: 'Skills & Reference' },
+                            { text: 'Create a comprehensive guide to building and maintaining a year-round vegetable garden', badge: 'advanced', kb: 'Water & Food' },
+                            { text: 'Write a complete wilderness first aid manual covering trauma, environmental injuries, and medical emergencies', badge: 'advanced', kb: 'Medical & First Aid' },
+                            { text: 'Create a detailed security and defense guide for protecting a homestead or bug-out location', badge: 'advanced', kb: 'Emergency Plans' }
+                        ]
+                    }
+                ]
+            }
+        ];
+        
+        // ============================================
+        // RENDERING
+        // ============================================
+        
+        let activeFilter = 'all';
+        let totalPrompts = 0;
+        
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = '';
+            let visibleCount = 0;
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+            
+            PROMPT_CATEGORIES.forEach((cat, catIdx) => {
+                let catPromptCount = 0;
+                let subcatHtml = '';
+                
+                cat.subcategories.forEach(sub => {
+                    let promptsHtml = '';
+                    let subCount = 0;
+                    
+                    sub.prompts.forEach((p, pIdx) => {
+                        // Apply filters
+                        if (activeFilter === 'kb' && !p.kb) return;
+                        if (activeFilter === 'vision' && p.badge !== 'vision') return;
+                        if (searchTerm && !p.text.toLowerCase().includes(searchTerm)) return;
+                        
+                        subCount++;
+                        catPromptCount++;
+                        
+                        const badgeClass = p.badge === 'all' ? 'all-models' : p.badge === 'vision' ? 'vision' : 'advanced';
+                        const badgeText = p.badge === 'all' ? 'All Models' : p.badge === 'vision' ? '📷 Vision' : '12B+';
+                        const kbHtml = p.kb ? `<div class="kb-tag">📚 ${p.kb}</div>` : '';
+                        
+                        promptsHtml += `
+                            <div class="prompt-card" id="prompt-${catIdx}-${pIdx}">
+                                <div style="flex: 1;">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <span class="prompt-badge ${badgeClass}">${badgeText}</span>
+                                    </div>
+                                    <div class="prompt-text">${p.text}</div>
+                                    ${kbHtml}
+                                </div>
+                                <div class="prompt-actions">
+                                    <button class="prompt-action-btn" onclick="copyPrompt('${escapeForAttr(p.text)}', 'prompt-${catIdx}-${pIdx}')">📋 Copy</button>
+                                    <button class="prompt-action-btn use" onclick="usePrompt('${escapeForAttr(p.text)}')">▶ Use</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    if (subCount > 0) {
+                        subcatHtml += `
+                            <div class="subcategory">
+                                <div class="subcategory-title">${sub.title}</div>
+                                <div class="prompt-grid">${promptsHtml}</div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                if (catPromptCount > 0) {
+                    visibleCount += catPromptCount;
+                    container.innerHTML += `
+                        <div class="category" id="cat-${catIdx}">
+                            <div class="category-header" onclick="toggleCategory('cat-${catIdx}')">
+                                <span class="category-icon">${cat.icon}</span>
+                                <span class="category-title">${cat.title}</span>
+                                <span class="category-count">${catPromptCount} prompts</span>
+                                <span class="category-toggle">▼</span>
+                            </div>
+                            <div class="subcategories">${subcatHtml}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            document.getElementById('promptCount').textContent = `${visibleCount} prompts`;
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+        
+        function escapeForAttr(str) {
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+        
+        function toggleCategory(catId) {
+            document.getElementById(catId).classList.toggle('collapsed');
+        }
+        
+        function setFilter(filter, btn) {
+            activeFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderCategories();
+        }
+        
+        function filterPrompts() {
+            renderCategories();
+        }
+        
+        // ============================================
+        // ACTIONS
+        // ============================================
+        
+        function copyPrompt(text, cardId) {
+            navigator.clipboard.writeText(text).then(() => {
+                const card = document.getElementById(cardId);
+                card.classList.add('copied');
+                showToast('Copied to clipboard!');
+                setTimeout(() => card.classList.remove('copied'), 2000);
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('Copied to clipboard!');
+            });
+        }
+        
+        function usePrompt(text) {
+            // Store the prompt and redirect to chat
+            sessionStorage.setItem('offgrid-ready-prompt', text);
+            window.location.href = '/online';
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 2500);
+        }
+        
+        // ============================================
+        // INIT
+        // ============================================
+        
+        // Count total prompts
+        PROMPT_CATEGORIES.forEach(cat => {
+            cat.subcategories.forEach(sub => {
+                totalPrompts += sub.prompts.length;
+            });
+        });
+        
+        renderCategories();
+    </script>
+</body>
+</html>
