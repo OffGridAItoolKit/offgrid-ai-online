@@ -1327,8 +1327,8 @@ body {
     
     .welcome {
         padding: 20px;
-        padding-top: 75px;
-        padding-bottom: 60px;
+        padding-top: 30px;
+        padding-bottom: 40px;
     }
     
     .welcome h2 {
@@ -1739,18 +1739,18 @@ body {
     
     /* Remove the extra padding that was added for the hamburger menu */
     .welcome {
-        padding-top: 45px !important;  /* Your custom 45px for compass visibility */
+        padding-top: 20px !important;
     }
     
     /* Also adjust the messages container top padding if needed */
     .messages:has(.welcome) {
-        padding-top: 20px !important;
+        padding-top: 10px !important;
     }
     
-    /* Enlarge the compass icon by 25% on mobile */
+    /* Slightly smaller compass on mobile to save vertical space */
     .welcome-icon {
-        width: 137.5px !important;  /* 110px * 1.25 = 137.5px */
-        height: 137.5px !important;  /* 110px * 1.25 = 137.5px */
+        width: 100px !important;
+        height: 100px !important;
     }
 }
 /* Hide Verified Drive badge on mobile and tablet portrait */

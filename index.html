@@ -532,6 +532,17 @@
         /* Hide hamburger menu on mobile for customers */
         body.is-customer .toggle-sidebar { display: none !important; }
         
+        /* Mobile: hide status text, keep dot only */
+        @media (max-width: 768px) {
+            .status .status-text { display: none !important; }
+            /* Hide customer badge on mobile to reduce header clutter */
+            .customer-badge { display: none !important; }
+            /* Hide marketing paragraph and redundant badges on mobile for customers */
+            body.is-customer .welcome > p { display: none !important; }
+            body.is-customer .welcome-subtitle { display: none !important; }
+            body.is-customer .feature-badges { display: none !important; }
+        }
+        
         /* Voice recording indicator */
         .voice-recording {
             display: none;
@@ -1015,8 +1026,8 @@
                     <!-- Desktop quick actions (Customer: KB + Prompts) -->
                     <div class="quick-actions desktop-quick-actions customer-only" style="grid-template-columns: 1fr 1fr;">
                         <div class="quick-action" onclick="openKnowledgeBase()" style="border-color: #b8860b;">
-                            <div class="quick-action-title">📚 Open Knowledge Base</div>
-                            <div class="quick-action-desc">Your offline survival library</div>
+                            <div class="quick-action-title">📂 Open File Explorer</div>
+                            <div class="quick-action-desc">Navigate to your offline survival library</div>
                         </div>
                         <div class="quick-action" onclick="window.location.href='/online/ready-made-prompts'" style="border-color: #b8860b;">
                             <div class="quick-action-title">💡 Ready-Made Prompts</div>
@@ -1044,6 +1055,13 @@
 
                     <!-- Mobile quick actions (Customer) -->
                     <div class="mobile-quick-actions customer-only">
+                        <div class="quick-action" onclick="triggerCameraCapture()">
+                            <div class="quick-action-icon">📸</div>
+                            <div class="quick-action-content">
+                                <div class="quick-action-title">Take Picture</div>
+                                <div class="quick-action-desc">Camera capture</div>
+                            </div>
+                        </div>
                         <div class="quick-action" onclick="triggerGalleryUpload()">
                             <div class="quick-action-icon">🖼️</div>
                             <div class="quick-action-content">
@@ -1056,13 +1074,6 @@
                             <div class="quick-action-content">
                                 <div class="quick-action-title">Voice Input</div>
                                 <div class="quick-action-desc">Speak your prompt</div>
-                            </div>
-                        </div>
-                        <div class="quick-action" onclick="openKnowledgeBase()">
-                            <div class="quick-action-icon">📚</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Open Knowledge Base</div>
-                                <div class="quick-action-desc">Your offline survival library</div>
                             </div>
                         </div>
                         <div class="quick-action" onclick="window.location.href='/online/ready-made-prompts'">
@@ -1843,6 +1854,17 @@
             if (input) input.click();
         }
         
+        function triggerCameraCapture() {
+            let input = document.getElementById('imageInput');
+            if (!input) {
+                transitionToChat();
+                const welcome = document.getElementById('welcome');
+                if (welcome) welcome.remove();
+                input = document.getElementById('imageInput');
+            }
+            if (input) input.click();
+        }
+
         function triggerGalleryUpload() {
             let input = document.getElementById('galleryInput');
             if (!input) {
