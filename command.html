@@ -3935,7 +3935,7 @@
                             <img src="${imageSrc}" alt="Generated image: ${escapeHtml(prompt)}">
                             <div class="studio-result-actions">
                                 <button class="studio-download-btn" onclick="downloadGeneratedImage('${imageSrc.replace(/'/g, "\\'")}')">\ud83d\udcbe Download Image</button>
-                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat('${imageSrc.replace(/'/g, "\\'")}')">\ud83d\udcac Send to Chat</button>
+                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat('${imageSrc.replace(/'/g, "\\'")}', '${escapeHtml(prompt).replace(/'/g, "\\'")}')">💬 Send to Chat</button>
                             </div>
                             ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
                         </div>
@@ -3985,7 +3985,7 @@
             document.body.removeChild(a);
         }
 
-        function insertImageToChat(imageSrc) {
+        function insertImageToChat(imageSrc, promptText) {
             // Close the image studio
             closeImageStudio();
 
@@ -3997,8 +3997,28 @@
                 if (bottomInputArea) bottomInputArea.style.display = '';
             }
 
+            // Add to conversationHistory so Save to KB works
+            const imagePromptText = promptText || 'Image generation request';
+            conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
+            conversationHistory.push({ role: 'assistant', content: `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](embedded-image)\n\n*Generated using Image Studio in OffGrid Command Center.*` });
+
             // Add the image as a message in the chat
             const messagesDiv = document.getElementById('messages');
+
+            // Also add the user prompt as a visible message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            userDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">🎨 Image Studio Request</div>
+                    ${escapeHtml(imagePromptText)}
+                    <div class="message-time">${userTime}</div>
+                </div>
+                <div class="message-avatar">You</div>
+            `;
+            messagesDiv.appendChild(userDiv);
+
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message assistant';
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -4006,7 +4026,7 @@
             messageDiv.innerHTML = `
                 <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
                 <div class="message-content">
-                    <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">\ud83c\udfa8 Image Studio</div>
+                    <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">🎨 Image Studio</div>
                     <img src="${imageSrc}" alt="Generated image" style="max-width: 100%; border-radius: 10px; margin: 8px 0;">
                     <div class="message-time">${time}</div>
                 </div>
