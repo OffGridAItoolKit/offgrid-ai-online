@@ -869,7 +869,7 @@ Based on these, write the final Command answer as described.
 
 /**
  * POST /api/command/generate-image
- * Generates an image using Google Gemini 2.5 Flash via OpenRouter.
+ * Generates an image using Nano Banana Pro (Gemini 3 Pro Image Preview) via OpenRouter.
  * Takes a text prompt and returns the generated image as base64.
  * No data is stored — processed in memory and discarded.
  */
@@ -896,7 +896,7 @@ app.post('/api/command/generate-image', async (req, res) => {
                 'X-Title': 'OffGrid AI Command Center - Image Studio'
             },
             body: JSON.stringify({
-                model: 'google/gemini-2.5-flash-preview:thinking',
+                model: 'google/gemini-3-pro-image-preview',
                 messages: [
                     {
                         role: 'user',
@@ -904,14 +904,7 @@ app.post('/api/command/generate-image', async (req, res) => {
                     }
                 ],
                 max_tokens: 8192,
-                temperature: 1.0,
-                provider: {
-                    require_parameters: true
-                },
-                response_modalities: ['image', 'text'],
-                image_generation: {
-                    quality: 'high'
-                }
+                modalities: ['image', 'text']
             })
         });
         
@@ -923,12 +916,24 @@ app.post('/api/command/generate-image', async (req, res) => {
         
         const data = await response.json();
         
-        // Extract image from response - Gemini returns inline_data with base64
+        // Extract image from response
+        // OpenRouter returns images in message.images[] array as base64 data URLs
         let imageBase64 = null;
         let textResponse = '';
         
-        const content = data.choices?.[0]?.message?.content;
-        if (Array.isArray(content)) {
+        const message = data.choices?.[0]?.message;
+        
+        // Method 1: OpenRouter normalized format - message.images array
+        if (message?.images && Array.isArray(message.images) && message.images.length > 0) {
+            const firstImage = message.images[0];
+            if (firstImage?.image_url?.url) {
+                imageBase64 = firstImage.image_url.url;
+            }
+        }
+        
+        // Method 2: Check content array (multipart response)
+        const content = message?.content;
+        if (!imageBase64 && Array.isArray(content)) {
             for (const part of content) {
                 if (part.type === 'image_url' && part.image_url?.url) {
                     imageBase64 = part.image_url.url;
@@ -939,16 +944,17 @@ app.post('/api/command/generate-image', async (req, res) => {
                 }
             }
         } else if (typeof content === 'string') {
+            textResponse = content;
             // Check if the response contains a base64 image in markdown format
             const imgMatch = content.match(/!\[.*?\]\((data:image\/[^)]+)\)/);
             if (imgMatch) {
                 imageBase64 = imgMatch[1];
             }
-            textResponse = content;
         }
         
         if (!imageBase64) {
-            console.warn('[Nano Banana] No image in response. Text response:', textResponse.substring(0, 200));
+            console.warn('[Nano Banana] No image in response. Keys:', JSON.stringify(Object.keys(message || {})));
+            console.warn('[Nano Banana] Text response:', (textResponse || '').substring(0, 200));
             return res.json({
                 success: false,
                 error: 'The model did not generate an image. Try rephrasing your prompt to be more descriptive.',
