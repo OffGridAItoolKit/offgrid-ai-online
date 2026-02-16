@@ -764,7 +764,9 @@ app.post('/api/command/council', async (req, res) => {
             message: `🏆 Chairman selected: ${chairmanResult.emoji} ${chairmanResult.shortName} (Answer ${chairmanLabel})`,
             chairmanKey: chairmanResult.key,
             chairmanLabel: chairmanLabel,
-            scores: scoresSummary
+            scores: scoresSummary,
+            rawReviews: reviewOutcome.rawReviews,
+            labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, emoji: r.emoji }; return acc; }, {})
         })}\n\n`);
 
         console.log('[Council] Chairman selected:', {
@@ -839,7 +841,9 @@ Based on these, write the final Command answer as described.
                 chairmanKey: chairmanResult.key,
                 chairmanName: chairmanResult.shortName,
                 chairmanEmoji: chairmanResult.emoji,
-                scores: scoresSummary
+                scores: scoresSummary,
+                rawReviews: reviewOutcome.rawReviews,
+                labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, emoji: r.emoji }; return acc; }, {})
             }
         })}\n\n`);
         await streamOpenRouter(COMMAND_MODELS.scout.id, synthesisMessages, res, 4096, 0.5);
@@ -856,6 +860,116 @@ Based on these, write the final Command answer as described.
         }
         res.write(`data: ${JSON.stringify({ error: 'Council error: ' + error.message })}\n\n`);
         res.end();
+    }
+});
+
+// =============================================================================
+// NANO BANANA IMAGE GENERATION ENDPOINT
+// =============================================================================
+
+/**
+ * POST /api/command/generate-image
+ * Generates an image using Google Gemini 2.5 Flash via OpenRouter.
+ * Takes a text prompt and returns the generated image as base64.
+ * No data is stored — processed in memory and discarded.
+ */
+app.post('/api/command/generate-image', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        
+        if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
+            return res.status(400).json({ error: 'A text prompt is required' });
+        }
+        
+        if (!OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'Server configuration error' });
+        }
+        
+        console.log(`[Nano Banana] Generating image for: "${prompt.substring(0, 80)}..."`);
+        
+        const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://offgridtoolkit.ai',
+                'X-Title': 'OffGrid AI Command Center - Image Studio'
+            },
+            body: JSON.stringify({
+                model: 'google/gemini-2.5-flash-preview:thinking',
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt.trim()
+                    }
+                ],
+                max_tokens: 8192,
+                temperature: 1.0,
+                provider: {
+                    require_parameters: true
+                },
+                response_modalities: ['image', 'text'],
+                image_generation: {
+                    quality: 'high'
+                }
+            })
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('[Nano Banana] API error:', errorData);
+            throw new Error(errorData.error?.message || `Image generation failed (${response.status})`);
+        }
+        
+        const data = await response.json();
+        
+        // Extract image from response - Gemini returns inline_data with base64
+        let imageBase64 = null;
+        let textResponse = '';
+        
+        const content = data.choices?.[0]?.message?.content;
+        if (Array.isArray(content)) {
+            for (const part of content) {
+                if (part.type === 'image_url' && part.image_url?.url) {
+                    imageBase64 = part.image_url.url;
+                } else if (part.type === 'text') {
+                    textResponse += part.text || '';
+                } else if (part.inline_data) {
+                    imageBase64 = `data:${part.inline_data.mime_type};base64,${part.inline_data.data}`;
+                }
+            }
+        } else if (typeof content === 'string') {
+            // Check if the response contains a base64 image in markdown format
+            const imgMatch = content.match(/!\[.*?\]\((data:image\/[^)]+)\)/);
+            if (imgMatch) {
+                imageBase64 = imgMatch[1];
+            }
+            textResponse = content;
+        }
+        
+        if (!imageBase64) {
+            console.warn('[Nano Banana] No image in response. Text response:', textResponse.substring(0, 200));
+            return res.json({
+                success: false,
+                error: 'The model did not generate an image. Try rephrasing your prompt to be more descriptive.',
+                textResponse: textResponse
+            });
+        }
+        
+        console.log('[Nano Banana] Image generated successfully');
+        
+        res.json({
+            success: true,
+            image: imageBase64,
+            textResponse: textResponse,
+            prompt: prompt.trim()
+        });
+        
+    } catch (error) {
+        console.error('[Nano Banana] Error:', error);
+        res.status(500).json({ 
+            error: 'Image generation failed: ' + error.message 
+        });
     }
 });
 
