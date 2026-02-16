@@ -344,6 +344,16 @@
             font-size: 12px;
             margin-bottom: 20px;
         }
+        .save-modal .folder-hint {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: -10px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        .save-modal .folder-hint strong {
+            color: #6b7280;
+        }
         .save-modal label {
             display: block;
             color: #374151;
@@ -2030,7 +2040,7 @@
                 <div class="kb-modal">
                     <div class="kb-modal-icon">📚</div>
                     <h3>Save to Your Knowledge Base</h3>
-                    <p>The Knowledge Base is a powerful feature of the <strong>OffGrid AI ToolKit USB drive</strong>. Save conversations, build a personal reference library, and access it all offline — anywhere, anytime.</p>
+                    <p>The Knowledge Base is a powerful feature of the <strong>OffGrid AI ToolKit USB drive</strong>. Save conversations, build a personal reference library, and access it all offline, anywhere, anytime.</p>
                     <p style="font-size: 12px; color: #8b7355;">With the USB version, your saved knowledge stays on <em>your</em> drive. No cloud. No accounts. Just your data, under your control.</p>
                     <a href="https://offgridaitoolkit.com" target="_blank" class="kb-modal-cta">🛒 Get the USB Version</a>
                     <button class="kb-modal-close" onclick="closeKBUpsellModal()">Maybe later</button>
@@ -2088,20 +2098,22 @@
                     <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
                     <label for="saveCategory">Category</label>
                     <select id="saveCategory">
-                        <option value="General">General</option>
-                        <option value="Survival">Survival & Emergency</option>
-                        <option value="Medical">Medical & First Aid</option>
-                        <option value="Navigation">Navigation & Outdoors</option>
-                        <option value="Technical">Technical & Trades</option>
-                        <option value="Food">Food & Water</option>
-                        <option value="Shelter">Shelter & Construction</option>
-                        <option value="Education">Education & Reference</option>
+                        <option value="Other">Other</option>
+                        <option value="Emergency Plans">Emergency Plans</option>
+                        <option value="Gear & Checklists">Gear & Checklists</option>
+                        <option value="Medical & First Aid">Medical & First Aid</option>
+                        <option value="Navigation & Orientation">Navigation & Orientation</option>
+                        <option value="OffGrid AI Documentation">OffGrid AI Documentation</option>
+                        <option value="Shelter & Fire">Shelter & Fire</option>
+                        <option value="Skills & Reference">Skills & Reference</option>
+                        <option value="Water & Food">Water & Food</option>
                     </select>
+                    <div class="folder-hint">💡 <strong>OffGrid AI USB users:</strong> Choose a folder, then navigate to your OffGrid AI drive &gt; Saved Knowledge Base &gt; [category] when saving.</div>
                     <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
                     <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
                     <div class="save-modal-actions">
                         <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
-                        <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">📄 Export PDF</button>
+                        <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">🖨️ Print / Save PDF</button>
                         <button class="save-modal-btn primary" onclick="executeSave()">💾 Save .md</button>
                     </div>
                 </div>
@@ -2170,7 +2182,8 @@
             // Build conversation content
             let content = `# ${title}\n\n`;
             content += `*Saved from OffGrid AI Online on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
-            content += `**Model:** ${MODEL_DISPLAY[selectedModel]?.name || selectedModel}\n\n`;
+            content += `**Model:** ${MODEL_DISPLAY[selectedModel]?.name || selectedModel}  \n`;
+            content += `**Category:** ${category}\n\n`;
             content += '---\n\n';
             
             conversationHistory.forEach((msg, index) => {
@@ -2205,7 +2218,7 @@
         
         async function executeSave() {
             const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
-            const category = document.getElementById('saveCategory')?.value || 'General';
+            const category = document.getElementById('saveCategory')?.value || 'Other';
             const tags = document.getElementById('saveTags')?.value || '';
             
             const markdownContent = generateMarkdownContent(title, category, tags);
@@ -2216,11 +2229,20 @@
             // Try File System Access API first
             if (kbDirectoryHandle) {
                 try {
-                    const fileHandle = await kbDirectoryHandle.getFileHandle(filename, { create: true });
+                    // Try to save into the category subfolder if it exists
+                    let targetDir = kbDirectoryHandle;
+                    try {
+                        targetDir = await kbDirectoryHandle.getDirectoryHandle(category, { create: false });
+                    } catch (e) {
+                        // Category subfolder doesn't exist, save to the selected root folder
+                        console.log('Category subfolder not found, saving to root folder');
+                    }
+                    const fileHandle = await targetDir.getFileHandle(filename, { create: true });
                     const writable = await fileHandle.createWritable();
                     await writable.write(markdownContent);
                     await writable.close();
-                    showSaveToast(`Saved: ${filename}`, `Saved directly to your computer — never to our servers.`);
+                    const savedTo = targetDir === kbDirectoryHandle ? kbDirectoryHandle.name : `${kbDirectoryHandle.name}/${category}`;
+                    showSaveToast(`Saved: ${filename}`, `Saved to ${savedTo}. Never to our servers.`);
                     return;
                 } catch (err) {
                     console.error('File System Access write failed, falling back to download:', err);
