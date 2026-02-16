@@ -541,6 +541,9 @@
             body.is-customer .welcome > p { display: none !important; }
             body.is-customer .welcome-subtitle { display: none !important; }
             body.is-customer .feature-badges { display: none !important; }
+            /* Hide ONLINE badge and title from welcome body on mobile (already in header) */
+            body.is-customer .welcome h2 { display: none !important; }
+            body.is-customer .welcome-online-badge { display: none !important; }
         }
         
         /* Voice recording indicator */
