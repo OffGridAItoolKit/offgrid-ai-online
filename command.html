@@ -1875,113 +1875,174 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Prompt Helper System */
-        .prompt-helper-toggle {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: none;
-            border: none;
-            color: #a855f7;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 4px 0;
-            margin-bottom: 8px;
-            transition: color 0.2s;
+        /* Category Chips */
+        .studio-categories {
+            margin-bottom: 18px;
         }
-        .prompt-helper-toggle:hover { color: #7c3aed; }
-        .prompt-helper-toggle .arrow { transition: transform 0.2s; display: inline-block; font-size: 10px; }
-        .prompt-helper-toggle .arrow.open { transform: rotate(90deg); }
-
-        .prompt-builder {
-            background: #faf5ff;
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 14px;
-            display: none;
-        }
-        .prompt-builder.visible { display: block; }
-        .prompt-builder-row {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
-            align-items: center;
-        }
-        .prompt-builder-row:last-child { margin-bottom: 0; }
-        .prompt-builder-row label {
-            min-width: 90px;
-            font-size: 11px;
-            font-weight: 700;
-            color: #7c3aed;
-            margin-bottom: 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .prompt-builder-row input {
-            flex: 1;
-            padding: 7px 10px;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            font-size: 12px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            background: white;
-        }
-        .prompt-builder-row input:focus {
-            outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.08);
-        }
-        .prompt-builder-row input::placeholder { color: #9ca3af; }
-        .build-prompt-btn {
-            width: 100%;
-            padding: 8px;
-            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 6px;
-            transition: all 0.2s;
-        }
-        .build-prompt-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3); }
-
-        .example-prompts-section {
-            margin-bottom: 14px;
-        }
-        .example-prompts-label {
+        .studio-categories-label {
             font-size: 11px;
             font-weight: 700;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
-        .example-chips {
+        .category-chips {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
-        .example-chip {
-            padding: 5px 10px;
+        .category-chip {
+            padding: 6px 12px;
             background: #f3f4f6;
-            border: 1px solid #e5e7eb;
+            border: 1.5px solid #e5e7eb;
             border-radius: 20px;
             font-size: 11px;
             color: #4b5563;
             cursor: pointer;
             transition: all 0.2s;
             line-height: 1.3;
+            font-weight: 500;
         }
-        .example-chip:hover {
+        .category-chip:hover {
             background: #faf5ff;
             border-color: #a855f7;
             color: #7c3aed;
         }
+        .category-chip.selected {
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            color: white;
+            border-color: #a855f7;
+            font-weight: 700;
+        }
+
+        /* AI Suggestion Bubble */
+        .ai-suggestion {
+            background: linear-gradient(135deg, #faf5ff 0%, #f0e6ff 100%);
+            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 14px 0;
+            animation: fadeIn 0.3s ease;
+        }
+        .ai-suggestion-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .ai-suggestion-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .ai-suggestion-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #7c3aed;
+        }
+        .ai-suggestion-text {
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.6;
+            font-style: italic;
+            margin-bottom: 12px;
+        }
+        .ai-suggestion-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .ai-suggestion-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .ai-suggestion-btn.primary {
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            color: white;
+        }
+        .ai-suggestion-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+        }
+        .ai-suggestion-btn.secondary {
+            background: white;
+            color: #7c3aed;
+            border: 1.5px solid rgba(168, 85, 247, 0.3);
+        }
+        .ai-suggestion-btn.secondary:hover {
+            background: #faf5ff;
+        }
+        .ai-suggestion-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Crafting animation */
+        .studio-crafting {
+            text-align: center;
+            padding: 20px 0;
+            color: #7c3aed;
+        }
+        .studio-crafting .spinner {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(168, 85, 247, 0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 8px;
+        }
+
+        /* Edit prompt textarea (hidden by default) */
+        .edit-prompt-area {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            resize: vertical;
+            min-height: 80px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .edit-prompt-area:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        /* Direct prompt toggle */
+        .direct-prompt-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 11px;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-top: 8px;
+            transition: color 0.2s;
+        }
+        .direct-prompt-toggle:hover { color: #7c3aed; }
 
         .error-reason-badge {
             display: inline-block;
@@ -3770,66 +3831,57 @@
         }
 
         // ============================================
-        // IMAGE STUDIO (NANO BANANA)
+        // IMAGE STUDIO — AI-ASSISTED PROMPT CRAFTING
         // ============================================
 
+        let studioSelectedCategory = 'other';
+        let studioCraftedPrompt = '';
+
         function openImageStudio() {
+            studioSelectedCategory = 'other';
+            studioCraftedPrompt = '';
+
             const overlay = document.createElement('div');
             overlay.className = 'image-studio-overlay';
             overlay.id = 'imageStudioModal';
             overlay.innerHTML = `
                 <div class="image-studio-modal">
                     <h3>\ud83c\udfa8 Image Studio</h3>
-                    <div class="studio-subtitle">Generate images using AI. A Command Center premium feature.</div>
+                    <div class="studio-subtitle">Describe what you need \u2014 our AI crafts the perfect prompt for you.</div>
 
-                    <div class="example-prompts-section">
-                        <div class="example-prompts-label">Try an example</div>
-                        <div class="example-chips">
-                            <span class="example-chip" onclick="fillExamplePrompt(this)">A photorealistic off-grid cabin in a snowy mountain forest, warm light glowing from windows, aerial drone shot at golden hour</span>
-                            <span class="example-chip" onclick="fillExamplePrompt(this)">Technical diagram of a solar panel wiring system for a 12V battery bank, clean engineering illustration style with labels</span>
-                            <span class="example-chip" onclick="fillExamplePrompt(this)">Watercolor painting of a wilderness campsite by a river, with a campfire and tent under a starry night sky</span>
-                            <span class="example-chip" onclick="fillExamplePrompt(this)">Infographic showing 5 steps to purify water in an emergency, flat design with icons and clear text labels</span>
-                            <span class="example-chip" onclick="fillExamplePrompt(this)">Cinematic portrait of a hiker standing on a cliff edge overlooking a vast valley, dramatic backlighting, 16:9 format</span>
+                    <div class="studio-categories">
+                        <div class="studio-categories-label">What type of visual do you need?</div>
+                        <div class="category-chips">
+                            <span class="category-chip" data-cat="survival" onclick="selectStudioCategory(this)">\ud83c\udfaf Survival Diagram</span>
+                            <span class="category-chip" data-cat="homestead" onclick="selectStudioCategory(this)">\ud83c\udfe1 Homestead Guide</span>
+                            <span class="category-chip" data-cat="medical" onclick="selectStudioCategory(this)">\u2695\ufe0f Medical Reference</span>
+                            <span class="category-chip" data-cat="wilderness" onclick="selectStudioCategory(this)">\ud83e\uddb6 Wilderness ID</span>
+                            <span class="category-chip" data-cat="adventure" onclick="selectStudioCategory(this)">\ud83d\ude90 Adventure Planning</span>
+                            <span class="category-chip" data-cat="research" onclick="selectStudioCategory(this)">\ud83d\udd2c Field Research</span>
+                            <span class="category-chip" data-cat="ministry" onclick="selectStudioCategory(this)">\u271d\ufe0f Ministry Resource</span>
+                            <span class="category-chip" data-cat="education" onclick="selectStudioCategory(this)">\ud83d\udc68\u200d\ud83c\udfeb Educational Material</span>
+                            <span class="category-chip selected" data-cat="other" onclick="selectStudioCategory(this)">\ud83d\udca1 Other</span>
                         </div>
                     </div>
 
-                    <label for="imagePrompt">Describe the image you want to create</label>
-                    <textarea id="imagePrompt" placeholder="Be specific: describe the subject, composition, action, location, and visual style. Example: A photorealistic close-up of a hand-built water filter using sand and charcoal layers in a clear plastic bottle, outdoor forest setting, natural lighting"></textarea>
-
-                    <button class="prompt-helper-toggle" onclick="togglePromptBuilder()">
-                        <span class="arrow" id="builderArrow">\u25B6</span> Prompt Builder \u2014 help me write a better prompt
-                    </button>
-
-                    <div class="prompt-builder" id="promptBuilder">
-                        <div class="prompt-builder-row">
-                            <label>Subject</label>
-                            <input type="text" id="pb-subject" placeholder="What is in the image? (e.g., a solar-powered water filter)">
-                        </div>
-                        <div class="prompt-builder-row">
-                            <label>Composition</label>
-                            <input type="text" id="pb-composition" placeholder="How is it framed? (e.g., close-up, wide shot, aerial view)">
-                        </div>
-                        <div class="prompt-builder-row">
-                            <label>Action</label>
-                            <input type="text" id="pb-action" placeholder="What is happening? (e.g., water flowing through layers)">
-                        </div>
-                        <div class="prompt-builder-row">
-                            <label>Location</label>
-                            <input type="text" id="pb-location" placeholder="Where? (e.g., a forest clearing, a workshop bench)">
-                        </div>
-                        <div class="prompt-builder-row">
-                            <label>Style</label>
-                            <input type="text" id="pb-style" placeholder="Visual style? (e.g., photorealistic, watercolor, technical diagram)">
-                        </div>
-                        <button class="build-prompt-btn" onclick="buildPromptFromFields()">\u2728 Build Prompt</button>
-                    </div>
+                    <label for="studioDescription">Describe what you need</label>
+                    <textarea id="studioDescription" placeholder="Just describe it naturally \u2014 e.g., 'a diagram showing how to build a simple water filter' or 'an infographic about edible plants in the Pacific Northwest'"></textarea>
 
                     <div class="image-studio-actions">
                         <button class="studio-cancel-btn" onclick="closeImageStudio()">Cancel</button>
-                        <button class="studio-generate-btn" id="studioGenerateBtn" onclick="generateImage()">\ud83c\udfa8 Generate Image</button>
+                        <button class="studio-generate-btn" id="studioCraftBtn" onclick="craftImagePrompt()">\u2728 Craft My Prompt</button>
                     </div>
 
+                    <div id="studioAiSuggestion"></div>
                     <div id="studioResult"></div>
+
+                    <button class="direct-prompt-toggle" onclick="toggleDirectPrompt()">\u270f\ufe0f I want to write my own prompt</button>
+                    <div id="directPromptSection" style="display: none; margin-top: 10px;">
+                        <textarea id="imagePrompt" class="edit-prompt-area" placeholder="Write your image generation prompt directly..."></textarea>
+                        <div class="image-studio-actions">
+                            <button class="studio-generate-btn" id="studioGenerateBtn" onclick="generateImage()">\ud83c\udfa8 Generate Image</button>
+                        </div>
+                    </div>
 
                     <div class="studio-privacy"><span class="lock-icon">\ud83d\udd12</span> Images are generated on-demand and never stored on our servers.</div>
                     <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Nano Banana Pro (Gemini 3 Pro)</div>
@@ -3841,53 +3893,149 @@
             });
 
             setTimeout(() => {
-                const promptInput = document.getElementById('imagePrompt');
-                if (promptInput) promptInput.focus();
+                const descInput = document.getElementById('studioDescription');
+                if (descInput) descInput.focus();
             }, 100);
         }
 
-        function fillExamplePrompt(chip) {
-            const textarea = document.getElementById('imagePrompt');
-            if (textarea) {
-                textarea.value = chip.textContent.trim();
-                textarea.focus();
+        function selectStudioCategory(chip) {
+            // Remove selected from all chips
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('selected'));
+            chip.classList.add('selected');
+            studioSelectedCategory = chip.dataset.cat;
+        }
+
+        function toggleDirectPrompt() {
+            const section = document.getElementById('directPromptSection');
+            if (section) {
+                const isVisible = section.style.display !== 'none';
+                section.style.display = isVisible ? 'none' : 'block';
+                if (!isVisible) {
+                    const textarea = document.getElementById('imagePrompt');
+                    if (textarea) {
+                        // Pre-fill with crafted prompt if available
+                        if (studioCraftedPrompt && !textarea.value) {
+                            textarea.value = studioCraftedPrompt;
+                        }
+                        textarea.focus();
+                    }
+                }
             }
         }
 
-        function togglePromptBuilder() {
-            const builder = document.getElementById('promptBuilder');
-            const arrow = document.getElementById('builderArrow');
-            if (builder) {
-                builder.classList.toggle('visible');
-                if (arrow) arrow.classList.toggle('open');
-            }
-        }
-
-        function buildPromptFromFields() {
-            const subject = document.getElementById('pb-subject')?.value.trim();
-            const composition = document.getElementById('pb-composition')?.value.trim();
-            const action = document.getElementById('pb-action')?.value.trim();
-            const location = document.getElementById('pb-location')?.value.trim();
-            const style = document.getElementById('pb-style')?.value.trim();
-
-            if (!subject) {
-                document.getElementById('pb-subject')?.focus();
+        async function craftImagePrompt() {
+            const description = document.getElementById('studioDescription')?.value.trim();
+            if (!description) {
+                document.getElementById('studioDescription')?.focus();
                 return;
             }
 
-            let parts = [];
-            if (style) parts.push(`A ${style} of`);
-            parts.push(subject);
-            if (action) parts.push(action);
-            if (location) parts.push(`in ${location}`);
-            if (composition) parts.push(`${composition}`);
+            const craftBtn = document.getElementById('studioCraftBtn');
+            const suggestionDiv = document.getElementById('studioAiSuggestion');
 
-            const builtPrompt = parts.join(', ');
-            const textarea = document.getElementById('imagePrompt');
-            if (textarea) {
-                textarea.value = builtPrompt;
-                textarea.focus();
+            craftBtn.disabled = true;
+            craftBtn.textContent = 'Crafting...';
+            suggestionDiv.innerHTML = `
+                <div class="studio-crafting">
+                    <div class="spinner"></div>
+                    <div style="font-size: 13px;">OffGrid AI is crafting your prompt...</div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/command/craft-prompt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        description: description,
+                        category: studioSelectedCategory
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Failed to craft prompt');
+                }
+
+                studioCraftedPrompt = data.prompt;
+
+                suggestionDiv.innerHTML = `
+                    <div class="ai-suggestion">
+                        <div class="ai-suggestion-header">
+                            <div class="ai-suggestion-avatar">\ud83c\udfa8</div>
+                            <div class="ai-suggestion-label">OffGrid AI suggests:</div>
+                        </div>
+                        <div class="ai-suggestion-text" id="craftedPromptText">${escapeHtml(data.prompt)}</div>
+                        <div class="ai-suggestion-actions">
+                            <button class="ai-suggestion-btn primary" id="generateCraftedBtn" onclick="generateFromCraftedPrompt()">\ud83c\udfa8 Generate This Image</button>
+                            <button class="ai-suggestion-btn secondary" onclick="editCraftedPrompt()">\u270f\ufe0f Edit Prompt</button>
+                            <button class="ai-suggestion-btn secondary" onclick="retryCraftPrompt()">\ud83d\udd04 Try Again</button>
+                        </div>
+                        <div id="editPromptArea" style="display: none; margin-top: 12px;">
+                            <textarea class="edit-prompt-area" id="editablePrompt">${escapeHtml(data.prompt)}</textarea>
+                            <button class="ai-suggestion-btn primary" style="margin-top: 6px;" onclick="generateFromEditedPrompt()">\ud83c\udfa8 Generate Edited Prompt</button>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Prompt crafting error:', error);
+                suggestionDiv.innerHTML = `
+                    <div style="text-align: center; padding: 16px; color: #ef4444;">
+                        <div style="font-size: 13px; font-weight: 600;">Couldn't craft prompt</div>
+                        <div style="font-size: 12px; margin-top: 4px; color: #6b7280;">${escapeHtml(error.message)}</div>
+                        <div style="font-size: 11px; margin-top: 8px; color: #9ca3af;">You can write your own prompt using the "I want to write my own prompt" option below.</div>
+                    </div>
+                `;
+            } finally {
+                craftBtn.disabled = false;
+                craftBtn.textContent = '\u2728 Craft My Prompt';
             }
+        }
+
+        function editCraftedPrompt() {
+            const editArea = document.getElementById('editPromptArea');
+            if (editArea) {
+                editArea.style.display = editArea.style.display === 'none' ? 'block' : 'none';
+                if (editArea.style.display === 'block') {
+                    document.getElementById('editablePrompt')?.focus();
+                }
+            }
+        }
+
+        function retryCraftPrompt() {
+            craftImagePrompt();
+        }
+
+        async function generateFromCraftedPrompt() {
+            if (!studioCraftedPrompt) return;
+            // Set the hidden imagePrompt textarea and generate
+            const promptTextarea = document.getElementById('imagePrompt');
+            if (promptTextarea) promptTextarea.value = studioCraftedPrompt;
+            else {
+                // Create a temporary hidden one
+                const tempTextarea = document.createElement('textarea');
+                tempTextarea.id = 'imagePrompt';
+                tempTextarea.value = studioCraftedPrompt;
+                tempTextarea.style.display = 'none';
+                document.getElementById('imageStudioModal')?.querySelector('.image-studio-modal')?.appendChild(tempTextarea);
+            }
+            // Disable the generate button
+            const genBtn = document.getElementById('generateCraftedBtn');
+            if (genBtn) { genBtn.disabled = true; genBtn.textContent = 'Generating...'; }
+            await generateImage();
+            if (genBtn) { genBtn.disabled = false; genBtn.textContent = '\ud83c\udfa8 Generate This Image'; }
+        }
+
+        async function generateFromEditedPrompt() {
+            const editedPrompt = document.getElementById('editablePrompt')?.value.trim();
+            if (!editedPrompt) return;
+            studioCraftedPrompt = editedPrompt;
+            // Update the display text
+            const displayText = document.getElementById('craftedPromptText');
+            if (displayText) displayText.textContent = editedPrompt;
+            await generateFromCraftedPrompt();
         }
 
         function closeImageStudio() {
@@ -3905,8 +4053,10 @@
             const generateBtn = document.getElementById('studioGenerateBtn');
             const resultDiv = document.getElementById('studioResult');
 
-            generateBtn.disabled = true;
-            generateBtn.textContent = 'Generating...';
+            if (generateBtn) {
+                generateBtn.disabled = true;
+                generateBtn.textContent = 'Generating...';
+            }
             resultDiv.innerHTML = `
                 <div class="studio-generating">
                     <div class="spinner"></div>
@@ -3971,8 +4121,10 @@
                     </div>
                 `;
             } finally {
-                generateBtn.disabled = false;
-                generateBtn.textContent = '\ud83c\udfa8 Generate Image';
+                if (generateBtn) {
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = '\ud83c\udfa8 Generate Image';
+                }
             }
         }
 
