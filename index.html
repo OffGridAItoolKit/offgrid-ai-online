@@ -2067,25 +2067,6 @@
                 ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
                 : 'Conversation';
             
-            const hasFileSystemAccess = ('showDirectoryPicker' in window);
-            
-            let dirStatusHTML = '';
-            if (hasFileSystemAccess) {
-                if (kbDirectoryHandle) {
-                    dirStatusHTML = `
-                        <div class="dir-status set">
-                            <span>📁 Saving to: <strong>${kbDirectoryHandle.name}</strong></span>
-                            <button class="dir-status-btn" onclick="pickKBDirectory()">Change</button>
-                        </div>`;
-                } else {
-                    dirStatusHTML = `
-                        <div class="dir-status unset">
-                            <span>📁 No save folder selected</span>
-                            <button class="dir-status-btn" onclick="pickKBDirectory()">Choose Folder</button>
-                        </div>`;
-                }
-            }
-            
             const overlay = document.createElement('div');
             overlay.className = 'save-modal-overlay';
             overlay.id = 'saveModal';
@@ -2093,7 +2074,6 @@
                 <div class="save-modal">
                     <h3>💾 Save to Knowledge Base</h3>
                     <div class="save-modal-subtitle">Saved directly to your computer — never to our servers.</div>
-                    ${dirStatusHTML}
                     <label for="saveTitle">Title</label>
                     <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
                     <label for="saveCategory">Category</label>
@@ -2108,7 +2088,7 @@
                         <option value="Skills & Reference">Skills & Reference</option>
                         <option value="Water & Food">Water & Food</option>
                     </select>
-                    <div class="folder-hint">💡 <strong>OffGrid AI USB users:</strong> Choose a folder, then navigate to your OffGrid AI drive &gt; Saved Knowledge Base &gt; [category] when saving.</div>
+                    <div class="folder-hint">💡 <strong>OffGrid AI USB users:</strong> When the Save dialog opens, navigate to your OffGrid AI drive &gt; Saved Knowledge Base &gt; the matching category folder.</div>
                     <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
                     <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
                     <div class="save-modal-actions">
@@ -2226,31 +2206,32 @@
             
             closeSaveModal();
             
-            // Try File System Access API first
-            if (kbDirectoryHandle) {
+            // Method 1: showSaveFilePicker — opens a native "Save As" dialog
+            if ('showSaveFilePicker' in window) {
                 try {
-                    // Try to save into the category subfolder if it exists
-                    let targetDir = kbDirectoryHandle;
-                    try {
-                        targetDir = await kbDirectoryHandle.getDirectoryHandle(category, { create: false });
-                    } catch (e) {
-                        // Category subfolder doesn't exist, save to the selected root folder
-                        console.log('Category subfolder not found, saving to root folder');
-                    }
-                    const fileHandle = await targetDir.getFileHandle(filename, { create: true });
+                    const fileHandle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: 'Markdown File',
+                            accept: { 'text/markdown': ['.md'] }
+                        }]
+                    });
                     const writable = await fileHandle.createWritable();
                     await writable.write(markdownContent);
                     await writable.close();
-                    const savedTo = targetDir === kbDirectoryHandle ? kbDirectoryHandle.name : `${kbDirectoryHandle.name}/${category}`;
-                    showSaveToast(`Saved: ${filename}`, `Saved to ${savedTo}. Never to our servers.`);
+                    showSaveToast(`Saved: ${fileHandle.name}`, `Navigate to your OffGrid AI drive > Saved Knowledge Base > ${category}. Never stored on our servers.`);
                     return;
                 } catch (err) {
-                    console.error('File System Access write failed, falling back to download:', err);
+                    if (err.name === 'AbortError') {
+                        // User cancelled the save dialog
+                        return;
+                    }
+                    console.error('showSaveFilePicker failed, falling back to download:', err);
                     // Fall through to download method
                 }
             }
             
-            // Fallback: standard browser download
+            // Method 2: Fallback for browsers without showSaveFilePicker (Firefox, Safari)
             const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2260,7 +2241,7 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showSaveToast(`Downloaded: ${filename}`, `Saved directly to your computer — never to our servers.`);
+            showSaveToast(`Downloaded: ${filename}`, `Move this file to your OffGrid AI drive > Saved Knowledge Base > ${category}`);
         }
         
         async function exportAsPDF() {
