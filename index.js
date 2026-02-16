@@ -903,7 +903,6 @@ app.post('/api/command/generate-image', async (req, res) => {
                         content: prompt.trim()
                     }
                 ],
-                max_tokens: 8192,
                 modalities: ['image', 'text']
             })
         });
@@ -915,6 +914,10 @@ app.post('/api/command/generate-image', async (req, res) => {
         }
         
         const data = await response.json();
+        
+        // Check finish_reason for content policy / safety blocks
+        const finishReason = data.choices?.[0]?.finish_reason || '';
+        console.log('[Nano Banana] finish_reason:', finishReason);
         
         // Extract image from response
         // OpenRouter returns images in message.images[] array as base64 data URLs
@@ -953,11 +956,37 @@ app.post('/api/command/generate-image', async (req, res) => {
         }
         
         if (!imageBase64) {
-            console.warn('[Nano Banana] No image in response. Keys:', JSON.stringify(Object.keys(message || {})));
+            console.warn('[Nano Banana] No image in response. finish_reason:', finishReason);
+            console.warn('[Nano Banana] Message keys:', JSON.stringify(Object.keys(message || {})));
             console.warn('[Nano Banana] Text response:', (textResponse || '').substring(0, 200));
+            
+            // Determine specific error reason based on finish_reason
+            let errorReason = 'unknown';
+            let errorMessage = 'The model did not generate an image. Try rephrasing your prompt.';
+            
+            if (finishReason === 'SAFETY' || finishReason === 'safety') {
+                errorReason = 'safety';
+                errorMessage = 'Your prompt was flagged by the model\'s safety filters. Try rephrasing to avoid content that could be interpreted as harmful, violent, or dangerous.';
+            } else if (finishReason === 'OTHER' || finishReason === 'other') {
+                errorReason = 'content_policy';
+                errorMessage = 'Your prompt was blocked by content policy (possibly copyright or trademark related). Try describing the concept in your own words without referencing specific brands or characters.';
+            } else if (finishReason === 'MAX_TOKENS' || finishReason === 'max_tokens' || finishReason === 'length') {
+                errorReason = 'max_tokens';
+                errorMessage = 'The response was cut off due to length limits. Try a simpler prompt.';
+            } else if (finishReason === 'RECITATION' || finishReason === 'recitation') {
+                errorReason = 'recitation';
+                errorMessage = 'The model detected potential copyright content duplication. Try a more original prompt.';
+            } else {
+                // Generic - the model just chose not to generate an image
+                errorReason = 'no_image';
+                errorMessage = 'The model responded with text but did not generate an image. Try being more specific about the visual style you want (e.g., "photorealistic", "watercolor", "technical diagram").';
+            }
+            
             return res.json({
                 success: false,
-                error: 'The model did not generate an image. Try rephrasing your prompt to be more descriptive.',
+                error: errorMessage,
+                errorReason: errorReason,
+                finishReason: finishReason,
                 textResponse: textResponse
             });
         }

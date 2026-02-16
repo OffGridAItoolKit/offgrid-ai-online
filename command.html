@@ -1875,6 +1875,129 @@
             to { transform: rotate(360deg); }
         }
 
+        /* Prompt Helper System */
+        .prompt-helper-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: none;
+            color: #a855f7;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 0;
+            margin-bottom: 8px;
+            transition: color 0.2s;
+        }
+        .prompt-helper-toggle:hover { color: #7c3aed; }
+        .prompt-helper-toggle .arrow { transition: transform 0.2s; display: inline-block; font-size: 10px; }
+        .prompt-helper-toggle .arrow.open { transform: rotate(90deg); }
+
+        .prompt-builder {
+            background: #faf5ff;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+            display: none;
+        }
+        .prompt-builder.visible { display: block; }
+        .prompt-builder-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .prompt-builder-row:last-child { margin-bottom: 0; }
+        .prompt-builder-row label {
+            min-width: 90px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #7c3aed;
+            margin-bottom: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .prompt-builder-row input {
+            flex: 1;
+            padding: 7px 10px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        .prompt-builder-row input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.08);
+        }
+        .prompt-builder-row input::placeholder { color: #9ca3af; }
+        .build-prompt-btn {
+            width: 100%;
+            padding: 8px;
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: all 0.2s;
+        }
+        .build-prompt-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3); }
+
+        .example-prompts-section {
+            margin-bottom: 14px;
+        }
+        .example-prompts-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .example-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .example-chip {
+            padding: 5px 10px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s;
+            line-height: 1.3;
+        }
+        .example-chip:hover {
+            background: #faf5ff;
+            border-color: #a855f7;
+            color: #7c3aed;
+        }
+
+        .error-reason-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        .error-reason-badge.safety { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .error-reason-badge.content_policy { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .error-reason-badge.no_image { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .error-reason-badge.max_tokens { background: #fefce8; color: #ca8a04; border: 1px solid #fde68a; }
+
     </style>
 </head>
 <body>
@@ -3659,8 +3782,47 @@
                     <h3>\ud83c\udfa8 Image Studio <span style="font-weight: 400; font-size: 14px; color: #a855f7;">Nano Banana Pro</span></h3>
                     <div class="studio-subtitle">Generate images using AI. Powered by Nano Banana Pro (Gemini 3 Pro).</div>
 
+                    <div class="example-prompts-section">
+                        <div class="example-prompts-label">Try an example</div>
+                        <div class="example-chips">
+                            <span class="example-chip" onclick="fillExamplePrompt(this)">A photorealistic off-grid cabin in a snowy mountain forest, warm light glowing from windows, aerial drone shot at golden hour</span>
+                            <span class="example-chip" onclick="fillExamplePrompt(this)">Technical diagram of a solar panel wiring system for a 12V battery bank, clean engineering illustration style with labels</span>
+                            <span class="example-chip" onclick="fillExamplePrompt(this)">Watercolor painting of a wilderness campsite by a river, with a campfire and tent under a starry night sky</span>
+                            <span class="example-chip" onclick="fillExamplePrompt(this)">Infographic showing 5 steps to purify water in an emergency, flat design with icons and clear text labels</span>
+                            <span class="example-chip" onclick="fillExamplePrompt(this)">Cinematic portrait of a hiker standing on a cliff edge overlooking a vast valley, dramatic backlighting, 16:9 format</span>
+                        </div>
+                    </div>
+
                     <label for="imagePrompt">Describe the image you want to create</label>
-                    <textarea id="imagePrompt" placeholder="e.g., A detailed diagram of a solar-powered water filtration system for off-grid use, technical illustration style"></textarea>
+                    <textarea id="imagePrompt" placeholder="Be specific: describe the subject, composition, action, location, and visual style. Example: A photorealistic close-up of a hand-built water filter using sand and charcoal layers in a clear plastic bottle, outdoor forest setting, natural lighting"></textarea>
+
+                    <button class="prompt-helper-toggle" onclick="togglePromptBuilder()">
+                        <span class="arrow" id="builderArrow">\u25B6</span> Prompt Builder \u2014 help me write a better prompt
+                    </button>
+
+                    <div class="prompt-builder" id="promptBuilder">
+                        <div class="prompt-builder-row">
+                            <label>Subject</label>
+                            <input type="text" id="pb-subject" placeholder="What is in the image? (e.g., a solar-powered water filter)">
+                        </div>
+                        <div class="prompt-builder-row">
+                            <label>Composition</label>
+                            <input type="text" id="pb-composition" placeholder="How is it framed? (e.g., close-up, wide shot, aerial view)">
+                        </div>
+                        <div class="prompt-builder-row">
+                            <label>Action</label>
+                            <input type="text" id="pb-action" placeholder="What is happening? (e.g., water flowing through layers)">
+                        </div>
+                        <div class="prompt-builder-row">
+                            <label>Location</label>
+                            <input type="text" id="pb-location" placeholder="Where? (e.g., a forest clearing, a workshop bench)">
+                        </div>
+                        <div class="prompt-builder-row">
+                            <label>Style</label>
+                            <input type="text" id="pb-style" placeholder="Visual style? (e.g., photorealistic, watercolor, technical diagram)">
+                        </div>
+                        <button class="build-prompt-btn" onclick="buildPromptFromFields()">\u2728 Build Prompt</button>
+                    </div>
 
                     <div class="image-studio-actions">
                         <button class="studio-cancel-btn" onclick="closeImageStudio()">Cancel</button>
@@ -3681,6 +3843,50 @@
                 const promptInput = document.getElementById('imagePrompt');
                 if (promptInput) promptInput.focus();
             }, 100);
+        }
+
+        function fillExamplePrompt(chip) {
+            const textarea = document.getElementById('imagePrompt');
+            if (textarea) {
+                textarea.value = chip.textContent.trim();
+                textarea.focus();
+            }
+        }
+
+        function togglePromptBuilder() {
+            const builder = document.getElementById('promptBuilder');
+            const arrow = document.getElementById('builderArrow');
+            if (builder) {
+                builder.classList.toggle('visible');
+                if (arrow) arrow.classList.toggle('open');
+            }
+        }
+
+        function buildPromptFromFields() {
+            const subject = document.getElementById('pb-subject')?.value.trim();
+            const composition = document.getElementById('pb-composition')?.value.trim();
+            const action = document.getElementById('pb-action')?.value.trim();
+            const location = document.getElementById('pb-location')?.value.trim();
+            const style = document.getElementById('pb-style')?.value.trim();
+
+            if (!subject) {
+                document.getElementById('pb-subject')?.focus();
+                return;
+            }
+
+            let parts = [];
+            if (style) parts.push(`A ${style} of`);
+            parts.push(subject);
+            if (action) parts.push(action);
+            if (location) parts.push(`in ${location}`);
+            if (composition) parts.push(`${composition}`);
+
+            const builtPrompt = parts.join(', ');
+            const textarea = document.getElementById('imagePrompt');
+            if (textarea) {
+                textarea.value = builtPrompt;
+                textarea.focus();
+            }
         }
 
         function closeImageStudio() {
@@ -3734,11 +3940,24 @@
                         </div>
                     `;
                 } else {
+                    const reason = data.errorReason || 'unknown';
+                    const reasonLabels = {
+                        safety: 'Safety Filter',
+                        content_policy: 'Content Policy',
+                        no_image: 'No Image Generated',
+                        max_tokens: 'Token Limit',
+                        recitation: 'Copyright Detection',
+                        unknown: 'Generation Issue'
+                    };
+                    const reasonLabel = reasonLabels[reason] || 'Generation Issue';
+                    
                     resultDiv.innerHTML = `
-                        <div style="text-align: center; padding: 20px; color: #ef4444;">
-                            <div style="font-size: 14px; font-weight: 600;">Image generation did not produce an image</div>
-                            <div style="font-size: 12px; margin-top: 6px; color: #6b7280;">${data.error || 'Try rephrasing your prompt to be more descriptive.'}</div>
-                            ${data.textResponse ? `<div style="font-size: 12px; margin-top: 10px; color: #4b5563; text-align: left; background: #f9fafb; padding: 12px; border-radius: 8px;">${escapeHtml(data.textResponse)}</div>` : ''}
+                        <div style="text-align: center; padding: 20px;">
+                            <span class="error-reason-badge ${reason}">${escapeHtml(reasonLabel)}</span>
+                            <div style="font-size: 14px; font-weight: 600; color: #ef4444; margin-top: 6px;">Image generation did not produce an image</div>
+                            <div style="font-size: 12px; margin-top: 6px; color: #6b7280;">${escapeHtml(data.error || 'Try rephrasing your prompt to be more descriptive.')}</div>
+                            ${data.textResponse ? `<div style="font-size: 12px; margin-top: 10px; color: #4b5563; text-align: left; background: #f9fafb; padding: 12px; border-radius: 8px; max-height: 120px; overflow-y: auto;"><strong>Model response:</strong> ${escapeHtml(data.textResponse)}</div>` : ''}
+                            <div style="font-size: 11px; margin-top: 12px; color: #9ca3af;">Tip: Try using the Prompt Builder above, or click an example prompt to test with a known-good prompt.</div>
                         </div>
                     `;
                 }
