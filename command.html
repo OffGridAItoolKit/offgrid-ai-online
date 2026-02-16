@@ -1372,6 +1372,509 @@
         .image-upload-input {
             display: none;
         }
+
+        /* ============================================ */
+        /* Save to Knowledge Base Styles               */
+        /* ============================================ */
+
+        .save-kb-button {
+            width: 100%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #10b981;
+            font-weight: 600;
+            text-align: left;
+        }
+        .save-kb-button:hover {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25) 0%, rgba(5, 150, 105, 0.25) 100%);
+            border-color: #10b981;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .save-kb-button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .save-kb-button:disabled:hover {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.15) 100%);
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: none;
+        }
+
+        /* Save modal overlay */
+        .save-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .save-modal {
+            background: #ffffff;
+            border: 2px solid #b8860b;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+        .save-modal h3 {
+            color: #2c1810;
+            font-size: 18px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+        .save-modal .save-modal-subtitle {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .save-modal .folder-hint {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: -10px;
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+        .save-modal .folder-hint strong {
+            color: #6b7280;
+        }
+        .save-modal label {
+            display: block;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .save-modal input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+        }
+        .save-modal input[type="text"]:focus {
+            outline: none;
+            border-color: #b8860b;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.1);
+        }
+        .save-modal select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            background: white;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .save-modal select:focus {
+            outline: none;
+            border-color: #b8860b;
+        }
+        .save-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 8px;
+        }
+        .save-modal-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        .save-modal-btn.primary {
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: #1a0f05;
+        }
+        .save-modal-btn.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+        }
+        .save-modal-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        .save-modal-btn.secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Save toast */
+        .save-toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 13px;
+            z-index: 10001;
+            animation: slideUp 0.3s ease, fadeOut 0.3s ease 2.7s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 90%;
+        }
+        .save-toast .toast-subtitle {
+            font-size: 11px;
+            opacity: 0.85;
+            margin-top: 4px;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* ============================================ */
+        /* See Deliberation Modal Styles               */
+        /* ============================================ */
+
+        .see-deliberation-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: none;
+            border: 1px solid rgba(218, 165, 32, 0.3);
+            color: #b8860b;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 6px;
+        }
+        .see-deliberation-btn:hover {
+            background: rgba(218, 165, 32, 0.1);
+            border-color: #daa520;
+            color: #daa520;
+        }
+
+        .deliberation-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .deliberation-modal {
+            background: #ffffff;
+            border: 2px solid #b8860b;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 700px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        .deliberation-modal h3 {
+            color: #2c1810;
+            font-size: 18px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .deliberation-modal .delib-subtitle {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .deliberation-modal .delib-section {
+            margin-bottom: 20px;
+        }
+        .deliberation-modal .delib-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .deliberation-modal .delib-summary {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.08) 0%, rgba(218, 165, 32, 0.08) 100%);
+            border: 1px solid rgba(184, 134, 11, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #4a2c1a;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .deliberation-modal table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        .deliberation-modal th {
+            background: #f9fafb;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .deliberation-modal td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #4b5563;
+        }
+        .deliberation-modal tr.chairman-highlight td {
+            background: rgba(218, 165, 32, 0.08);
+            font-weight: 600;
+            color: #2c1810;
+        }
+        .deliberation-modal .reviewer-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+        }
+        .deliberation-modal .reviewer-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+        .deliberation-modal .reviewer-ranking {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+        }
+        .deliberation-modal .reviewer-explanation {
+            font-size: 12px;
+            color: #4b5563;
+            font-style: italic;
+            line-height: 1.5;
+            margin-top: 6px;
+            padding-left: 10px;
+            border-left: 2px solid #daa520;
+        }
+        .deliberation-close-btn {
+            display: block;
+            margin: 16px auto 0;
+            padding: 10px 28px;
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: #1a0f05;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .deliberation-close-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+        }
+
+        /* ============================================ */
+        /* Image Studio Styles                         */
+        /* ============================================ */
+
+        .image-studio-tab {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.35);
+            border-radius: 6px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: #a855f7;
+            font-weight: 600;
+            text-align: left;
+            width: 100%;
+        }
+        .image-studio-tab:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.22) 0%, rgba(139, 92, 246, 0.22) 100%);
+            border-color: #a855f7;
+            box-shadow: 0 2px 8px rgba(168, 85, 247, 0.2);
+        }
+
+        .image-studio-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .image-studio-modal {
+            background: #ffffff;
+            border: 2px solid #a855f7;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 600px;
+            width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideIn 0.3s ease;
+        }
+        .image-studio-modal h3 {
+            color: #2c1810;
+            font-size: 18px;
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .image-studio-modal .studio-subtitle {
+            color: #6b7280;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        .image-studio-modal .studio-privacy {
+            font-size: 11px;
+            color: #9ca3af;
+            text-align: center;
+            margin-top: 12px;
+        }
+        .image-studio-modal .studio-privacy .lock-icon {
+            color: #10b981;
+        }
+        .image-studio-modal label {
+            display: block;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .image-studio-modal textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            margin-bottom: 16px;
+            resize: vertical;
+            min-height: 80px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+        .image-studio-modal textarea:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+        .image-studio-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .studio-generate-btn {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .studio-generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
+        }
+        .studio-generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .studio-cancel-btn {
+            padding: 10px 20px;
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .studio-cancel-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .studio-result {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .studio-result img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            margin-bottom: 12px;
+        }
+        .studio-result-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .studio-download-btn {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .studio-download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        .studio-generating {
+            text-align: center;
+            padding: 30px 0;
+            color: #6b7280;
+        }
+        .studio-generating .spinner {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(168, 85, 247, 0.2);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body>
@@ -1453,6 +1956,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                 New Chat
             </button>
+
+            <button class="save-kb-button" id="saveToKbBtn" onclick="showSaveModal()" disabled>💾 Save to Knowledge Base</button>
+            <button class="image-studio-tab" onclick="openImageStudio()">🎨 Image Studio <span style="font-weight: 400; font-size: 11px; opacity: 0.7;">• Nano Banana</span></button>
 
             <div class="sidebar-section">
                 <div class="sidebar-title">Sample Prompts</div>
@@ -1804,6 +2310,8 @@
         let chairmanName = null;
         let chairmanEmoji = null;
         let voiceRecognition = null;
+        let lastCouncilDeliberation = null; // Stores full deliberation data for "See Deliberation"
+        let lastCouncilLabelMap = null; // Maps labels (A,B,C,D) to model info
 
         // Build scores HTML table
         function buildScoresHtml(scores, chairmanLabel) {
@@ -2162,6 +2670,10 @@
 
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
+                // Enable Save to KB button
+                const saveBtn = document.getElementById('saveToKbBtn');
+                if (saveBtn) saveBtn.disabled = false;
+
             } catch (error) {
                 console.error('Stream error:', error);
                 streamingContent.innerHTML = `<span style="color: #ef4444;">Error: ${error.message}</span>`;
@@ -2184,6 +2696,8 @@
             chairmanKey = null;
             chairmanName = null;
             chairmanEmoji = null;
+            lastCouncilDeliberation = null;
+            lastCouncilLabelMap = null;
 
             const progressDiv = document.createElement('div');
             progressDiv.className = 'council-progress';
@@ -2292,6 +2806,18 @@
                                     if (key === 'chairman' && parsed.scores) {
                                         councilScores = parsed.scores;
                                         chairmanKey = parsed.chairmanKey;
+                                        // Store deliberation data for "See Deliberation" feature
+                                        if (parsed.rawReviews) {
+                                            lastCouncilDeliberation = {
+                                                scores: parsed.scores,
+                                                rawReviews: parsed.rawReviews,
+                                                chairmanLabel: parsed.chairmanLabel,
+                                                chairmanKey: parsed.chairmanKey
+                                            };
+                                        }
+                                        if (parsed.labelMap) {
+                                            lastCouncilLabelMap = parsed.labelMap;
+                                        }
                                         const scoresPanel = document.createElement('div');
                                         scoresPanel.className = 'council-scores-panel';
                                         scoresPanel.innerHTML = buildScoresHtml(parsed.scores, parsed.chairmanLabel);
@@ -2326,6 +2852,18 @@
                                     chairmanKey = parsed.councilMeta.chairmanKey;
                                     chairmanName = parsed.councilMeta.chairmanName;
                                     chairmanEmoji = parsed.councilMeta.chairmanEmoji;
+                                    // Also store deliberation data from councilMeta
+                                    if (parsed.councilMeta.rawReviews && !lastCouncilDeliberation) {
+                                        lastCouncilDeliberation = {
+                                            scores: parsed.councilMeta.scores,
+                                            rawReviews: parsed.councilMeta.rawReviews,
+                                            chairmanLabel: null,
+                                            chairmanKey: parsed.councilMeta.chairmanKey
+                                        };
+                                    }
+                                    if (parsed.councilMeta.labelMap && !lastCouncilLabelMap) {
+                                        lastCouncilLabelMap = parsed.councilMeta.labelMap;
+                                    }
                                 }
 
                                 // Handle streaming content
@@ -2383,7 +2921,24 @@
                 timeIndicator.innerHTML = `⭐ Command Council • ${responseTime}s (4 models + peer review)${chairmanInfo}`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
 
+                // Add "See Deliberation" button if we have deliberation data
+                if (lastCouncilDeliberation && lastCouncilDeliberation.rawReviews && lastCouncilDeliberation.rawReviews.length > 0) {
+                    const delibBtn = document.createElement('button');
+                    delibBtn.className = 'see-deliberation-btn';
+                    delibBtn.innerHTML = '📊 See Deliberation';
+                    // Capture the current deliberation data in a closure
+                    const capturedDelib = JSON.parse(JSON.stringify(lastCouncilDeliberation));
+                    const capturedLabelMap = lastCouncilLabelMap ? JSON.parse(JSON.stringify(lastCouncilLabelMap)) : null;
+                    const capturedScores = councilScores ? JSON.parse(JSON.stringify(councilScores)) : null;
+                    delibBtn.onclick = () => showDeliberationModal(capturedDelib, capturedLabelMap, capturedScores);
+                    messageDiv.querySelector('.message-content').appendChild(delibBtn);
+                }
+
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
+
+                // Enable Save to KB button
+                const saveBtn = document.getElementById('saveToKbBtn');
+                if (saveBtn) saveBtn.disabled = false;
 
             } catch (error) {
                 console.error('Council error:', error);
@@ -2601,6 +3156,8 @@
         function clearChat() {
             if (confirm('Clear all messages and return to home? This will start a new session.')) {
                 conversationHistory = [];
+                lastCouncilDeliberation = null;
+                lastCouncilLabelMap = null;
                 location.reload();
             }
         }
@@ -2721,6 +3278,525 @@
             input.value = el.textContent;
             autoResize(input);
             input.focus();
+        }
+
+        // ============================================
+        // SAVE TO KNOWLEDGE BASE
+        // ============================================
+
+        function showSaveModal() {
+            if (conversationHistory.length === 0) return;
+
+            // Auto-generate title from first user message
+            const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+            const autoTitle = firstUserMsg
+                ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
+                : 'Conversation';
+
+            const overlay = document.createElement('div');
+            overlay.className = 'save-modal-overlay';
+            overlay.id = 'saveModal';
+            overlay.innerHTML = `
+                <div class="save-modal">
+                    <h3>\ud83d\udcbe Save to Knowledge Base</h3>
+                    <div class="save-modal-subtitle">Saved directly to your computer \u2014 never to our servers.</div>
+                    <label for="saveTitle">Title</label>
+                    <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
+                    <label for="saveCategory">Category</label>
+                    <select id="saveCategory">
+                        <option value="Emergency Plans">Emergency Plans</option>
+                        <option value="Gear & Checklists">Gear & Checklists</option>
+                        <option value="Medical & First Aid">Medical & First Aid</option>
+                        <option value="Navigation & Orientation">Navigation & Orientation</option>
+                        <option value="OffGrid AI Documentation">OffGrid AI Documentation</option>
+                        <option value="Other" selected>Other</option>
+                        <option value="Shelter & Fire">Shelter & Fire</option>
+                        <option value="Skills & Reference">Skills & Reference</option>
+                        <option value="Water & Food">Water & Food</option>
+                    </select>
+                    <div class="folder-hint">\ud83d\udca1 <strong>OffGrid AI USB users:</strong> When the Save dialog opens, navigate to your OffGrid AI drive > Saved Knowledge Base > the matching category folder.</div>
+                    <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
+                    <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
+                    <div class="save-modal-actions">
+                        <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
+                        <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">\ud83d\udda8\ufe0f Print / Save PDF</button>
+                        <button class="save-modal-btn primary" onclick="executeSave()">\ud83d\udcbe Save .md</button>
+                    </div>
+                    <div style="font-size: 11px; color: #9ca3af; text-align: center; margin-top: 12px;"><span style="color: #10b981;">\ud83d\udd12</span> This conversation is ephemeral and exists only in your browser.</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeSaveModal();
+            });
+
+            // Focus the title input
+            setTimeout(() => {
+                const titleInput = document.getElementById('saveTitle');
+                if (titleInput) {
+                    titleInput.focus();
+                    titleInput.select();
+                }
+            }, 100);
+        }
+
+        function closeSaveModal() {
+            const modal = document.getElementById('saveModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
+            }
+        }
+
+        function generateMarkdownContent(title, category, tags) {
+            const now = new Date();
+            const isoDate = now.toISOString();
+            const tagsArray = tags
+                ? tags.split(',').map(t => t.trim()).filter(t => t)
+                : [];
+
+            // Determine model info for frontmatter
+            const modelName = selectedModel === 'command' ? 'AI-Council' : (MODEL_CONFIG[selectedModel]?.name || selectedModel);
+            const chairmanInfo = (selectedModel === 'command' && chairmanName) ? chairmanName : '';
+
+            // Build YAML frontmatter
+            let frontmatter = '---\n';
+            frontmatter += `title: "${title.replace(/"/g, '\\"')}"\n`;
+            frontmatter += `date: ${isoDate}\n`;
+            frontmatter += `source: command-center\n`;
+            frontmatter += `model: ${modelName}\n`;
+            if (chairmanInfo) {
+                frontmatter += `chairman: ${chairmanInfo}\n`;
+            }
+            frontmatter += `category: ${category}\n`;
+            if (tagsArray.length > 0) {
+                frontmatter += `tags:\n`;
+                tagsArray.forEach(tag => {
+                    frontmatter += `  - ${tag}\n`;
+                });
+            }
+            frontmatter += '---\n\n';
+
+            // Build conversation content
+            let content = `# ${title}\n\n`;
+            content += `*Saved from OffGrid Command Center on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
+            if (selectedModel === 'command' && chairmanName) {
+                content += `**Model:** AI Council (Chairman: ${chairmanEmoji} ${chairmanName})  \n`;
+            } else {
+                content += `**Model:** ${MODEL_CONFIG[selectedModel]?.name || selectedModel}  \n`;
+            }
+            content += `**Category:** ${category}\n\n`;
+            content += '---\n\n';
+
+            conversationHistory.forEach((msg, index) => {
+                if (msg.role === 'user') {
+                    content += `## \ud83d\udc64 User\n\n`;
+                    content += `${msg.content}\n\n`;
+                    if (msg.image) {
+                        content += `![Uploaded Image](${msg.image})\n\n`;
+                    }
+                } else if (msg.role === 'assistant') {
+                    content += `## \ud83e\udd16 OffGrid AI\n\n`;
+                    content += `${msg.content}\n\n`;
+                }
+                if (index < conversationHistory.length - 1) {
+                    content += '---\n\n';
+                }
+            });
+
+            return frontmatter + content;
+        }
+
+        function generateFilename(title) {
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const safeTitle = title
+                .replace(/[^a-zA-Z0-9\s-]/g, '')
+                .replace(/\s+/g, '-')
+                .substring(0, 50)
+                .replace(/-+$/, '');
+            return `${dateStr}_${safeTitle}.md`;
+        }
+
+        async function executeSave() {
+            const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
+            const category = document.getElementById('saveCategory')?.value || 'Other';
+            const tags = document.getElementById('saveTags')?.value || '';
+
+            const markdownContent = generateMarkdownContent(title, category, tags);
+            const filename = generateFilename(title);
+
+            closeSaveModal();
+
+            // Method 1: showSaveFilePicker \u2014 opens a native \u201cSave As\u201d dialog
+            if ('showSaveFilePicker' in window) {
+                try {
+                    const fileHandle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: 'Markdown File',
+                            accept: { 'text/markdown': ['.md'] }
+                        }]
+                    });
+                    const writable = await fileHandle.createWritable();
+                    await writable.write(markdownContent);
+                    await writable.close();
+                    showSaveToast(`Saved: ${fileHandle.name}`, `Navigate to your OffGrid AI drive > Saved Knowledge Base > ${category}. Never stored on our servers.`);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    console.error('showSaveFilePicker failed, falling back to download:', err);
+                }
+            }
+
+            // Method 2: Fallback for browsers without showSaveFilePicker
+            const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showSaveToast(`Downloaded: ${filename}`, `Move this file to your OffGrid AI drive > Saved Knowledge Base > ${category}`);
+        }
+
+        async function exportAsPDF() {
+            const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
+            const category = document.getElementById('saveCategory')?.value || 'General';
+            const tags = document.getElementById('saveTags')?.value || '';
+
+            const markdownContent = generateMarkdownContent(title, category, tags);
+
+            closeSaveModal();
+            showSaveToast('Generating PDF...', 'Please wait');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/export-pdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ markdown: markdownContent, title: title })
+                });
+
+                if (!response.ok) throw new Error('PDF generation failed');
+
+                const data = await response.json();
+
+                const printWindow = window.open('', '_blank');
+                if (printWindow) {
+                    printWindow.document.write(data.html);
+                    printWindow.document.close();
+                    printWindow.onload = function() {
+                        setTimeout(() => { printWindow.print(); }, 500);
+                    };
+                    showSaveToast('PDF ready!', 'Use your browser\'s print dialog to save as PDF. Saved directly to your computer \u2014 never to our servers.');
+                } else {
+                    const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = data.filename.replace('.pdf', '.html');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showSaveToast('Downloaded HTML version', 'Open the file and use File > Print > Save as PDF');
+                }
+            } catch (error) {
+                console.error('PDF export error:', error);
+                const existingToast = document.querySelector('.save-toast');
+                if (existingToast) existingToast.remove();
+                showSaveToast('PDF export failed', 'Please try saving as Markdown instead.');
+            }
+        }
+
+        function showSaveToast(message, subtitle) {
+            const existingToast = document.querySelector('.save-toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = 'save-toast';
+            toast.innerHTML = `${message}${subtitle ? `<div class="toast-subtitle">${subtitle}</div>` : ''}`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) toast.remove();
+            }, 3000);
+        }
+
+        // ============================================
+        // SEE DELIBERATION MODAL
+        // ============================================
+
+        function showDeliberationModal(delib, labelMap, scores) {
+            if (!delib || !delib.rawReviews) return;
+
+            const overlay = document.createElement('div');
+            overlay.className = 'deliberation-overlay';
+            overlay.id = 'deliberationModal';
+
+            // Build the scores table
+            let scoresTableRows = '';
+            const scoreLabels = scores ? Object.keys(scores).sort() : [];
+            for (const label of scoreLabels) {
+                const s = scores[label];
+                const modelInfo = labelMap ? labelMap[label] : null;
+                const modelDisplay = modelInfo ? `${modelInfo.emoji} ${modelInfo.name}` : `Answer ${label}`;
+                const isChairman = (delib.chairmanKey && modelInfo && modelInfo.key === delib.chairmanKey);
+                const rowClass = isChairman ? 'chairman-highlight' : '';
+                const crown = isChairman ? ' \ud83d\udc51' : '';
+                scoresTableRows += `<tr class="${rowClass}">
+                    <td>${modelDisplay}${crown}</td>
+                    <td style="text-align: center;">${s.accPoints}</td>
+                    <td style="text-align: center;">${s.insightPoints}</td>
+                    <td style="text-align: center; font-weight: 700;">${s.councilScore}</td>
+                </tr>`;
+            }
+
+            // Build the reviewer cards
+            let reviewerCards = '';
+            const REVIEWER_NAMES = {
+                scout: '\ud83d\udd2d Scout (GPT 5.2)',
+                medic: '\ud83c\udfe5 Medic (Claude 4.5)',
+                navigator: '\ud83e\udded Navigator (Gemini 2.5)',
+                ranger: '\ud83c\udfd5\ufe0f Ranger (Grok 4.1)'
+            };
+
+            for (const review of delib.rawReviews) {
+                const reviewerDisplay = REVIEWER_NAMES[review.reviewer] || review.modelName || review.reviewer;
+
+                // Map label rankings to model names
+                const mapRanking = (ranking) => {
+                    if (!ranking || !Array.isArray(ranking)) return 'N/A';
+                    return ranking.map((label, idx) => {
+                        const info = labelMap ? labelMap[label] : null;
+                        const name = info ? `${info.emoji} ${info.name}` : `Answer ${label}`;
+                        return `${idx + 1}. ${name}`;
+                    }).join(' \u2192 ');
+                };
+
+                reviewerCards += `
+                    <div class="reviewer-card">
+                        <div class="reviewer-name">${reviewerDisplay}</div>
+                        <div class="reviewer-ranking"><strong>Accuracy:</strong> ${mapRanking(review.accuracy_ranking)}</div>
+                        <div class="reviewer-ranking"><strong>Insight:</strong> ${mapRanking(review.insight_ranking)}</div>
+                        ${review.top_accuracy_explanation ? `<div class="reviewer-explanation"><strong>Best for accuracy:</strong> ${escapeHtml(review.top_accuracy_explanation)}</div>` : ''}
+                        ${review.top_insight_explanation ? `<div class="reviewer-explanation"><strong>Best for insight:</strong> ${escapeHtml(review.top_insight_explanation)}</div>` : ''}
+                    </div>
+                `;
+            }
+
+            // Build chairman summary
+            const chairmanModelInfo = labelMap && delib.chairmanLabel ? labelMap[delib.chairmanLabel] : null;
+            const chairmanDisplay = chairmanModelInfo
+                ? `${chairmanModelInfo.emoji} ${chairmanModelInfo.name}`
+                : (chairmanName ? `${chairmanEmoji} ${chairmanName}` : 'Unknown');
+
+            // Find the chairman's score details
+            let chairmanScoreDetail = '';
+            for (const label of scoreLabels) {
+                const s = scores[label];
+                const modelInfo = labelMap ? labelMap[label] : null;
+                if (modelInfo && modelInfo.key === delib.chairmanKey) {
+                    chairmanScoreDetail = `Council Score: ${s.councilScore} (Accuracy: ${s.accPoints} \u00d7 2 + Insight: ${s.insightPoints} \u00d7 1)`;
+                    break;
+                }
+            }
+
+            overlay.innerHTML = `
+                <div class="deliberation-modal">
+                    <h3>\ud83d\udcca Council Deliberation Report</h3>
+                    <div class="delib-subtitle">Full transparency into how the AI Council reached its decision.</div>
+
+                    <div class="delib-summary">
+                        <strong>\ud83c\udfc6 Chairman Elected:</strong> ${chairmanDisplay}<br>
+                        ${chairmanScoreDetail ? `<span style="font-size: 12px; color: #6b7280;">${chairmanScoreDetail}</span><br>` : ''}
+                        <span style="font-size: 12px; color: #6b7280;">Formula: Score = 2\u00d7Accuracy + 1\u00d7Insight | Highest score wins. All 4 models voted anonymously.</span>
+                    </div>
+
+                    <div class="delib-section">
+                        <div class="delib-section-title">\ud83d\udcca Final Scores (Borda Count)</div>
+                        <table>
+                            <thead><tr><th>Model</th><th style="text-align: center;">Accuracy</th><th style="text-align: center;">Insight</th><th style="text-align: center;">Score</th></tr></thead>
+                            <tbody>${scoresTableRows}</tbody>
+                        </table>
+                    </div>
+
+                    <div class="delib-section">
+                        <div class="delib-section-title">\ud83d\udd0d Individual Reviewer Votes</div>
+                        ${reviewerCards}
+                    </div>
+
+                    <button class="deliberation-close-btn" onclick="closeDeliberationModal()">Close</button>
+                </div>
+            `;
+
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeDeliberationModal();
+            });
+        }
+
+        function closeDeliberationModal() {
+            const modal = document.getElementById('deliberationModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
+            }
+        }
+
+        // ============================================
+        // IMAGE STUDIO (NANO BANANA)
+        // ============================================
+
+        function openImageStudio() {
+            const overlay = document.createElement('div');
+            overlay.className = 'image-studio-overlay';
+            overlay.id = 'imageStudioModal';
+            overlay.innerHTML = `
+                <div class="image-studio-modal">
+                    <h3>\ud83c\udfa8 Image Studio <span style="font-weight: 400; font-size: 14px; color: #a855f7;">Nano Banana</span></h3>
+                    <div class="studio-subtitle">Generate images using AI. Powered by Gemini 2.5 Flash.</div>
+
+                    <label for="imagePrompt">Describe the image you want to create</label>
+                    <textarea id="imagePrompt" placeholder="e.g., A detailed diagram of a solar-powered water filtration system for off-grid use, technical illustration style"></textarea>
+
+                    <div class="image-studio-actions">
+                        <button class="studio-cancel-btn" onclick="closeImageStudio()">Cancel</button>
+                        <button class="studio-generate-btn" id="studioGenerateBtn" onclick="generateImage()">\ud83c\udfa8 Generate Image</button>
+                    </div>
+
+                    <div id="studioResult"></div>
+
+                    <div class="studio-privacy"><span class="lock-icon">\ud83d\udd12</span> Images are generated on-demand and never stored on our servers.</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) closeImageStudio();
+            });
+
+            setTimeout(() => {
+                const promptInput = document.getElementById('imagePrompt');
+                if (promptInput) promptInput.focus();
+            }, 100);
+        }
+
+        function closeImageStudio() {
+            const modal = document.getElementById('imageStudioModal');
+            if (modal) {
+                modal.style.animation = 'fadeOut 0.2s ease';
+                setTimeout(() => modal.remove(), 200);
+            }
+        }
+
+        async function generateImage() {
+            const prompt = document.getElementById('imagePrompt')?.value.trim();
+            if (!prompt) return;
+
+            const generateBtn = document.getElementById('studioGenerateBtn');
+            const resultDiv = document.getElementById('studioResult');
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            resultDiv.innerHTML = `
+                <div class="studio-generating">
+                    <div class="spinner"></div>
+                    <div>Creating your image...</div>
+                    <div style="font-size: 12px; margin-top: 4px; color: #9ca3af;">This may take 10-30 seconds</div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/command/generate-image`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Image generation failed');
+                }
+
+                if (data.success && data.image) {
+                    const imageSrc = data.image.startsWith('data:') ? data.image : `data:image/png;base64,${data.image}`;
+                    resultDiv.innerHTML = `
+                        <div class="studio-result">
+                            <img src="${imageSrc}" alt="Generated image: ${escapeHtml(prompt)}">
+                            <div class="studio-result-actions">
+                                <button class="studio-download-btn" onclick="downloadGeneratedImage('${imageSrc.replace(/'/g, "\\'")}')">\ud83d\udcbe Download Image</button>
+                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat('${imageSrc.replace(/'/g, "\\'")}')">\ud83d\udcac Send to Chat</button>
+                            </div>
+                            ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #ef4444;">
+                            <div style="font-size: 14px; font-weight: 600;">Image generation did not produce an image</div>
+                            <div style="font-size: 12px; margin-top: 6px; color: #6b7280;">${data.error || 'Try rephrasing your prompt to be more descriptive.'}</div>
+                            ${data.textResponse ? `<div style="font-size: 12px; margin-top: 10px; color: #4b5563; text-align: left; background: #f9fafb; padding: 12px; border-radius: 8px;">${escapeHtml(data.textResponse)}</div>` : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Image generation error:', error);
+                resultDiv.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #ef4444;">
+                        <div style="font-size: 14px; font-weight: 600;">Generation Failed</div>
+                        <div style="font-size: 12px; margin-top: 6px; color: #6b7280;">${escapeHtml(error.message)}</div>
+                    </div>
+                `;
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = '\ud83c\udfa8 Generate Image';
+            }
+        }
+
+        function downloadGeneratedImage(imageSrc) {
+            const a = document.createElement('a');
+            a.href = imageSrc;
+            a.download = `offgrid-image-${new Date().toISOString().split('T')[0]}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function insertImageToChat(imageSrc) {
+            // Close the image studio
+            closeImageStudio();
+
+            // Remove welcome screen if present
+            const welcome = document.getElementById('welcome');
+            if (welcome) {
+                welcome.remove();
+                const bottomInputArea = document.querySelector('.input-area');
+                if (bottomInputArea) bottomInputArea.style.display = '';
+            }
+
+            // Add the image as a message in the chat
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message assistant';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            messageDiv.innerHTML = `
+                <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
+                <div class="message-content">
+                    <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">\ud83c\udfa8 Image Studio</div>
+                    <img src="${imageSrc}" alt="Generated image" style="max-width: 100%; border-radius: 10px; margin: 8px 0;">
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Enable Save to KB button
+            const saveBtn = document.getElementById('saveToKbBtn');
+            if (saveBtn) saveBtn.disabled = false;
         }
 
         // ============================================
