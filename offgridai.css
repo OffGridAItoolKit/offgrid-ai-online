@@ -1737,14 +1737,15 @@ body {
         padding-right: 24px !important;
     }
     
-    /* Remove the extra padding that was added for the hamburger menu */
+    /* Ensure welcome screen clears the fixed 60px header */
     .welcome {
-        padding-top: 20px !important;
+        padding-top: 10px !important;
     }
     
-    /* Also adjust the messages container top padding if needed */
+    /* Messages container with welcome needs enough top padding to clear fixed header */
     .messages:has(.welcome) {
-        padding-top: 10px !important;
+        padding-top: 65px !important;
+        padding-bottom: 20px !important;
     }
     
     /* Slightly smaller compass on mobile to save vertical space */
