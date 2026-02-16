@@ -1748,10 +1748,11 @@ body {
         padding-bottom: 20px !important;
     }
     
-    /* Slightly smaller compass on mobile to save vertical space */
+    /* Smaller compass on mobile to save vertical space */
     .welcome-icon {
-        width: 100px !important;
-        height: 100px !important;
+        width: 80px !important;
+        height: 80px !important;
+        margin-bottom: 8px !important;
     }
 }
 /* Hide Verified Drive badge on mobile and tablet portrait */
