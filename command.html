@@ -1566,6 +1566,27 @@
         .see-deliberation-btn:hover {
             background: rgba(218, 165, 32, 0.1);
             border-color: #daa520;
+        }
+
+        .create-visual-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #a855f7;
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 6px;
+            margin-left: 8px;
+        }
+        .create-visual-btn:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: #a855f7;
             color: #daa520;
         }
 
@@ -2888,6 +2909,14 @@
                 timeIndicator.innerHTML = `⚡ ${config.shortName} • ${responseTime}s`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
 
+                // Add "Create Visual" button for single-model responses
+                const singleVisualBtn = document.createElement('button');
+                singleVisualBtn.className = 'create-visual-btn';
+                singleVisualBtn.innerHTML = '\ud83c\udfa8 Create Visual';
+                const capturedSingleResponse = fullResponse;
+                singleVisualBtn.onclick = () => createVisualFromResponse(capturedSingleResponse, singleVisualBtn);
+                messageDiv.querySelector('.message-content').appendChild(singleVisualBtn);
+
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
                 // Enable Save to KB button
@@ -3153,6 +3182,14 @@
                     delibBtn.onclick = () => showDeliberationModal(capturedDelib, capturedLabelMap, capturedScores);
                     messageDiv.querySelector('.message-content').appendChild(delibBtn);
                 }
+
+                // Add "Create Visual" button to generate an Image Studio prompt from this response
+                const visualBtn = document.createElement('button');
+                visualBtn.className = 'create-visual-btn';
+                visualBtn.innerHTML = '🎨 Create Visual';
+                const capturedResponse = fullResponse;
+                visualBtn.onclick = () => createVisualFromResponse(capturedResponse, visualBtn);
+                messageDiv.querySelector('.message-content').appendChild(visualBtn);
 
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
@@ -3509,9 +3546,18 @@
 
             // Auto-generate title from first user message
             const firstUserMsg = conversationHistory.find(m => m.role === 'user');
-            const autoTitle = firstUserMsg
-                ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
-                : 'Conversation';
+            let autoTitle = 'Conversation';
+            if (firstUserMsg) {
+                let titleSource = firstUserMsg.content;
+                // Strip [Image Studio] prefix for cleaner titles
+                titleSource = titleSource.replace(/^\[Image Studio\]\s*/i, '');
+                // For image-only saves (no user message), use a descriptive title
+                autoTitle = titleSource.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim() || 'Image Studio Visual';
+            } else {
+                // Check if it's an image-only save (direct/conversation prompt with no user message)
+                const hasImage = conversationHistory.some(m => m.content && m.content.includes('![Generated Image]'));
+                autoTitle = hasImage ? 'Image Studio Visual' : 'Conversation';
+            }
 
             const overlay = document.createElement('div');
             overlay.className = 'save-modal-overlay';
@@ -3628,14 +3674,13 @@
         }
 
         function generateFilename(title) {
-            const now = new Date();
-            const dateStr = now.toISOString().split('T')[0];
             const safeTitle = title
                 .replace(/[^a-zA-Z0-9\s-]/g, '')
                 .replace(/\s+/g, '-')
-                .substring(0, 50)
-                .replace(/-+$/, '');
-            return `${dateStr}_${safeTitle}.md`;
+                .substring(0, 60)
+                .replace(/-+$/, '')
+                .toLowerCase();
+            return `${safeTitle}.md`;
         }
 
         async function executeSave() {
@@ -3926,7 +3971,7 @@
                     <div id="directPromptSection" style="display: none; margin-top: 10px;">
                         <textarea id="imagePrompt" class="edit-prompt-area" placeholder="Write your image generation prompt directly..."></textarea>
                         <div class="image-studio-actions">
-                            <button class="studio-generate-btn" id="studioGenerateBtn" onclick="generateImage()">\ud83c\udfa8 Generate Image</button>
+                            <button class="studio-generate-btn" id="studioGenerateBtn" onclick="window._imageFromConversation = true; generateImage()">\ud83c\udfa8 Generate Image</button>
                         </div>
                     </div>
 
@@ -4212,6 +4257,12 @@
         }
 
         async function insertImageToChat(imageSrc, promptText) {
+            // Determine if this is a "write my own" / "from conversation" prompt (no summary needed)
+            // or an AI-assisted prompt (summary wanted)
+            const isDirectPrompt = window._imageFromConversation || false;
+            // Reset the flag
+            window._imageFromConversation = false;
+
             // Close the image studio
             closeImageStudio();
 
@@ -4226,82 +4277,181 @@
             const imagePromptText = promptText || 'Image generation request';
             const messagesDiv = document.getElementById('messages');
 
-            // Add the user prompt as a visible message
-            const userDiv = document.createElement('div');
-            userDiv.className = 'message user';
-            const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            userDiv.innerHTML = `
-                <div class="message-content">
-                    <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">🎨 Image Studio Request</div>
-                    ${escapeHtml(imagePromptText)}
-                    <div class="message-time">${userTime}</div>
-                </div>
-                <div class="message-avatar">You</div>
-            `;
-            messagesDiv.appendChild(userDiv);
-
-            // Show image + loading state for summary
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message assistant';
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const summaryContainerId = 'imageSummary_' + Date.now();
-
-            messageDiv.innerHTML = `
-                <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
-                <div class="message-content">
-                    <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">🎨 Image Studio</div>
-                    <img src="${imageSrc}" alt="Generated image" style="max-width: 100%; border-radius: 10px; margin: 8px 0;">
-                    <div id="${summaryContainerId}" style="margin-top: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px; color: #9ca3af; font-size: 13px;">
-                            <div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
-                            Generating practical field guide...
-                        </div>
+            // For direct/conversation prompts: show image only, no user prompt bubble, no summary
+            // For AI-assisted prompts: show full flow with user prompt, image, and summary
+            if (isDirectPrompt) {
+                // CLEAN image-only display — no prompt text, no summary
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant';
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messageDiv.innerHTML = `
+                    <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
+                    <div class="message-content">
+                        <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">\ud83c\udfa8 Image Studio</div>
+                        <img src="${imageSrc}" alt="Generated image" style="max-width: 100%; border-radius: 10px; margin: 8px 0;">
+                        <div style="font-size: 11px; color: #9ca3af; margin-top: 4px;">Generated using Image Studio in OffGrid Command Center.</div>
+                        <div class="message-time">${time}</div>
                     </div>
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                `;
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
-            // Fetch AI-generated contextual summary
-            let summaryText = '';
-            try {
-                const summaryResponse = await fetch(`${API_BASE}/api/command/image-summary`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt: imagePromptText, category: studioSelectedCategory || 'other' })
-                });
-                const summaryData = await summaryResponse.json();
-                if (summaryData.success && summaryData.summary) {
-                    summaryText = summaryData.summary;
-                    const container = document.getElementById(summaryContainerId);
-                    if (container) {
-                        container.innerHTML = `<div class="markdown-content" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">${marked.parse(summaryText)}</div>`;
+                // Clean KB save — just the image, no prompt metadata
+                conversationHistory.push({ role: 'assistant', content: `![Generated Image](${imageSrc})\n\n*Generated using Image Studio in OffGrid Command Center.*` });
+
+            } else {
+                // AI-ASSISTED flow — full display with user prompt, image, and summary
+                const userDiv = document.createElement('div');
+                userDiv.className = 'message user';
+                const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                userDiv.innerHTML = `
+                    <div class="message-content">
+                        <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">\ud83c\udfa8 Image Studio Request</div>
+                        ${escapeHtml(imagePromptText)}
+                        <div class="message-time">${userTime}</div>
+                    </div>
+                    <div class="message-avatar">You</div>
+                `;
+                messagesDiv.appendChild(userDiv);
+
+                // Show image + loading state for summary
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant';
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const summaryContainerId = 'imageSummary_' + Date.now();
+
+                messageDiv.innerHTML = `
+                    <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
+                    <div class="message-content">
+                        <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">\ud83c\udfa8 Image Studio</div>
+                        <img src="${imageSrc}" alt="Generated image" style="max-width: 100%; border-radius: 10px; margin: 8px 0;">
+                        <div id="${summaryContainerId}" style="margin-top: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; color: #9ca3af; font-size: 13px;">
+                                <div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                                Generating practical field guide...
+                            </div>
+                        </div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                messagesDiv.appendChild(messageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                // Fetch AI-generated contextual summary
+                let summaryText = '';
+                try {
+                    const summaryResponse = await fetch(`${API_BASE}/api/command/image-summary`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt: imagePromptText, category: studioSelectedCategory || 'other' })
+                    });
+                    const summaryData = await summaryResponse.json();
+                    if (summaryData.success && summaryData.summary) {
+                        summaryText = summaryData.summary;
+                        const container = document.getElementById(summaryContainerId);
+                        if (container) {
+                            container.innerHTML = `<div class="markdown-content" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">${marked.parse(summaryText)}</div>`;
+                        }
+                    } else {
+                        const container = document.getElementById(summaryContainerId);
+                        if (container) container.remove();
                     }
-                } else {
-                    // Summary failed but image is fine — just remove the loading indicator
+                } catch (err) {
+                    console.error('Summary generation failed:', err);
                     const container = document.getElementById(summaryContainerId);
                     if (container) container.remove();
                 }
-            } catch (err) {
-                console.error('Summary generation failed:', err);
-                const container = document.getElementById(summaryContainerId);
-                if (container) container.remove();
-            }
 
-            // Add to conversationHistory so Save to KB works
-            // Embed actual base64 image data in markdown so it renders on the flash drive KB viewer
-            conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
-            const assistantContent = summaryText
-                ? `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](${imageSrc})\n\n---\n\n${summaryText}\n\n*Generated using Image Studio in OffGrid Command Center.*`
-                : `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](${imageSrc})\n\n*Generated using Image Studio in OffGrid Command Center.*`;
-            conversationHistory.push({ role: 'assistant', content: assistantContent });
+                // Add to conversationHistory with summary for KB save
+                conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
+                const assistantContent = summaryText
+                    ? `![Generated Image](${imageSrc})\n\n---\n\n${summaryText}\n\n*Generated using Image Studio in OffGrid Command Center.*`
+                    : `![Generated Image](${imageSrc})\n\n*Generated using Image Studio in OffGrid Command Center.*`;
+                conversationHistory.push({ role: 'assistant', content: assistantContent });
+            }
 
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
             // Enable Save to KB button
             const saveBtn = document.getElementById('saveToKbBtn');
             if (saveBtn) saveBtn.disabled = false;
+        }
+
+        // ============================================
+        // CREATE VISUAL FROM RESPONSE
+        // ============================================
+
+        async function createVisualFromResponse(responseText, buttonEl) {
+            // Show loading state on the button
+            const originalHTML = buttonEl.innerHTML;
+            buttonEl.innerHTML = '\u2728 Crafting prompt...';
+            buttonEl.disabled = true;
+            buttonEl.style.opacity = '0.7';
+
+            try {
+                const response = await fetch(`${API_BASE}/api/command/visual-prompt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationContext: responseText
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.prompt) {
+                    // Open Image Studio with the prompt pre-filled in "write my own" mode
+                    openImageStudioWithPrompt(data.prompt);
+                    // Reset button
+                    buttonEl.innerHTML = '\u2705 Prompt Created';
+                    buttonEl.style.opacity = '1';
+                    setTimeout(() => {
+                        buttonEl.innerHTML = originalHTML;
+                        buttonEl.disabled = false;
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Failed to generate visual prompt');
+                }
+            } catch (error) {
+                console.error('Create visual error:', error);
+                buttonEl.innerHTML = '\u274c Failed';
+                buttonEl.style.opacity = '1';
+                setTimeout(() => {
+                    buttonEl.innerHTML = originalHTML;
+                    buttonEl.disabled = false;
+                }, 2000);
+            }
+        }
+
+        function openImageStudioWithPrompt(prompt) {
+            // Open Image Studio normally
+            openImageStudio();
+
+            // Wait for modal to render, then switch to "write my own" mode and fill the prompt
+            setTimeout(() => {
+                // Show the direct prompt section
+                const directSection = document.getElementById('directPromptSection');
+                if (directSection) directSection.style.display = 'block';
+
+                // Fill in the prompt
+                const promptTextarea = document.getElementById('imagePrompt');
+                if (promptTextarea) {
+                    promptTextarea.value = prompt;
+                    promptTextarea.style.height = 'auto';
+                    promptTextarea.style.height = Math.min(promptTextarea.scrollHeight, 200) + 'px';
+                }
+
+                // Update the toggle button text
+                const toggleBtn = document.querySelector('.direct-prompt-toggle');
+                if (toggleBtn) toggleBtn.textContent = '\u2728 Switch to AI-Assisted mode';
+
+                // Mark this as a "from conversation" prompt so we skip the summary
+                window._imageFromConversation = true;
+
+                // Scroll the modal to show the prompt
+                const modal = document.querySelector('.image-studio-modal');
+                if (modal) modal.scrollTop = modal.scrollHeight;
+            }, 200);
         }
 
         // ============================================

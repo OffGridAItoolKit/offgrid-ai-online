@@ -1220,6 +1220,111 @@ Rules:
 });
 
 // =============================================================================
+// VISUAL PROMPT FROM CONVERSATION ENDPOINT
+// =============================================================================
+
+/**
+ * POST /api/command/visual-prompt
+ * Takes the last council/AI response from a conversation and generates
+ * an optimized Image Studio prompt based on that content.
+ * Uses GPT-4.1 Mini for fast, cost-effective generation.
+ * No data is stored — processed in memory and discarded.
+ */
+app.post('/api/command/visual-prompt', async (req, res) => {
+    try {
+        const { conversationContext, category } = req.body;
+
+        if (!conversationContext || typeof conversationContext !== 'string' || conversationContext.trim().length === 0) {
+            return res.status(400).json({ error: 'Conversation context is required.' });
+        }
+
+        console.log(`[Visual Prompt] Generating image prompt from conversation (${conversationContext.length} chars)`);
+
+        const systemPrompt = `You are the OffGrid AI Visual Prompt Specialist. You read an AI-generated answer about survival, homesteading, medical, or off-grid topics and create an optimized image generation prompt that produces a useful COMPANION VISUAL for that information.
+
+ABOUT THE USERS:
+Survivalists, homesteaders, first responders, field medics, hikers, hunters, overlanders, field researchers, missionaries, remote educators, and privacy advocates. They need PRACTICAL visual content they can reference in the field.
+
+YOUR TASK:
+1. Read the AI response provided
+2. Identify the KEY practical information that would benefit from a visual companion
+3. Create an image generation prompt for a useful diagram, infographic, checklist, or reference chart
+4. The visual should COMPLEMENT the text — not just illustrate it, but add organizational value
+
+IMAGE SIZE & STYLE RULES:
+- Create PRACTICAL REFERENCE VISUALS — NOT large posters
+- Target size: standard document/screen size (like a reference card, field guide page, or single-page infographic)
+- Style: clean, organized, labeled, easy to read at normal screen/print size
+- Best formats: labeled diagrams, step-by-step infographics, checklists with icons, comparison charts, flow charts, identification cards, quick-reference guides
+- Use clear section dividers, consistent icons, readable text sizes
+- Specify: clean white or light background, professional illustration style, labeled components
+- Include color palette suggestions (earth tones for survival, clinical blues for medical, etc.)
+
+SAFETY REFRAMING:
+- Reframe any sensitive content (survival techniques, medical procedures, weapons, wound care) as EDUCATIONAL ILLUSTRATIONS or TECHNICAL DIAGRAMS
+- Use academic/clinical language
+- Never use words that could trigger safety filters
+
+RULES:
+- Output ONLY the optimized prompt text, nothing else
+- Do NOT include any preamble, explanation, or commentary
+- Do NOT wrap in quotes
+- Keep the prompt between 80-200 words
+- Be specific and descriptive
+- Always specify illustration/visual style
+- Always mention background color
+- Include "labeled" or "annotated" for diagrams`;
+
+        const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://offgridtoolkit.ai',
+                'X-Title': 'OffGrid Command Center'
+            },
+            body: JSON.stringify({
+                model: 'openai/gpt-4.1-mini',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `Read this AI response and create an optimized image generation prompt for a practical companion visual:\n\n${conversationContext.substring(0, 4000)}` }
+                ],
+                temperature: 0.7,
+                max_tokens: 400
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            console.error('[Visual Prompt] API error:', errorData);
+            throw new Error(errorData.error?.message || `API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        const visualPrompt = data.choices?.[0]?.message?.content?.trim();
+
+        if (!visualPrompt) {
+            throw new Error('No visual prompt was generated');
+        }
+
+        console.log(`[Visual Prompt] Generated: "${visualPrompt.substring(0, 100)}..."`);
+
+        res.json({
+            success: true,
+            prompt: visualPrompt,
+            model: 'gpt-4.1-mini'
+        });
+
+    } catch (error) {
+        console.error('[Visual Prompt] Error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Visual prompt generation failed: ' + error.message
+        });
+    }
+});
+
+// =============================================================================
 // PDF EXPORT ENDPOINT
 // =============================================================================
 
