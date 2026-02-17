@@ -186,6 +186,17 @@ function buildOpenRouterMessages(messages, multimodal = true) {
 }
 
 /**
+ * Promise-based timeout helper. Rejects after `ms` milliseconds.
+ */
+function withTimeout(promise, ms, label = 'Operation') {
+    let timer;
+    const timeout = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s`)), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+/**
  * Make a non-streaming request to OpenRouter and return the text response
  */
 async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7) {
@@ -395,6 +406,9 @@ async function runCouncilReview(userQuery, labeledResults) {
     });
 
     // Stage 2: each model acts as a reviewer, anonymously
+    // Per-model timeout: 30 seconds for reviews (shorter since they're simpler tasks)
+    const REVIEW_TIMEOUT_MS = 30000;
+
     const reviewPromises = modelKeys.map(async (reviewKey) => {
         const reviewModel = COMMAND_MODELS[reviewKey];
         // Randomize label order per reviewer to reduce positional bias
@@ -402,7 +416,11 @@ async function runCouncilReview(userQuery, labeledResults) {
         const reviewMessages = buildReviewerMessages(userQuery, answersByLabel, shuffledLabels);
 
         try {
-            const reviewText = await callOpenRouter(reviewModel.id, reviewMessages, 1024, 0.2);
+            const reviewText = await withTimeout(
+                callOpenRouter(reviewModel.id, reviewMessages, 1024, 0.2),
+                REVIEW_TIMEOUT_MS,
+                `${reviewModel.shortName} review`
+            );
             const parsed = safeParseJSON(reviewText);
 
             if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(parsed.insight_ranking)) {
@@ -459,8 +477,12 @@ async function runCouncilReview(userQuery, labeledResults) {
     });
 
     // Select Chairman by highest CouncilScore, with tie-breakers
-    let chairmanLabel = labels[0];
-    for (const label of labels) {
+    // Skip errored models — they can't be chairman
+    const eligibleLabels = labeledResults
+        .filter(r => !r.response.startsWith('[Error:'))
+        .map(r => r.label);
+    let chairmanLabel = eligibleLabels[0] || labels[0];
+    for (const label of eligibleLabels) {
         const current = scores[label];
         const best = scores[chairmanLabel];
         if (!best) {
@@ -702,11 +724,18 @@ app.post('/api/command/council', async (req, res) => {
         const modelKeys = ['scout', 'medic', 'navigator', 'ranger'];
         const baseMessages = buildOpenRouterMessages(messages, true);
         
+        // Per-model timeout: 45 seconds for initial answers
+        const MODEL_TIMEOUT_MS = 45000;
+
         const promises = modelKeys.map(async (key) => {
             const model = COMMAND_MODELS[key];
             try {
                 const modelMessages = buildOpenRouterMessages(messages, model.multimodal);
-                const response = await callOpenRouter(model.id, modelMessages, 2048);
+                const response = await withTimeout(
+                    callOpenRouter(model.id, modelMessages, 2048),
+                    MODEL_TIMEOUT_MS,
+                    model.shortName
+                );
                 
                 // Send progress update
                 res.write(`data: ${JSON.stringify({ 
@@ -719,9 +748,10 @@ app.post('/api/command/council', async (req, res) => {
             } catch (error) {
                 console.error(`[Council] ${model.shortName} error:`, error.message);
                 
+                const isTimeout = error.message.includes('timed out');
                 res.write(`data: ${JSON.stringify({ 
                     progress: key, 
-                    message: `${model.emoji} ${model.shortName} error (skipped)` 
+                    message: `${model.emoji} ${model.shortName} ${isTimeout ? 'timed out' : 'error'} (skipped)` 
                 })}\n\n`);
                 
                 return { key, name: model.name, shortName: model.shortName, emoji: model.emoji, response: `[Error: ${error.message}]` };
@@ -730,7 +760,22 @@ app.post('/api/command/council', async (req, res) => {
         
         const results = await Promise.all(promises);
 
+        // Filter out timed-out/errored models so they don't poison the council
+        const validResults = results.filter(r => !r.response.startsWith('[Error:'));
+        const skippedCount = results.length - validResults.length;
+        if (skippedCount > 0) {
+            console.log(`[Council] ${skippedCount} model(s) failed/timed out, proceeding with ${validResults.length}`);
+        }
+
+        // Need at least 2 models to run a meaningful council
+        if (validResults.length < 2) {
+            res.write(`data: ${JSON.stringify({ error: 'Too many models failed. Please try again.' })}\n\n`);
+            res.end();
+            return;
+        }
+
         // Assign labels A, B, C, D to each result in a deterministic order
+        // Use ALL results (including errors) so label positions stay consistent
         const labeledResults = results.map((r, idx) => ({
             label: String.fromCharCode(65 + idx), // 'A', 'B', 'C', ...
             ...r
