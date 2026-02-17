@@ -319,9 +319,7 @@
         /* Attachment menu dropdown */
         .attach-menu {
             display: none;
-            position: absolute;
-            bottom: calc(100% + 8px);
-            left: 0;
+            position: fixed;
             background: white;
             border: 1px solid rgba(184, 134, 11, 0.3);
             border-radius: 12px;
@@ -329,8 +327,8 @@
             overflow-y: auto;
             overflow-x: hidden;
             z-index: 1000;
-            min-width: 200px;
-            max-height: min(420px, calc(100vh - 200px));
+            min-width: 220px;
+            max-height: 70vh;
         }
 
         .attach-menu.open {
@@ -2719,14 +2717,51 @@
             allMenus.forEach(m => m.classList.remove('open'));
             if (!anyOpen) {
                 const welcome = document.getElementById('welcome');
+                let menu;
                 if (welcome && window.innerWidth > 768) {
-                    const wm = document.getElementById('attachMenuWelcome');
-                    if (wm) wm.classList.add('open');
+                    menu = document.getElementById('attachMenuWelcome');
                 } else {
-                    const bm = document.getElementById('attachMenu');
-                    if (bm) bm.classList.add('open');
+                    menu = document.getElementById('attachMenu');
+                }
+                if (menu) {
+                    menu.classList.add('open');
+                    positionAttachMenu(menu);
                 }
             }
+        }
+
+        function positionAttachMenu(menu) {
+            // Find the plus button that triggered this menu
+            const btn = menu.closest('.input-wrapper')?.querySelector('.attach-btn') ||
+                        document.querySelector('.attach-btn');
+            if (!btn) return;
+
+            const btnRect = btn.getBoundingClientRect();
+            const menuHeight = menu.scrollHeight;
+            const viewportHeight = window.innerHeight;
+            const padding = 12;
+
+            // Position above the button by default
+            let top = btnRect.top - menuHeight - 8;
+            let left = btnRect.left;
+
+            // If menu would go above viewport, position it below the button instead
+            if (top < padding) {
+                top = Math.max(padding, btnRect.top - (viewportHeight * 0.7) + 8);
+                // If still not enough room, just pin to top with padding
+                if (top < padding) top = padding;
+            }
+
+            // Keep within horizontal bounds
+            if (left + 240 > window.innerWidth) {
+                left = window.innerWidth - 250;
+            }
+
+            menu.style.top = top + 'px';
+            menu.style.left = left + 'px';
+            // Constrain max-height so it doesn't overflow bottom either
+            const maxH = Math.min(viewportHeight - top - padding, viewportHeight * 0.7);
+            menu.style.maxHeight = maxH + 'px';
         }
 
         function closeAttachMenu() {
@@ -3679,7 +3714,7 @@
             content += `**Category:** ${category}\n\n`;
             content += '---\n\n';
 
-            // Track image replacement index
+            // Track image replacement index (matches order from extractBase64Images)
             let imageIndex = 0;
 
             conversationHistory.forEach((msg, index) => {
@@ -3687,7 +3722,13 @@
                     content += `## \ud83d\udc64 User\n\n`;
                     content += `${msg.content}\n\n`;
                     if (msg.image) {
-                        content += `![Uploaded Image](${msg.image})\n\n`;
+                        // Replace base64 user image with relative file path
+                        if (imageFilenames && imageIndex < imageFilenames.length) {
+                            content += `![Uploaded Image](./${imageFilenames[imageIndex]})\n\n`;
+                            imageIndex++;
+                        } else {
+                            content += `![Uploaded Image](${msg.image})\n\n`;
+                        }
                     }
                 } else if (msg.role === 'assistant') {
                     content += `## \ud83e\udd16 OffGrid AI\n\n`;
@@ -3723,17 +3764,28 @@
             return `${safeTitle}.md`;
         }
 
-        // Extract base64 images from conversation history
+        // Extract base64 images from conversation history (both user uploads and AI-generated)
         function extractBase64Images() {
             const images = [];
             conversationHistory.forEach(msg => {
+                // User-uploaded images (stored as msg.image dataUrl)
+                if (msg.role === 'user' && msg.image) {
+                    const formatMatch = msg.image.match(/data:image\/([^;]+);/);
+                    images.push({
+                        dataUrl: msg.image,
+                        format: formatMatch ? formatMatch[1] : 'jpeg',
+                        source: 'user-upload'
+                    });
+                }
+                // AI-generated images embedded as markdown in assistant content
                 if (msg.role === 'assistant' && msg.content) {
                     const regex = /!\[[^\]]*\]\((data:image\/([^;]+);base64,[^)]+)\)/g;
                     let match;
                     while ((match = regex.exec(msg.content)) !== null) {
                         images.push({
                             dataUrl: match[1],
-                            format: match[2] || 'png'
+                            format: match[2] || 'png',
+                            source: 'ai-generated'
                         });
                     }
                 }
