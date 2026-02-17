@@ -3614,7 +3614,7 @@
             }
         }
 
-        function generateMarkdownContent(title, category, tags) {
+        function generateMarkdownContent(title, category, tags, imageFilenames) {
             const now = new Date();
             const isoDate = now.toISOString();
             const tagsArray = tags
@@ -3641,6 +3641,12 @@
                     frontmatter += `  - ${tag}\n`;
                 });
             }
+            if (imageFilenames && imageFilenames.length > 0) {
+                frontmatter += `images:\n`;
+                imageFilenames.forEach(img => {
+                    frontmatter += `  - ${img}\n`;
+                });
+            }
             frontmatter += '---\n\n';
 
             // Build conversation content
@@ -3654,6 +3660,9 @@
             content += `**Category:** ${category}\n\n`;
             content += '---\n\n';
 
+            // Track image replacement index
+            let imageIndex = 0;
+
             conversationHistory.forEach((msg, index) => {
                 if (msg.role === 'user') {
                     content += `## \ud83d\udc64 User\n\n`;
@@ -3663,7 +3672,19 @@
                     }
                 } else if (msg.role === 'assistant') {
                     content += `## \ud83e\udd16 OffGrid AI\n\n`;
-                    content += `${msg.content}\n\n`;
+                    // Replace inline base64 images with relative file paths
+                    let msgContent = msg.content;
+                    if (imageFilenames && imageFilenames.length > 0) {
+                        msgContent = msgContent.replace(/!\[([^\]]*)\]\(data:image\/[^)]+\)/g, (match, alt) => {
+                            if (imageIndex < imageFilenames.length) {
+                                const filename = imageFilenames[imageIndex];
+                                imageIndex++;
+                                return `![${alt}](./${filename})`;
+                            }
+                            return match;
+                        });
+                    }
+                    content += `${msgContent}\n\n`;
                 }
                 if (index < conversationHistory.length - 1) {
                     content += '---\n\n';
@@ -3683,48 +3704,160 @@
             return `${safeTitle}.md`;
         }
 
+        // Extract base64 images from conversation history
+        function extractBase64Images() {
+            const images = [];
+            conversationHistory.forEach(msg => {
+                if (msg.role === 'assistant' && msg.content) {
+                    const regex = /!\[[^\]]*\]\((data:image\/([^;]+);base64,[^)]+)\)/g;
+                    let match;
+                    while ((match = regex.exec(msg.content)) !== null) {
+                        images.push({
+                            dataUrl: match[1],
+                            format: match[2] || 'png'
+                        });
+                    }
+                }
+            });
+            return images;
+        }
+
+        // Convert base64 data URL to Blob
+        function dataUrlToBlob(dataUrl) {
+            const parts = dataUrl.split(',');
+            const mime = parts[0].match(/:(.*?);/)[1];
+            const binary = atob(parts[1]);
+            const array = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) {
+                array[i] = binary.charCodeAt(i);
+            }
+            return new Blob([array], { type: mime });
+        }
+
         async function executeSave() {
             const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
             const category = document.getElementById('saveCategory')?.value || 'Other';
             const tags = document.getElementById('saveTags')?.value || '';
 
-            const markdownContent = generateMarkdownContent(title, category, tags);
             const filename = generateFilename(title);
+            const baseName = filename.replace('.md', '');
+
+            // Check if conversation contains base64 images
+            const embeddedImages = extractBase64Images();
+            const hasImages = embeddedImages.length > 0;
 
             closeSaveModal();
 
-            // Method 1: showSaveFilePicker \u2014 opens a native \u201cSave As\u201d dialog
-            if ('showSaveFilePicker' in window) {
-                try {
-                    const fileHandle = await window.showSaveFilePicker({
-                        suggestedName: filename,
-                        types: [{
-                            description: 'Markdown File',
-                            accept: { 'text/markdown': ['.md'] }
-                        }]
-                    });
-                    const writable = await fileHandle.createWritable();
-                    await writable.write(markdownContent);
-                    await writable.close();
-                    showSaveToast(`Saved: ${fileHandle.name}`, `Navigate to your OffGrid AI drive > Saved Knowledge Base > ${category}. Never stored on our servers.`);
-                    return;
-                } catch (err) {
-                    if (err.name === 'AbortError') return;
-                    console.error('showSaveFilePicker failed, falling back to download:', err);
-                }
-            }
+            if (hasImages) {
+                // MULTI-FILE SAVE: .md + .png files using showDirectoryPicker
+                const imageFilenames = embeddedImages.map((img, i) => 
+                    `${baseName}-img-${i + 1}.${img.format}`
+                );
 
-            // Method 2: Fallback for browsers without showSaveFilePicker
-            const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showSaveToast(`Downloaded: ${filename}`, `Move this file to your OffGrid AI drive > Saved Knowledge Base > ${category}`);
+                const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
+
+                if ('showDirectoryPicker' in window) {
+                    try {
+                        showSaveToast('Select folder...', `Choose the Knowledge Base > ${category} folder on your OffGrid AI drive.`);
+                        const dirHandle = await window.showDirectoryPicker({
+                            mode: 'readwrite',
+                            startIn: 'documents'
+                        });
+
+                        // Write the .md file
+                        const mdHandle = await dirHandle.getFileHandle(filename, { create: true });
+                        const mdWritable = await mdHandle.createWritable();
+                        await mdWritable.write(markdownContent);
+                        await mdWritable.close();
+
+                        // Write each image as a separate .png file
+                        for (let i = 0; i < embeddedImages.length; i++) {
+                            const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
+                            const imgHandle = await dirHandle.getFileHandle(imageFilenames[i], { create: true });
+                            const imgWritable = await imgHandle.createWritable();
+                            await imgWritable.write(imgBlob);
+                            await imgWritable.close();
+                        }
+
+                        showSaveToast(
+                            `Saved: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
+                            `Files saved to your selected folder. Never stored on our servers.`
+                        );
+                        return;
+                    } catch (err) {
+                        if (err.name === 'AbortError') return;
+                        console.error('showDirectoryPicker failed, falling back:', err);
+                    }
+                }
+
+                // Fallback: download .md + .png files separately
+                // Download .md first
+                const mdBlob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+                const mdUrl = URL.createObjectURL(mdBlob);
+                const mdLink = document.createElement('a');
+                mdLink.href = mdUrl;
+                mdLink.download = filename;
+                document.body.appendChild(mdLink);
+                mdLink.click();
+                document.body.removeChild(mdLink);
+                URL.revokeObjectURL(mdUrl);
+
+                // Download each image
+                for (let i = 0; i < embeddedImages.length; i++) {
+                    const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
+                    const imgUrl = URL.createObjectURL(imgBlob);
+                    const imgLink = document.createElement('a');
+                    imgLink.href = imgUrl;
+                    imgLink.download = imageFilenames[i];
+                    document.body.appendChild(imgLink);
+                    // Small delay between downloads so browser doesn't block them
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    imgLink.click();
+                    document.body.removeChild(imgLink);
+                    URL.revokeObjectURL(imgUrl);
+                }
+
+                showSaveToast(
+                    `Downloaded: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
+                    `Move ALL downloaded files to your OffGrid AI drive > Knowledge Base > ${category} folder.`
+                );
+
+            } else {
+                // SINGLE FILE SAVE: no images, use showSaveFilePicker as before
+                const markdownContent = generateMarkdownContent(title, category, tags);
+
+                if ('showSaveFilePicker' in window) {
+                    try {
+                        const fileHandle = await window.showSaveFilePicker({
+                            suggestedName: filename,
+                            types: [{
+                                description: 'Markdown File',
+                                accept: { 'text/markdown': ['.md'] }
+                            }]
+                        });
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(markdownContent);
+                        await writable.close();
+                        showSaveToast(`Saved: ${fileHandle.name}`, `Navigate to your OffGrid AI drive > Saved Knowledge Base > ${category}. Never stored on our servers.`);
+                        return;
+                    } catch (err) {
+                        if (err.name === 'AbortError') return;
+                        console.error('showSaveFilePicker failed, falling back to download:', err);
+                    }
+                }
+
+                // Fallback download
+                const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showSaveToast(`Downloaded: ${filename}`, `Move this file to your OffGrid AI drive > Saved Knowledge Base > ${category}`);
+            }
         }
 
         async function exportAsPDF() {
