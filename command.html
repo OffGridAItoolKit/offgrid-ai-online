@@ -4149,12 +4149,17 @@
 
                 if (data.success && data.image) {
                     const imageSrc = data.image.startsWith('data:') ? data.image : `data:image/png;base64,${data.image}`;
+                    
+                    // Store image data in JS variable to avoid onclick attribute overflow
+                    window._lastGeneratedImage = imageSrc;
+                    window._lastGeneratedPrompt = prompt;
+                    
                     resultDiv.innerHTML = `
                         <div class="studio-result">
                             <img src="${imageSrc}" alt="Generated image: ${escapeHtml(prompt)}">
                             <div class="studio-result-actions">
-                                <button class="studio-download-btn" onclick="downloadGeneratedImage('${imageSrc.replace(/'/g, "\\'")}')">\ud83d\udcbe Download Image</button>
-                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat('${imageSrc.replace(/'/g, "\\'")}', '${escapeHtml(prompt).replace(/'/g, "\\'")}')">💬 Send to Chat</button>
+                                <button class="studio-download-btn" onclick="downloadGeneratedImage(window._lastGeneratedImage)">\ud83d\udcbe Download Image</button>
+                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat(window._lastGeneratedImage, window._lastGeneratedPrompt)">\ud83d\udcac Send to Chat</button>
                             </div>
                             ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
                         </div>
@@ -4206,7 +4211,7 @@
             document.body.removeChild(a);
         }
 
-        function insertImageToChat(imageSrc, promptText) {
+        async function insertImageToChat(imageSrc, promptText) {
             // Close the image studio
             closeImageStudio();
 
@@ -4218,15 +4223,10 @@
                 if (bottomInputArea) bottomInputArea.style.display = '';
             }
 
-            // Add to conversationHistory so Save to KB works
             const imagePromptText = promptText || 'Image generation request';
-            conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
-            conversationHistory.push({ role: 'assistant', content: `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](embedded-image)\n\n*Generated using Image Studio in OffGrid Command Center.*` });
-
-            // Add the image as a message in the chat
             const messagesDiv = document.getElementById('messages');
 
-            // Also add the user prompt as a visible message
+            // Add the user prompt as a visible message
             const userDiv = document.createElement('div');
             userDiv.className = 'message user';
             const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -4240,19 +4240,62 @@
             `;
             messagesDiv.appendChild(userDiv);
 
+            // Show image + loading state for summary
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message assistant';
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const summaryContainerId = 'imageSummary_' + Date.now();
 
             messageDiv.innerHTML = `
                 <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
                 <div class="message-content">
                     <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">🎨 Image Studio</div>
                     <img src="${imageSrc}" alt="Generated image" style="max-width: 100%; border-radius: 10px; margin: 8px 0;">
+                    <div id="${summaryContainerId}" style="margin-top: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #9ca3af; font-size: 13px;">
+                            <div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div>
+                            Generating practical field guide...
+                        </div>
+                    </div>
                     <div class="message-time">${time}</div>
                 </div>
             `;
             messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Fetch AI-generated contextual summary
+            let summaryText = '';
+            try {
+                const summaryResponse = await fetch(`${API_BASE}/api/command/image-summary`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: imagePromptText, category: studioSelectedCategory || 'other' })
+                });
+                const summaryData = await summaryResponse.json();
+                if (summaryData.success && summaryData.summary) {
+                    summaryText = summaryData.summary;
+                    const container = document.getElementById(summaryContainerId);
+                    if (container) {
+                        container.innerHTML = `<div class="markdown-content" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb;">${marked.parse(summaryText)}</div>`;
+                    }
+                } else {
+                    // Summary failed but image is fine — just remove the loading indicator
+                    const container = document.getElementById(summaryContainerId);
+                    if (container) container.remove();
+                }
+            } catch (err) {
+                console.error('Summary generation failed:', err);
+                const container = document.getElementById(summaryContainerId);
+                if (container) container.remove();
+            }
+
+            // Add to conversationHistory so Save to KB works
+            conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
+            const assistantContent = summaryText
+                ? `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](embedded-image)\n\n---\n\n${summaryText}\n\n*Generated using Image Studio in OffGrid Command Center.*`
+                : `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](embedded-image)\n\n*Generated using Image Studio in OffGrid Command Center.*`;
+            conversationHistory.push({ role: 'assistant', content: assistantContent });
+
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
             // Enable Save to KB button

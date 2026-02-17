@@ -1122,6 +1122,104 @@ RULES:
 });
 
 // =============================================================================
+// IMAGE CONTEXT SUMMARY ENDPOINT
+// =============================================================================
+
+/**
+ * POST /api/command/image-summary
+ * Generates a practical contextual summary for a generated image.
+ * Takes the image prompt and category, returns actionable text:
+ * supplies needed, steps, safety notes, etc.
+ * Uses GPT-4.1 Mini for fast, cost-effective generation.
+ * No data is stored — processed in memory and discarded.
+ */
+app.post('/api/command/image-summary', async (req, res) => {
+    try {
+        const { prompt, category } = req.body;
+
+        if (!prompt || typeof prompt !== 'string') {
+            return res.status(400).json({ error: 'Image prompt is required' });
+        }
+
+        const categoryContext = {
+            survival: 'Focus on survival priorities, safety warnings, and materials that can be found in the wild or in a basic emergency kit.',
+            homestead: 'Focus on building materials, tools needed, estimated costs, and seasonal considerations for off-grid homesteading.',
+            medical: 'Focus on supplies needed, step-by-step procedure, when to seek professional help, and important safety warnings.',
+            wilderness: 'Focus on identification tips, safety warnings (toxic lookalikes), seasonal availability, and habitat information.',
+            adventure: 'Focus on gear needed, safety precautions, weather considerations, and navigation tips.',
+            research: 'Focus on methodology, equipment needed, data collection tips, and field safety protocols.',
+            ministry: 'Focus on practical application, audience considerations, and supporting resources.',
+            education: 'Focus on learning objectives, materials needed, age-appropriate adaptations, and assessment ideas.',
+            other: 'Focus on practical, actionable information that adds real-world value.'
+        };
+
+        const contextHint = categoryContext[category] || categoryContext.other;
+
+        const systemPrompt = `You are a practical field guide assistant for the OffGrid AI ToolKit — a USB-based AI system used by survivalists, homesteaders, first responders, hikers, and off-grid communities.
+
+The user just generated an image using this prompt: "${prompt}"
+
+Your job is to write a SHORT, practical companion summary that adds real survival/practical value when this image is saved to their Knowledge Base. This text will appear alongside the image.
+
+${contextHint}
+
+Format your response EXACTLY like this:
+## Quick Reference
+[1-2 sentence summary of what this image shows and why it's useful]
+
+### What You'll Need
+- [Bullet list of supplies, materials, or tools — be specific]
+
+### Key Steps
+1. [Numbered actionable steps — keep it concise, 4-6 steps max]
+
+### Safety Notes
+- [Important warnings or considerations]
+
+Rules:
+- Be concise — this is a field reference, not an essay
+- Use plain language a non-expert can understand
+- Include specific quantities, measurements, or sizes where relevant
+- If the topic involves any danger, ALWAYS include safety warnings
+- Do NOT describe the image itself — add NEW practical value
+- Total response should be 150-250 words max`;
+
+        const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://offgridtoolkit.ai',
+                'X-Title': 'OffGrid Command Center'
+            },
+            body: JSON.stringify({
+                model: 'openai/gpt-4.1-mini',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    { role: 'user', content: `Generate a practical companion summary for this image. The image was created from this prompt: "${prompt}"` }
+                ],
+                temperature: 0.4
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Image summary API error:', errorText);
+            return res.status(500).json({ error: 'Failed to generate summary' });
+        }
+
+        const data = await response.json();
+        const summary = data.choices?.[0]?.message?.content || '';
+
+        res.json({ success: true, summary });
+
+    } catch (error) {
+        console.error('Image summary error:', error);
+        res.status(500).json({ error: 'Failed to generate summary' });
+    }
+});
+
+// =============================================================================
 // PDF EXPORT ENDPOINT
 // =============================================================================
 
