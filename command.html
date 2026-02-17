@@ -326,9 +326,11 @@
             border: 1px solid rgba(184, 134, 11, 0.3);
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             z-index: 1000;
             min-width: 200px;
+            max-height: min(420px, calc(100vh - 200px));
         }
 
         .attach-menu.open {
@@ -2426,10 +2428,7 @@
                 <button class="remove-image" onclick="removeImage()">Remove</button>
             </div>
 
-            <!-- Hidden file inputs -->
-            <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
-            <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
-            <input type="file" id="docInput" class="image-upload-input" accept=".pdf,.doc,.docx,.txt" onchange="handleDocSelect(event)">
+            <!-- Hidden file inputs moved to end of body so they're always accessible -->
 
             <div class="input-wrapper">
                 <!-- Plus button -->
@@ -3336,20 +3335,40 @@
         }
 
         function showImagePreview() {
+            // Show in whichever preview area is currently visible
             const preview = document.getElementById('imagePreview');
+            const previewWelcome = document.getElementById('imagePreviewWelcome');
             const previewImg = document.getElementById('previewImg');
             const previewFilename = document.getElementById('previewFilename');
 
-            previewImg.src = selectedImage.dataUrl;
-            previewFilename.textContent = selectedImage.name;
-            preview.classList.add('active');
+            // Bottom input area preview
+            if (preview && previewImg && previewFilename && selectedImage) {
+                previewImg.src = selectedImage.dataUrl;
+                previewFilename.textContent = selectedImage.name;
+                preview.classList.add('active');
+            }
+
+            // Welcome screen preview (if still visible)
+            if (previewWelcome && selectedImage) {
+                previewWelcome.innerHTML = `
+                    <img class="preview-image" src="${selectedImage.dataUrl}" alt="Preview">
+                    <div class="preview-info"><div class="preview-filename">${selectedImage.name}</div></div>
+                    <button class="remove-image" onclick="removeImage()">Remove</button>
+                `;
+                previewWelcome.classList.add('active');
+            }
         }
 
         function removeImage() {
             selectedImage = null;
-            document.getElementById('imagePreview').classList.remove('active');
-            document.getElementById('imageInput').value = '';
-            document.getElementById('galleryInput').value = '';
+            const preview = document.getElementById('imagePreview');
+            const previewWelcome = document.getElementById('imagePreviewWelcome');
+            if (preview) preview.classList.remove('active');
+            if (previewWelcome) { previewWelcome.classList.remove('active'); previewWelcome.innerHTML = ''; }
+            const imageInput = document.getElementById('imageInput');
+            const galleryInput = document.getElementById('galleryInput');
+            if (imageInput) imageInput.value = '';
+            if (galleryInput) galleryInput.value = '';
         }
 
         // ============================================
@@ -4693,5 +4712,9 @@
             console.log('OffGrid Command Center v2 - Ready!');
         });
     </script>
+    <!-- Hidden file inputs (outside any display:none containers so they always work) -->
+    <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
+    <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
+    <input type="file" id="docInput" class="image-upload-input" accept=".pdf,.doc,.docx,.txt" onchange="handleDocSelect(event)">
 </body>
 </html>
