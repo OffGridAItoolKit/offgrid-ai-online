@@ -4290,10 +4290,11 @@
             }
 
             // Add to conversationHistory so Save to KB works
+            // Embed actual base64 image data in markdown so it renders on the flash drive KB viewer
             conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
             const assistantContent = summaryText
-                ? `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](embedded-image)\n\n---\n\n${summaryText}\n\n*Generated using Image Studio in OffGrid Command Center.*`
-                : `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](embedded-image)\n\n*Generated using Image Studio in OffGrid Command Center.*`;
+                ? `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](${imageSrc})\n\n---\n\n${summaryText}\n\n*Generated using Image Studio in OffGrid Command Center.*`
+                : `🎨 **Image Generated**\n\n*Prompt:* ${imagePromptText}\n\n![Generated Image](${imageSrc})\n\n*Generated using Image Studio in OffGrid Command Center.*`;
             conversationHistory.push({ role: 'assistant', content: assistantContent });
 
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
