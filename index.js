@@ -1638,6 +1638,11 @@ app.get('/online/ready-made-prompts', (req, res) => {
     res.sendFile(path.join(__dirname, 'ready-made-prompts.html'));
 });
 
+// Ready-Made Prompts page (Command Center)
+app.get('/command/ready-made-prompts', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ready-made-prompts.html'));
+});
+
 // Customer experience - ad-free online toolkit
 app.get('/online', (req, res) => {
     serveWithExperience(req, res, true);

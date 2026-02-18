@@ -1214,9 +1214,11 @@
         }
         
         function usePrompt(text) {
-            // Store the prompt and redirect to chat
+            // Store the prompt and redirect to the originating chat page
             sessionStorage.setItem('offgrid-ready-prompt', text);
-            window.location.href = '/online';
+            // Detect if user came from Command Center based on referrer or URL path
+            const isCommand = document.referrer.includes('/command') || window.location.pathname.includes('/command');
+            window.location.href = isCommand ? '/command' : '/online';
         }
         
         function showToast(message) {

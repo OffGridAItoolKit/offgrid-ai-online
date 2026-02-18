@@ -2165,10 +2165,7 @@
         </div>
         <div class="header-center-mobile" style="display: none;"><span class="online-badge" style="margin-left: 0;">COMMAND</span></div>
         <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="/" class="back-link desktop-only">← Free Version</a>
-            <a href="https://offgridaitoolkit.com" target="_blank" class="purchase-cta">
-                🛒 <span class="desktop-only">Get Offline Version</span><span class="mobile-only">Offline</span>
-            </a>
+            <a href="/" class="back-link">← Free Version</a>
             <div class="status">
                 <span class="status-dot disconnected" id="statusDot"></span>
                 <span id="statusText" class="status-text desktop-only">Connecting...</span>
@@ -2189,7 +2186,7 @@
             <div class="sidebar-section">
                 <div class="sidebar-title">⭐ Command Center</div>
                 <div class="privacy-notice" style="margin: 0 0 12px 0; padding: 10px;">
-                    <strong>🔒 Privacy:</strong> Conversations are not stored. Each session is ephemeral.
+                    <strong>🔒 Privacy:</strong> Conversations and images are never stored. Each session is ephemeral.
                 </div>
             </div>
 
@@ -2199,7 +2196,8 @@
             </button>
 
             <button class="save-kb-button" id="saveToKbBtn" onclick="showSaveModal()" disabled>💾 Save to Knowledge Base</button>
-            <button class="image-studio-tab" onclick="openImageStudio()">🎨 Image Studio</button>
+            <button class="image-studio-tab" onclick="openImageStudio()" style="margin-top: 8px; margin-bottom: 8px;">🎨 Image Studio</button>
+            <a href="/command/ready-made-prompts" class="image-studio-tab" style="margin-bottom: 4px; text-decoration: none; text-align: center; display: block;">📋 Ready-Made Prompts</a>
 
             <div class="sidebar-section">
                 <div class="sidebar-title">Sample Prompts</div>
@@ -2250,12 +2248,11 @@
                 </div>
             </div>
 
-            <div class="sidebar-section">
-                <div class="sidebar-title">Get the Full Version</div>
-                <a href="https://offgridaitoolkit.com" target="_blank" class="tool-button" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%); color: #1a0f05; font-weight: 600; text-decoration: none; display: block; text-align: center;">
-                    🛒 Purchase USB Version<br>
-                    <span style="font-size: 11px; font-weight: 400;">100% Offline • Complete Privacy</span>
-                </a>
+            <div class="sidebar-section" style="margin-top: auto; padding-top: 12px;">
+                <div style="background: rgba(184, 134, 11, 0.08); border: 1px solid rgba(184, 134, 11, 0.15); border-radius: 10px; padding: 12px; text-align: center;">
+                    <div style="font-size: 12px; color: #b8860b; font-weight: 600; margin-bottom: 4px;">⭐ Premium Multi-Model AI</div>
+                    <div style="font-size: 11px; color: #9ca3af; line-height: 1.4;">4 frontier models • Peer-reviewed answers • Zero data retention</div>
+                </div>
             </div>
         </div>
 
@@ -2312,6 +2309,10 @@
                                     <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
                                         <span class="attach-menu-icon">📖</span>
                                         <span>Summarize Document</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="window.location.href='/command/ready-made-prompts'; closeAttachMenu();" style="border-top: 1px solid rgba(184, 134, 11, 0.15); padding-top: 10px;">
+                                        <span class="attach-menu-icon">📋</span>
+                                        <span>Ready-Made Prompts</span>
                                     </div>
                                 </div>
 
@@ -2463,6 +2464,10 @@
                     <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
                         <span class="attach-menu-icon">📖</span>
                         <span>Summarize Document</span>
+                    </div>
+                    <div class="attach-menu-item" onclick="window.location.href='/command/ready-made-prompts'; closeAttachMenu();" style="border-top: 1px solid rgba(184, 134, 11, 0.15); padding-top: 10px;">
+                        <span class="attach-menu-icon">📋</span>
+                        <span>Ready-Made Prompts</span>
                     </div>
                 </div>
 
@@ -4759,6 +4764,26 @@
                         location.reload();
                     }
                 }, { passive: true });
+            }
+
+            // Check for ready-made prompt from prompts page
+            const readyPrompt = sessionStorage.getItem('offgrid-ready-prompt');
+            if (readyPrompt) {
+                sessionStorage.removeItem('offgrid-ready-prompt');
+                setTimeout(() => {
+                    const welcomeInput = document.getElementById('messageInputWelcome');
+                    const chatInput = document.getElementById('messageInput');
+                    const welcome = document.getElementById('welcome');
+                    if (welcomeInput && welcome && welcome.style.display !== 'none') {
+                        welcomeInput.value = readyPrompt;
+                        welcomeInput.focus();
+                        autoResize(welcomeInput);
+                    } else if (chatInput) {
+                        chatInput.value = readyPrompt;
+                        chatInput.focus();
+                        autoResize(chatInput);
+                    }
+                }, 500);
             }
 
             console.log('OffGrid Command Center v2 - Ready!');
