@@ -3234,9 +3234,188 @@
                     if (done) break;
 
                     sseBuffer += decoder.decode(value, { stream: true });
-                    // Split on double-newline (SSE message boundary)
                     const sseMessages = sseBuffer.split('\n\n');
-                    // Keep the last (potentially incomplete) segment in the buffer
+                    sseBuffer = sseMessages.pop() || '';
+
+                    for (const sseMsg of sseMessages) {
+                        const lines = sseMsg.split('\n');
+                        for (const line of lines) {
+                            if (!line.startsWith('data: ')) continue;
+                            const data = line.slice(6).trim();
+                            if (!data || data === '[DONE]') continue;
+
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.content) {
+                                    fullResponse += parsed.content;
+                                    if (typeof marked !== 'undefined') {
+                                        streamingContent.innerHTML = marked.parse(fullResponse) + '<span class="streaming-cursor"></span>';
+                                    } else {
+                                        streamingContent.textContent = fullResponse;
+                                    }
+                                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                                }
+                                if (parsed.error) throw new Error(parsed.error);
+                            } catch (e) {
+                                if (e.message && !e.message.includes('JSON')) throw e;
+                            }
+                        }
+                    }
+                }
+
+                // Process any remaining data in the SSE buffer
+                if (sseBuffer.trim()) {
+                    const remainingLines = sseBuffer.split('\n');
+                    for (const line of remainingLines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const data = line.slice(6).trim();
+                        if (!data || data === '[DONE]') continue;
+                        try {
+                            const parsed = JSON.parse(data);
+                            if (parsed.content) fullResponse += parsed.content;
+                        } catch (e) { /* ignore parse errors in final buffer flush */ }
+                    }
+                }
+
+                if (typeof marked !== 'undefined') {
+                    streamingContent.innerHTML = marked.parse(fullResponse);
+                } else {
+                    streamingContent.textContent = fullResponse;
+                }
+
+                const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
+                const timeIndicator = document.createElement('div');
+                timeIndicator.className = 'response-time';
+                timeIndicator.innerHTML = `⚡ ${config.shortName} • ${responseTime}s`;
+                messageDiv.querySelector('.message-content').appendChild(timeIndicator);
+
+                // Add "Create Visual" button for single-model responses
+                const singleVisualBtn = document.createElement('button');
+                singleVisualBtn.className = 'create-visual-btn';
+                singleVisualBtn.innerHTML = '\ud83c\udfa8 Create Visual';
+                const capturedSingleResponse = fullResponse;
+                singleVisualBtn.onclick = () => createVisualFromResponse(capturedSingleResponse, singleVisualBtn);
+                messageDiv.querySelector('.message-content').appendChild(singleVisualBtn);
+
+                conversationHistory.push({ role: 'assistant', content: fullResponse });
+
+                // Enable Save to KB button
+                const saveBtn = document.getElementById('saveToKbBtn');
+                if (saveBtn) saveBtn.disabled = false;
+
+            } catch (error) {
+                console.error('Stream error:', error);
+                streamingContent.innerHTML = `<span style="color: #ef4444;">Error: ${error.message}</span>`;
+            } finally {
+                streamingContent.removeAttribute('id');
+                isTyping = false;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('messageInput').focus();
+            }
+        }
+
+        // ============================================
+        // COMMAND (COUNCIL) MODE
+        // ============================================
+
+        async function sendCommandMessage(userMessage, imageToSend, requestStartTime) {
+            const messagesDiv = document.getElementById('messages');
+
+            councilScores = null;
+            chairmanKey = null;
+            chairmanName = null;
+            chairmanEmoji = null;
+            lastCouncilDeliberation = null;
+            lastCouncilLabelMap = null;
+
+            const progressDiv = document.createElement('div');
+            progressDiv.className = 'council-progress';
+            progressDiv.id = 'councilProgress';
+            progressDiv.innerHTML = `
+                <div class="council-progress-title">⭐ Command Council Deliberating...</div>
+                <div class="council-step active" id="step-scout">
+                    <div class="council-step-icon">🔭</div>
+                    <span>Scout (GPT 5.2) analyzing...</span>
+                </div>
+                <div class="council-step" id="step-medic">
+                    <div class="council-step-icon">🏥</div>
+                    <span>Medic (Claude Sonnet 4.6) analyzing...</span>
+                </div>
+                <div class="council-step" id="step-navigator">
+                    <div class="council-step-icon">🧭</div>
+                    <span>Navigator (Gemini 3.1 Pro) analyzing...</span>
+                </div>
+                <div class="council-step" id="step-ranger">
+                    <div class="council-step-icon">🏕️</div>
+                    <span>Ranger (Grok 4.1 Fast) analyzing...</span>
+                </div>
+                <div class="council-step" id="step-review">
+                    <div class="council-step-icon">🤝</div>
+                    <span>Anonymous peer review...</span>
+                </div>
+                <div class="council-step" id="step-chairman">
+                    <div class="council-step-icon">🏆</div>
+                    <span>Selecting Chairman...</span>
+                </div>
+                <div class="council-step" id="step-synthesis">
+                    <div class="council-step-icon">⭐</div>
+                    <span>Synthesizing from Chairman + advisors...</span>
+                </div>
+            `;
+            messagesDiv.appendChild(progressDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            setTimeout(() => {
+                document.getElementById('step-medic')?.classList.add('active');
+                document.getElementById('step-navigator')?.classList.add('active');
+                document.getElementById('step-ranger')?.classList.add('active');
+            }, 500);
+
+            try {
+                const messages = conversationHistory.map(msg => ({
+                    role: msg.role,
+                    content: msg.content,
+                    image: msg.image
+                }));
+
+                const response = await fetch(`${API_BASE}/api/command/council`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: messages })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullResponse = '';
+                let synthesisStarted = false;
+
+                // SSE buffer to handle chunks split across TCP packets
+                let sseBuffer = '';
+
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant';
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                messageDiv.innerHTML = `
+                    <div class="message-avatar" style="background: #daa520; color: white;">AI</div>
+                    <div class="message-content">
+                        <div class="model-indicator command">⭐ Command Council</div>
+                        <div class="message-text markdown-content" id="councilStreamingContent"></div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    sseBuffer += decoder.decode(value, { stream: true });
+                    const sseMessages = sseBuffer.split('\n\n');
                     sseBuffer = sseMessages.pop() || '';
 
                     for (const sseMsg of sseMessages) {
@@ -3403,7 +3582,6 @@
                         } catch (e) { /* ignore parse errors in final buffer flush */ }
                     }
                 }
-
 
                 // Finalize
                 const el = document.getElementById('councilStreamingContent');
