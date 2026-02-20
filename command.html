@@ -1895,6 +1895,14 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+            50% { box-shadow: 0 0 0 8px rgba(168, 85, 247, 0.3); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
 
         /* Category Chips */
         .studio-categories {
@@ -1937,7 +1945,7 @@
             font-weight: 700;
         }
 
-        /* Example Prompts */
+        /* Example Prompt Cards — Horizontal Scroll */
         .example-prompts-section {
             margin-bottom: 16px;
         }
@@ -1949,30 +1957,153 @@
             letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
-        .example-chips {
+        .example-cards-scroll {
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: #d1d5db transparent;
         }
-        .example-chip {
-            padding: 6px 11px;
-            background: #f0fdf4;
-            border: 1.5px solid #bbf7d0;
-            border-radius: 20px;
-            font-size: 11px;
-            color: #166534;
+        .example-cards-scroll::-webkit-scrollbar {
+            height: 5px;
+        }
+        .example-cards-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .example-cards-scroll::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 10px;
+        }
+        .example-card {
+            flex: 0 0 180px;
+            padding: 12px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s;
-            line-height: 1.3;
-            font-weight: 500;
+            line-height: 1.4;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
-        .example-chip:hover {
-            background: #dcfce7;
+        .example-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        /* Try It cards — green theme */
+        .example-card.try-it {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+        }
+        .example-card.try-it:hover {
             border-color: #22c55e;
-            color: #15803d;
-            transform: translateY(-1px);
+            background: #dcfce7;
+        }
+        .example-card.try-it .card-badge {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        /* Create Instantly cards — gold/amber theme */
+        .example-card.create-instant {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1.5px solid #fcd34d;
+        }
+        .example-card.create-instant:hover {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+        .example-card.create-instant .card-badge {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            border: none;
+        }
+        .card-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+        .card-emoji {
+            font-size: 22px;
+            line-height: 1;
+        }
+        .card-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.3;
+        }
+        .card-desc {
+            font-size: 10px;
+            color: #6b7280;
+            line-height: 1.3;
         }
 
+        /* First-Run Tooltips */
+        .studio-tooltip {
+            position: absolute;
+            background: #1f2937;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            line-height: 1.4;
+            max-width: 240px;
+            z-index: 10001;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            animation: fadeIn 0.3s ease;
+            pointer-events: auto;
+        }
+        .studio-tooltip::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+        }
+        .studio-tooltip.arrow-down::after {
+            border-top-color: #1f2937;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .studio-tooltip.arrow-up::after {
+            border-bottom-color: #1f2937;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .studio-tooltip .tooltip-step {
+            display: inline-block;
+            background: #a855f7;
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 18px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-right: 6px;
+        }
+        .studio-tooltip .tooltip-dismiss {
+            display: block;
+            margin-top: 8px;
+            font-size: 10px;
+            color: #9ca3af;
+            cursor: pointer;
+        }
+        .studio-tooltip .tooltip-dismiss:hover {
+            color: white;
+        }
         /* AI Suggestion Bubble */
         .ai-suggestion {
             background: linear-gradient(135deg, #faf5ff 0%, #f0e6ff 100%);
@@ -3724,15 +3855,19 @@
 
             conversationHistory.forEach((msg, index) => {
                 if (msg.role === 'user') {
-                    content += `## \ud83d\udc64 User\n\n`;
-                    content += `${msg.content}\n\n`;
-                    if (msg.image) {
-                        // Replace base64 user image with relative file path
-                        if (imageFilenames && imageIndex < imageFilenames.length) {
-                            content += `![Uploaded Image](./${imageFilenames[imageIndex]})\n\n`;
-                            imageIndex++;
-                        } else {
-                            content += `![Uploaded Image](${msg.image})\n\n`;
+                    // Skip Image Studio prompt messages from KB save — they are internal plumbing
+                    const isImageStudioPrompt = msg.content && msg.content.startsWith('[Image Studio]');
+                    if (!isImageStudioPrompt) {
+                        content += `## \ud83d\udc64 User\n\n`;
+                        content += `${msg.content}\n\n`;
+                        if (msg.image) {
+                            // Replace base64 user image with relative file path
+                            if (imageFilenames && imageIndex < imageFilenames.length) {
+                                content += `![Uploaded Image](./${imageFilenames[imageIndex]})\n\n`;
+                                imageIndex++;
+                            } else {
+                                content += `![Uploaded Image](${msg.image})\n\n`;
+                            }
                         }
                     }
                 } else if (msg.role === 'assistant') {
@@ -4155,20 +4290,16 @@
                     </div>
 
                     <div class="example-prompts-section">
-                        <div class="example-prompts-label">\u2728 Try an example \u2014 see what's possible</div>
-                        <div class="example-chips">
-                            <span class="example-chip" onclick="fillStudioExample(this, 'homestead')">\ud83d\udc14 Detailed diagram of an off-grid chicken coop with multiple angles, measurements, and building materials list</span>
-                            <span class="example-chip" onclick="fillStudioExample(this, 'survival')">\u2600\ufe0f Technical diagram of a solar panel wiring system for a 12V battery bank, clean engineering illustration style with labels</span>
-                            <span class="example-chip" onclick="fillStudioExample(this, 'survival')">\ud83d\udca7 Step-by-step infographic showing 5 methods to purify water in an emergency situation</span>
-                            <span class="example-chip" onclick="fillStudioExample(this, 'medical')">\ud83e\ude79 Visual guide for basic wound care and bandaging techniques in a field setting</span>
-                            <span class="example-chip" onclick="fillStudioExample(this, 'wilderness')">\ud83c\udf3f Identification chart of common edible wild plants in North America with labeled features</span>
-                        </div>
+                        <div class="example-prompts-label">\u2728 Explore examples \u2014 scroll to see more</div>
+                        <div class="example-cards-scroll" id="exampleCardsScroll"></div>
                     </div>
 
-                    <label for="studioDescription">Describe what you need</label>
-                    <textarea id="studioDescription" placeholder="Just describe it naturally \u2014 e.g., 'a diagram showing how to build a simple water filter' or 'an infographic about edible plants in the Pacific Northwest'"></textarea>
+                    <div style="position: relative;">
+                        <label for="studioDescription" id="studioDescLabel">Describe what you need</label>
+                        <textarea id="studioDescription" placeholder="Just describe it naturally \u2014 e.g., 'a diagram showing how to build a simple water filter' or 'an infographic about edible plants in the Pacific Northwest'"></textarea>
+                    </div>
 
-                    <div class="image-studio-actions">
+                    <div class="image-studio-actions" style="position: relative;">
                         <button class="studio-cancel-btn" onclick="closeImageStudio()">Cancel</button>
                         <button class="studio-generate-btn" id="studioCraftBtn" onclick="craftImagePrompt()">\u2728 Craft My Prompt</button>
                     </div>
@@ -4193,6 +4324,10 @@
                 if (e.target === overlay) closeImageStudio();
             });
 
+            // Render the example cards and show first-run tooltips
+            renderExampleCards();
+            showStudioTooltips();
+
             setTimeout(() => {
                 const descInput = document.getElementById('studioDescription');
                 if (descInput) descInput.focus();
@@ -4206,25 +4341,243 @@
             studioSelectedCategory = chip.dataset.cat;
         }
 
+        // ============================================
+        // EXAMPLE PROMPT CARDS DATA
+        // ============================================
+
+        const STUDIO_EXAMPLE_CARDS = [
+            // CREATE INSTANTLY cards (8) — hardcoded proven prompts
+            {
+                type: 'create-instant',
+                emoji: '\ud83d\udc14',
+                title: 'Chicken Coop Blueprint',
+                desc: 'Multi-angle technical illustration with materials list',
+                category: 'homestead',
+                craftedPrompt: 'Detailed, labeled technical diagram of an off-grid chicken coop shown from multiple angles including front, side, and top views. Include precise measurements in feet and inches for each section: frame, nesting boxes, roosting bars, ventilation, door, and run area. Annotate building materials list with types of wood, wire mesh, fasteners, roofing, and paint. Use warm, earthy color palette with natural wood tones and soft greens. Background is clean off-white for clarity. Include clear, easy-to-read educational labels and callouts highlighting structural features and functional elements. Style is professional, hand-drawn architectural illustration with neat line work and balanced layout for practical homesteading reference.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\ud83c\udf3f',
+                title: 'Edible Wild Plants Guide',
+                desc: 'Identification chart with labeled features and safety notes',
+                category: 'wilderness',
+                craftedPrompt: 'Comprehensive identification chart of common edible wild plants of North America. Include at least 6 plants: Dandelion, Wild Asparagus, Common Plantain, Stinging Nettle, Wood Sorrel, and Purslane. For each plant show a detailed botanical illustration with labeled features, common name, Latin name, edible parts, usage notes, and caution warnings. Use a clean, educational field-guide style with warm earthy tones and natural colors. Include a key for subspecies and species abbreviations. Add a safety disclaimer at the bottom: Ensure Positive ID Before Consuming. When in Doubt, Do Not Eat. Professional botanical illustration style with clear labels and organized grid layout.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\ud83e\udded',
+                title: 'Shadow-Stick Navigation',
+                desc: 'Step-by-step guide to finding North using the sun',
+                category: 'survival',
+                craftedPrompt: 'Step-by-step illustrated field guide showing the shadow-stick method for finding North using the sun\'s shadow. Show materials needed (vertical stick, two markers, sunny sky, level ground), then illustrate each step: plant the stick, mark initial shadow tip as Point A, wait 15-30 minutes, mark new shadow tip as Point B, draw the East-West line connecting A to B, determine North-South perpendicular line. Include diagrams for both Northern and Southern hemisphere orientation. Add accuracy tips: wait longer for better results, use on clear days, use level ground only. Use warm earthy tones with clear numbered steps, directional arrows, and educational callouts. Professional field reference style with balanced layout.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\ud83e\udeb2',
+                title: 'Edible Insects for Survival',
+                desc: 'Identification and preparation guide for safe protein',
+                category: 'survival',
+                craftedPrompt: 'Comprehensive illustrated field guide showing safe edible insects for survival nutrition and sustainable protein sourcing. Include sections for: Orthoptera (grasshoppers, crickets, locusts), Beetle Larvae (grubs), Termites, Ants (larvae/pupae/adults), Cicadas, Aquatic Nymphs (mayfly, dragonfly, stonefly), and Bee/Wasp Brood. For each insect group show detailed illustrations, habitat locations, collection methods, preparation instructions (cook thoroughly), and safety warnings. Include an Insects to Avoid checklist with red flags: bright colors, hairy caterpillars, chemical odor, pesticide zones, toxic beetles. Add health cautions about shellfish allergies, uncooked risks, and starting small. Use warm earthy vintage field guide style with organized grid layout and clear educational labels.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\ud83d\udee0\ufe0f',
+                title: 'Overlander Repair Tool Kit',
+                desc: 'Top 15 essential field repair tools with descriptions',
+                category: 'adventure',
+                craftedPrompt: 'Detailed illustrated reference poster showing the Top 15 Essential Overlander Field Repair Tools. Include two columns of essential tools and kits (1-8 and 9-15): 3/8 drive socket set with extensions, breaker bar, combination wrench set, multi-bit screwdriver, needle-nose pliers, water-pump pliers, locking pliers (vise-grips), adjustable wrench, metric and SAE hex key set, tire plug kit with valve core tool, 12V air compressor with tire gauge, jack with base plate and lug tool, electrical repair kit, wire stripper/crimper combo, multimeter/test light. Add sections for Consumables and Repair Supplies (zip ties, duct tape, electrical tape, hose clamps, epoxy/RTV silicone) and Optional High-Value Extras (jump starter pack, headlamp, mechanic gloves). Use vintage adventure map style with warm earthy tones, detailed tool illustrations, and organized professional layout.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\u2600\ufe0f',
+                title: 'Solar Panel Wiring Diagram',
+                desc: 'Complete 12V battery bank system with engineering labels',
+                category: 'survival',
+                craftedPrompt: 'Technical engineering diagram of a complete off-grid solar panel wiring system for a 12V battery bank. Show solar panels connected in parallel and series configurations, charge controller wiring, battery bank connections, fuse box, inverter, and load distribution panel. Include wire gauge specifications, fuse ratings, and voltage/amperage labels at each connection point. Use clean engineering illustration style with color-coded wires (red positive, black negative, green ground). Include a component list with specifications. Background is clean white/light gray. Professional technical drawing style with neat line work, clear labels, and organized layout suitable for field reference.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\ud83c\udfe1',
+                title: 'Raised Garden Bed Plans',
+                desc: 'Construction diagram with planting zones and materials',
+                category: 'homestead',
+                craftedPrompt: 'Detailed technical illustration of a raised garden bed construction plan for off-grid homesteading. Show multiple views: exploded assembly diagram, top-down planting zone layout, and cross-section with soil layers. Include precise measurements for a 4x8 foot bed with 12-inch depth. Label all materials: cedar or untreated lumber dimensions, galvanized screws, landscape fabric, gravel drainage layer, soil mix ratios. Include companion planting zones with suggested vegetables for each section. Use warm earthy color palette with natural wood tones and garden greens. Professional hand-drawn architectural illustration style with clear annotations and balanced layout for practical reference.'
+            },
+            {
+                type: 'create-instant',
+                emoji: '\ud83d\udca7',
+                title: 'Water Purification Methods',
+                desc: 'Step-by-step infographic of 5 emergency techniques',
+                category: 'survival',
+                craftedPrompt: 'Step-by-step infographic illustrating 5 methods to purify water in an emergency survival situation. Include: 1) Boiling (rolling boil for 1 minute, 3 minutes at altitude), 2) Solar disinfection (SODIS method with clear bottles), 3) DIY charcoal/sand filter (layered construction diagram), 4) Chemical treatment (iodine and chlorine tablet dosing), 5) UV light purification (SteriPEN-style device usage). For each method show materials needed, step-by-step process, effectiveness rating, and time required. Include safety warnings and limitations for each method. Use clean educational infographic style with warm earthy tones, numbered steps, clear icons, and organized vertical layout. Professional field reference quality.'
+            },
+            // TRY IT cards (4) — simple descriptions for the craft workflow
+            {
+                type: 'try-it',
+                emoji: '\ud83e\ude79',
+                title: 'Wound Care Field Guide',
+                desc: 'Basic bandaging techniques for emergencies',
+                category: 'medical',
+                simplePrompt: 'Visual guide for basic wound care and bandaging techniques in a field setting'
+            },
+            {
+                type: 'try-it',
+                emoji: '\ud83c\udf32',
+                title: 'Emergency Shelter Designs',
+                desc: 'Wilderness shelter types and construction',
+                category: 'survival',
+                simplePrompt: 'Illustrated guide showing 4 types of emergency wilderness shelters with construction steps and materials needed'
+            },
+            {
+                type: 'try-it',
+                emoji: '\ud83d\udd25',
+                title: 'Fire Starting Methods',
+                desc: 'Multiple techniques for starting fire without matches',
+                category: 'survival',
+                simplePrompt: 'Step-by-step visual guide showing 5 methods to start a fire without matches in a survival situation'
+            },
+            {
+                type: 'try-it',
+                emoji: '\ud83e\uddf0',
+                title: 'Rainwater Collection System',
+                desc: 'Design diagram for off-grid water harvesting',
+                category: 'homestead',
+                simplePrompt: 'Technical diagram of a rainwater collection and filtration system for an off-grid cabin'
+            }
+        ];
+
+        function renderExampleCards() {
+            const container = document.getElementById('exampleCardsScroll');
+            if (!container) return;
+
+            container.innerHTML = STUDIO_EXAMPLE_CARDS.map((card, i) => `
+                <div class="example-card ${card.type === 'create-instant' ? 'create-instant' : 'try-it'}" onclick="handleExampleCard(${i})">
+                    <span class="card-badge">${card.type === 'create-instant' ? '\u26a1 Create Instantly' : '\ud83e\uddea Try It'}</span>
+                    <span class="card-emoji">${card.emoji}</span>
+                    <span class="card-title">${card.title}</span>
+                    <span class="card-desc">${card.desc}</span>
+                </div>
+            `).join('');
+        }
+
+        function handleExampleCard(index) {
+            const card = STUDIO_EXAMPLE_CARDS[index];
+            if (!card) return;
+
+            // Auto-select the matching category
+            if (card.category) {
+                const catChip = document.querySelector(`.category-chip[data-cat="${card.category}"]`);
+                if (catChip) selectStudioCategory(catChip);
+            }
+
+            // Dismiss tooltips on first interaction
+            dismissStudioTooltips();
+
+            if (card.type === 'create-instant' && card.craftedPrompt) {
+                // CREATE INSTANTLY: Skip the craft step, go straight to generation
+                studioCraftedPrompt = card.craftedPrompt;
+
+                // Fill the description field with the simple title for context
+                const textarea = document.getElementById('studioDescription');
+                if (textarea) textarea.value = card.title + ' \u2014 ' + card.desc;
+
+                // Show the crafted prompt in the AI suggestion area and auto-generate
+                const suggestionDiv = document.getElementById('studioAiSuggestion');
+                suggestionDiv.innerHTML = `
+                    <div class="ai-suggestion">
+                        <div class="ai-suggestion-header">
+                            <div class="ai-suggestion-avatar">\ud83c\udfa8</div>
+                            <div class="ai-suggestion-label">OffGrid AI suggests:</div>
+                        </div>
+                        <div class="ai-suggestion-text" id="craftedPromptText">${escapeHtml(card.craftedPrompt)}</div>
+                        <div class="ai-suggestion-actions">
+                            <button class="ai-suggestion-btn primary" id="generateCraftedBtn" onclick="generateFromCraftedPrompt()">\ud83c\udfa8 Generate This Image</button>
+                            <button class="ai-suggestion-btn secondary" onclick="editCraftedPrompt()">\u270f\ufe0f Edit Prompt</button>
+                            <button class="ai-suggestion-btn secondary" onclick="retryCraftPrompt()">\ud83d\udd04 Try Again</button>
+                        </div>
+                        <div id="editPromptArea" style="display: none; margin-top: 12px;">
+                            <textarea class="edit-prompt-area" id="editablePrompt">${escapeHtml(card.craftedPrompt)}</textarea>
+                            <button class="ai-suggestion-btn primary" style="margin-top: 6px;" onclick="generateFromEditedPrompt()">\ud83c\udfa8 Generate Edited Prompt</button>
+                        </div>
+                    </div>
+                `;
+
+                // Scroll the suggestion into view
+                setTimeout(() => suggestionDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+
+            } else if (card.simplePrompt) {
+                // TRY IT: Fill the description and let user click Craft My Prompt
+                const textarea = document.getElementById('studioDescription');
+                if (textarea) {
+                    textarea.value = card.simplePrompt;
+                    textarea.focus();
+                    // Pulse the Craft button to draw attention
+                    const craftBtn = document.getElementById('studioCraftBtn');
+                    if (craftBtn) {
+                        craftBtn.style.animation = 'none';
+                        craftBtn.offsetHeight; // trigger reflow
+                        craftBtn.style.animation = 'pulse-glow 1.5s ease 2';
+                    }
+                }
+            }
+        }
+
+        // ============================================
+        // FIRST-RUN GUIDED TOOLTIPS
+        // ============================================
+
+        function showStudioTooltips() {
+            // Only show on first visit
+            if (localStorage.getItem('studioTooltipsSeen')) return;
+
+            setTimeout(() => {
+                const modal = document.querySelector('.image-studio-modal');
+                if (!modal) return;
+
+                // Tooltip 1: On the example cards
+                const cardsSection = document.getElementById('exampleCardsScroll');
+                if (cardsSection) {
+                    const tip1 = document.createElement('div');
+                    tip1.className = 'studio-tooltip arrow-up';
+                    tip1.id = 'studioTip1';
+                    tip1.innerHTML = `<span class="tooltip-step">1</span> <strong>Pick an example</strong> to get started, or describe your own idea below. Gold cards generate instantly!<span class="tooltip-dismiss" onclick="dismissStudioTooltips()">Got it</span>`;
+                    tip1.style.cssText = 'position: relative; margin: 4px 0 8px 0; display: inline-block;';
+                    cardsSection.parentNode.insertBefore(tip1, cardsSection.nextSibling);
+                }
+
+                // Tooltip 2: On the Craft button
+                const craftBtn = document.getElementById('studioCraftBtn');
+                if (craftBtn) {
+                    const tip2 = document.createElement('div');
+                    tip2.className = 'studio-tooltip arrow-down';
+                    tip2.id = 'studioTip2';
+                    tip2.innerHTML = `<span class="tooltip-step">2</span> <strong>Craft My Prompt</strong> \u2014 our AI transforms your simple idea into a detailed, optimized image prompt.`;
+                    tip2.style.cssText = 'position: relative; margin: 0 0 8px 0; display: inline-block;';
+                    craftBtn.parentNode.insertBefore(tip2, craftBtn.parentNode.firstChild);
+                }
+            }, 400);
+        }
+
+        function dismissStudioTooltips() {
+            localStorage.setItem('studioTooltipsSeen', 'true');
+            const tip1 = document.getElementById('studioTip1');
+            const tip2 = document.getElementById('studioTip2');
+            if (tip1) { tip1.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => tip1.remove(), 300); }
+            if (tip2) { tip2.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => tip2.remove(), 300); }
+        }
+
         function fillStudioExample(chip, category) {
-            // Get the text without the emoji prefix
+            // Legacy function kept for backwards compatibility
             let text = chip.textContent.trim();
-            // Remove leading emoji (first 2-3 chars including space)
             text = text.replace(/^[\u{1F000}-\u{1FFFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}]\s*/u, '');
-            
-            // Fill the description textarea
             const textarea = document.getElementById('studioDescription');
             if (textarea) {
                 textarea.value = text;
                 textarea.focus();
             }
-            
-            // Auto-select the matching category chip
             if (category) {
                 const catChip = document.querySelector(`.category-chip[data-cat="${category}"]`);
-                if (catChip) {
-                    selectStudioCategory(catChip);
-                }
+                if (catChip) selectStudioCategory(catChip);
             }
         }
 
