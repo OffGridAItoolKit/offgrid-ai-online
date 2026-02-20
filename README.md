@@ -1,216 +1,106 @@
-# OffGrid AI ToolKit Online
+# OffGrid AI ToolKit Online - Technical Overview
 
-**Cloud-Powered Gemma 3 AI Assistant** - The online demonstration version of OffGrid AI ToolKit.
+**Version 5.1.0** | **Last Updated:** 2026-02-20
 
-## Overview
+This document provides a comprehensive technical overview of the OffGrid AI ToolKit Online platform, including the free Online ToolKit and the premium Command Center. It is intended for developers, administrators, and technical staff.
 
-This is the online version of OffGrid AI ToolKit, designed to showcase the power of Gemma 3 models with cloud-based inference. Users can experience the same AI models available in the offline USB version, but with significantly faster response times thanks to cloud infrastructure.
+---
 
-## Features
+## 1. System Architecture
 
-| Feature | Description |
-|---------|-------------|
-| **Gemma 3 Models** | Access to Gemma 3 4B, 12B, 27B, and MedGemma 3 4B |
-| **Multimodal Support** | Image upload and analysis capabilities |
-| **Fast Responses** | Cloud-powered inference for 1-5 second response times |
-| **Privacy First** | No conversation storage - sessions are ephemeral |
-| **Mobile Responsive** | Works on desktop, tablet, and mobile devices |
-| **Purchase CTA** | Prominent call-to-action for the offline USB version |
+The platform is built on a simple and robust technical stack, prioritizing maintainability, security, and privacy.
 
-## Technical Stack
+**Frontend**: Vanilla HTML, CSS, and JavaScript. The frontend is a single-page application for the free toolkit and a separate one for the Command Center. No complex build step is required, allowing for simple static file serving.
 
-The application uses a simple, maintainable architecture:
+**Backend**: A Node.js server using the Express framework. The backend serves three primary functions:
+1.  **Static File Server**: Serves the HTML, CSS, and JS files for the frontend.
+2.  **Secure API Proxy**: All communication with external AI model providers (like OpenRouter) is proxied through the backend. This keeps all API keys and sensitive credentials on the server, never exposing them to the client.
+3.  **Business Logic**: Implements application-specific features such as the AI Council, PDF export, and health checks.
 
-**Backend**: Node.js with Express serves as a secure proxy between the frontend and OpenRouter API. This keeps the API key secure on the server side and handles rate limiting, CORS, and request validation.
+**External Services**:
+*   **OpenRouter**: Provides a unified API to access a wide range of large language models (LLMs), including Google's Gemma 3, OpenAI's GPT models, Anthropic's Claude, and more.
+*   **Better Stack**: Used for privacy-safe operational logging and monitoring. Captures application events for troubleshooting without storing any user data or prompts.
 
-**Frontend**: Vanilla HTML, CSS, and JavaScript adapted from the original Electron-based offline version. No build step required - files can be served directly from any static file server.
+## 2. Core Features
 
-**API Integration**: OpenRouter provides unified access to all Gemma 3 models through a single API interface.
+The platform is divided into two main products: the free Online ToolKit and the premium Command Center.
 
-## Project Structure
+### 2.1. Online ToolKit (Free)
 
-```
-offgrid-ai-online/
-├── package.json          # Node.js dependencies and scripts
-├── .env                  # Environment variables (API key, etc.)
-├── .env.example          # Template for environment variables
-├── README.md             # This documentation
-├── server/
-│   └── index.js          # Express server with OpenRouter proxy
-└── public/
-    ├── index.html        # Main application HTML
-    ├── offgridai.css     # Styling (from offline version)
-    └── [assets]          # Logo images and icons
-```
+The free toolkit provides a demonstration of the core OffGrid AI experience using the same Gemma 3 models found in the offline USB product.
 
-## Setup Instructions
+*   **Gemma 3 Models**: Access to `gemma-3-4b`, `gemma-3-12b`, and `gemma-3-27b`.
+*   **Multimodal Input**: Supports image uploads for visual analysis.
+*   **Ephemeral Conversations**: All chat sessions are processed in memory and are not stored, ensuring user privacy.
+*   **Save to Knowledge Base**: Users can save conversations as local Markdown (`.md`) files.
+*   **PDF Export**: Conversations can be exported as styled PDF documents.
 
-### Prerequisites
+### 2.2. Command Center (Premium)
 
-Before deploying, ensure you have:
+The Command Center is the premium offering, providing access to advanced features and a council of powerful AI models.
 
-1. Node.js 18+ installed
-2. An OpenRouter API key (get one at https://openrouter.ai/keys)
-3. A hosting environment that supports Node.js (cPanel with Node.js, VPS, etc.)
+*   **AI Council**: A multi-model system where four specialist AIs work in parallel to answer a user's query. The council consists of:
+    *   **Scout (GPT-5.2)**: Vision and image analysis specialist.
+    *   **Medic (Claude 4.5 Sonnet)**: Safety, analysis, and medical specialist.
+    *   **Navigator (Gemini 2.5 Pro)**: Research, planning, and web-browsing specialist.
+    *   **Ranger (Grok 4.1)**: Creative solutions and unconventional thinking.
+*   **Command Mode**: A synthesis mode where the AI Council's responses are reviewed by a "Chairman" AI, which then provides a final, synthesized answer.
+*   **Image Studio**: An AI-assisted image generation tool using Nano Banana Pro (Gemini 3 Pro Image Preview) with features like prompt crafting and visual prompt generation from conversations.
+*   **Ready-Made Prompts**: A library of pre-built prompts for common survival, homesteading, and off-grid scenarios.
 
-### Local Development
+## 3. API Endpoints
 
-1. Clone or download the project files
-2. Copy `.env.example` to `.env` and add your OpenRouter API key:
-   ```
-   OPENROUTER_API_KEY=sk-or-v1-your-key-here
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Start the server:
-   ```bash
-   npm start
-   ```
-5. Open http://localhost:3000 in your browser
+The backend exposes a set of API endpoints for the frontend to consume. All endpoints are prefixed with `/api`.
 
-### Production Deployment
-
-#### Option 1: cPanel with Node.js
-
-1. Upload all project files to your hosting directory
-2. Create a `.env` file with your production settings
-3. In cPanel, go to "Setup Node.js App"
-4. Create a new application pointing to your project directory
-5. Set the startup file to `server/index.js`
-6. Install dependencies and start the application
-
-#### Option 2: VPS/Cloud Server
-
-1. Upload files to your server
-2. Install Node.js if not already installed
-3. Create `.env` with production settings:
-   ```
-   OPENROUTER_API_KEY=your_key
-   PORT=3000
-   NODE_ENV=production
-   ALLOWED_ORIGINS=https://offgridtoolkit.ai
-   ```
-4. Install dependencies: `npm install`
-5. Use PM2 for process management:
-   ```bash
-   npm install -g pm2
-   pm2 start server/index.js --name offgrid-ai-online
-   pm2 save
-   ```
-6. Configure your reverse proxy (nginx/Apache) to forward requests to port 3000
-
-## API Endpoints
+### 3.1. Public Endpoints
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/health` | GET | Health check - returns server status |
-| `/api/models` | GET | Returns available Gemma 3 models |
-| `/api/chat` | POST | Main chat endpoint - sends messages to AI |
-| `/api/stream` | POST | Streaming chat endpoint for real-time responses |
+|---|---|---|
+| `/api/health` | GET | General health check for the server. |
+| `/api/models` | GET | Returns the list of available Gemma 3 models for the free toolkit. |
+| `/api/chat` | POST | Main chat endpoint for the free toolkit. |
+| `/api/stream` | POST | Streaming chat endpoint for the free toolkit. |
+| `/api/export-pdf` | POST | Converts a Markdown conversation to a PDF. |
 
-### Chat Request Format
+### 3.2. Command Center Endpoints
 
-```json
-{
-  "model": "gemma-3-4b",
-  "messages": [
-    {
-      "role": "user",
-      "content": "Hello, what is OffGrid AI?",
-      "image": "data:image/jpeg;base64,..." // Optional
-    }
-  ]
-}
-```
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/command/models` | GET | Returns the list of available Command Center models. |
+| `/api/command/stream` | POST | Streaming chat endpoint for the Command Center models. |
+| `/api/command/council` | POST | Initiates a parallel request to the AI Council. |
+| `/api/command/generate-image` | POST | Generates an image from a text prompt. |
+| `/api/command/craft-prompt` | POST | Generates an optimized image prompt from a user query. |
+| `/api/command/image-summary` | POST | Generates a text summary of an image. |
+| `/api/command/visual-prompt` | POST | Generates an image prompt from a conversation. |
+| `/api/health/image-gen` | GET | Health check for the image generation service. |
 
-### Chat Response Format
+## 4. Environment Variables
 
-```json
-{
-  "response": "OffGrid AI ToolKit is...",
-  "model": "Gemma 3 4B",
-  "modelId": "google/gemma-3-4b-it",
-  "responseTime": 1234,
-  "usage": { "prompt_tokens": 10, "completion_tokens": 50 }
-}
-```
+The application is configured using environment variables. A `.env.example` file is provided as a template.
 
-## Available Models
+| Variable | Required | Description |
+|---|---|---|
+| `OPENROUTER_API_KEY` | Yes | Your API key for OpenRouter. |
+| `BETTERSTACK_SOURCE_TOKEN` | No | Your source token for Better Stack logging. |
+| `PORT` | No | The port for the server to run on (default: 3000). |
+| `NODE_ENV` | No | The environment mode (e.g., `production`). |
+| `ALLOWED_ORIGINS` | No | A comma-separated list of allowed origins for CORS. |
+| `RATE_LIMIT_WINDOW_MS` | No | The window for rate limiting in milliseconds (default: 60000). |
+| `RATE_LIMIT_MAX_REQUESTS` | No | The maximum number of requests per window (default: 30). |
 
-| Model Key | OpenRouter ID | Description |
-|-----------|---------------|-------------|
-| `gemma-3-4b` | google/gemma-3-4b-it | Fastest, great for quick questions |
-| `gemma-3-12b` | google/gemma-3-12b-it | Balanced performance |
-| `gemma-3-27b` | google/gemma-3-27b-it | Maximum intelligence |
-| `medgemma-3-4b` | google/medgemma-4b-it | Medical/healthcare specialist |
+## 5. Deployment
 
-## Environment Variables
+The application is deployed on Render, a cloud platform that supports Node.js applications. The deployment is configured to be continuous, meaning that any push to the `main` branch of the GitHub repository will automatically trigger a new deployment.
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `OPENROUTER_API_KEY` | Yes | - | Your OpenRouter API key |
-| `PORT` | No | 3000 | Server port |
-| `NODE_ENV` | No | development | Environment mode |
-| `ALLOWED_ORIGINS` | No | localhost | CORS allowed origins |
-| `RATE_LIMIT_WINDOW_MS` | No | 60000 | Rate limit window (ms) |
-| `RATE_LIMIT_MAX_REQUESTS` | No | 30 | Max requests per window |
+## 6. Monitoring & Troubleshooting
 
-## Security Considerations
+Operational monitoring and troubleshooting are handled through a combination of health checks and external logging.
 
-The application implements several security measures:
+*   **Health Checks**: The `/api/health` and `/api/health/image-gen` endpoints provide real-time status of the server and its key services.
+*   **Better Stack Logging**: All significant application events are logged to Better Stack. This provides a centralized and searchable log of operational data without compromising user privacy. See the **Operations & Troubleshooting Manual** for more details.
+*   **Health Check Script**: A shell script (`scripts/health-check.sh`) is available for manual or automated testing of the image generation service.
 
-**API Key Protection**: The OpenRouter API key is stored server-side and never exposed to the frontend. All API calls are proxied through the backend.
+---
 
-**Rate Limiting**: Built-in rate limiting prevents abuse (default: 30 requests per minute per IP).
-
-**Input Validation**: All user inputs are validated before being sent to the API.
-
-**CORS Configuration**: In production, configure `ALLOWED_ORIGINS` to only allow requests from your domain.
-
-## Customization
-
-### Changing Branding
-
-The application uses the OffGrid branding with earth tones (browns, golds) and the compass logo. To customize:
-
-1. Replace logo files in `public/` directory
-2. Modify colors in `public/offgridai.css` (search for color values like `#b8860b`, `#2c1810`)
-3. Update the title and meta tags in `public/index.html`
-
-### Adding Models
-
-To add new models, update the `GEMMA_MODELS` object in `server/index.js`:
-
-```javascript
-const GEMMA_MODELS = {
-    'new-model': {
-        id: 'provider/model-id',
-        name: 'Display Name',
-        description: 'Model description',
-        multimodal: true,
-        responseTime: '~X seconds'
-    }
-};
-```
-
-## Troubleshooting
-
-**"API authentication error"**: Verify your OpenRouter API key is correct in the `.env` file.
-
-**"Cannot connect to server"**: Ensure the Node.js server is running and accessible.
-
-**Slow responses**: This may indicate high load on OpenRouter. Try a smaller model like Gemma 3 4B.
-
-**Images not working**: Ensure the model supports multimodal input. MedGemma and all Gemma 3 models support images.
-
-## License
-
-Proprietary - OffGrid AI ToolKit LLC
-
-## Support
-
-For support, contact: support@offgridaitoolkit.com
-
-For the offline USB version, visit: https://offgridaitoolkit.com
+*For more detailed information on specific features or operational procedures, please refer to the **Command Center Developer Documentation** and the **Operations & Troubleshooting Manual**.*
