@@ -28,6 +28,48 @@ const PORT = process.env.PORT || 3000;
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
 
+// =============================================================================
+// BETTER STACK LOGGING (persistent, privacy-safe operational logs)
+// =============================================================================
+const BETTERSTACK_SOURCE_TOKEN = process.env.BETTERSTACK_SOURCE_TOKEN;
+const BETTERSTACK_ENDPOINT = 'https://s1749343.eu-fsn-3.betterstackdata.com';
+
+/**
+ * Send a log entry to Better Stack. Fire-and-forget (non-blocking).
+ * PRIVACY: Never logs prompts, messages, user content, IPs, or session data.
+ * Only logs: event type, model used, duration, status, error reasons.
+ */
+function logToBetterStack(level, event, data = {}) {
+    if (!BETTERSTACK_SOURCE_TOKEN) return;
+    
+    const entry = {
+        dt: new Date().toISOString(),
+        level: level,
+        message: `[${event}] ${data.summary || ''}`,
+        service: 'offgrid-ai-online',
+        event: event,
+        ...data
+    };
+    
+    // Remove any fields that could contain user content (safety net)
+    delete entry.prompt;
+    delete entry.messages;
+    delete entry.content;
+    delete entry.userQuery;
+    delete entry.ip;
+    
+    fetch(BETTERSTACK_ENDPOINT, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${BETTERSTACK_SOURCE_TOKEN}`
+        },
+        body: JSON.stringify(entry)
+    }).catch(() => {}); // Silent fail — logging should never break the app
+}
+
+console.log(`[Better Stack] ${BETTERSTACK_SOURCE_TOKEN ? '✓ Logging enabled' : '✗ No token — logging disabled'}`);
+
 // Original Gemma 3 Models (Free Demo)
 const GEMMA_MODELS = {
     'gemma-3-27b': {
@@ -580,6 +622,14 @@ app.post('/api/chat', async (req, res) => {
         const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages);
         const responseTime = Date.now() - startTime;
         
+        logToBetterStack('info', 'chat.free', {
+            summary: `${modelConfig.name} responded in ${responseTime}ms`,
+            model: modelConfig.name,
+            modelId: modelConfig.id,
+            durationMs: responseTime,
+            status: 'success'
+        });
+        
         res.json({
             response: aiResponse,
             model: modelConfig.name,
@@ -589,6 +639,12 @@ app.post('/api/chat', async (req, res) => {
         
     } catch (error) {
         console.error('Chat endpoint error:', error);
+        logToBetterStack('error', 'chat.free', {
+            summary: `Error: ${error.message}`,
+            status: 'error',
+            errorMessage: error.message,
+            durationMs: Date.now() - startTime
+        });
         res.status(500).json({ 
             error: 'An error occurred while processing your request. Please try again.' 
         });
@@ -600,6 +656,7 @@ app.post('/api/chat', async (req, res) => {
  * Streaming chat endpoint for Gemma models
  */
 app.post('/api/stream', async (req, res) => {
+    const streamStart = Date.now();
     try {
         const { model, messages } = req.body;
         
@@ -619,10 +676,24 @@ app.post('/api/stream', async (req, res) => {
         res.setHeader('Connection', 'keep-alive');
         
         await streamOpenRouter(modelConfig.id, openRouterMessages, res);
+        logToBetterStack('info', 'stream.free', {
+            summary: `${modelConfig.name} streamed in ${Date.now() - streamStart}ms`,
+            model: modelConfig.name,
+            modelId: modelConfig.id,
+            durationMs: Date.now() - streamStart,
+            status: 'success'
+        });
         res.end();
         
     } catch (error) {
         console.error('Stream endpoint error:', error);
+        logToBetterStack('error', 'stream.free', {
+            summary: `Stream error: ${error.message}`,
+            model: req.body?.model || 'unknown',
+            status: 'error',
+            errorMessage: error.message,
+            durationMs: Date.now() - streamStart
+        });
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
@@ -654,6 +725,7 @@ app.get('/api/command/models', (req, res) => {
  * Streaming endpoint for single Command Center models
  */
 app.post('/api/command/stream', async (req, res) => {
+    const cmdStreamStart = Date.now();
     try {
         const { model, messages } = req.body;
         
@@ -673,10 +745,24 @@ app.post('/api/command/stream', async (req, res) => {
         res.setHeader('Connection', 'keep-alive');
         
         await streamOpenRouter(modelConfig.id, openRouterMessages, res);
+        logToBetterStack('info', 'chat.command', {
+            summary: `${modelConfig.shortName} streamed in ${Date.now() - cmdStreamStart}ms`,
+            model: modelConfig.shortName,
+            modelId: modelConfig.id,
+            durationMs: Date.now() - cmdStreamStart,
+            status: 'success'
+        });
         res.end();
         
     } catch (error) {
         console.error('Command stream error:', error);
+        logToBetterStack('error', 'chat.command', {
+            summary: `${req.body?.model || 'unknown'} error: ${error.message}`,
+            model: req.body?.model || 'unknown',
+            status: 'error',
+            errorMessage: error.message,
+            durationMs: Date.now() - cmdStreamStart
+        });
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
@@ -698,6 +784,7 @@ app.post('/api/command/stream', async (req, res) => {
  * 6. Stream the synthesized response to the client
  */
 app.post('/api/command/council', async (req, res) => {
+    const councilStartTime = Date.now();
     try {
         const { messages } = req.body;
         
@@ -896,10 +983,25 @@ Based on these, write the final Command answer as described.
         res.write('data: [DONE]\n\n');
         res.end();
         
+        const councilDuration = Date.now() - councilStartTime;
         console.log('[Council] Complete');
+        logToBetterStack('info', 'council.complete', {
+            summary: `Council completed in ${councilDuration}ms | Chairman: ${chairmanResult.shortName}`,
+            durationMs: councilDuration,
+            chairman: chairmanResult.shortName,
+            modelsResponded: labeledResults.filter(r => !r.error).map(r => r.shortName),
+            modelsTimedOut: labeledResults.filter(r => r.error).map(r => r.shortName),
+            status: 'success'
+        });
         
     } catch (error) {
         console.error('Council endpoint error:', error);
+        logToBetterStack('error', 'council.error', {
+            summary: `Council failed: ${error.message}`,
+            status: 'error',
+            errorMessage: error.message,
+            durationMs: Date.now() - councilStartTime
+        });
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
@@ -930,6 +1032,19 @@ function logImageGen(entry) {
     imageGenLog.push(entry);
     if (imageGenLog.length > IMAGE_GEN_LOG_MAX) imageGenLog.shift();
     console.log(`[Nano Banana Monitor] ${entry.status} | ${entry.durationMs}ms | finish: ${entry.finishReason || '-'} | reason: ${entry.errorReason || '-'}`);
+    
+    // Persist to Better Stack
+    logToBetterStack(
+        entry.status === 'success' ? 'info' : 'warn',
+        'image.generate',
+        {
+            summary: `Image gen ${entry.status} in ${entry.durationMs}ms | finish: ${entry.finishReason || '-'}`,
+            status: entry.status,
+            durationMs: entry.durationMs,
+            finishReason: entry.finishReason,
+            errorReason: entry.errorReason
+        }
+    );
 }
 
 // Health check endpoint for image generation
@@ -1226,6 +1341,12 @@ RULES:
 
         console.log(`[Prompt Assistant] Crafted prompt: "${craftedPrompt.substring(0, 100)}..."`);
 
+        logToBetterStack('info', 'prompt.craft', {
+            summary: `Prompt crafted for category: ${category || 'other'}`,
+            category: category || 'other',
+            status: 'success'
+        });
+
         res.json({
             success: true,
             prompt: craftedPrompt,
@@ -1235,6 +1356,11 @@ RULES:
 
     } catch (error) {
         console.error('[Prompt Assistant] Error:', error);
+        logToBetterStack('error', 'prompt.craft', {
+            summary: `Prompt craft failed: ${error.message}`,
+            status: 'error',
+            errorMessage: error.message
+        });
         res.status(500).json({
             success: false,
             error: 'Prompt crafting failed: ' + error.message
@@ -1332,10 +1458,20 @@ Rules:
         const data = await response.json();
         const summary = data.choices?.[0]?.message?.content || '';
 
+        logToBetterStack('info', 'image.summary', {
+            summary: 'Image summary generated',
+            status: 'success'
+        });
+
         res.json({ success: true, summary });
 
     } catch (error) {
         console.error('Image summary error:', error);
+        logToBetterStack('error', 'image.summary', {
+            summary: `Image summary failed: ${error.message}`,
+            status: 'error',
+            errorMessage: error.message
+        });
         res.status(500).json({ error: 'Failed to generate summary' });
     }
 });
@@ -1430,6 +1566,11 @@ RULES:
 
         console.log(`[Visual Prompt] Generated: "${visualPrompt.substring(0, 100)}..."`);
 
+        logToBetterStack('info', 'prompt.visual', {
+            summary: 'Visual prompt generated from conversation',
+            status: 'success'
+        });
+
         res.json({
             success: true,
             prompt: visualPrompt,
@@ -1438,6 +1579,11 @@ RULES:
 
     } catch (error) {
         console.error('[Visual Prompt] Error:', error);
+        logToBetterStack('error', 'prompt.visual', {
+            summary: `Visual prompt failed: ${error.message}`,
+            status: 'error',
+            errorMessage: error.message
+        });
         res.status(500).json({
             success: false,
             error: 'Visual prompt generation failed: ' + error.message
@@ -1626,6 +1772,11 @@ app.post('/api/export-pdf', async (req, res) => {
         
     } catch (error) {
         console.error('PDF export error:', error);
+        logToBetterStack('error', 'export.pdf', {
+            summary: `PDF export failed: ${error.message}`,
+            status: 'error',
+            errorMessage: error.message
+        });
         res.status(500).json({ error: 'Failed to generate PDF export' });
     }
 });
@@ -1771,4 +1922,14 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('║    /command  → Command Center (premium)                   ║');
     console.log('╚═══════════════════════════════════════════════════════════╝');
     console.log('');
+
+    // Log server startup to Better Stack
+    logToBetterStack('info', 'server.startup', {
+        summary: `OffGrid AI server started on port ${PORT}`,
+        port: PORT,
+        apiKeyConfigured: !!OPENROUTER_API_KEY,
+        betterStackConfigured: !!BETTERSTACK_SOURCE_TOKEN,
+        nodeVersion: process.version,
+        environment: process.env.NODE_ENV || 'development'
+    });
 });
