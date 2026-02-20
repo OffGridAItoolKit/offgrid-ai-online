@@ -9,6 +9,11 @@ This document provides a reverse-chronological summary of recent development pro
 ### February 2026
 
 **2026-02-20**
+*   **AI Council Model Upgrades**
+    *   Upgraded **Medic** from Claude Sonnet 4 (`anthropic/claude-sonnet-4`) to **Claude Sonnet 4.6** (`anthropic/claude-sonnet-4.6`). Same pricing, strictly better benchmarks, 1M context window.
+    *   Upgraded **Navigator** from Gemini 2.5 Pro (`google/gemini-2.5-pro`) to **Gemini 3.1 Pro Preview** (`google/gemini-3.1-pro-preview`). Highest Intelligence Index on OpenRouter (57.0). Same pricing.
+    *   Updated all display names, comments, and startup banner to reflect the new models.
+    *   Updated all documentation (README, Command Center Docs, project docs).
 *   **Better Stack Logging Integration (eccb628)**
     *   Integrated privacy-safe, persistent operational logging using Better Stack.
     *   Added a `logToBetterStack` function that sends event metadata (model, duration, status) without logging any user data, prompts, or IPs.

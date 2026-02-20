@@ -1,6 +1,6 @@
 # OffGrid AI ToolKit Online - Technical Overview
 
-**Version 5.1.0** | **Last Updated:** 2026-02-20
+**Version 5.2.0** | **Last Updated:** 2026-02-20
 
 This document provides a comprehensive technical overview of the OffGrid AI ToolKit Online platform, including the free Online ToolKit and the premium Command Center. It is intended for developers, administrators, and technical staff.
 
@@ -41,8 +41,8 @@ The Command Center is the premium offering, providing access to advanced feature
 
 *   **AI Council**: A multi-model system where four specialist AIs work in parallel to answer a user's query. The council consists of:
     *   **Scout (GPT-5.2)**: Vision and image analysis specialist.
-    *   **Medic (Claude 4.5 Sonnet)**: Safety, analysis, and medical specialist.
-    *   **Navigator (Gemini 2.5 Pro)**: Research, planning, and web-browsing specialist.
+    *   **Medic (Claude Sonnet 4.6)**: Safety, analysis, and medical specialist.
+    *   **Navigator (Gemini 3.1 Pro)**: Research, planning, and web-browsing specialist.
     *   **Ranger (Grok 4.1)**: Creative solutions and unconventional thinking.
 *   **Command Mode**: A synthesis mode where the AI Council's responses are reviewed by a "Chairman" AI, which then provides a final, synthesized answer.
 *   **Image Studio**: An AI-assisted image generation tool using Nano Banana Pro (Gemini 3 Pro Image Preview) with features like prompt crafting and visual prompt generation from conversations.

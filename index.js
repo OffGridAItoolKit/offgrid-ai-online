@@ -113,16 +113,16 @@ const COMMAND_MODELS = {
         multimodal: true
     },
     'medic': {
-        id: 'anthropic/claude-sonnet-4',
-        name: 'Medic (Claude 4.5 Sonnet)',
+        id: 'anthropic/claude-sonnet-4.6',
+        name: 'Medic (Claude Sonnet 4.6)',
         shortName: 'Medic',
         emoji: '🏥',
         description: 'Safety & Analysis',
         multimodal: true
     },
     'navigator': {
-        id: 'google/gemini-2.5-pro',
-        name: 'Navigator (Gemini 2.5 Pro)',
+        id: 'google/gemini-3.1-pro-preview',
+        name: 'Navigator (Gemini 3.1 Pro)',
         shortName: 'Navigator',
         emoji: '🧭',
         description: 'Research & Planning',
@@ -780,7 +780,7 @@ app.post('/api/command/stream', async (req, res) => {
  * 2. Collect all 4 responses
  * 3. Run anonymous peer review (each model ranks all answers for accuracy & insight)
  * 4. Compute Chairman using Borda-style scoring
- * 5. Use Scout (GPT-4o) as Command editor to synthesize final answer
+ * 5. Use Scout (GPT-5.2) as Command editor to synthesize final answer
  * 6. Stream the synthesized response to the client
  */
 app.post('/api/command/council', async (req, res) => {
@@ -965,7 +965,7 @@ Based on these, write the final Command answer as described.
             }
         ];
         
-        // Step 5: Stream the synthesis response (using Scout/GPT-4o as the editor)
+        // Step 5: Stream the synthesis response (using Scout/GPT-5.2 as the editor)
         console.log('[Council] Starting synthesis stream (Command editor)...');
         // Send the council metadata before streaming begins
         res.write(`data: ${JSON.stringify({ 
@@ -1910,8 +1910,8 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Command Center Models:                                   ║');
     console.log('║    🔭 Scout    (GPT 5.2)          - Vision Specialist      ║');
-    console.log('║    🏥 Medic    (Claude 4.5 Sonnet) - Safety & Analysis     ║');
-    console.log('║    🧭 Navigator (Gemini 2.5 Pro)  - Research & Planning   ║');
+    console.log('║    🏥 Medic    (Claude Sonnet 4.6) - Safety & Analysis      ║');
+    console.log('║    🧭 Navigator (Gemini 3.1 Pro)  - Research & Planning   ║');
     console.log('║    🏕️  Ranger   (Grok 4.1)        - Creative Solutions    ║');
     console.log('║    ⭐ Command  (Council Consensus) - All 4 + Synthesis    ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
