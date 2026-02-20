@@ -918,7 +918,76 @@ Based on these, write the final Command answer as described.
  * Takes a text prompt and returns the generated image as base64.
  * No data is stored — processed in memory and discarded.
  */
+// =============================================================================
+// IMAGE GENERATION MONITORING
+// =============================================================================
+// In-memory rolling log of last 50 image generation attempts (privacy-safe: no prompts stored)
+const imageGenLog = [];
+const IMAGE_GEN_LOG_MAX = 50;
+
+function logImageGen(entry) {
+    entry.timestamp = new Date().toISOString();
+    imageGenLog.push(entry);
+    if (imageGenLog.length > IMAGE_GEN_LOG_MAX) imageGenLog.shift();
+    console.log(`[Nano Banana Monitor] ${entry.status} | ${entry.durationMs}ms | finish: ${entry.finishReason || '-'} | reason: ${entry.errorReason || '-'}`);
+}
+
+// Health check endpoint for image generation
+app.get('/api/health/image-gen', async (req, res) => {
+    const startTime = Date.now();
+    try {
+        const testResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://offgridtoolkit.ai',
+                'X-Title': 'OffGrid AI Health Check'
+            },
+            body: JSON.stringify({
+                model: 'google/gemini-3-pro-image-preview',
+                messages: [{ role: 'user', content: 'Generate a simple image of a green circle on a white background' }],
+                modalities: ['image', 'text']
+            })
+        });
+        const durationMs = Date.now() - startTime;
+        const data = await testResponse.json();
+        const hasImage = !!(data.choices?.[0]?.message?.images?.length > 0);
+        const finishReason = data.choices?.[0]?.finish_reason || 'unknown';
+        
+        // Calculate recent stats
+        const last24h = imageGenLog.filter(e => Date.now() - new Date(e.timestamp).getTime() < 86400000);
+        const successCount = last24h.filter(e => e.status === 'success').length;
+        const failCount = last24h.filter(e => e.status !== 'success').length;
+        const avgDuration = last24h.length > 0 ? Math.round(last24h.reduce((s, e) => s + e.durationMs, 0) / last24h.length) : 0;
+        
+        res.json({
+            healthy: hasImage && testResponse.ok,
+            testDurationMs: durationMs,
+            testImageGenerated: hasImage,
+            testFinishReason: finishReason,
+            httpStatus: testResponse.status,
+            recentStats: {
+                totalRequests: last24h.length,
+                successes: successCount,
+                failures: failCount,
+                successRate: last24h.length > 0 ? `${Math.round(successCount / last24h.length * 100)}%` : 'N/A',
+                avgResponseMs: avgDuration
+            },
+            recentLog: imageGenLog.slice(-10)
+        });
+    } catch (error) {
+        res.json({
+            healthy: false,
+            error: error.message,
+            testDurationMs: Date.now() - startTime,
+            recentLog: imageGenLog.slice(-10)
+        });
+    }
+});
+
 app.post('/api/command/generate-image', async (req, res) => {
+    const genStartTime = Date.now();
     try {
         const { prompt } = req.body;
         
@@ -1001,6 +1070,7 @@ app.post('/api/command/generate-image', async (req, res) => {
         }
         
         if (!imageBase64) {
+            const failDuration = Date.now() - genStartTime;
             console.warn('[Nano Banana] No image in response. finish_reason:', finishReason);
             console.warn('[Nano Banana] Message keys:', JSON.stringify(Object.keys(message || {})));
             console.warn('[Nano Banana] Text response:', (textResponse || '').substring(0, 200));
@@ -1027,6 +1097,8 @@ app.post('/api/command/generate-image', async (req, res) => {
                 errorMessage = 'The model responded with text but did not generate an image. Try being more specific about the visual style you want (e.g., "photorealistic", "watercolor", "technical diagram").';
             }
             
+            logImageGen({ status: 'fail', durationMs: failDuration, finishReason, errorReason, httpStatus: response.status });
+            
             return res.json({
                 success: false,
                 error: errorMessage,
@@ -1036,7 +1108,9 @@ app.post('/api/command/generate-image', async (req, res) => {
             });
         }
         
-        console.log('[Nano Banana] Image generated successfully');
+        const successDuration = Date.now() - genStartTime;
+        console.log(`[Nano Banana] Image generated successfully in ${successDuration}ms`);
+        logImageGen({ status: 'success', durationMs: successDuration, finishReason, errorReason: null, httpStatus: response.status });
         
         res.json({
             success: true,
@@ -1046,7 +1120,9 @@ app.post('/api/command/generate-image', async (req, res) => {
         });
         
     } catch (error) {
+        const errorDuration = Date.now() - genStartTime;
         console.error('[Nano Banana] Error:', error);
+        logImageGen({ status: 'error', durationMs: errorDuration, finishReason: null, errorReason: error.message, httpStatus: null });
         res.status(500).json({ 
             error: 'Image generation failed: ' + error.message 
         });
