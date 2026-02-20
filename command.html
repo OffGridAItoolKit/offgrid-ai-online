@@ -1714,6 +1714,198 @@
         }
 
         /* ============================================ */
+        /* Confidence Meter                            */
+        /* ============================================ */
+
+        .confidence-meter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .confidence-bar {
+            width: 80px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+        .confidence-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease-out;
+        }
+        .confidence-fill.decisive { background: linear-gradient(90deg, #10b981, #059669); }
+        .confidence-fill.moderate { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .confidence-fill.close { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .confidence-label {
+            font-weight: 600;
+            font-size: 10px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .confidence-label.decisive { color: #059669; }
+        .confidence-label.moderate { color: #d97706; }
+        .confidence-label.close { color: #dc2626; }
+
+        /* Confidence meter in deliberation modal */
+        .delib-confidence {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 8px;
+        }
+        .delib-confidence-bar {
+            flex: 1;
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .delib-confidence-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1.2s ease-out;
+        }
+        .delib-confidence-fill.decisive { background: linear-gradient(90deg, #10b981, #059669); }
+        .delib-confidence-fill.moderate { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .delib-confidence-fill.close { background: linear-gradient(90deg, #ef4444, #dc2626); }
+        .delib-confidence-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        /* ============================================ */
+        /* Model Highlight Pulse (Chairman)            */
+        /* ============================================ */
+
+        @keyframes chairmanPulse {
+            0% { box-shadow: 0 0 0 0 rgba(218, 165, 32, 0.6); }
+            25% { box-shadow: 0 0 12px 4px rgba(218, 165, 32, 0.4); }
+            50% { box-shadow: 0 0 0 0 rgba(218, 165, 32, 0.2); }
+            75% { box-shadow: 0 0 12px 4px rgba(218, 165, 32, 0.4); }
+            100% { box-shadow: 0 0 0 0 rgba(218, 165, 32, 0); }
+        }
+        .roster-item.chairman-elected {
+            animation: chairmanPulse 2s ease-in-out;
+            border-color: #daa520 !important;
+            position: relative;
+        }
+        .roster-item.chairman-elected::after {
+            content: '\1F451';
+            position: absolute;
+            top: -8px;
+            right: -4px;
+            font-size: 14px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* ============================================ */
+        /* Deep Mode (Ctrl+Shift+D)                    */
+        /* ============================================ */
+
+        .deep-mode-indicator {
+            position: fixed;
+            bottom: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #1a0f05 0%, #2c1810 100%);
+            color: #daa520;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(218, 165, 32, 0.4);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+        .deep-mode-indicator.active {
+            display: flex;
+        }
+        .deep-mode-indicator:hover {
+            border-color: #daa520;
+            box-shadow: 0 0 12px rgba(218, 165, 32, 0.3);
+        }
+        .deep-mode-pulse {
+            width: 6px;
+            height: 6px;
+            background: #daa520;
+            border-radius: 50%;
+            animation: deepPulse 2s infinite;
+        }
+        @keyframes deepPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Deep Mode win rate section in deliberation modal */
+        .delib-win-rates {
+            margin-top: 16px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, rgba(44, 24, 16, 0.04), rgba(184, 134, 11, 0.04));
+            border: 1px solid rgba(184, 134, 11, 0.15);
+            border-radius: 10px;
+        }
+        .delib-win-rates-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .win-rate-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #4b5563;
+        }
+        .win-rate-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .win-rate-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s ease-out;
+        }
+        .win-rate-bar-fill.scout { background: #3b82f6; }
+        .win-rate-bar-fill.medic { background: #ef4444; }
+        .win-rate-bar-fill.navigator { background: #10b981; }
+        .win-rate-bar-fill.ranger { background: #a855f7; }
+        .win-rate-pct {
+            font-weight: 700;
+            font-size: 11px;
+            min-width: 36px;
+            text-align: right;
+        }
+        .win-rate-total {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 6px;
+            text-align: center;
+        }
+
+        /* ============================================ */
         /* Image Studio Styles                         */
         /* ============================================ */
 
@@ -3082,6 +3274,11 @@
                                         if (parsed.labelMap) {
                                             lastCouncilLabelMap = parsed.labelMap;
                                         }
+                                        // Trigger chairman pulse on sidebar
+                                        if (parsed.chairmanKey) {
+                                            pulseChairmanModel(parsed.chairmanKey);
+                                            recordWin(parsed.chairmanKey);
+                                        }
                                         const scoresPanel = document.createElement('div');
                                         scoresPanel.className = 'council-scores-panel';
                                         scoresPanel.innerHTML = buildScoresHtml(parsed.scores, parsed.chairmanLabel);
@@ -3230,6 +3427,21 @@
                 const chairmanInfo = chairmanName ? ` | Chairman: ${chairmanEmoji} ${chairmanName}` : '';
                 timeIndicator.innerHTML = `⭐ Command Council • ${responseTime}s (4 models + peer review)${chairmanInfo}`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
+
+                // Add confidence meter if we have scores
+                if (councilScores && lastCouncilDeliberation && lastCouncilDeliberation.chairmanKey) {
+                    const conf = calculateConfidence(councilScores);
+                    const meterDiv = document.createElement('div');
+                    meterDiv.className = 'confidence-meter';
+                    meterDiv.innerHTML = `
+                        <span style="font-size: 10px;">Consensus:</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill ${conf.level}" style="width: ${conf.pct}%"></div>
+                        </div>
+                        <span class="confidence-label ${conf.level}">${conf.label}</span>
+                    `;
+                    messageDiv.querySelector('.message-content').appendChild(meterDiv);
+                }
 
                 // Add "See Deliberation" button if we have deliberation data
                 if (lastCouncilDeliberation && lastCouncilDeliberation.rawReviews && lastCouncilDeliberation.rawReviews.length > 0) {
@@ -4104,6 +4316,26 @@
                 }
             }
 
+            // Calculate confidence for the modal
+            const conf = calculateConfidence(scores);
+            const confFillClass = conf.level;
+            const confBarHtml = `
+                <div class="delib-confidence">
+                    <div class="delib-confidence-text">${conf.label}</div>
+                    <div class="delib-confidence-bar">
+                        <div class="delib-confidence-fill ${confFillClass}" style="width: 0%" id="delibConfFill"></div>
+                    </div>
+                    <div style="font-size: 11px; color: #6b7280; white-space: nowrap;">Margin: ${conf.margin || 0}pts</div>
+                </div>
+            `;
+
+            // Deep Mode: win rates
+            const winRateHtml = deepModeActive ? buildWinRateHtml() : '';
+
+            // Breadcrumbs
+            incrementDelibViews();
+            const breadcrumbHtml = getBreadcrumbHtml();
+
             overlay.innerHTML = `
                 <div class="deliberation-modal">
                     <h3>\ud83d\udcca Council Deliberation Report</h3>
@@ -4113,6 +4345,7 @@
                         <strong>\ud83c\udfc6 Chairman Elected:</strong> ${chairmanDisplay}<br>
                         ${chairmanScoreDetail ? `<span style="font-size: 12px; color: #6b7280;">${chairmanScoreDetail}</span><br>` : ''}
                         <span style="font-size: 12px; color: #6b7280;">Formula: Score = 2\u00d7Accuracy + 1\u00d7Insight | Highest score wins. All 4 models voted anonymously.</span>
+                        ${confBarHtml}
                     </div>
 
                     <div class="delib-section">
@@ -4128,9 +4361,18 @@
                         ${reviewerCards}
                     </div>
 
+                    ${winRateHtml}
+                    ${breadcrumbHtml}
+
                     <button class="deliberation-close-btn" onclick="closeDeliberationModal()">Close</button>
                 </div>
             `;
+
+            // Animate the confidence bar fill after render
+            setTimeout(() => {
+                const fill = document.getElementById('delibConfFill');
+                if (fill) fill.style.width = conf.pct + '%';
+            }, 100);
 
             document.body.appendChild(overlay);
             overlay.addEventListener('click', function(e) {
@@ -4144,6 +4386,169 @@
                 modal.style.animation = 'fadeOut 0.2s ease';
                 setTimeout(() => modal.remove(), 200);
             }
+        }
+
+        // ============================================
+        // CONFIDENCE METER
+        // ============================================
+
+        function calculateConfidence(scores) {
+            if (!scores) return { pct: 0, level: 'close', label: 'No data' };
+            const vals = Object.values(scores).map(s => s.councilScore).sort((a, b) => b - a);
+            if (vals.length < 2) return { pct: 100, level: 'decisive', label: 'Unanimous' };
+            const maxScore = vals[0];
+            const runnerUp = vals[1];
+            const margin = maxScore - runnerUp;
+            // Max possible margin with 4 models Borda: ~12 points
+            // Typical range: 0-8 points margin
+            const pct = Math.min(100, Math.round((margin / 8) * 100));
+            let level, label;
+            if (margin >= 6) { level = 'decisive'; label = 'Dominant'; }
+            else if (margin >= 4) { level = 'decisive'; label = 'Strong consensus'; }
+            else if (margin >= 2) { level = 'moderate'; label = 'Moderate consensus'; }
+            else if (margin >= 1) { level = 'close'; label = 'Close call'; }
+            else { level = 'close'; label = 'Tied — tiebreaker used'; }
+            return { pct, level, label, margin, maxScore, runnerUp };
+        }
+
+        // ============================================
+        // MODEL HIGHLIGHT PULSE (CHAIRMAN)
+        // ============================================
+
+        function pulseChairmanModel(modelKey) {
+            // Clear any previous chairman highlights
+            document.querySelectorAll('.roster-item.chairman-elected').forEach(el => {
+                el.classList.remove('chairman-elected');
+            });
+            // Find the matching sidebar roster item
+            const rosterItem = document.querySelector(`.roster-item.${modelKey}`);
+            if (rosterItem) {
+                rosterItem.classList.add('chairman-elected');
+                // Remove the class after animation completes (keep crown for session)
+                setTimeout(() => {
+                    rosterItem.style.animation = 'none';
+                }, 2500);
+            }
+        }
+
+        // ============================================
+        // DEEP MODE (Ctrl+Shift+D)
+        // ============================================
+
+        let deepModeActive = localStorage.getItem('offgrid-deep-mode') === 'true';
+        let deliberationViewCount = parseInt(localStorage.getItem('offgrid-delib-views') || '0');
+
+        function initDeepMode() {
+            // Create the Deep Mode indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'deep-mode-indicator' + (deepModeActive ? ' active' : '');
+            indicator.id = 'deepModeIndicator';
+            indicator.innerHTML = '<div class="deep-mode-pulse"></div> DEEP MODE';
+            indicator.title = 'Deep Mode active — enhanced analytics visible. Press Ctrl+Shift+D to toggle.';
+            indicator.onclick = () => toggleDeepMode();
+            document.body.appendChild(indicator);
+
+            // Keyboard shortcut listener
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                    e.preventDefault();
+                    toggleDeepMode();
+                }
+            });
+        }
+
+        function toggleDeepMode() {
+            deepModeActive = !deepModeActive;
+            localStorage.setItem('offgrid-deep-mode', deepModeActive);
+            const indicator = document.getElementById('deepModeIndicator');
+            if (indicator) {
+                indicator.classList.toggle('active', deepModeActive);
+            }
+            if (deepModeActive) {
+                showDeepModeToast();
+            }
+        }
+
+        function showDeepModeToast() {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#1a0f05,#2c1810);color:#daa520;padding:14px 20px;border-radius:12px;border:1px solid rgba(218,165,32,0.4);z-index:99999;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;';
+            toast.innerHTML = '<div style="margin-bottom:4px;">\u26a1 Deep Mode Activated</div><div style="font-size:11px;font-weight:400;color:#b8860b;">Enhanced analytics now visible in deliberation reports.<br>Press Ctrl+Shift+D again to toggle off.</div>';
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================
+        // HISTORICAL WIN RATE TRACKING
+        // ============================================
+
+        function getWinHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('offgrid-win-history') || '{"scout":0,"medic":0,"navigator":0,"ranger":0,"total":0}');
+            } catch { return { scout: 0, medic: 0, navigator: 0, ranger: 0, total: 0 }; }
+        }
+
+        function recordWin(modelKey) {
+            const history = getWinHistory();
+            if (history[modelKey] !== undefined) {
+                history[modelKey]++;
+            }
+            history.total++;
+            localStorage.setItem('offgrid-win-history', JSON.stringify(history));
+        }
+
+        function buildWinRateHtml() {
+            const history = getWinHistory();
+            if (history.total === 0) return '';
+            const models = [
+                { key: 'scout', name: '\ud83d\udd2d Scout', color: 'scout' },
+                { key: 'medic', name: '\ud83c\udfe5 Medic', color: 'medic' },
+                { key: 'navigator', name: '\ud83e\udded Navigator', color: 'navigator' },
+                { key: 'ranger', name: '\ud83c\udfd5\ufe0f Ranger', color: 'ranger' }
+            ];
+            let rows = '';
+            for (const m of models) {
+                const wins = history[m.key] || 0;
+                const pct = Math.round((wins / history.total) * 100);
+                rows += `
+                    <div class="win-rate-row">
+                        <span style="min-width: 100px; font-weight: 600;">${m.name}</span>
+                        <div class="win-rate-bar-bg">
+                            <div class="win-rate-bar-fill ${m.color}" style="width: ${pct}%"></div>
+                        </div>
+                        <span class="win-rate-pct">${wins}W (${pct}%)</span>
+                    </div>
+                `;
+            }
+            return `
+                <div class="delib-win-rates">
+                    <div class="delib-win-rates-title">\ud83d\udcc8 Historical Win Rates</div>
+                    ${rows}
+                    <div class="win-rate-total">Based on ${history.total} council quer${history.total === 1 ? 'y' : 'ies'} in this browser</div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // DISCOVERABILITY BREADCRUMBS
+        // ============================================
+
+        function incrementDelibViews() {
+            deliberationViewCount++;
+            localStorage.setItem('offgrid-delib-views', deliberationViewCount);
+        }
+
+        function getBreadcrumbHtml() {
+            if (deepModeActive) return ''; // Already discovered
+            if (deliberationViewCount >= 5 && deliberationViewCount < 8) {
+                return '<div style="text-align:center;margin-top:12px;font-size:10px;color:#9ca3af;font-style:italic;">There\'s more to discover... \ud83d\udd11</div>';
+            }
+            if (deliberationViewCount >= 8) {
+                return '<div style="text-align:center;margin-top:12px;font-size:10px;color:#b8860b;font-style:italic;">Power users: try Ctrl+Shift+D \u26a1</div>';
+            }
+            return '';
         }
 
         // ============================================
@@ -5030,6 +5435,7 @@
                 }, 500);
             }
 
+            initDeepMode();
             console.log('OffGrid Command Center v2 - Ready!');
         });
     </script>
