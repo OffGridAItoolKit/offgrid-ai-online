@@ -1828,6 +1828,33 @@ function markdownToHtml(md) {
 }
 
 // =============================================================================
+// SUBDOMAIN ROUTING: imagestudio.offgridtoolkit.ai
+// =============================================================================
+// Serves the standalone Image Studio page when accessed via the subdomain.
+// All API endpoints (/api/*) still work normally since they're defined above.
+// This middleware intercepts page-level requests only.
+// =============================================================================
+
+function isImageStudioSubdomain(hostname) {
+    return hostname === 'imagestudio.offgridtoolkit.ai' ||
+           hostname === 'imagestudio.offgridtoolkit.ai:3000' || // local dev
+           hostname.startsWith('imagestudio.');
+}
+
+app.use((req, res, next) => {
+    if (!isImageStudioSubdomain(req.hostname)) return next();
+    
+    // Let API routes pass through to their handlers
+    if (req.path.startsWith('/api/')) return next();
+    
+    // Let static assets pass through (CSS, JS, images, fonts)
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/)) return next();
+    
+    // Serve the standalone Image Studio page for all other requests
+    res.sendFile(path.join(__dirname, 'image-studio.html'));
+});
+
+// =============================================================================
 // ROUTE: /command - Serve Command Center page
 // =============================================================================
 
