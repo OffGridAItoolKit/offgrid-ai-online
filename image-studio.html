@@ -9,95 +9,507 @@
     <meta property="og:description" content="Your AI Field Illustrator. Describe what you need. Get survival diagrams, technical blueprints, and field guides in seconds.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://imagestudio.offgridtoolkit.ai">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/offgridai.css?v=4.0">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* ============================================
-         * IMAGE STUDIO STANDALONE PAGE
-         * Design: Full-page Image Studio experience
-         * No Command Center chrome. Direct access.
+         * IMAGE STUDIO - MARKETING + LIVE DEMO
+         * Design: Workshop + Field Guide hybrid
+         * Flow: Gallery > CTA > Live Demo
          * ============================================ */
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #0f1419;
-            color: #e5e7eb;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+        :root {
+            --slate-deep: #1a2332;
+            --slate-mid: #243044;
+            --gold: #d4a843;
+            --gold-hover: #e5bc5a;
+            --teal: #2a9d8f;
+            --teal-hover: #35b8a8;
+            --cream: #f5f0e8;
+            --cream-dark: #e8e0d0;
+            --text-light: #f5f0e8;
+            --text-muted: #9ca3af;
+            --text-dark: #1a1a1a;
         }
 
-        /* ---- Top Navigation Bar ---- */
-        .studio-nav {
-            background: rgba(15, 20, 25, 0.95);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 12px 20px;
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--slate-deep);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* ---- Navigation ---- */
+        .site-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(26, 35, 50, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+            padding: 0 24px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
-        .studio-nav-brand {
+        .nav-brand {
             display: flex;
             align-items: center;
             gap: 10px;
             text-decoration: none;
         }
-        .studio-nav-brand .brand-icon {
-            font-size: 20px;
-        }
-        .studio-nav-brand .brand-text {
-            font-size: 15px;
+        .nav-brand-icon { font-size: 22px; }
+        .nav-brand-text {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
             font-weight: 700;
-            color: #e5e7eb;
-            letter-spacing: 0.5px;
+            color: var(--cream);
+            letter-spacing: 1px;
         }
-        .studio-nav-brand .brand-sub {
-            font-size: 10px;
-            color: #6b7280;
-            font-weight: 500;
+        .nav-brand-sub {
+            font-size: 9px;
+            color: var(--gold);
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
-        .studio-nav-links {
+        .nav-links {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
         }
-        .studio-nav-links a {
-            font-size: 12px;
-            color: #9ca3af;
+        .nav-links a {
+            font-size: 13px;
+            color: var(--text-muted);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
         }
-        .studio-nav-links a:hover {
-            color: #d4a843;
-        }
-        .nav-cta {
-            background: linear-gradient(135deg, #d4a843 0%, #b8860b 100%);
-            color: #1a1a1a !important;
-            padding: 7px 16px;
+        .nav-links a:hover { color: var(--gold); }
+        .nav-cta-btn {
+            background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
+            color: var(--text-dark) !important;
+            padding: 8px 18px;
             border-radius: 6px;
             font-weight: 700 !important;
             font-size: 11px !important;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
-        .nav-cta:hover {
-            color: #1a1a1a !important;
-            opacity: 0.9;
+        .nav-cta-btn:hover { opacity: 0.9; }
+
+        /* Mobile nav */
+        .nav-hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--cream);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .nav-hamburger { display: block; }
+            .nav-links.open {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(26, 35, 50, 0.98);
+                padding: 20px;
+                gap: 16px;
+                border-bottom: 1px solid rgba(212, 168, 67, 0.15);
+            }
         }
 
-        /* ---- Main Content Area ---- */
-        .studio-main {
-            flex: 1;
+        /* ---- Hero Section ---- */
+        .hero {
+            padding: 140px 24px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--slate-deep) 0%, #0f1720 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('https://private-us-east-1.manuscdn.com/sessionFile/At53MxUSvLWI8BhlpyaIZZ/sandbox/O8f1DS505IWUQW1aTrI7Qh-img-1_1771710819000_na1fn_aGVyby1iZw.png?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvQXQ1M014VVN2TFdJOEJobHB5YUlaWi9zYW5kYm94L084ZjFEUzUwNUlXVVFXMWFUckk3UWgtaW1nLTFfMTc3MTcxMDgxOTAwMF9uYTFmbl9hR1Z5YnkxaVp3LnBuZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=jwvnVMKM7~c9xyL2RWyl5gY8IwvfNhWMG7W~egVCbqe~OXv5B5IUpCQZevR7sEvN7kphxOIo66sF83eIjsgLdN1K-0K50FqC2vTbBR1OX0BqZYhDWdXJTJSK331UNtnpidkrNvuHLrqMnaaDDEC5ZWrKdIsXz22dHcMFm1ChGgKTVozpAVezeLxqNDeDZRNwEcHBV36kzdJO~iK7GCsJ8n2CPJUvhjNm-qgee8C0SHUOsFvBus38nw5qHE5EGrmxKG6Kjap33h-SbDpiYItnIe5B2I-HZydEm6AKHI2Ge-akQdpk-PdgS8UOZtkAIgiwlKMgnkx11k9-vpvroivMuQ__') center/cover no-repeat;
+            opacity: 0.12;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: rgba(212, 168, 67, 0.15);
+            border: 1px solid rgba(212, 168, 67, 0.3);
+            color: var(--gold);
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 64px);
+            line-height: 1.1;
+            color: var(--cream);
+            margin-bottom: 8px;
+        }
+        .hero h1 .gold { color: var(--gold); }
+        .hero-tagline {
+            font-family: 'DM Sans', sans-serif;
+            font-size: clamp(16px, 2.5vw, 22px);
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-bottom: 32px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-ctas {
             display: flex;
-            align-items: flex-start;
+            gap: 16px;
             justify-content: center;
-            padding: 30px 16px 60px;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, var(--gold) 0%, #b8860b 100%);
+            color: var(--text-dark);
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212, 168, 67, 0.3); }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            color: var(--cream);
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            border: 1px solid rgba(245, 240, 232, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+        .hero-privacy {
+            margin-top: 28px;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* ---- Gallery Section ---- */
+        .gallery-section {
+            padding: 80px 0 80px;
+            background: #0f1720;
+            position: relative;
+        }
+        .gallery-header {
+            text-align: center;
+            padding: 0 24px;
+            margin-bottom: 48px;
+        }
+        .gallery-header h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--cream);
+            margin-bottom: 12px;
+        }
+        .gallery-header h2 .gold { color: var(--gold); }
+        .gallery-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Horizontal scroll gallery */
+        .gallery-track-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-track {
+            display: flex;
+            gap: 20px;
+            padding: 0 24px 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .gallery-track::-webkit-scrollbar { display: none; }
+        .gallery-card {
+            flex: 0 0 340px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--slate-mid);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .gallery-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+        }
+        .gallery-card img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            display: block;
+        }
+        .gallery-card-caption {
+            padding: 14px 16px;
+            border-top: 2px solid var(--gold);
+        }
+        .gallery-card-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--cream);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .gallery-card-tag {
+            font-size: 11px;
+            color: var(--gold);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+
+        /* Gallery navigation arrows */
+        .gallery-nav {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .gallery-nav button {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(245, 240, 232, 0.2);
+            background: rgba(26, 35, 50, 0.8);
+            color: var(--cream);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gallery-nav button:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(212, 168, 67, 0.1);
+        }
+
+        /* Lightbox */
+        .lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0,0,0,0.92);
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            cursor: pointer;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 24px;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .lightbox-close:hover { opacity: 1; }
+        .lightbox-caption {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--cream);
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.6);
+            padding: 8px 20px;
+            border-radius: 6px;
+        }
+
+        /* ---- Features Section ---- */
+        .features-section {
+            padding: 80px 24px;
+            background: var(--cream);
+            color: var(--text-dark);
+            position: relative;
+        }
+        .features-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .features-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .features-header h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--text-dark);
+            margin-bottom: 12px;
+        }
+        .features-header p {
+            font-size: 16px;
+            color: #6b7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            border: 1px solid #e5e0d8;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        .feature-icon {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+        .feature-card h3 {
+            font-size: 18px;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* ---- Try It CTA Section ---- */
+        .try-cta-section {
+            padding: 80px 24px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--slate-deep) 0%, #0f1720 100%);
+            position: relative;
+        }
+        .try-cta-section h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            color: var(--cream);
+            margin-bottom: 12px;
+        }
+        .try-cta-section h2 .gold { color: var(--gold); }
+        .try-cta-section p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto 32px;
+        }
+        .try-cta-section .btn-primary {
+            font-size: 16px;
+            padding: 16px 40px;
+        }
+        .try-cta-arrow {
+            margin-top: 24px;
+            font-size: 28px;
+            color: var(--gold);
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(8px); }
+        }
+
+        /* ---- Live Demo Section ---- */
+        .demo-section {
+            padding: 60px 24px 80px;
+            background: #0f1419;
+        }
+        .demo-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .demo-header h2 {
+            font-size: 28px;
+            color: var(--cream);
+            margin-bottom: 8px;
+        }
+        .demo-header p {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .demo-limit-badge {
+            display: inline-block;
+            background: rgba(42, 157, 143, 0.15);
+            border: 1px solid rgba(42, 157, 143, 0.3);
+            color: var(--teal);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-top: 8px;
         }
 
         /* ---- Studio Container (the actual tool) ---- */
@@ -109,9 +521,9 @@
             padding: 28px;
             max-width: 640px;
             width: 100%;
-            animation: fadeIn 0.4s ease;
+            margin: 0 auto;
+            color: var(--text-dark);
         }
-
         .studio-container h2 {
             color: #2c1810;
             font-size: 20px;
@@ -136,10 +548,8 @@
             margin-bottom: 20px;
         }
 
-        /* ---- Category Chips ---- */
-        .studio-categories {
-            margin-bottom: 18px;
-        }
+        /* Category Chips */
+        .studio-categories { margin-bottom: 18px; }
         .studio-categories-label {
             font-size: 11px;
             font-weight: 700;
@@ -148,11 +558,7 @@
             letter-spacing: 0.5px;
             margin-bottom: 8px;
         }
-        .category-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
+        .category-chips { display: flex; flex-wrap: wrap; gap: 6px; }
         .category-chip {
             padding: 6px 12px;
             background: #f3f4f6;
@@ -165,11 +571,7 @@
             line-height: 1.3;
             font-weight: 500;
         }
-        .category-chip:hover {
-            background: #faf5ff;
-            border-color: #a855f7;
-            color: #7c3aed;
-        }
+        .category-chip:hover { background: #faf5ff; border-color: #a855f7; color: #7c3aed; }
         .category-chip.selected {
             background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
             color: white;
@@ -177,10 +579,8 @@
             font-weight: 700;
         }
 
-        /* ---- Example Cards ---- */
-        .example-prompts-section {
-            margin-bottom: 16px;
-        }
+        /* Example Cards */
+        .example-prompts-section { margin-bottom: 16px; }
         .example-prompts-label {
             font-size: 11px;
             font-weight: 700;
@@ -202,7 +602,6 @@
         .example-cards-scroll::-webkit-scrollbar { height: 5px; }
         .example-cards-scroll::-webkit-scrollbar-track { background: transparent; }
         .example-cards-scroll::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-
         .example-card {
             flex: 0 0 180px;
             padding: 12px;
@@ -215,407 +614,403 @@
             flex-direction: column;
             gap: 6px;
         }
-        .example-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .example-card.try-it {
-            background: #f0fdf4;
-            border: 1.5px solid #bbf7d0;
-        }
-        .example-card.try-it:hover {
-            border-color: #22c55e;
-            background: #dcfce7;
-        }
-        .example-card.try-it .card-badge {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-        .example-card.create-instant {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-            border: 1.5px solid #fcd34d;
-        }
-        .example-card.create-instant:hover {
-            border-color: #f59e0b;
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-        }
-        .example-card.create-instant .card-badge {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            border: none;
-        }
-        .card-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            width: fit-content;
-        }
-        .card-emoji { font-size: 22px; line-height: 1; }
-        .card-title { font-size: 12px; font-weight: 700; color: #1f2937; line-height: 1.3; }
-        .card-desc { font-size: 10px; color: #6b7280; line-height: 1.3; }
+        .example-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .example-card.try-it { background: #f0fdf4; border: 1.5px solid #bbf7d0; }
+        .example-card.try-it:hover { border-color: #22c55e; background: #dcfce7; }
+        .example-card.try-it .card-badge { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .example-card.create-instant { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1.5px solid #fcd34d; }
+        .example-card.create-instant:hover { border-color: #f59e0b; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .example-card.create-instant .card-badge { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; }
+        .card-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; width: fit-content; }
+        .card-emoji { font-size: 20px; }
+        .card-title { font-size: 13px; font-weight: 700; color: #1f2937; }
+        .card-desc { font-size: 11px; color: #6b7280; }
 
-        /* ---- Textarea ---- */
-        .studio-container label {
-            display: block;
-            color: #374151;
+        /* Studio form elements */
+        #studioDescription, .edit-prompt-area {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px 14px;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 13px;
+            color: #1f2937;
+            background: #f9fafb;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+            transition: border-color 0.2s;
+        }
+        #studioDescription:focus, .edit-prompt-area:focus { outline: none; border-color: #a855f7; background: white; }
+        #studioDescLabel {
+            display: block;
+            font-size: 12px;
             font-weight: 600;
+            color: #4b5563;
             margin-bottom: 6px;
         }
-        .studio-container textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            margin-bottom: 16px;
-            resize: vertical;
-            min-height: 80px;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-            color: #1f2937;
-            background: #ffffff;
-        }
-        .studio-container textarea:focus {
-            outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
-        }
 
-        /* ---- Action Buttons ---- */
-        .image-studio-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-        }
+        .image-studio-actions { display: flex; justify-content: flex-end; margin-top: 10px; gap: 8px; }
         .studio-generate-btn {
             padding: 10px 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
             background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
         }
-        .studio-generate-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
-        }
-        .studio-generate-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .studio-cancel-btn {
-            display: none; /* No cancel on standalone page */
-        }
+        .studio-generate-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3); }
+        .studio-generate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-        /* ---- Result Area ---- */
-        .studio-result {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .studio-result img {
-            max-width: 100%;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            margin-bottom: 12px;
-        }
-        .studio-result-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
-        }
-        .studio-download-btn {
-            padding: 8px 20px;
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .studio-download-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-        }
-        .studio-generating {
-            text-align: center;
-            padding: 30px 0;
-            color: #6b7280;
-        }
-        .studio-generating .spinner {
-            display: inline-block;
-            width: 32px;
-            height: 32px;
-            border: 3px solid rgba(168, 85, 247, 0.2);
-            border-top-color: #a855f7;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 12px;
-        }
-
-        /* ---- AI Suggestion Bubble ---- */
+        /* AI Suggestion */
         .ai-suggestion {
-            background: linear-gradient(135deg, #faf5ff 0%, #f0e6ff 100%);
-            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            background: #faf5ff;
+            border: 1.5px solid #e9d5ff;
             border-radius: 12px;
             padding: 16px;
-            margin: 14px 0;
-            animation: fadeIn 0.3s ease;
+            margin-top: 12px;
         }
-        .ai-suggestion-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-        .ai-suggestion-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-        .ai-suggestion-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #7c3aed;
-        }
-        .ai-suggestion-text {
-            font-size: 13px;
-            color: #374151;
-            line-height: 1.6;
-            font-style: italic;
-            margin-bottom: 12px;
-        }
-        .ai-suggestion-actions {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+        .ai-suggestion-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+        .ai-suggestion-avatar { font-size: 16px; }
+        .ai-suggestion-label { font-size: 12px; font-weight: 700; color: #7c3aed; }
+        .ai-suggestion-text { font-size: 12px; color: #4b5563; line-height: 1.6; font-style: italic; }
+        .ai-suggestion-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
         .ai-suggestion-btn {
-            padding: 8px 18px;
+            padding: 7px 14px;
             border-radius: 8px;
+            border: none;
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            border: none;
         }
-        .ai-suggestion-btn.primary {
-            background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%);
-            color: white;
-        }
-        .ai-suggestion-btn.primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(168, 85, 247, 0.3);
-        }
-        .ai-suggestion-btn.secondary {
-            background: white;
-            color: #7c3aed;
-            border: 1.5px solid rgba(168, 85, 247, 0.3);
-        }
-        .ai-suggestion-btn.secondary:hover {
-            background: #faf5ff;
-        }
-        .ai-suggestion-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .ai-suggestion-btn.primary { background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); color: white; }
+        .ai-suggestion-btn.primary:hover { transform: translateY(-1px); }
+        .ai-suggestion-btn.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+        .ai-suggestion-btn.secondary { background: white; color: #7c3aed; border: 1.5px solid #e9d5ff; }
+        .ai-suggestion-btn.secondary:hover { background: #faf5ff; }
 
-        /* ---- Crafting Animation ---- */
-        .studio-crafting {
-            text-align: center;
-            padding: 20px 0;
-            color: #7c3aed;
+        /* Result area */
+        .studio-result { margin-top: 16px; text-align: center; }
+        .studio-result img { max-width: 100%; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .studio-result-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .studio-download-btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .studio-crafting .spinner {
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(168, 85, 247, 0.2);
+        .studio-download-btn:hover { border-color: #a855f7; color: #7c3aed; }
+
+        .studio-generating { text-align: center; padding: 30px; color: #6b7280; font-size: 14px; }
+        .spinner {
+            width: 32px; height: 32px;
+            border: 3px solid #e5e7eb;
             border-top-color: #a855f7;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
-            margin-bottom: 8px;
+            margin: 0 auto 12px;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ---- Direct Prompt Toggle ---- */
         .direct-prompt-toggle {
             display: block;
-            width: 100%;
-            text-align: center;
+            margin: 14px auto 0;
             background: none;
             border: none;
             color: #9ca3af;
             font-size: 12px;
             cursor: pointer;
-            padding: 10px;
-            margin-top: 8px;
-            transition: color 0.2s;
-        }
-        .direct-prompt-toggle:hover {
-            color: #a855f7;
-        }
-        .edit-prompt-area {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 13px;
+            text-decoration: underline;
             font-family: inherit;
-            min-height: 100px;
-            resize: vertical;
-            box-sizing: border-box;
-            color: #1f2937;
-            background: #ffffff;
         }
-        .edit-prompt-area:focus {
-            outline: none;
-            border-color: #a855f7;
-            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
-        }
+        .direct-prompt-toggle:hover { color: #7c3aed; }
 
-        /* ---- Error Reason Badges ---- */
+        .studio-privacy {
+            text-align: center;
+            font-size: 11px;
+            color: #c4c4c4;
+            margin-top: 16px;
+        }
+        .lock-icon { margin-right: 4px; }
+
+        /* Error badges */
         .error-reason-badge {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
-        .error-reason-badge.safety { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .error-reason-badge.content_policy { background: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
-        .error-reason-badge.no_image { background: #fefce8; color: #ca8a04; border: 1px solid #fde68a; }
-        .error-reason-badge.max_tokens { background: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; }
-        .error-reason-badge.recitation { background: #faf5ff; color: #9333ea; border: 1px solid #e9d5ff; }
-        .error-reason-badge.unknown { background: #f9fafb; color: #6b7280; border: 1px solid #e5e7eb; }
 
-        /* ---- Privacy & Footer ---- */
-        .studio-privacy {
-            font-size: 11px;
-            color: #9ca3af;
+        /* Generation limit overlay */
+        .limit-overlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            z-index: 50;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            margin-top: 12px;
+            padding: 40px;
         }
-        .studio-privacy .lock-icon {
-            color: #10b981;
+        .limit-overlay.active { display: flex; }
+        .limit-overlay-content h3 {
+            font-size: 22px;
+            color: #2c1810;
+            margin-bottom: 10px;
         }
-        .studio-footer {
-            text-align: center;
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: auto;
-        }
-        .studio-footer a {
+        .limit-overlay-content p {
+            font-size: 14px;
             color: #6b7280;
+            margin-bottom: 20px;
+            max-width: 400px;
+        }
+        .limit-overlay-content .btn-primary {
+            font-size: 14px;
+        }
+        .limit-overlay-content .btn-secondary-sm {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #6b7280;
+            text-decoration: underline;
+        }
+        .limit-overlay-content .btn-secondary-sm:hover { color: var(--gold); }
+
+        /* ---- Footer ---- */
+        .site-footer {
+            padding: 40px 24px;
+            background: var(--slate-deep);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            text-align: center;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-muted);
             text-decoration: none;
-            font-size: 11px;
-            margin: 0 12px;
             transition: color 0.2s;
         }
-        .studio-footer a:hover {
-            color: #d4a843;
-        }
-        .studio-footer .footer-privacy {
-            font-size: 10px;
-            color: #4b5563;
-            margin-top: 8px;
-        }
-
-        /* ---- Promo Banner (below studio) ---- */
-        .promo-banner {
-            max-width: 640px;
-            width: 100%;
-            margin: 24px auto 0;
-            padding: 16px 20px;
-            background: rgba(212, 168, 67, 0.08);
-            border: 1px solid rgba(212, 168, 67, 0.2);
-            border-radius: 10px;
-            text-align: center;
-        }
-        .promo-banner p {
-            font-size: 12px;
-            color: #9ca3af;
-            margin-bottom: 8px;
-            line-height: 1.5;
-        }
-        .promo-banner a {
-            display: inline-block;
-            font-size: 12px;
-            font-weight: 700;
-            color: #d4a843;
-            text-decoration: none;
-            transition: opacity 0.2s;
-        }
-        .promo-banner a:hover {
-            opacity: 0.8;
+        .footer-links a:hover { color: var(--gold); }
+        .footer-privacy {
+            font-size: 11px;
+            color: #6b7280;
         }
 
         /* ---- Animations ---- */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
-            50% { box-shadow: 0 0 0 8px rgba(168, 85, 247, 0.3); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.6s ease forwards; }
 
         /* ---- Responsive ---- */
         @media (max-width: 640px) {
-            .studio-nav { padding: 10px 14px; }
-            .studio-nav-links a:not(.nav-cta) { display: none; }
-            .studio-main { padding: 16px 10px 40px; }
-            .studio-container { padding: 20px 16px; }
-            .example-card { flex: 0 0 160px; }
+            .hero { padding: 120px 16px 60px; }
+            .gallery-card { flex: 0 0 280px; }
+            .gallery-card img { height: 200px; }
+            .studio-container { padding: 20px; }
+            .features-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
     <!-- Navigation -->
-    <nav class="studio-nav">
-        <a href="/" class="studio-nav-brand">
-            <span class="brand-icon">&#127912;</span>
+    <nav class="site-nav">
+        <a href="/" class="nav-brand">
+            <span class="nav-brand-icon">&#127912;</span>
             <div>
-                <div class="brand-text">IMAGE STUDIO</div>
-                <div class="brand-sub">BY OFFGRID AI</div>
+                <div class="nav-brand-text">IMAGE STUDIO</div>
+                <div class="nav-brand-sub">by OffGrid AI</div>
             </div>
         </a>
-        <div class="studio-nav-links">
+        <button class="nav-hamburger" onclick="document.querySelector('.nav-links').classList.toggle('open')">&#9776;</button>
+        <div class="nav-links">
             <a href="https://offgridtoolkit.ai/command">Command Center</a>
             <a href="https://offgridtoolkit.ai">ToolKit Online</a>
-            <a href="https://offgridaitoolkit.com" class="nav-cta">GET THE USB DRIVE</a>
+            <a href="https://offgridaitoolkit.com" class="nav-cta-btn">GET THE USB DRIVE</a>
         </div>
     </nav>
 
-    <!-- Main Studio Area -->
-    <main class="studio-main">
-        <div>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content fade-in">
+            <div class="hero-badge">Powered by Gemini 3 Pro</div>
+            <h1>Your AI <span class="gold">Field Illustrator</span></h1>
+            <p class="hero-tagline">Describe what you need. Get survival diagrams, technical blueprints, and field guides in seconds.</p>
+            <div class="hero-ctas">
+                <a href="#try-it" class="btn-primary" onclick="smoothScroll(event, 'try-it')">&#127912; Try It To Believe It</a>
+                <a href="#gallery" class="btn-secondary" onclick="smoothScroll(event, 'gallery')">&#128247; View the Gallery</a>
+            </div>
+            <div class="hero-privacy">&#128274; No images stored. Each session is ephemeral and private.</div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery-section" id="gallery">
+        <div class="gallery-header">
+            <h2>Real Output. <span class="gold">No Filters.</span></h2>
+            <p>Every image below was generated by Image Studio. Click any image for a closer look.</p>
+        </div>
+        <div class="gallery-track-wrapper">
+            <div class="gallery-track" id="galleryTrack">
+                <div class="gallery-card" onclick="openLightbox(0)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png" alt="Chicken Coop Blueprint" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Chicken Coop Blueprint</div>
+                        <div class="gallery-card-tag">Homestead Guide</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(1)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/sQEWCSEUaYUUqLeL.jpg" alt="Grid-Down 72hr Decision Guide" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Grid-Down 72hr Decision Guide</div>
+                        <div class="gallery-card-tag">Survival Diagram</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(2)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/AqzaxPhPfxKUgXah.png" alt="Edible Plants of North America" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Edible Plants of North America</div>
+                        <div class="gallery-card-tag">Wilderness ID</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(3)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/VxGvxVSJYEHbSucz.png" alt="5 C's of Survival" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">5 C's of Survival</div>
+                        <div class="gallery-card-tag">Survival Diagram</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(4)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/iKIfAOnyygcAQooY.jpg" alt="Overlander Tool Kit" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Overlander Tool Kit</div>
+                        <div class="gallery-card-tag">Adventure Planning</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(5)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/ABKFWcnoSloPLnLE.png" alt="Medical Supplies Checklist" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Medical Supplies Checklist</div>
+                        <div class="gallery-card-tag">Medical Reference</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(6)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/jCqYsNxMLstFgjsl.jpg" alt="Snare Trap Construction" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Snare Trap Construction</div>
+                        <div class="gallery-card-tag">Survival Diagram</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(7)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/mSUdNDJNeDWgknrK.png" alt="Barter Value Guide" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Barter Value Guide</div>
+                        <div class="gallery-card-tag">Survival Diagram</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(8)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/PzTSIdYsyaMrWsup.png" alt="Foraging Guide: Arizona" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Foraging Guide: Arizona</div>
+                        <div class="gallery-card-tag">Wilderness ID</div>
+                    </div>
+                </div>
+                <div class="gallery-card" onclick="openLightbox(9)">
+                    <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/ehTkKNdnmlrZzoAR.png" alt="Underground Water Sources" loading="lazy">
+                    <div class="gallery-card-caption">
+                        <div class="gallery-card-title">Underground Water Sources</div>
+                        <div class="gallery-card-tag">Field Research</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="gallery-nav">
+            <button onclick="scrollGallery(-1)" aria-label="Previous">&#8592;</button>
+            <button onclick="scrollGallery(1)" aria-label="Next">&#8594;</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="features-inner">
+            <div class="features-header">
+                <h2>What Can You Create?</h2>
+                <p>Image Studio turns plain descriptions into detailed, reference-quality visuals. No design skills needed.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">&#128736;&#65039;</div>
+                    <h3>Technical Blueprints</h3>
+                    <p>Multi-angle construction diagrams with measurements, materials lists, and assembly instructions. From chicken coops to solar panel wiring.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#127807;</div>
+                    <h3>Field Identification Guides</h3>
+                    <p>Botanical charts, wildlife ID sheets, and foraging references with labeled features, safety notes, and regional specifics.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#129657;</div>
+                    <h3>Medical References</h3>
+                    <p>Wound care guides, first aid procedures, and medical supply checklists formatted for quick field reference.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#127919;</div>
+                    <h3>Survival Infographics</h3>
+                    <p>Decision trees, step-by-step procedures, and priority checklists for emergency scenarios. Clear, actionable, and printable.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128300;</div>
+                    <h3>Educational Materials</h3>
+                    <p>Teaching aids, process diagrams, and reference posters for classrooms, workshops, or self-study.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128656;</div>
+                    <h3>Adventure Planning</h3>
+                    <p>Gear checklists, route planning visuals, vehicle repair guides, and overlanding preparation charts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Try It CTA Section -->
+    <section class="try-cta-section" id="try-it">
+        <h2>See It <span class="gold">For Yourself</span></h2>
+        <p>Still not convinced? Generate your own image right now. One free preview, no sign-up required.</p>
+        <button class="btn-primary" onclick="smoothScroll(event, 'demo')">&#127912; Create Your Own Image</button>
+        <div class="try-cta-arrow">&#8595;</div>
+    </section>
+
+    <!-- Live Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="demo-header">
+            <h2>&#127912; Live Image Studio</h2>
+            <p>Pick a category, choose an example or describe your own, and watch the AI work.</p>
+            <div class="demo-limit-badge" id="demoLimitBadge">1 Free Preview Available</div>
+        </div>
+
+        <div style="position: relative;">
             <div class="studio-container" id="studioContainer">
                 <div class="studio-header-row">
                     <h2>&#127912; Image Studio</h2>
@@ -676,33 +1071,81 @@
                 <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Gemini 3 Pro</div>
             </div>
 
-            <!-- Promo Banner -->
-            <div class="promo-banner">
-                <p>Image Studio is part of the <strong>OffGrid AI Command Center</strong>. Generate images, chat with the AI Council, save to your Knowledge Base, and more.</p>
-                <a href="https://offgridtoolkit.ai/command">Open the Full Command Center &rarr;</a>
+            <!-- Generation Limit Overlay -->
+            <div class="limit-overlay" id="limitOverlay">
+                <div class="limit-overlay-content">
+                    <div style="font-size: 48px; margin-bottom: 16px;">&#127912;</div>
+                    <h3>You Created Something Amazing</h3>
+                    <p>You have used your free preview. Unlock unlimited Image Studio access, the AI Council, Knowledge Base, and more in the full Command Center.</p>
+                    <a href="https://offgridtoolkit.ai/command" class="btn-primary">Open the Full Command Center</a>
+                    <br>
+                    <a href="https://offgridaitoolkit.com" class="btn-secondary-sm">Or get the USB Drive for 100% offline access</a>
+                </div>
             </div>
         </div>
-    </main>
+    </section>
 
     <!-- Footer -->
-    <footer class="studio-footer">
-        <div>
+    <footer class="site-footer">
+        <div class="footer-links">
             <a href="https://offgridtoolkit.ai">OffGrid AI ToolKit</a>
             <a href="https://offgridtoolkit.ai/command">Command Center</a>
             <a href="https://cmdcouncil.com">Command Council</a>
             <a href="https://offgridaitoolkit.com">Get the USB Drive</a>
         </div>
-        <div class="footer-privacy">No conversations or images are stored. Each session is ephemeral.</div>
+        <div class="footer-privacy">No conversations or images are stored. Each session is ephemeral and private.</div>
     </footer>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+        <img id="lightboxImg" src="" alt="">
+        <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
 
     <script>
         // ============================================
-        // IMAGE STUDIO STANDALONE - JavaScript
+        // IMAGE STUDIO - COMBINED MARKETING + DEMO
         // ============================================
 
         const API_BASE = window.location.origin;
         let selectedCategory = 'other';
         let craftedPrompt = '';
+        const MAX_FREE_GENERATIONS = 1;
+
+        // ---- Generation Limit ----
+        function getGenerationCount() {
+            try { return parseInt(localStorage.getItem('offgrid_img_gen_count') || '0', 10); }
+            catch { return 0; }
+        }
+        function incrementGenerationCount() {
+            try {
+                const count = getGenerationCount() + 1;
+                localStorage.setItem('offgrid_img_gen_count', count.toString());
+                return count;
+            } catch { return 1; }
+        }
+        function isLimitReached() {
+            return getGenerationCount() >= MAX_FREE_GENERATIONS;
+        }
+        function showLimitOverlay() {
+            const overlay = document.getElementById('limitOverlay');
+            if (overlay) overlay.classList.add('active');
+        }
+        function updateLimitBadge() {
+            const badge = document.getElementById('demoLimitBadge');
+            if (!badge) return;
+            const remaining = Math.max(0, MAX_FREE_GENERATIONS - getGenerationCount());
+            if (remaining > 0) {
+                badge.textContent = remaining + ' Free Preview' + (remaining > 1 ? 's' : '') + ' Available';
+                badge.style.borderColor = 'rgba(42, 157, 143, 0.3)';
+                badge.style.color = '#2a9d8f';
+            } else {
+                badge.textContent = 'Free Preview Used';
+                badge.style.borderColor = 'rgba(212, 168, 67, 0.3)';
+                badge.style.color = '#d4a843';
+            }
+        }
 
         // ---- Utility Functions ----
         function escapeHtml(text) {
@@ -717,104 +1160,85 @@
             selectedCategory = chip.dataset.cat;
         }
 
-        // ============================================
-        // EXAMPLE PROMPT CARDS DATA
-        // ============================================
+        function smoothScroll(e, targetId) {
+            e.preventDefault();
+            const el = document.getElementById(targetId);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ---- Gallery ----
+        const GALLERY_IMAGES = [
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png', title: 'Chicken Coop Blueprint' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/sQEWCSEUaYUUqLeL.jpg', title: 'Grid-Down 72hr Decision Guide' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/AqzaxPhPfxKUgXah.png', title: 'Edible Plants of North America' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/VxGvxVSJYEHbSucz.png', title: '5 C\'s of Survival' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/iKIfAOnyygcAQooY.jpg', title: 'Overlander Tool Kit' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/ABKFWcnoSloPLnLE.png', title: 'Medical Supplies Checklist' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/jCqYsNxMLstFgjsl.jpg', title: 'Snare Trap Construction' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/mSUdNDJNeDWgknrK.png', title: 'Barter Value Guide' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/PzTSIdYsyaMrWsup.png', title: 'Foraging Guide: Arizona' },
+            { src: 'https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/ehTkKNdnmlrZzoAR.png', title: 'Underground Water Sources' }
+        ];
+
+        function scrollGallery(direction) {
+            const track = document.getElementById('galleryTrack');
+            if (track) track.scrollBy({ left: direction * 370, behavior: 'smooth' });
+        }
+
+        function openLightbox(index) {
+            const img = GALLERY_IMAGES[index];
+            if (!img) return;
+            document.getElementById('lightboxImg').src = img.src;
+            document.getElementById('lightboxCaption').textContent = img.title;
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+        // ---- Example Cards ----
         const EXAMPLE_CARDS = [
             {
-                type: 'create-instant',
-                emoji: '&#128020;',
-                title: 'Chicken Coop Blueprint',
-                desc: 'Multi-angle technical illustration with materials list',
-                category: 'homestead',
+                type: 'create-instant', emoji: '&#128020;', title: 'Chicken Coop Blueprint',
+                desc: 'Multi-angle technical illustration with materials list', category: 'homestead',
                 craftedPrompt: 'Detailed, labeled technical diagram of an off-grid chicken coop shown from multiple angles including front, side, and top views. Include precise measurements in feet and inches for each section: frame, nesting boxes, roosting bars, ventilation, door, and run area. Annotate building materials list with types of wood, wire mesh, fasteners, roofing, and paint. Use warm, earthy color palette with natural wood tones and soft greens. Background is clean off-white for clarity. Include clear, easy-to-read educational labels and callouts highlighting structural features and functional elements. Style is professional, hand-drawn architectural illustration with neat line work and balanced layout for practical homesteading reference.'
             },
             {
-                type: 'create-instant',
-                emoji: '&#127807;',
-                title: 'Edible Wild Plants Guide',
-                desc: 'Identification chart with labeled features and safety notes',
-                category: 'wilderness',
+                type: 'create-instant', emoji: '&#127807;', title: 'Edible Wild Plants Guide',
+                desc: 'Identification chart with labeled features and safety notes', category: 'wilderness',
                 craftedPrompt: 'Comprehensive identification chart of common edible wild plants of North America. Include at least 6 plants: Dandelion, Wild Asparagus, Common Plantain, Stinging Nettle, Wood Sorrel, and Purslane. For each plant show a detailed botanical illustration with labeled features, common name, Latin name, edible parts, usage notes, and caution warnings. Use a clean, educational field-guide style with warm earthy tones and natural colors. Include a key for subspecies and species abbreviations. Add a safety disclaimer at the bottom: Ensure Positive ID Before Consuming. When in Doubt, Do Not Eat. Professional botanical illustration style with clear labels and organized grid layout.'
             },
             {
-                type: 'create-instant',
-                emoji: '&#129517;',
-                title: 'Shadow-Stick Navigation',
-                desc: 'Step-by-step guide to finding North using the sun',
-                category: 'survival',
+                type: 'create-instant', emoji: '&#129517;', title: 'Shadow-Stick Navigation',
+                desc: 'Step-by-step guide to finding North using the sun', category: 'survival',
                 craftedPrompt: 'Step-by-step illustrated field guide showing the shadow-stick method for finding North using the sun\'s shadow. Show materials needed (vertical stick, two markers, sunny sky, level ground), then illustrate each step: plant the stick, mark initial shadow tip as Point A, wait 15-30 minutes, mark new shadow tip as Point B, draw the East-West line connecting A to B, determine North-South perpendicular line. Include diagrams for both Northern and Southern hemisphere orientation. Add accuracy tips: wait longer for better results, use on clear days, use level ground only. Use warm earthy tones with clear numbered steps, directional arrows, and educational callouts. Professional field reference style with balanced layout.'
             },
             {
-                type: 'create-instant',
-                emoji: '&#129714;',
-                title: 'Edible Insects for Survival',
-                desc: 'Identification and preparation guide for safe protein',
-                category: 'survival',
+                type: 'create-instant', emoji: '&#129714;', title: 'Edible Insects for Survival',
+                desc: 'Identification and preparation guide for safe protein', category: 'survival',
                 craftedPrompt: 'Comprehensive illustrated field guide showing safe edible insects for survival nutrition and sustainable protein sourcing. Include sections for: Orthoptera (grasshoppers, crickets, locusts), Beetle Larvae (grubs), Termites, Ants (larvae/pupae/adults), Cicadas, Aquatic Nymphs (mayfly, dragonfly, stonefly), and Bee/Wasp Brood. For each insect group show detailed illustrations, habitat locations, collection methods, preparation instructions (cook thoroughly), and safety warnings. Include an Insects to Avoid checklist with red flags: bright colors, hairy caterpillars, chemical odor, pesticide zones, toxic beetles. Add health cautions about shellfish allergies, uncooked risks, and starting small. Use warm earthy vintage field guide style with organized grid layout and clear educational labels.'
             },
             {
-                type: 'create-instant',
-                emoji: '&#128736;&#65039;',
-                title: 'Overlander Repair Tool Kit',
-                desc: 'Top 15 essential field repair tools with descriptions',
-                category: 'adventure',
-                craftedPrompt: 'Detailed illustrated reference poster showing the Top 15 Essential Overlander Field Repair Tools. Include two columns of essential tools and kits (1-8 and 9-15): 3/8 drive socket set with extensions, breaker bar, combination wrench set, multi-bit screwdriver, needle-nose pliers, water-pump pliers, locking pliers (vise-grips), adjustable wrench, metric and SAE hex key set, tire plug kit with valve core tool, 12V air compressor with tire gauge, jack with base plate and lug tool, electrical repair kit, wire stripper/crimper combo, multimeter/test light. Add sections for Consumables and Repair Supplies (zip ties, duct tape, electrical tape, hose clamps, epoxy/RTV silicone) and Optional High-Value Extras (jump starter pack, headlamp, mechanic gloves). Use vintage adventure map style with warm earthy tones, detailed tool illustrations, and organized professional layout.'
-            },
-            {
-                type: 'create-instant',
-                emoji: '&#9728;&#65039;',
-                title: 'Solar Panel Wiring Diagram',
-                desc: 'Complete 12V battery bank system with engineering labels',
-                category: 'survival',
-                craftedPrompt: 'Technical engineering diagram of a complete off-grid solar panel wiring system for a 12V battery bank. Show solar panels connected in parallel and series configurations, charge controller wiring, battery bank connections, fuse box, inverter, and load distribution panel. Include wire gauge specifications, fuse ratings, and voltage/amperage labels at each connection point. Use clean engineering illustration style with color-coded wires (red positive, black negative, green ground). Include a component list with specifications. Background is clean white/light gray. Professional technical drawing style with neat line work, clear labels, and organized layout suitable for field reference.'
-            },
-            {
-                type: 'create-instant',
-                emoji: '&#127969;',
-                title: 'Raised Garden Bed Plans',
-                desc: 'Construction diagram with planting zones and materials',
-                category: 'homestead',
-                craftedPrompt: 'Detailed technical illustration of a raised garden bed construction plan for off-grid homesteading. Show multiple views: exploded assembly diagram, top-down planting zone layout, and cross-section with soil layers. Include precise measurements for a 4x8 foot bed with 12-inch depth. Label all materials: cedar or untreated lumber dimensions, galvanized screws, landscape fabric, gravel drainage layer, soil mix ratios. Include companion planting zones with suggested vegetables for each section. Use warm earthy color palette with natural wood tones and garden greens. Professional hand-drawn architectural illustration style with clear annotations and balanced layout for practical reference.'
-            },
-            {
-                type: 'create-instant',
-                emoji: '&#128167;',
-                title: 'Water Purification Methods',
-                desc: 'Step-by-step infographic of 5 emergency techniques',
-                category: 'survival',
-                craftedPrompt: 'Comprehensive infographic showing 5 emergency water purification methods for survival situations. Include: 1) Boiling with time/temperature guidelines, 2) Solar disinfection (SODIS) with clear bottle method, 3) Chemical treatment with iodine/chlorine tablets and dosage, 4) DIY sand/charcoal/gravel filter construction diagram, 5) UV purification with commercial pen device. For each method show step-by-step illustrations, effectiveness ratings, pros/cons, and time required. Include a water source risk assessment chart. Use clean educational style with warm earthy tones and clear numbered steps. Professional field reference layout with balanced sections and safety warnings.'
-            },
-            {
-                type: 'try-it',
-                emoji: '&#129657;',
-                title: 'Wound Care Field Guide',
-                desc: 'Basic bandaging techniques for emergencies',
-                category: 'medical',
+                type: 'try-it', emoji: '&#129657;', title: 'Wound Care Field Guide',
+                desc: 'Basic bandaging techniques for emergencies', category: 'medical',
                 simplePrompt: 'Visual guide for basic wound care and bandaging techniques in a field setting'
             },
             {
-                type: 'try-it',
-                emoji: '&#127794;',
-                title: 'Emergency Shelter Designs',
-                desc: 'Wilderness shelter types and construction',
-                category: 'survival',
+                type: 'try-it', emoji: '&#127794;', title: 'Emergency Shelter Designs',
+                desc: 'Wilderness shelter types and construction', category: 'survival',
                 simplePrompt: 'Illustrated guide showing 4 types of emergency wilderness shelters with construction steps and materials needed'
             },
             {
-                type: 'try-it',
-                emoji: '&#128293;',
-                title: 'Fire Starting Methods',
-                desc: 'Multiple techniques for starting fire without matches',
-                category: 'survival',
+                type: 'try-it', emoji: '&#128293;', title: 'Fire Starting Methods',
+                desc: 'Multiple techniques for starting fire without matches', category: 'survival',
                 simplePrompt: 'Step-by-step visual guide showing 5 methods to start a fire without matches in a survival situation'
             },
             {
-                type: 'try-it',
-                emoji: '&#129520;',
-                title: 'Rainwater Collection System',
-                desc: 'Design diagram for off-grid water harvesting',
-                category: 'homestead',
+                type: 'try-it', emoji: '&#129520;', title: 'Rainwater Collection System',
+                desc: 'Design diagram for off-grid water harvesting', category: 'homestead',
                 simplePrompt: 'Technical diagram of a rainwater collection and filtration system for an off-grid cabin'
             }
         ];
@@ -833,6 +1257,7 @@
         }
 
         function handleExampleCard(index) {
+            if (isLimitReached()) { showLimitOverlay(); return; }
             const card = EXAMPLE_CARDS[index];
             if (!card) return;
 
@@ -844,7 +1269,7 @@
             if (card.type === 'create-instant' && card.craftedPrompt) {
                 craftedPrompt = card.craftedPrompt;
                 const textarea = document.getElementById('studioDescription');
-                if (textarea) textarea.value = card.title + ' \u2014 ' + card.desc;
+                if (textarea) textarea.value = card.title + ' - ' + card.desc;
 
                 const suggestionDiv = document.getElementById('studioAiSuggestion');
                 suggestionDiv.innerHTML = `
@@ -865,30 +1290,18 @@
                         </div>
                     </div>
                 `;
-                setTimeout(() => suggestionDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
-
             } else if (card.simplePrompt) {
                 const textarea = document.getElementById('studioDescription');
-                if (textarea) {
-                    textarea.value = card.simplePrompt;
-                    textarea.focus();
-                    const craftBtn = document.getElementById('studioCraftBtn');
-                    if (craftBtn) {
-                        craftBtn.style.animation = 'none';
-                        craftBtn.offsetHeight;
-                        craftBtn.style.animation = 'pulse-glow 1.5s ease 2';
-                    }
-                }
+                if (textarea) textarea.value = card.simplePrompt;
+                craftImagePrompt();
             }
         }
 
         // ---- Craft Prompt ----
         async function craftImagePrompt() {
+            if (isLimitReached()) { showLimitOverlay(); return; }
             const description = document.getElementById('studioDescription')?.value.trim();
-            if (!description) {
-                document.getElementById('studioDescription')?.focus();
-                return;
-            }
+            if (!description) { document.getElementById('studioDescription')?.focus(); return; }
 
             const craftBtn = document.getElementById('studioCraftBtn');
             const suggestionDiv = document.getElementById('studioAiSuggestion');
@@ -896,7 +1309,7 @@
             craftBtn.disabled = true;
             craftBtn.textContent = 'Crafting...';
             suggestionDiv.innerHTML = `
-                <div class="studio-crafting">
+                <div style="text-align: center; padding: 20px; color: #6b7280;">
                     <div class="spinner"></div>
                     <div style="font-size: 13px;">OffGrid AI is crafting your prompt...</div>
                 </div>
@@ -906,16 +1319,11 @@
                 const response = await fetch(`${API_BASE}/api/command/craft-prompt`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        description: description,
-                        category: selectedCategory
-                    })
+                    body: JSON.stringify({ description, category: selectedCategory })
                 });
 
                 const data = await response.json();
-                if (!response.ok || !data.success) {
-                    throw new Error(data.error || 'Failed to craft prompt');
-                }
+                if (!response.ok || !data.success) throw new Error(data.error || 'Failed to craft prompt');
 
                 craftedPrompt = data.prompt;
                 suggestionDiv.innerHTML = `
@@ -937,7 +1345,6 @@
                     </div>
                 `;
             } catch (error) {
-                console.error('Prompt crafting error:', error);
                 suggestionDiv.innerHTML = `
                     <div style="text-align: center; padding: 16px; color: #ef4444;">
                         <div style="font-size: 13px; font-weight: 600;">Couldn't craft prompt</div>
@@ -955,27 +1362,24 @@
             const editArea = document.getElementById('editPromptArea');
             if (editArea) {
                 editArea.style.display = editArea.style.display === 'none' ? 'block' : 'none';
-                if (editArea.style.display === 'block') {
-                    document.getElementById('editablePrompt')?.focus();
-                }
+                if (editArea.style.display === 'block') document.getElementById('editablePrompt')?.focus();
             }
         }
 
-        function retryCraftPrompt() {
-            craftImagePrompt();
-        }
+        function retryCraftPrompt() { craftImagePrompt(); }
 
         async function generateFromCraftedPrompt() {
+            if (isLimitReached()) { showLimitOverlay(); return; }
             if (!craftedPrompt) return;
             const promptTextarea = document.getElementById('imagePrompt');
             if (promptTextarea) {
                 promptTextarea.value = craftedPrompt;
             } else {
-                const tempTextarea = document.createElement('textarea');
-                tempTextarea.id = 'imagePrompt';
-                tempTextarea.value = craftedPrompt;
-                tempTextarea.style.display = 'none';
-                document.getElementById('studioContainer')?.appendChild(tempTextarea);
+                const temp = document.createElement('textarea');
+                temp.id = 'imagePrompt';
+                temp.value = craftedPrompt;
+                temp.style.display = 'none';
+                document.getElementById('studioContainer')?.appendChild(temp);
             }
             const genBtn = document.getElementById('generateCraftedBtn');
             if (genBtn) { genBtn.disabled = true; genBtn.textContent = 'Generating...'; }
@@ -993,6 +1397,7 @@
         }
 
         function toggleDirectPrompt() {
+            if (isLimitReached()) { showLimitOverlay(); return; }
             const section = document.getElementById('directPromptSection');
             if (section) {
                 const isVisible = section.style.display !== 'none';
@@ -1000,9 +1405,7 @@
                 if (!isVisible) {
                     const textarea = document.getElementById('imagePrompt');
                     if (textarea) {
-                        if (craftedPrompt && !textarea.value) {
-                            textarea.value = craftedPrompt;
-                        }
+                        if (craftedPrompt && !textarea.value) textarea.value = craftedPrompt;
                         textarea.focus();
                     }
                 }
@@ -1011,16 +1414,15 @@
 
         // ---- Generate Image ----
         async function generateImage() {
+            if (isLimitReached()) { showLimitOverlay(); return; }
+
             const prompt = document.getElementById('imagePrompt')?.value.trim();
             if (!prompt) return;
 
             const generateBtn = document.getElementById('studioGenerateBtn');
             const resultDiv = document.getElementById('studioResult');
 
-            if (generateBtn) {
-                generateBtn.disabled = true;
-                generateBtn.textContent = 'Generating...';
-            }
+            if (generateBtn) { generateBtn.disabled = true; generateBtn.textContent = 'Generating...'; }
             resultDiv.innerHTML = `
                 <div class="studio-generating">
                     <div class="spinner"></div>
@@ -1028,6 +1430,9 @@
                     <div style="font-size: 12px; margin-top: 4px; color: #9ca3af;">This may take 10-30 seconds</div>
                 </div>
             `;
+
+            // Scroll result into view
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
             try {
                 const response = await fetch(`${API_BASE}/api/command/generate-image`, {
@@ -1038,15 +1443,16 @@
 
                 const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(data.error || 'Image generation failed');
-                }
+                if (!response.ok) throw new Error(data.error || 'Image generation failed');
 
                 if (data.success && data.image) {
                     const imageSrc = data.image.startsWith('data:') ? data.image : `data:image/png;base64,${data.image}`;
-
                     window._lastGeneratedImage = imageSrc;
                     window._lastGeneratedPrompt = prompt;
+
+                    // Count this generation
+                    const newCount = incrementGenerationCount();
+                    updateLimitBadge();
 
                     resultDiv.innerHTML = `
                         <div class="studio-result">
@@ -1057,16 +1463,19 @@
                             ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
                         </div>
                     `;
+
+                    // Scroll to the generated image
+                    setTimeout(() => resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+
+                    // Show limit message after a brief delay so they can see their image first
+                    if (newCount >= MAX_FREE_GENERATIONS) {
+                        setTimeout(() => {
+                            showLimitOverlay();
+                        }, 8000);
+                    }
                 } else {
                     const reason = data.errorReason || 'unknown';
-                    const reasonLabels = {
-                        safety: 'Safety Filter',
-                        content_policy: 'Content Policy',
-                        no_image: 'No Image Generated',
-                        max_tokens: 'Token Limit',
-                        recitation: 'Copyright Detection',
-                        unknown: 'Generation Issue'
-                    };
+                    const reasonLabels = { safety: 'Safety Filter', content_policy: 'Content Policy', no_image: 'No Image Generated', max_tokens: 'Token Limit', recitation: 'Copyright Detection', unknown: 'Generation Issue' };
                     const reasonLabel = reasonLabels[reason] || 'Generation Issue';
 
                     resultDiv.innerHTML = `
@@ -1074,13 +1483,11 @@
                             <span class="error-reason-badge ${reason}">${escapeHtml(reasonLabel)}</span>
                             <div style="font-size: 14px; font-weight: 600; color: #ef4444; margin-top: 6px;">Image generation did not produce an image</div>
                             <div style="font-size: 12px; margin-top: 6px; color: #6b7280;">${escapeHtml(data.error || 'Try rephrasing your prompt to be more descriptive.')}</div>
-                            ${data.textResponse ? `<div style="font-size: 12px; margin-top: 10px; color: #4b5563; text-align: left; background: #f9fafb; padding: 12px; border-radius: 8px; max-height: 120px; overflow-y: auto;"><strong>Model response:</strong> ${escapeHtml(data.textResponse)}</div>` : ''}
                             <div style="font-size: 11px; margin-top: 12px; color: #9ca3af;">Tip: Try using the Prompt Builder above, or click an example prompt to test with a known-good prompt.</div>
                         </div>
                     `;
                 }
             } catch (error) {
-                console.error('Image generation error:', error);
                 resultDiv.innerHTML = `
                     <div style="text-align: center; padding: 20px; color: #ef4444;">
                         <div style="font-size: 14px; font-weight: 600;">Generation Failed</div>
@@ -1088,10 +1495,7 @@
                     </div>
                 `;
             } finally {
-                if (generateBtn) {
-                    generateBtn.disabled = false;
-                    generateBtn.textContent = '\ud83c\udfa8 Generate Image';
-                }
+                if (generateBtn) { generateBtn.disabled = false; generateBtn.textContent = '\ud83c\udfa8 Generate Image'; }
             }
         }
 
@@ -1107,7 +1511,16 @@
         // ---- Initialize ----
         document.addEventListener('DOMContentLoaded', () => {
             renderExampleCards();
-            document.getElementById('studioDescription')?.focus();
+            updateLimitBadge();
+            // Check if already at limit on load
+            if (isLimitReached()) {
+                const badge = document.getElementById('demoLimitBadge');
+                if (badge) {
+                    badge.textContent = 'Free Preview Used';
+                    badge.style.borderColor = 'rgba(212, 168, 67, 0.3)';
+                    badge.style.color = '#d4a843';
+                }
+            }
         });
     </script>
 </body>
