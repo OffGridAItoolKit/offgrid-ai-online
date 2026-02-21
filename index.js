@@ -1835,14 +1835,26 @@ function markdownToHtml(md) {
 // This middleware intercepts page-level requests only.
 // =============================================================================
 
-function isImageStudioSubdomain(hostname) {
-    return hostname === 'imagestudio.offgridtoolkit.ai' ||
-           hostname === 'imagestudio.offgridtoolkit.ai:3000' || // local dev
-           hostname.startsWith('imagestudio.');
+function isImageStudioSubdomain(req) {
+    // Check multiple sources since reverse proxies handle hostnames differently
+    const hostname = req.hostname || '';                          // Express parsed (respects trust proxy)
+    const hostHeader = req.headers.host || '';                    // Raw Host header
+    const forwardedHost = req.headers['x-forwarded-host'] || '';  // Proxy forwarded host
+    
+    const isMatch = hostname.startsWith('imagestudio.') ||
+                    hostHeader.startsWith('imagestudio.') ||
+                    forwardedHost.startsWith('imagestudio.');
+    
+    // Temporary debug logging (remove after confirming it works)
+    if (req.path === '/' || req.path === '') {
+        console.log(`[Subdomain Check] hostname=${hostname} | host=${hostHeader} | x-forwarded-host=${forwardedHost} | match=${isMatch}`);
+    }
+    
+    return isMatch;
 }
 
 app.use((req, res, next) => {
-    if (!isImageStudioSubdomain(req.hostname)) return next();
+    if (!isImageStudioSubdomain(req)) return next();
     
     // Let API routes pass through to their handlers
     if (req.path.startsWith('/api/')) return next();
