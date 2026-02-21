@@ -184,6 +184,37 @@ app.use('/api/chat', limiter);
 app.use('/api/stream', limiter);
 app.use('/api/command/', commandLimiter);
 
+// =============================================================================
+// SUBDOMAIN ROUTING: imagestudio.offgridtoolkit.ai
+// =============================================================================
+// MUST be placed BEFORE express.static so it intercepts root page requests
+// before the static middleware serves index.html as the default directory index.
+// =============================================================================
+
+function isImageStudioSubdomain(req) {
+    const hostname = req.hostname || '';
+    const hostHeader = req.headers.host || '';
+    const forwardedHost = req.headers['x-forwarded-host'] || '';
+    
+    return hostname.startsWith('imagestudio.') ||
+           hostHeader.startsWith('imagestudio.') ||
+           forwardedHost.startsWith('imagestudio.');
+}
+
+app.use((req, res, next) => {
+    if (!isImageStudioSubdomain(req)) return next();
+    
+    // Let API routes pass through to their handlers
+    if (req.path.startsWith('/api/')) return next();
+    
+    // Let static assets pass through (CSS, JS, images, fonts)
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/)) return next();
+    
+    // Serve the standalone Image Studio page for all page-level requests
+    console.log(`[Image Studio] Serving standalone page for ${req.headers.host}${req.path}`);
+    res.sendFile(path.join(__dirname, 'image-studio.html'));
+});
+
 // Serve static files from the same directory as index.js (flat structure)
 app.use(express.static(__dirname));
 
@@ -1827,44 +1858,7 @@ function markdownToHtml(md) {
     return html;
 }
 
-// =============================================================================
-// SUBDOMAIN ROUTING: imagestudio.offgridtoolkit.ai
-// =============================================================================
-// Serves the standalone Image Studio page when accessed via the subdomain.
-// All API endpoints (/api/*) still work normally since they're defined above.
-// This middleware intercepts page-level requests only.
-// =============================================================================
-
-function isImageStudioSubdomain(req) {
-    // Check multiple sources since reverse proxies handle hostnames differently
-    const hostname = req.hostname || '';                          // Express parsed (respects trust proxy)
-    const hostHeader = req.headers.host || '';                    // Raw Host header
-    const forwardedHost = req.headers['x-forwarded-host'] || '';  // Proxy forwarded host
-    
-    const isMatch = hostname.startsWith('imagestudio.') ||
-                    hostHeader.startsWith('imagestudio.') ||
-                    forwardedHost.startsWith('imagestudio.');
-    
-    // Temporary debug logging (remove after confirming it works)
-    if (req.path === '/' || req.path === '') {
-        console.log(`[Subdomain Check] hostname=${hostname} | host=${hostHeader} | x-forwarded-host=${forwardedHost} | match=${isMatch}`);
-    }
-    
-    return isMatch;
-}
-
-app.use((req, res, next) => {
-    if (!isImageStudioSubdomain(req)) return next();
-    
-    // Let API routes pass through to their handlers
-    if (req.path.startsWith('/api/')) return next();
-    
-    // Let static assets pass through (CSS, JS, images, fonts)
-    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/)) return next();
-    
-    // Serve the standalone Image Studio page for all other requests
-    res.sendFile(path.join(__dirname, 'image-studio.html'));
-});
+// (Subdomain routing moved above express.static — see line ~188)
 
 // =============================================================================
 // ROUTE: /command - Serve Command Center page
