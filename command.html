@@ -1944,6 +1944,7 @@
         .image-studio-modal {
             background: #ffffff;
             border: 2px solid #a855f7;
+            border-top: 3px solid #2c1810;
             border-radius: 16px;
             padding: 28px;
             max-width: 600px;
@@ -2239,63 +2240,7 @@
             line-height: 1.3;
         }
 
-        /* First-Run Tooltips */
-        .studio-tooltip {
-            position: absolute;
-            background: #1f2937;
-            color: white;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 12px;
-            line-height: 1.4;
-            max-width: 240px;
-            z-index: 10001;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
-            animation: fadeIn 0.3s ease;
-            pointer-events: auto;
-        }
-        .studio-tooltip::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border: 6px solid transparent;
-        }
-        .studio-tooltip.arrow-down::after {
-            border-top-color: #1f2937;
-            bottom: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .studio-tooltip.arrow-up::after {
-            border-bottom-color: #1f2937;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .studio-tooltip .tooltip-step {
-            display: inline-block;
-            background: #a855f7;
-            color: white;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 18px;
-            font-size: 10px;
-            font-weight: 700;
-            margin-right: 6px;
-        }
-        .studio-tooltip .tooltip-dismiss {
-            display: block;
-            margin-top: 8px;
-            font-size: 10px;
-            color: #9ca3af;
-            cursor: pointer;
-        }
-        .studio-tooltip .tooltip-dismiss:hover {
-            color: white;
-        }
+
         /* AI Suggestion Bubble */
         .ai-suggestion {
             background: linear-gradient(135deg, #faf5ff 0%, #f0e6ff 100%);
@@ -4745,8 +4690,11 @@
             overlay.id = 'imageStudioModal';
             overlay.innerHTML = `
                 <div class="image-studio-modal">
-                    <h3>\ud83c\udfa8 Image Studio</h3>
-                    <div class="studio-subtitle">Describe what you need \u2014 our AI crafts the perfect prompt for you.</div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                        <h3 style="margin-bottom: 0;">\ud83c\udfa8 Image Studio</h3>
+                        <span style="font-size: 9px; color: #9ca3af; font-weight: 500; letter-spacing: 0.3px;">by OffGrid AI</span>
+                    </div>
+                    <div class="studio-subtitle">Describe what you need. Our AI crafts the perfect prompt for you.</div>
 
                     <div class="studio-categories">
                         <div class="studio-categories-label">What type of visual do you need?</div>
@@ -4764,13 +4712,13 @@
                     </div>
 
                     <div class="example-prompts-section">
-                        <div class="example-prompts-label">\u2728 Explore examples \u2014 scroll to see more</div>
+                        <div class="example-prompts-label">\u2728 Explore examples. Scroll to see more</div>
                         <div class="example-cards-scroll" id="exampleCardsScroll"></div>
                     </div>
 
                     <div style="position: relative;">
                         <label for="studioDescription" id="studioDescLabel">Describe what you need</label>
-                        <textarea id="studioDescription" placeholder="Just describe it naturally \u2014 e.g., 'a diagram showing how to build a simple water filter' or 'an infographic about edible plants in the Pacific Northwest'"></textarea>
+                        <textarea id="studioDescription" placeholder="Just describe it naturally, e.g. 'a diagram showing how to build a simple water filter' or 'an infographic about edible plants in the Pacific Northwest'"></textarea>
                     </div>
 
                     <div class="image-studio-actions" style="position: relative;">
@@ -4790,7 +4738,7 @@
                     </div>
 
                     <div class="studio-privacy"><span class="lock-icon">\ud83d\udd12</span> Images are generated on-demand and never stored on our servers.</div>
-                    <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Nano Banana Pro (Gemini 3 Pro)</div>
+                    <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Gemini 3 Pro</div>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -4798,9 +4746,8 @@
                 if (e.target === overlay) closeImageStudio();
             });
 
-            // Render the example cards and show first-run tooltips
+            // Render the example cards
             renderExampleCards();
-            showStudioTooltips();
 
             setTimeout(() => {
                 const descInput = document.getElementById('studioDescription');
@@ -4944,8 +4891,6 @@
                 if (catChip) selectStudioCategory(catChip);
             }
 
-            // Dismiss tooltips on first interaction
-            dismissStudioTooltips();
 
             if (card.type === 'create-instant' && card.craftedPrompt) {
                 // CREATE INSTANTLY: Skip the craft step, go straight to generation
@@ -4997,48 +4942,7 @@
         }
 
         // ============================================
-        // FIRST-RUN GUIDED TOOLTIPS
-        // ============================================
 
-        function showStudioTooltips() {
-            // Only show on first visit
-            if (localStorage.getItem('studioTooltipsSeen')) return;
-
-            setTimeout(() => {
-                const modal = document.querySelector('.image-studio-modal');
-                if (!modal) return;
-
-                // Tooltip 1: On the example cards
-                const cardsSection = document.getElementById('exampleCardsScroll');
-                if (cardsSection) {
-                    const tip1 = document.createElement('div');
-                    tip1.className = 'studio-tooltip arrow-up';
-                    tip1.id = 'studioTip1';
-                    tip1.innerHTML = `<span class="tooltip-step">1</span> <strong>Pick an example</strong> to get started, or describe your own idea below. Gold cards generate instantly!<span class="tooltip-dismiss" onclick="dismissStudioTooltips()">Got it</span>`;
-                    tip1.style.cssText = 'position: relative; margin: 4px 0 8px 0; display: inline-block;';
-                    cardsSection.parentNode.insertBefore(tip1, cardsSection.nextSibling);
-                }
-
-                // Tooltip 2: On the Craft button
-                const craftBtn = document.getElementById('studioCraftBtn');
-                if (craftBtn) {
-                    const tip2 = document.createElement('div');
-                    tip2.className = 'studio-tooltip arrow-down';
-                    tip2.id = 'studioTip2';
-                    tip2.innerHTML = `<span class="tooltip-step">2</span> <strong>Craft My Prompt</strong> \u2014 our AI transforms your simple idea into a detailed, optimized image prompt.`;
-                    tip2.style.cssText = 'position: relative; margin: 0 0 8px 0; display: inline-block;';
-                    craftBtn.parentNode.insertBefore(tip2, craftBtn.parentNode.firstChild);
-                }
-            }, 400);
-        }
-
-        function dismissStudioTooltips() {
-            localStorage.setItem('studioTooltipsSeen', 'true');
-            const tip1 = document.getElementById('studioTip1');
-            const tip2 = document.getElementById('studioTip2');
-            if (tip1) { tip1.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => tip1.remove(), 300); }
-            if (tip2) { tip2.style.animation = 'fadeOut 0.3s ease'; setTimeout(() => tip2.remove(), 300); }
-        }
 
         function fillStudioExample(chip, category) {
             // Legacy function kept for backwards compatibility
