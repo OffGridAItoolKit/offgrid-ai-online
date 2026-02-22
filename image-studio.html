@@ -737,8 +737,50 @@
 
         /* Result area */
         .studio-result { margin-top: 16px; text-align: center; }
-        .studio-result img { max-width: 100%; border-radius: 10px; margin-bottom: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
-        .studio-result-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+        .studio-result img { max-width: 100%; border-radius: 10px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .studio-result-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .studio-action-btn {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1.5px solid #e5e7eb;
+            background: white;
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .studio-action-btn:hover { border-color: #a855f7; color: #7c3aed; }
+        .studio-action-btn.download { background: linear-gradient(135deg, #a855f7 0%, #8b5cf6 100%); color: white; border-color: transparent; }
+        .studio-action-btn.download:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3); }
+        .studio-action-btn.twitter { border-color: #1da1f2; color: #1da1f2; }
+        .studio-action-btn.twitter:hover { background: #1da1f2; color: white; }
+        .studio-action-btn.facebook { border-color: #1877f2; color: #1877f2; }
+        .studio-action-btn.facebook:hover { background: #1877f2; color: white; }
+        .studio-action-btn.copy-link { border-color: var(--gold); color: #b8941f; }
+        .studio-action-btn.copy-link:hover { background: var(--gold); color: white; }
+        .studio-result-upsell {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 8px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+        .studio-result-upsell a {
+            color: #a855f7;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+        .studio-result-upsell a:hover { color: #7c3aed; }
         .studio-download-btn {
             padding: 8px 18px;
             border-radius: 8px;
@@ -1187,6 +1229,8 @@
         let craftedPrompt = '';
         let currentLightboxIndex = 0;
         const MAX_FREE_GENERATIONS = 1;
+        let hasSavedImage = false;
+        let watermarkedImageSrc = null;
 
         // ---- Generation Limit ----
         function getGenerationCount() {
@@ -1204,11 +1248,31 @@
             return getGenerationCount() >= MAX_FREE_GENERATIONS;
         }
         function showLimitOverlay() {
+            // Auto-download the image if user hasn't saved it yet
+            if (!hasSavedImage && (watermarkedImageSrc || window._lastGeneratedImage)) {
+                downloadImage(watermarkedImageSrc || window._lastGeneratedImage);
+            }
             // Hide the entire demo section and show the limit section instead
             const demoSection = document.getElementById('demo');
             const limitSection = document.getElementById('limitSection');
             if (demoSection) demoSection.style.display = 'none';
-            if (limitSection) limitSection.style.display = 'block';
+            if (limitSection) {
+                limitSection.style.display = 'block';
+                // Add auto-saved note if we auto-downloaded
+                if (!hasSavedImage && (watermarkedImageSrc || window._lastGeneratedImage)) {
+                    const note = limitSection.querySelector('.limit-auto-save-note');
+                    if (!note) {
+                        const content = limitSection.querySelector('.limit-overlay-content');
+                        if (content) {
+                            const noteEl = document.createElement('div');
+                            noteEl.className = 'limit-auto-save-note';
+                            noteEl.style.cssText = 'font-size: 12px; color: rgba(245,240,232,0.5); margin-top: 16px;';
+                            noteEl.textContent = 'Your image was automatically saved to your downloads.';
+                            content.appendChild(noteEl);
+                        }
+                    }
+                }
+            }
         }
         function updateLimitBadge() {
             const badge = document.getElementById('demoLimitBadge');
@@ -1558,6 +1622,26 @@
 
                 if (data.success && data.image) {
                     const imageSrc = data.image.startsWith('data:') ? data.image : `data:image/png;base64,${data.image}`;
+                    
+                    // Watermark the image
+                    hasSavedImage = false;
+                    watermarkedImageSrc = null;
+                    watermarkImage(imageSrc).then(wmSrc => {
+                        watermarkedImageSrc = wmSrc;
+                        window._lastGeneratedImage = wmSrc;
+                        window._lastGeneratedPrompt = prompt;
+                        
+                        // Update the displayed image to the watermarked version
+                        const resultImg = resultDiv.querySelector('.studio-result img');
+                        if (resultImg) resultImg.src = wmSrc;
+                    }).catch(() => {
+                        // Fallback to original if watermarking fails
+                        watermarkedImageSrc = imageSrc;
+                        window._lastGeneratedImage = imageSrc;
+                        window._lastGeneratedPrompt = prompt;
+                    });
+
+                    // Show original immediately while watermark processes
                     window._lastGeneratedImage = imageSrc;
                     window._lastGeneratedPrompt = prompt;
 
@@ -1565,25 +1649,25 @@
                     const newCount = incrementGenerationCount();
                     updateLimitBadge();
 
+                    const shareText = encodeURIComponent('I just created this with OffGrid AI Image Studio. Completely AI-generated. Try it yourself! #OffGridAI #AIArt #OffGridToolKit');
+                    const shareUrl = encodeURIComponent('https://imagestudio.offgridtoolkit.ai');
+
                     resultDiv.innerHTML = `
                         <div class="studio-result">
                             <img src="${imageSrc}" alt="Generated image: ${escapeHtml(prompt)}">
                             <div class="studio-result-actions">
-                                <button class="studio-download-btn" onclick="downloadImage(window._lastGeneratedImage)">&#128190; Download Image</button>
+                                <button class="studio-action-btn download" onclick="handleDownload()">&#128190; Download Image</button>
+                                <button class="studio-action-btn twitter" onclick="handleShare('twitter')">&#120143; Share on X</button>
+                                <button class="studio-action-btn facebook" onclick="handleShare('facebook')">f Share on Facebook</button>
+                                <button class="studio-action-btn copy-link" onclick="handleCopyLink(this)">&#128279; Copy Link</button>
                             </div>
                             ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
+                            <div class="studio-result-upsell">Want to create more? <a href="https://offgridtoolkit.ai/command">Open the full Command Center</a></div>
                         </div>
                     `;
 
                     // Scroll to the generated image
                     setTimeout(() => resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-
-                    // Show limit message after a brief delay so they can see their image first
-                    if (newCount >= MAX_FREE_GENERATIONS) {
-                        setTimeout(() => {
-                            showLimitOverlay();
-                        }, 8000);
-                    }
                 } else {
                     const reason = data.errorReason || 'unknown';
                     const reasonLabels = { safety: 'Safety Filter', content_policy: 'Content Policy', no_image: 'No Image Generated', max_tokens: 'Token Limit', recitation: 'Copyright Detection', unknown: 'Generation Issue' };
@@ -1610,9 +1694,45 @@
             }
         }
 
+        // Watermark the generated image with "Created with OffGrid AI Image Studio"
+        function watermarkImage(imageSrc) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Watermark text
+                        const text = 'Created with OffGrid AI Image Studio';
+                        const fontSize = Math.max(14, Math.floor(img.width / 50));
+                        ctx.font = `${fontSize}px sans-serif`;
+                        const textWidth = ctx.measureText(text).width;
+                        const x = img.width - textWidth - fontSize;
+                        const y = img.height - fontSize;
+                        
+                        // Semi-transparent background
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                        ctx.fillRect(x - 8, y - fontSize, textWidth + 16, fontSize + 10);
+                        
+                        // White text
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                        ctx.fillText(text, x, y);
+                        
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (e) { reject(e); }
+                };
+                img.onerror = reject;
+                img.src = imageSrc;
+            });
+        }
+
         function downloadImage(imageSrc) {
             try {
-                // Convert base64 to blob for reliable download
                 if (imageSrc.startsWith('data:')) {
                     const parts = imageSrc.split(',');
                     const mime = parts[0].match(/:(.*?);/)[1];
@@ -1624,7 +1744,7 @@
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'offgrid-image-' + new Date().toISOString().split('T')[0] + '.png';
+                    a.download = 'offgrid-ai-image-' + new Date().toISOString().split('T')[0] + '.png';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -1632,15 +1752,45 @@
                 } else {
                     const a = document.createElement('a');
                     a.href = imageSrc;
-                    a.download = 'offgrid-image-' + new Date().toISOString().split('T')[0] + '.png';
+                    a.download = 'offgrid-ai-image-' + new Date().toISOString().split('T')[0] + '.png';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
                 }
             } catch (err) {
-                // Fallback: open in new tab
                 window.open(imageSrc, '_blank');
             }
+        }
+
+        function handleDownload() {
+            hasSavedImage = true;
+            downloadImage(watermarkedImageSrc || window._lastGeneratedImage);
+        }
+
+        function handleShare(platform) {
+            hasSavedImage = true;
+            const shareText = 'I just created this with OffGrid AI Image Studio. Completely AI-generated. Try it yourself!';
+            const shareUrl = 'https://imagestudio.offgridtoolkit.ai';
+            const hashtags = 'OffGridAI,AIArt,OffGridToolKit';
+            
+            if (platform === 'twitter') {
+                window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}&hashtags=${hashtags}`, '_blank', 'width=600,height=400');
+            } else if (platform === 'facebook') {
+                window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, '_blank', 'width=600,height=400');
+            }
+        }
+
+        function handleCopyLink(btn) {
+            hasSavedImage = true;
+            navigator.clipboard.writeText('https://imagestudio.offgridtoolkit.ai').then(() => {
+                const original = btn.innerHTML;
+                btn.innerHTML = '&#10003; Copied!';
+                btn.style.borderColor = '#22c55e';
+                btn.style.color = '#22c55e';
+                setTimeout(() => { btn.innerHTML = original; btn.style.borderColor = ''; btn.style.color = ''; }, 2000);
+            }).catch(() => {
+                prompt('Copy this link:', 'https://imagestudio.offgridtoolkit.ai');
+            });
         }
 
         // ---- Initialize ----
