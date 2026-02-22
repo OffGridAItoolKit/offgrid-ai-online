@@ -215,6 +215,34 @@ app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'image-studio.html'));
 });
 
+// =============================================================================
+// SUBDOMAIN ROUTING: cmdcouncil.offgridtoolkit.ai
+// =============================================================================
+
+function isCmdCouncilSubdomain(req) {
+    const hostname = req.hostname || '';
+    const hostHeader = req.headers.host || '';
+    const forwardedHost = req.headers['x-forwarded-host'] || '';
+    
+    return hostname.startsWith('cmdcouncil.') ||
+           hostHeader.startsWith('cmdcouncil.') ||
+           forwardedHost.startsWith('cmdcouncil.');
+}
+
+app.use((req, res, next) => {
+    if (!isCmdCouncilSubdomain(req)) return next();
+    
+    // Let API routes pass through to their handlers
+    if (req.path.startsWith('/api/')) return next();
+    
+    // Let static assets pass through (CSS, JS, images, fonts)
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|map)$/)) return next();
+    
+    // Serve the standalone Command Council page for all page-level requests
+    console.log(`[Command Council] Serving standalone page for ${req.headers.host}${req.path}`);
+    res.sendFile(path.join(__dirname, 'cmdcouncil.html'));
+});
+
 // Serve static files from the same directory as index.js (flat structure)
 app.use(express.static(__dirname));
 

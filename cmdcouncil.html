@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <title>OffGrid AI Command Center | Four AI Models. One Answer.</title>
+    <meta name="description" content="The Command Center puts four of the world's top AI models on every question. Anonymous peer review. No single judge. No bias. Try 3 free prompts.">
+    <meta property="og:title" content="OffGrid AI Command Center">
+    <meta property="og:description" content="Four AI models compete on every question. Anonymous peer review. The best answer wins. Try it free.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cmdcouncil.offgridtoolkit.ai">
+    <meta property="og:image" content="https://private-us-east-1.manuscdn.com/sessionFile/At53MxUSvLWI8BhlpyaIZZ/sandbox/SYjZ8MZWhEEhC9U7z5qnGB-img-2_1771723483000_na1fn_Y21kY291bmNpbC1vZy1pbWFnZQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvQXQ1M014VVN2TFdJOEJobHB5YUlaWi9zYW5kYm94L1NZalo4TVpXaEVFaEM5VTd6NXFuR0ItaW1nLTJfMTc3MTcyMzQ4MzAwMF9uYTFmbl9ZMjFrWTI5MWJtTnBiQzF2WnkxcGJXRm5aUS5qcGc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=iNwJnJ1TxEBaV5K~oqexXRYOBo470z0JOdPYob0JaXO3pqW-yr4ULB4FYCZdDE40A--KY~6lxmisN6V8mjCpoQPs3KleN5gorozEh~WvnFMV-emzuBFZySsHlBzSaH6UwkT8K1OPtC4C7njrQkXYDBZj~nL-cWdPgSoz-9ib5kd2xD8ndGI796yjeIQ2Yp~wCxOaaKC9ZlM6G14MLxAAov0lStQMKqTuUaPUy923peMnf25WfDYZjSCEsyKviNq7JizOHcOnUWcu8jEoavMm6Gp9FfWwIMhiMB7BQtIWhbnxoOXIk9Oh9ghakn9uWjZahU2NFOF~0Tfr6nRhP3LSAQ__">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="OffGrid AI">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OffGrid AI Command Center">
+    <meta name="twitter:description" content="Four AI models compete on every question. Anonymous peer review. The best answer wins. Try it free.">
+    <meta name="twitter:image" content="https://private-us-east-1.manuscdn.com/sessionFile/At53MxUSvLWI8BhlpyaIZZ/sandbox/SYjZ8MZWhEEhC9U7z5qnGB-img-2_1771723483000_na1fn_Y21kY291bmNpbC1vZy1pbWFnZQ.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvQXQ1M014VVN2TFdJOEJobHB5YUlaWi9zYW5kYm94L1NZalo4TVpXaEVFaEM5VTd6NXFuR0ItaW1nLTJfMTc3MTcyMzQ4MzAwMF9uYTFmbl9ZMjFrWTI5MWJtTnBiQzF2WnkxcGJXRm5aUS5qcGc~eC1vc3MtcHJvY2Vzcz1pbWFnZS9yZXNpemUsd18xOTIwLGhfMTkyMC9mb3JtYXQsd2VicC9xdWFsaXR5LHFfODAiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE3OTg3NjE2MDB9fX1dfQ__&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=iNwJnJ1TxEBaV5K~oqexXRYOBo470z0JOdPYob0JaXO3pqW-yr4ULB4FYCZdDE40A--KY~6lxmisN6V8mjCpoQPs3KleN5gorozEh~WvnFMV-emzuBFZySsHlBzSaH6UwkT8K1OPtC4C7njrQkXYDBZj~nL-cWdPgSoz-9ib5kd2xD8ndGI796yjeIQ2Yp~wCxOaaKC9ZlM6G14MLxAAov0lStQMKqTuUaPUy923peMnf25WfDYZjSCEsyKviNq7JizOHcOnUWcu8jEoavMm6Gp9FfWwIMhiMB7BQtIWhbnxoOXIk9Oh9ghakn9uWjZahU2NFOF~0Tfr6nRhP3LSAQ__">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* ================================================================
+           DESIGN: OffGrid Command Center Marketing Page
+           Dark tactical aesthetic with gold accents
+           Fonts: Oswald (display) + DM Sans (body)
+           Colors: Charcoal bg, gold accent, cream text
+           ================================================================ */
+        :root {
+            --bg-deep: #0f1419;
+            --bg-card: #1a2030;
+            --bg-card-hover: #222d40;
+            --slate-deep: #1a2332;
+            --gold: #d4a843;
+            --gold-dim: rgba(212, 168, 67, 0.15);
+            --gold-glow: rgba(212, 168, 67, 0.25);
+            --cream: #f5f0e8;
+            --text-muted: #9ca3af;
+            --text-dark: #1a1a1a;
+            --scout-color: #4ade80;
+            --medic-color: #60a5fa;
+            --navigator-color: #34d399;
+            --ranger-color: #f59e0b;
+            --border-subtle: rgba(212, 168, 67, 0.1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-deep);
+            color: var(--cream);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        .gold { color: var(--gold); }
+
+        .section-badge {
+            display: inline-block;
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: var(--gold-dim);
+            padding: 6px 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            margin-bottom: 16px;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--bg-deep);
+            background: var(--gold);
+            padding: 14px 32px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+        }
+        .btn-primary:hover {
+            background: #e0b84d;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(212, 168, 67, 0.3);
+        }
+
+        .btn-outline {
+            display: inline-block;
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--cream);
+            background: transparent;
+            padding: 14px 32px;
+            border-radius: 6px;
+            border: 1px solid rgba(245, 240, 232, 0.3);
+            cursor: pointer;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        .btn-outline:hover {
+            border-color: var(--gold);
+            background: rgba(212, 168, 67, 0.08);
+        }
+
+        /* ---- Sticky Nav ---- */
+        .top-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(15, 20, 25, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--cream);
+        }
+        .nav-brand .star { color: var(--gold); font-size: 18px; }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+        }
+        .nav-links a {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+        .nav-links a:hover { color: var(--cream); }
+        .nav-cta {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--bg-deep) !important;
+            background: var(--gold);
+            padding: 8px 20px;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .nav-cta:hover { background: #e0b84d; }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+
+        /* ---- Hero Section ---- */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background-image: url('https://private-us-east-1.manuscdn.com/sessionFile/At53MxUSvLWI8BhlpyaIZZ/sandbox/SYjZ8MZWhEEhC9U7z5qnGB-img-1_1771723460000_na1fn_Y21kY291bmNpbC1oZXJvLWJn.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvQXQ1M014VVN2TFdJOEJobHB5YUlaWi9zYW5kYm94L1NZalo4TVpXaEVFaEM5VTd6NXFuR0ItaW1nLTFfMTc3MTcyMzQ2MDAwMF9uYTFmbl9ZMjFrWTI5MWJtTnBiQzFvWlhKdkxXSm4uanBnP3gtb3NzLXByb2Nlc3M9aW1hZ2UvcmVzaXplLHdfMTkyMCxoXzE5MjAvZm9ybWF0LHdlYnAvcXVhbGl0eSxxXzgwIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNzk4NzYxNjAwfX19XX0_&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=g1Obg2tclCDvOxrDbkBPtqVJ9Lu39~z0MxrdcZxk1Hm72H-VuLaqA6325ORWzex9wvys4ymPvOcZx4Wl5ezSeihsLgUQUpMjnOLoyqQDQcdgf4K0fhCWkDb40m8WvxI-FfdWwV9LrhhINL5cAXcU~YULVDISUTB3lt8gdCxUOclDl-I1h1yfRrlshr4-LIs5yWJXzxMvgBzjhDX3b02yyNwIukj61klGWd5yQkruqthsLDTmkJMfHnVHC1JQYTTlzq5BN5upurECy46XuyEzRa8r0Ql9Nhl~6SR4PuaviV~jhv0d-Q9UC71pTnRcRafex9Z~cvTlB1JtUgjb9Pb3UQ__');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(15, 20, 25, 0.5) 0%,
+                rgba(15, 20, 25, 0.7) 50%,
+                rgba(15, 20, 25, 0.95) 100%);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 750px;
+        }
+        .hero h1 {
+            font-size: clamp(36px, 6vw, 72px);
+            margin-bottom: 20px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+        }
+        .hero h1 .gold-italic {
+            color: var(--gold);
+            font-style: italic;
+        }
+        .hero .subtitle {
+            font-size: 17px;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero-model-chips {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .model-chip {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .model-chip .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .dot-scout { background: var(--scout-color); }
+        .dot-medic { background: var(--medic-color); }
+        .dot-navigator { background: var(--navigator-color); }
+        .dot-ranger { background: var(--ranger-color); }
+
+        /* ---- Council Section ---- */
+        .council-section {
+            padding: 100px 24px;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, var(--slate-deep) 100%);
+            position: relative;
+        }
+        .council-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .council-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .council-header h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            margin-bottom: 16px;
+        }
+        .council-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        .council-visual {
+            margin-bottom: 60px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+        .council-visual img {
+            width: 100%;
+            display: block;
+        }
+        .model-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 900px) {
+            .model-cards { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 500px) {
+            .model-cards { grid-template-columns: 1fr; }
+        }
+        .model-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px 24px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        .model-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(212, 168, 67, 0.25);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .model-card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        .model-card h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .model-card .model-id {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'DM Sans', monospace;
+            margin-bottom: 12px;
+        }
+        .model-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+        .model-card .specialty-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 4px 12px;
+            border-radius: 4px;
+        }
+        .tag-scout { background: rgba(74, 222, 128, 0.12); color: var(--scout-color); }
+        .tag-medic { background: rgba(96, 165, 250, 0.12); color: var(--medic-color); }
+        .tag-navigator { background: rgba(52, 211, 153, 0.12); color: var(--navigator-color); }
+        .tag-ranger { background: rgba(245, 158, 11, 0.12); color: var(--ranger-color); }
+
+        /* ---- Process Section ---- */
+        .process-section {
+            padding: 100px 24px;
+            background: var(--bg-deep);
+            position: relative;
+        }
+        .process-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .process-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .process-header h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            margin-bottom: 16px;
+        }
+        .process-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        .process-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .process-step {
+            display: grid;
+            grid-template-columns: 72px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+        .step-number {
+            width: 56px;
+            height: 56px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--gold);
+            background: var(--gold-dim);
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            flex-shrink: 0;
+        }
+        .step-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 28px;
+            transition: border-color 0.3s;
+        }
+        .step-content:hover {
+            border-color: rgba(212, 168, 67, 0.25);
+        }
+        .step-content .step-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 6px;
+        }
+        .step-content h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+        .step-content p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* ---- Features Section ---- */
+        .features-section {
+            padding: 100px 24px;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, var(--slate-deep) 100%);
+        }
+        .features-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+        .features-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        .features-header h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            margin-bottom: 16px;
+        }
+        .features-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        @media (max-width: 768px) {
+            .features-grid { grid-template-columns: 1fr; }
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 32px 28px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(212, 168, 67, 0.25);
+        }
+        .feature-card .feature-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+        }
+        .feature-card h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* ---- Demo Section ---- */
+        .demo-section {
+            padding: 100px 24px;
+            background: var(--bg-deep);
+            position: relative;
+        }
+        .demo-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .demo-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .demo-header h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            margin-bottom: 16px;
+        }
+        .demo-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 550px;
+            margin: 0 auto;
+        }
+        .demo-counter {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .demo-counter .count-display {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: var(--gold-dim);
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            display: inline-block;
+        }
+        .demo-chat-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .demo-chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .demo-chat-header .compass-icon {
+            font-size: 20px;
+            color: var(--gold);
+        }
+        .demo-chat-header span {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .demo-chat-header .mode-badge {
+            margin-left: auto;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: var(--gold-dim);
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+        .demo-messages {
+            padding: 24px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .demo-message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .demo-message.user {
+            text-align: right;
+        }
+        .demo-message.user .msg-bubble {
+            background: rgba(212, 168, 67, 0.15);
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            display: inline-block;
+            text-align: left;
+            padding: 12px 18px;
+            border-radius: 12px 12px 4px 12px;
+            max-width: 85%;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .demo-message.assistant .msg-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .demo-message.assistant .msg-header .model-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .demo-message.assistant .msg-header .model-tag {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: 'DM Sans', monospace;
+        }
+        .demo-message.assistant .msg-bubble {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px 20px;
+            border-radius: 4px 12px 12px 12px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--cream);
+        }
+        .demo-message.assistant .msg-bubble h1,
+        .demo-message.assistant .msg-bubble h2,
+        .demo-message.assistant .msg-bubble h3 {
+            font-size: 16px;
+            margin: 12px 0 6px;
+            color: var(--cream);
+        }
+        .demo-message.assistant .msg-bubble ul,
+        .demo-message.assistant .msg-bubble ol {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        .demo-message.assistant .msg-bubble li {
+            margin-bottom: 4px;
+        }
+        .demo-message.assistant .msg-bubble strong {
+            color: var(--gold);
+        }
+        .demo-message.assistant .msg-bubble p {
+            margin-bottom: 8px;
+        }
+        .demo-message.assistant .msg-bubble p:last-child {
+            margin-bottom: 0;
+        }
+        .demo-typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px 18px;
+        }
+        .demo-typing span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gold);
+            opacity: 0.4;
+            animation: typingDot 1.4s infinite;
+        }
+        .demo-typing span:nth-child(2) { animation-delay: 0.2s; }
+        .demo-typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingDot {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .demo-input-area {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .demo-input {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            color: var(--cream);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .demo-input:focus {
+            border-color: rgba(212, 168, 67, 0.3);
+        }
+        .demo-input::placeholder {
+            color: rgba(245, 240, 232, 0.3);
+        }
+        .demo-send-btn {
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--bg-deep);
+            background: var(--gold);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            white-space: nowrap;
+        }
+        .demo-send-btn:hover { background: #e0b84d; }
+        .demo-send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .demo-exhausted {
+            text-align: center;
+            padding: 40px 24px;
+        }
+        .demo-exhausted h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        .demo-exhausted p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .demo-sample-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+        .sample-prompt-btn {
+            font-size: 12px;
+            color: var(--cream);
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .sample-prompt-btn:hover {
+            background: rgba(212, 168, 67, 0.1);
+            border-color: rgba(212, 168, 67, 0.3);
+        }
+
+        /* ---- Privacy Section ---- */
+        .privacy-section {
+            padding: 80px 24px;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, var(--slate-deep) 100%);
+        }
+        .privacy-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .privacy-inner h2 {
+            font-size: clamp(24px, 3.5vw, 36px);
+            margin-bottom: 16px;
+        }
+        .privacy-inner p {
+            font-size: 16px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .privacy-badges {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin-top: 32px;
+            flex-wrap: wrap;
+        }
+        .privacy-badge {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--cream);
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .privacy-badge .icon { font-size: 16px; }
+
+        /* ---- Final CTA Section ---- */
+        .final-cta {
+            padding: 100px 24px;
+            text-align: center;
+            background: var(--bg-deep);
+            position: relative;
+        }
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 50%, rgba(212, 168, 67, 0.06) 0%, transparent 70%);
+        }
+        .final-cta-content {
+            position: relative;
+            z-index: 2;
+        }
+        .final-cta h2 {
+            font-size: clamp(28px, 4vw, 48px);
+            margin-bottom: 16px;
+        }
+        .final-cta p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 500px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .final-cta-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .final-cta .privacy-note {
+            margin-top: 24px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .final-cta .privacy-note .lock { color: var(--gold); }
+
+        /* ---- Footer ---- */
+        .footer {
+            padding: 32px 24px;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+        .footer-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            font-size: 13px;
+            color: var(--text-muted);
+            transition: color 0.3s;
+        }
+        .footer-links a:hover { color: var(--cream); }
+        .footer .copyright {
+            font-size: 12px;
+            color: rgba(156, 163, 175, 0.5);
+        }
+
+        /* ---- Scroll Animations ---- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="top-nav">
+        <a href="#" class="nav-brand">
+            <span class="star">&#11088;</span>
+            Command Center
+        </a>
+        <div class="nav-links">
+            <a href="#council">The Council</a>
+            <a href="#process">The Process</a>
+            <a href="#features">Features</a>
+            <a href="#demo">Try It</a>
+            <a href="https://offgridtoolkit.ai/command" class="nav-cta">Launch Command</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" id="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <div class="section-badge">OffGrid AI Command Center</div>
+            <h1>Four AI Models.<br><span class="gold-italic">One Decisive Answer.</span></h1>
+            <p class="subtitle">The Command Center puts GPT-5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, and Grok 4.1 Fast on every question. They compete, review each other anonymously, and the best answer wins. Then it gets even better.</p>
+            <div class="hero-buttons">
+                <a href="#demo" class="btn-primary" onclick="smoothScroll(event, 'demo')">&#9889; Try 3 Free Prompts</a>
+                <a href="#process" class="btn-outline" onclick="smoothScroll(event, 'process')">See How It Works</a>
+            </div>
+            <div class="hero-model-chips">
+                <span class="model-chip"><span class="dot dot-scout"></span> Scout</span>
+                <span class="model-chip"><span class="dot dot-medic"></span> Medic</span>
+                <span class="model-chip"><span class="dot dot-navigator"></span> Navigator</span>
+                <span class="model-chip"><span class="dot dot-ranger"></span> Ranger</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI Council Section -->
+    <section class="council-section" id="council">
+        <div class="council-inner">
+            <div class="council-header reveal">
+                <div class="section-badge">The Contenders</div>
+                <h2>Four Experts. <span class="gold-italic">Every Strength Covered.</span></h2>
+                <p>We selected four of the highest-benchmarked AI models in the world. Each one brings a genuine specialty. For any question, the right expert rises to the top.</p>
+            </div>
+
+            <div class="council-visual reveal">
+                <img src="https://private-us-east-1.manuscdn.com/sessionFile/At53MxUSvLWI8BhlpyaIZZ/sandbox/SYjZ8MZWhEEhC9U7z5qnGB-img-3_1771723452000_na1fn_Y21kY291bmNpbC1jb3VuY2lsLXZpc3VhbA.jpg?x-oss-process=image/resize,w_1920,h_1920/format,webp/quality,q_80&Expires=1798761600&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9wcml2YXRlLXVzLWVhc3QtMS5tYW51c2Nkbi5jb20vc2Vzc2lvbkZpbGUvQXQ1M014VVN2TFdJOEJobHB5YUlaWi9zYW5kYm94L1NZalo4TVpXaEVFaEM5VTd6NXFuR0ItaW1nLTNfMTc3MTcyMzQ1MjAwMF9uYTFmbl9ZMjFrWTI5MWJtTnBiQzFqYjNWdVkybHNMWFpwYzNWaGJBLmpwZz94LW9zcy1wcm9jZXNzPWltYWdlL3Jlc2l6ZSx3XzE5MjAsaF8xOTIwL2Zvcm1hdCx3ZWJwL3F1YWxpdHkscV84MCIsIkNvbmRpdGlvbiI6eyJEYXRlTGVzc1RoYW4iOnsiQVdTOkVwb2NoVGltZSI6MTc5ODc2MTYwMH19fV19&Key-Pair-Id=K2HSFNDJXOU9YS&Signature=EALEU8ZdcWhtiyZjxNxY~Yj1NmcTTkIu2ss2glG-qjujzwcvHM1ic8v~LYShdBCZjJ6DrYmmtoa0W40ZTmbwOLpEnPsFeMOlUtDr2veTI5QIrS6-oEqadAJOIu7b0wM-t0kP5LUIOql9gSCM3lYde1qGMGtMS1YOq0q48BV-WvY187yc7dIyk3pfocu--tqxIkGTxVJ2wri9dANANpPhsQn~v2F-rIem4KGigGsU~PYBwc7U2~7vUG2edTmHDL5TLa1bLvnzr9bTcoZC6wg730YVV1CS2Ibv0TWJL9cvUA4K700LCZGoNyqe80QJpRhDlj4PERKlAs8jqvG-xDLmBw__" alt="AI Council - Four models around a tactical table with Chairman synthesis at center" loading="lazy">
+            </div>
+
+            <div class="model-cards reveal">
+                <div class="model-card">
+                    <div class="model-card-icon">&#128301;</div>
+                    <h3>Scout</h3>
+                    <div class="model-id">GPT-5.2</div>
+                    <p>Vision specialist and multimodal powerhouse. Excels at image analysis, visual reasoning, and complex multimodal tasks.</p>
+                    <span class="specialty-tag tag-scout">Visual Intelligence</span>
+                </div>
+                <div class="model-card">
+                    <div class="model-card-icon">&#128203;</div>
+                    <h3>Medic</h3>
+                    <div class="model-id">Claude Sonnet 4.6</div>
+                    <p>Thorough reasoning with careful attention to nuance. Strongest at safety-critical analysis and edge case detection.</p>
+                    <span class="specialty-tag tag-medic">Analytical Depth</span>
+                </div>
+                <div class="model-card">
+                    <div class="model-card-icon">&#129517;</div>
+                    <h3>Navigator</h3>
+                    <div class="model-id">Gemini 3.1 Pro</div>
+                    <p>Deep research and strategic planning. Handles massive context windows and excels at long-form analysis and synthesis.</p>
+                    <span class="specialty-tag tag-navigator">Strategic Planning</span>
+                </div>
+                <div class="model-card">
+                    <div class="model-card-icon">&#127757;</div>
+                    <h3>Ranger</h3>
+                    <div class="model-id">Grok 4.1 Fast</div>
+                    <p>Unconventional thinking and rapid problem-solving. Brings creative angles that other models miss entirely.</p>
+                    <span class="specialty-tag tag-ranger">Creative Solutions</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process-section" id="process">
+        <div class="process-inner">
+            <div class="process-header reveal">
+                <div class="section-badge">The Process</div>
+                <h2>How the <span class="gold-italic">Council</span> Thinks</h2>
+                <p>A four-stage pipeline executed server-side. From question to answer in under 40 seconds. Fully transparent.</p>
+            </div>
+
+            <div class="process-steps">
+                <div class="process-step reveal">
+                    <div class="step-number">01</div>
+                    <div class="step-content">
+                        <div class="step-label">No Collaboration. No Influence.</div>
+                        <h3>Independent Responses</h3>
+                        <p>Each model receives the question and generates a complete answer on its own. No shared context. No chain-of-thought passing. Four independent perspectives from four different architectures.</p>
+                    </div>
+                </div>
+                <div class="process-step reveal">
+                    <div class="step-number">02</div>
+                    <div class="step-content">
+                        <div class="step-label">Blind Ranking. No Favoritism.</div>
+                        <h3>Anonymous Peer Review</h3>
+                        <p>Each model reviews all four answers anonymously. The answers are labeled A, B, C, D and shuffled differently for each reviewer. No model can recognize its own answer or play favorites.</p>
+                    </div>
+                </div>
+                <div class="process-step reveal">
+                    <div class="step-number">03</div>
+                    <div class="step-content">
+                        <div class="step-label">Mathematical Scoring. Merit Wins.</div>
+                        <h3>Chairman Election</h3>
+                        <p>Rankings are aggregated using a weighted Borda count where Accuracy counts double. The highest-scoring answer is elected Chairman for this specific query. No permanent leaders. Every question is a fresh competition.</p>
+                    </div>
+                </div>
+                <div class="process-step reveal">
+                    <div class="step-number">04</div>
+                    <div class="step-content">
+                        <div class="step-label">Decide First. Then Improve.</div>
+                        <h3>Command Synthesis</h3>
+                        <p>Scout (GPT-5.2) serves as permanent Editor-in-Chief. It takes the Chairman's winning answer as the foundation and incorporates genuine improvements from the other three advisors. The result is a decisive, polished, expert-level response.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="features">
+        <div class="features-inner">
+            <div class="features-header reveal">
+                <div class="section-badge">The Full Toolkit</div>
+                <h2>More Than <span class="gold-italic">Just Chat</span></h2>
+                <p>The Command Center is a complete intelligence platform. Every tool is built for people who need real answers, not chatbot fluff.</p>
+            </div>
+
+            <div class="features-grid reveal">
+                <div class="feature-card">
+                    <div class="feature-icon">&#127912;</div>
+                    <h3>Image Studio</h3>
+                    <p>Generate survival diagrams, technical blueprints, field guides, and reference charts from text descriptions. Powered by Gemini 3 Pro image generation.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128218;</div>
+                    <h3>Knowledge Base</h3>
+                    <p>Save any conversation as a local Markdown file. Images are extracted and saved alongside. Build your own offline reference library from AI-generated content.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128196;</div>
+                    <h3>PDF Export</h3>
+                    <p>Export any conversation as a styled PDF document with embedded images. Print it, store it, share it. Your knowledge, your format.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128161;</div>
+                    <h3>Ready-Made Prompts</h3>
+                    <p>A curated library of prompts designed for off-grid scenarios. Water purification, shelter building, first aid, navigation, food preservation, and more.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128065;</div>
+                    <h3>Vision Analysis</h3>
+                    <p>Upload an image and let Scout analyze it. Identify plants, assess terrain, read labels, interpret diagrams. See what the AI sees.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#128274;</div>
+                    <h3>Zero Storage</h3>
+                    <p>No conversations stored. No images saved. No user data collected. Every session is ephemeral. When you close the tab, it's gone. Privacy is not a feature. It's the architecture.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section class="demo-section" id="demo">
+        <div class="demo-inner">
+            <div class="demo-header reveal">
+                <div class="section-badge">Try It Free</div>
+                <h2>Ask the <span class="gold-italic">Council</span></h2>
+                <p>Three free prompts. No sign-up. No credit card. Type a question and see what four AI models working together can do.</p>
+            </div>
+
+            <div class="demo-counter">
+                <span class="count-display" id="promptCounter">3 of 3 Prompts Remaining</span>
+            </div>
+
+            <div class="demo-chat-container reveal" id="chatContainer">
+                <div class="demo-chat-header">
+                    <span class="compass-icon">&#11088;</span>
+                    <span>Command Center</span>
+                    <span class="mode-badge">Command Mode</span>
+                </div>
+                <div class="demo-messages" id="chatMessages">
+                    <div class="demo-sample-prompts" id="samplePrompts">
+                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How do I purify water without a filter?</button>
+                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Best ways to start a fire in wet conditions</button>
+                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How to build a basic solar power system</button>
+                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Emergency first aid for snake bites</button>
+                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How to navigate without GPS or compass</button>
+                    </div>
+                </div>
+                <div class="demo-input-area" id="inputArea">
+                    <input type="text" class="demo-input" id="demoInput" placeholder="Ask the Command Center anything..." maxlength="500">
+                    <button class="demo-send-btn" id="sendBtn" onclick="sendDemoMessage()">Send</button>
+                </div>
+            </div>
+
+            <div class="demo-exhausted" id="exhaustedMessage" style="display: none;">
+                <h3>Prompts Used</h3>
+                <p>You've used your 3 free prompts. Ready for unlimited access to the full AI Council?</p>
+                <a href="https://offgridtoolkit.ai/command" class="btn-primary">&#9889; Launch Full Command Center</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy Section -->
+    <section class="privacy-section">
+        <div class="privacy-inner reveal">
+            <div class="section-badge">Privacy First</div>
+            <h2>Your Questions. <span class="gold-italic">Your Business.</span></h2>
+            <p>We don't store conversations. We don't save images. We don't collect user data. Every session is ephemeral. When you close the tab, it's gone. This isn't a policy. It's the architecture.</p>
+            <div class="privacy-badges">
+                <div class="privacy-badge"><span class="icon">&#128274;</span> No Data Storage</div>
+                <div class="privacy-badge"><span class="icon">&#128683;</span> No Tracking</div>
+                <div class="privacy-badge"><span class="icon">&#128165;</span> Ephemeral Sessions</div>
+                <div class="privacy-badge"><span class="icon">&#128736;</span> Privacy by Design</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+        <div class="final-cta-content reveal">
+            <div class="section-badge">Ready?</div>
+            <h2>Experience the <span class="gold-italic">Full Council</span></h2>
+            <p>Four of the world's smartest AI models. Anonymous peer review. No single judge. No bias. Unlimited prompts. Full Image Studio. Knowledge Base. Everything.</p>
+            <div class="final-cta-buttons">
+                <a href="https://offgridtoolkit.ai/command" class="btn-primary">&#9889; Launch Command Center</a>
+                <a href="https://offgridtoolkit.ai" class="btn-outline">&#128187; Get the Offline Version</a>
+            </div>
+            <p class="privacy-note"><span class="lock">&#128274;</span> No conversations stored. Sessions are ephemeral. Privacy first, always.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="https://offgridtoolkit.ai">OffGrid AI</a>
+            <a href="https://offgridtoolkit.ai/command">Command Center</a>
+            <a href="https://imagestudio.offgridtoolkit.ai">Image Studio</a>
+            <a href="https://cmdcouncil.com">How the Council Thinks</a>
+        </div>
+        <p class="copyright">&copy; 2026 OffGrid AI. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // ================================================================
+        // DEMO CHAT FUNCTIONALITY
+        // ================================================================
+
+        const DEMO_LIMIT = 3;
+        const STORAGE_KEY = 'cmdcouncil_demo_count';
+
+        let promptsUsed = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
+        let isStreaming = false;
+
+        function updateCounter() {
+            const remaining = Math.max(0, DEMO_LIMIT - promptsUsed);
+            document.getElementById('promptCounter').textContent = `${remaining} of ${DEMO_LIMIT} Prompts Remaining`;
+            if (remaining === 0) {
+                document.getElementById('inputArea').style.display = 'none';
+                document.getElementById('exhaustedMessage').style.display = 'block';
+            }
+        }
+
+        function useSamplePrompt(btn) {
+            document.getElementById('demoInput').value = btn.textContent;
+            // Remove sample prompts after first use
+            const sampleContainer = document.getElementById('samplePrompts');
+            if (sampleContainer) sampleContainer.style.display = 'none';
+            sendDemoMessage();
+        }
+
+        function addMessage(role, content, modelName, modelTag) {
+            const messages = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `demo-message ${role}`;
+
+            if (role === 'user') {
+                msgDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(content)}</div>`;
+            } else {
+                const headerHtml = modelName
+                    ? `<div class="msg-header"><span class="model-name" style="color: var(--gold)">${modelName}</span><span class="model-tag">${modelTag || ''}</span></div>`
+                    : '';
+                msgDiv.innerHTML = `${headerHtml}<div class="msg-bubble">${content}</div>`;
+            }
+
+            messages.appendChild(msgDiv);
+            messages.scrollTop = messages.scrollHeight;
+            return msgDiv;
+        }
+
+        function addTypingIndicator() {
+            const messages = document.getElementById('chatMessages');
+            const typing = document.createElement('div');
+            typing.className = 'demo-message assistant';
+            typing.id = 'typingIndicator';
+            typing.innerHTML = `
+                <div class="msg-header"><span class="model-name" style="color: var(--gold)">Council</span><span class="model-tag">Processing...</span></div>
+                <div class="demo-typing"><span></span><span></span><span></span></div>
+            `;
+            messages.appendChild(typing);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        async function sendDemoMessage() {
+            if (isStreaming) return;
+            if (promptsUsed >= DEMO_LIMIT) return;
+
+            const input = document.getElementById('demoInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            // Hide sample prompts
+            const sampleContainer = document.getElementById('samplePrompts');
+            if (sampleContainer) sampleContainer.style.display = 'none';
+
+            // Increment counter
+            promptsUsed++;
+            localStorage.setItem(STORAGE_KEY, promptsUsed.toString());
+            updateCounter();
+
+            // Add user message
+            addMessage('user', query);
+            input.value = '';
+
+            // Disable input
+            isStreaming = true;
+            document.getElementById('sendBtn').disabled = true;
+            input.disabled = true;
+
+            // Show typing
+            addTypingIndicator();
+
+            try {
+                const response = await fetch('/api/command/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [{ role: 'user', content: query }],
+                        mode: 'command'
+                    })
+                });
+
+                removeTypingIndicator();
+
+                if (!response.ok) {
+                    addMessage('assistant', 'The Council is currently unavailable. Please try again later, or <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">launch the full Command Center</a>.', 'System', 'Error');
+                    isStreaming = false;
+                    document.getElementById('sendBtn').disabled = false;
+                    input.disabled = false;
+                    return;
+                }
+
+                // Stream the response
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullText = '';
+                let currentMsgDiv = null;
+                let currentModelName = 'Chairman';
+                let currentModelTag = 'Synthesized Answer';
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const data = line.slice(6).trim();
+                        if (data === '[DONE]') continue;
+
+                        try {
+                            const parsed = JSON.parse(data);
+
+                            // Handle different event types from the Command Center stream
+                            if (parsed.type === 'council_member' || parsed.type === 'member_response') {
+                                // Individual council member response
+                                const name = parsed.name || parsed.model || 'Council Member';
+                                const tag = parsed.modelId || parsed.model || '';
+                                if (parsed.content) {
+                                    addMessage('assistant', marked.parse(parsed.content), name, tag);
+                                }
+                            } else if (parsed.type === 'chairman' || parsed.type === 'final_answer' || parsed.type === 'synthesis') {
+                                // Chairman/final synthesized answer
+                                if (parsed.content) {
+                                    addMessage('assistant', marked.parse(parsed.content), 'Chairman', 'Final Synthesized Answer');
+                                }
+                            } else if (parsed.choices && parsed.choices[0]) {
+                                // Standard OpenAI-style streaming
+                                const delta = parsed.choices[0].delta;
+                                if (delta && delta.content) {
+                                    fullText += delta.content;
+                                    if (!currentMsgDiv) {
+                                        currentMsgDiv = addMessage('assistant', '', currentModelName, currentModelTag);
+                                    }
+                                    const bubble = currentMsgDiv.querySelector('.msg-bubble');
+                                    if (bubble) {
+                                        bubble.innerHTML = marked.parse(fullText);
+                                    }
+                                    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                                }
+                            } else if (parsed.content) {
+                                // Simple content field
+                                fullText += parsed.content;
+                                if (!currentMsgDiv) {
+                                    currentMsgDiv = addMessage('assistant', '', currentModelName, currentModelTag);
+                                }
+                                const bubble = currentMsgDiv.querySelector('.msg-bubble');
+                                if (bubble) {
+                                    bubble.innerHTML = marked.parse(fullText);
+                                }
+                                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                            }
+                        } catch (e) {
+                            // Skip unparseable lines
+                        }
+                    }
+                }
+
+                // If we accumulated text but never created a message div
+                if (fullText && !currentMsgDiv) {
+                    addMessage('assistant', marked.parse(fullText), currentModelName, currentModelTag);
+                }
+
+            } catch (err) {
+                removeTypingIndicator();
+                addMessage('assistant', 'Connection error. The Council may be temporarily unavailable. <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">Try the full Command Center</a>.', 'System', 'Error');
+            }
+
+            isStreaming = false;
+            if (promptsUsed < DEMO_LIMIT) {
+                document.getElementById('sendBtn').disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        // Enter key to send
+        document.getElementById('demoInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendDemoMessage();
+            }
+        });
+
+        // ================================================================
+        // SCROLL ANIMATIONS
+        // ================================================================
+
+        function smoothScroll(e, targetId) {
+            e.preventDefault();
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Intersection Observer for reveal animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Initialize counter on load
+        updateCounter();
+    </script>
+</body>
+</html>
