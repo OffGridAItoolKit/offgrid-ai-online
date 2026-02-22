@@ -9,6 +9,14 @@
     <meta property="og:description" content="Your AI Field Illustrator. Describe what you need. Get survival diagrams, technical blueprints, and field guides in seconds.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://imagestudio.offgridtoolkit.ai">
+    <meta property="og:image" content="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="OffGrid AI">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="OffGrid AI Image Studio">
+    <meta name="twitter:description" content="Your AI Field Illustrator. Describe what you need. Get survival diagrams, technical blueprints, and field guides in seconds.">
+    <meta name="twitter:image" content="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -488,6 +496,163 @@
             font-size: 14px;
             color: #6b7280;
             line-height: 1.6;
+        }
+
+        /* ---- Workflow Showcase Section ---- */
+        .workflow-section {
+            padding: 80px 24px;
+            background: linear-gradient(180deg, #0f1720 0%, var(--slate-deep) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .workflow-section::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(212, 168, 67, 0.06) 0%, transparent 70%);
+        }
+        .workflow-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        .workflow-header {
+            text-align: center;
+            margin-bottom: 56px;
+        }
+        .workflow-header h2 {
+            font-size: clamp(28px, 4vw, 42px);
+            color: var(--cream);
+            margin-bottom: 12px;
+        }
+        .workflow-header h2 .gold { color: var(--gold); }
+        .workflow-header p {
+            font-size: 16px;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        .workflow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        .workflow-step {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 24px;
+            position: relative;
+        }
+        .workflow-step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .workflow-step-number {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--slate-deep);
+            background: var(--gold);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+        .workflow-step-line {
+            width: 2px;
+            flex: 1;
+            background: linear-gradient(180deg, var(--gold) 0%, rgba(212, 168, 67, 0.15) 100%);
+            margin-top: 4px;
+        }
+        .workflow-step:last-child .workflow-step-line {
+            display: none;
+        }
+        .workflow-step-content {
+            background: rgba(36, 48, 68, 0.6);
+            border: 1px solid rgba(212, 168, 67, 0.12);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 24px;
+            transition: border-color 0.3s;
+        }
+        .workflow-step-content:hover {
+            border-color: rgba(212, 168, 67, 0.3);
+        }
+        .workflow-step-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        .workflow-step-content h3 {
+            font-size: 20px;
+            color: var(--cream);
+            margin-bottom: 10px;
+        }
+        .workflow-step-content p {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        .workflow-step-content .workflow-example {
+            margin-top: 16px;
+            padding: 14px 18px;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+            font-size: 13px;
+            color: rgba(245, 240, 232, 0.7);
+            font-style: italic;
+            line-height: 1.6;
+        }
+        .workflow-step-content .workflow-example strong {
+            color: var(--gold);
+            font-style: normal;
+        }
+        .workflow-connector {
+            text-align: center;
+            padding: 12px 0;
+            font-size: 20px;
+            color: var(--gold);
+            opacity: 0.5;
+        }
+        .workflow-bottom-cta {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(212, 168, 67, 0.12);
+        }
+        .workflow-bottom-cta p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+        .workflow-bottom-cta p strong {
+            color: var(--cream);
+        }
+        @media (max-width: 640px) {
+            .workflow-step {
+                grid-template-columns: 48px 1fr;
+                gap: 16px;
+            }
+            .workflow-step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+            .workflow-step-content {
+                padding: 20px;
+            }
         }
 
         /* ---- Try It CTA Section ---- */
@@ -1100,6 +1265,71 @@
                     <h3>Adventure Planning</h3>
                     <p>Gear checklists, route planning visuals, vehicle repair guides, and overlanding preparation charts.</p>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Workflow Showcase Section -->
+    <section class="workflow-section" id="workflow">
+        <div class="workflow-inner">
+            <div class="workflow-header">
+                <h2>One Question. <span class="gold">A Complete Field Kit.</span></h2>
+                <p>Image Studio doesn't work alone. Inside the Command Center, a single question triggers a pipeline that goes from research to visual reference to actionable supply list — automatically.</p>
+            </div>
+
+            <div class="workflow-steps">
+                <!-- Step 1: Ask -->
+                <div class="workflow-step">
+                    <div class="workflow-step-indicator">
+                        <div class="workflow-step-number">1</div>
+                        <div class="workflow-step-line"></div>
+                    </div>
+                    <div class="workflow-step-content">
+                        <div class="workflow-step-label">Ask the AI Council</div>
+                        <h3>Ask a Question, Get a Full Article</h3>
+                        <p>Type a question into the Command Center. The AI Council — multiple specialized models debating and synthesizing — produces a comprehensive, structured knowledge base article. Not a chatbot answer. A real reference document.</p>
+                        <div class="workflow-example">
+                            <strong>Example:</strong> "How do I purify water without a filter?" → The AI Council generates a full article covering source selection, clarification, boiling, chemical disinfection (chlorine dioxide, bleach, iodine), and solar disinfection — with safety notes for each method.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Visualize -->
+                <div class="workflow-step">
+                    <div class="workflow-step-indicator">
+                        <div class="workflow-step-number">2</div>
+                        <div class="workflow-step-line"></div>
+                    </div>
+                    <div class="workflow-step-content">
+                        <div class="workflow-step-label">Generate a Visual</div>
+                        <h3>Turn That Article Into a Diagram</h3>
+                        <p>Save the article to your Knowledge Base, then open Image Studio. It reads the article and generates a matching visual — a step-by-step field guide, a labeled diagram, an infographic. The image is tailored to the content, not generic clip art.</p>
+                        <div class="workflow-example">
+                            <strong>Example:</strong> The water purification article becomes a visual field guide showing each method side-by-side: boiling setup, bleach-to-water ratios, SODIS bottle placement — all labeled and color-coded for quick reference in the field.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Parts List -->
+                <div class="workflow-step">
+                    <div class="workflow-step-indicator">
+                        <div class="workflow-step-number">3</div>
+                        <div class="workflow-step-line"></div>
+                    </div>
+                    <div class="workflow-step-content">
+                        <div class="workflow-step-label">Extract a Parts List</div>
+                        <h3>AI Reads the Image Back to You</h3>
+                        <p>Send the generated image back into the Command Center chat. The AI reads every label, annotation, and detail in the image and produces a structured parts list or resource list — everything you need to actually execute what's in the diagram.</p>
+                        <div class="workflow-example">
+                            <strong>Example:</strong> From the water purification diagram, the AI extracts: clear containers (2L minimum), unscented household bleach (8.25% sodium hypochlorite), eye dropper, metal pot, heat source, chlorine dioxide tablets — with quantities and sourcing notes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="workflow-bottom-cta">
+                <p><strong>Question → Article → Visual → Parts List.</strong> That's the full pipeline. One question, and you have everything you need to act.</p>
+                <a href="https://offgridtoolkit.ai/command" class="btn-primary">&#9889; Open the Command Center</a>
             </div>
         </div>
     </section>
