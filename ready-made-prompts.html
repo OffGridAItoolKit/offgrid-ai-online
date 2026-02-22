@@ -421,6 +421,7 @@
         <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
         <button class="filter-btn" data-filter="kb" onclick="setFilter('kb', this)">📚 KB Builders</button>
         <button class="filter-btn" data-filter="vision" onclick="setFilter('vision', this)">📷 Vision</button>
+        <button class="filter-btn" data-filter="challenging" onclick="setFilter('challenging', this)">🧠 Challenging</button>
         <span class="prompt-count" id="promptCount"></span>
     </div>
 
@@ -448,6 +449,79 @@
         // ============================================
         
         const PROMPT_CATEGORIES = [
+            {
+                icon: '🧠',
+                title: 'Stump the Council',
+                subcategories: [
+                    {
+                        title: 'Logic Puzzles & Brain Teasers',
+                        prompts: [
+                            { text: 'You have 12 identical-looking balls. One is a different weight (heavier or lighter, you don\'t know which). Using a balance scale exactly 3 times, identify the odd ball AND determine if it is heavier or lighter. Show your complete decision tree.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: '100 prisoners are each assigned a random hat (red or blue) and lined up so each can see all hats in front but not their own or those behind. Starting from the back, each must guess their own hat color. They can strategize beforehand. What strategy guarantees the most survivors?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'A king tells 100 prisoners: tomorrow I will put a red or blue hat on each of you. You will be arranged so prisoner 100 sees all 99 hats ahead, prisoner 99 sees 98, and so on. Each announces a color. If it matches their hat, they are freed. They can strategize tonight. What is the optimal strategy and how many are guaranteed to survive?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Five pirates must divide 100 gold coins. The most senior proposes a split; all vote. If 50%+ approve, it is accepted. Otherwise, the proposer is thrown overboard and the next pirate proposes. Pirates are perfectly logical and greedy. What does the most senior pirate propose?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'You have two ropes. Each takes exactly 60 minutes to burn, but they burn non-uniformly (different sections burn at different rates). Using only these ropes and a lighter, measure exactly 45 minutes.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'There are 1000 lockers in a row, all closed. 1000 students walk by. Student 1 opens every locker. Student 2 toggles every 2nd locker. Student 3 toggles every 3rd, and so on. After all 1000 students pass, which lockers are open? Prove your answer mathematically.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'You are on a game show. Behind one of three doors is a car; behind the other two are goats. You pick door 1. The host (who knows what is behind each door) opens door 3, revealing a goat. Should you switch to door 2? Now extend this: what if there are 100 doors and the host opens 98 of them?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'A snail is at the bottom of a 30-foot well. Each day it climbs 3 feet, but each night it slides back 2 feet. On what day does it reach the top? Now solve the general case for a well of depth D, climb rate C, and slide rate S.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Two mathematicians are told the sum and product of two integers between 2 and 100. The "Sum" mathematician says "I knew you couldn\'t know." The "Product" mathematician says "Now I know." Sum says "Now I know too." What are the two numbers? Show your complete logical deduction.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Three gods A, B, and C are called True, False, and Random. True always speaks truly, False always speaks falsely, but whether Random speaks truly or falsely is a random matter. You must determine the identities of A, B, and C by asking three yes-no questions, each to a single god. The gods understand English but answer in their own language with "da" or "ja" (one means yes, one means no, but you don\'t know which). What three questions do you ask?', badge: 'advanced', kb: 'Skills & Reference', challenging: true }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🔭',
+                title: 'Deep Questions',
+                subcategories: [
+                    {
+                        title: 'Science & Philosophy',
+                        prompts: [
+                            { text: 'Explain the measurement problem in quantum mechanics. Why does observation appear to collapse the wave function, and how do the Copenhagen, Many-Worlds, and pilot wave interpretations each resolve this differently? Which has the strongest experimental support?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Is mathematics invented or discovered? Present the strongest arguments from both mathematical Platonism and formalism, address Godel\'s incompleteness theorems, and take a defended position.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'If we discovered microbial life on Europa tomorrow, what would be the cascading implications for biology, theology, astrobiology funding, planetary protection protocols, and international space law?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Explain why protein folding was considered one of biology\'s grand challenges, how AlphaFold solved it, what it still cannot do, and what this means for drug discovery in the next decade.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Steel-man the argument that consciousness is non-computational (Penrose-Hameroff), then steel-man the argument that it is purely computational (functionalism). Which position has fewer unresolved problems?', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Design a realistic plan to terraform Mars over 500 years. Include the physics of atmospheric thickening, the biology of soil creation, the engineering of magnetic field generation, and the governance model for decision-making across 20 generations.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Why did the Roman Empire fall? Evaluate the top 5 competing historical theories (economic, military, institutional, environmental, cultural) and explain which combination of factors best fits the archaeological and textual evidence.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Explain the P vs NP problem to a smart 16-year-old, then explain why most computer scientists believe P does not equal NP, what it would mean if P = NP, and why we cannot prove it either way.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Compare the economic models of Universal Basic Income, negative income tax, and job guarantee programs. For each, provide the strongest empirical evidence for and against, and design a hybrid system that addresses the weaknesses of all three.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'What would happen to Earth\'s climate, ecosystems, and human civilization if the Gulf Stream (AMOC) collapsed within the next 5 years? Use current oceanographic data to model the cascading effects decade by decade.', badge: 'advanced', kb: 'Skills & Reference', challenging: true }
+                        ]
+                    }
+                ]
+            },
+            {
+                icon: '🚨',
+                title: 'High-Stakes Survival',
+                subcategories: [
+                    {
+                        title: 'Time-Critical Emergency Scenarios',
+                        prompts: [
+                            { text: 'You are stranded in a desert with a car battery, a plastic tarp, and a length of copper wire. Design a system to collect drinking water and signal for rescue.', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'A nuclear power plant 50 miles upwind has had a meltdown. You have 2 hours before fallout arrives. What do you do in those 2 hours to maximize your family\'s survival?', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'Compare the survival tradeoffs of bugging in vs bugging out during a Category 5 hurricane if you live in a concrete block home 8 miles from the coast.', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'Design a complete off-grid water purification system for a family of 4 using only materials available at a hardware store. Include flow rates, filter stages, and maintenance schedule.', badge: 'advanced', kb: 'Water & Food', challenging: true },
+                            { text: 'You have been bitten by an unidentified snake in a remote area 6 hours from the nearest hospital. What are the exact steps, in order, that give you the best chance of survival?', badge: 'advanced', kb: 'Medical & First Aid', challenging: true },
+                            { text: 'Explain how to build a Faraday cage large enough to protect essential electronics from an EMP using household materials. Include the physics of why it works.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'You are on a sinking sailboat 3 miles offshore with no radio. You have a life jacket, a waterproof flashlight, and a gallon jug. What is your survival strategy?', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'Design a 72-hour emergency food and water plan for a family of 4 in an apartment during a complete grid-down scenario with no prior preparation.', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'What are the top 10 medicinal plants in North America, their active compounds, correct dosages, and the dangerous look-alikes you must avoid?', badge: 'advanced', kb: 'Medical & First Aid', challenging: true },
+                            { text: 'You need to cross a fast-moving river that is 40 feet wide and 4 feet deep. You have 50 feet of rope and a backpack. Describe three crossing methods ranked by safety.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'Compare the effectiveness of solar, wind, and micro-hydro power for a permanent off-grid homestead in the Pacific Northwest. Include cost per kWh, reliability, and maintenance.', badge: 'advanced', kb: 'Skills & Reference', challenging: true },
+                            { text: 'A wildfire is approaching your rural property from the west at 15 mph. You have 30 minutes. Your vehicle will not start. What is your decision tree?', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'You are lost in the wilderness in winter with a core body temperature dropping below 95 degrees F. You have a knife, a garbage bag, and wet matches. Walk me through the first 60 minutes.', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'Design a complete food preservation system for a year\'s harvest without electricity, covering fermentation, smoking, dehydration, and root cellaring with specific temperatures and timelines.', badge: 'advanced', kb: 'Water & Food', challenging: true },
+                            { text: 'You are in a building that has partially collapsed from an earthquake. You can hear rescuers but they cannot hear you. You have a cell phone with 3% battery. What do you do?', badge: 'advanced', kb: 'Emergency Plans', challenging: true },
+                            { text: 'What are the 5 most dangerous mistakes people make when purifying water in the wild, and what is the chemistry behind why each one can kill you?', badge: 'advanced', kb: 'Water & Food', challenging: true },
+                            { text: 'Compare the ballistic, thermal, and structural protection of 6 different improvised shelter materials (car doors, sandbags, books, earth, water barrels, concrete blocks) with actual stopping power data.', badge: 'advanced', kb: 'Shelter & Fire', challenging: true },
+                            { text: 'You discover your well water has been contaminated with both biological pathogens and heavy metals. Design a multi-stage filtration system using materials from a farm supply store.', badge: 'advanced', kb: 'Water & Food', challenging: true },
+                            { text: 'Explain the complete process of making penicillin from bread mold in a survival scenario, including the risks, the chemistry, and why this is a last resort.', badge: 'advanced', kb: 'Medical & First Aid', challenging: true },
+                            { text: 'Explain how to navigate using only the stars from the Southern Hemisphere, including how to find south without the Southern Cross being visible.', badge: 'advanced', kb: 'Navigation & Orientation', challenging: true }
+                        ]
+                    }
+                ]
+            },
             {
                 icon: '⚡',
                 title: 'Quick Start',
@@ -1116,6 +1190,7 @@
                         // Apply filters
                         if (activeFilter === 'kb' && !p.kb) return;
                         if (activeFilter === 'vision' && p.badge !== 'vision') return;
+                        if (activeFilter === 'challenging' && !p.challenging) return;
                         if (searchTerm && !p.text.toLowerCase().includes(searchTerm)) return;
                         
                         subCount++;
