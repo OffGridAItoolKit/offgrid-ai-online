@@ -735,25 +735,45 @@
         }
         .demo-sample-prompts {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
+            gap: 10px;
             margin-top: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .demo-sample-prompts::-webkit-scrollbar {
+            height: 4px;
+        }
+        .demo-sample-prompts::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.04);
+            border-radius: 2px;
+        }
+        .demo-sample-prompts::-webkit-scrollbar-thumb {
+            background: rgba(212, 168, 67, 0.3);
+            border-radius: 2px;
         }
         .sample-prompt-btn {
             font-size: 12px;
+            line-height: 1.5;
             color: var(--cream);
             background: rgba(255,255,255,0.06);
             border: 1px solid rgba(255,255,255,0.1);
-            padding: 8px 14px;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background 0.3s, border-color 0.3s;
+            transition: background 0.3s, border-color 0.3s, transform 0.2s;
             font-family: 'DM Sans', sans-serif;
+            min-width: 260px;
+            max-width: 320px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            text-align: left;
         }
         .sample-prompt-btn:hover {
             background: rgba(212, 168, 67, 0.1);
             border-color: rgba(212, 168, 67, 0.3);
+            transform: translateY(-2px);
         }
 
         /* ---- Deliberation Status UI ---- */
@@ -1039,9 +1059,6 @@
         }
         .prompt-group.active {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
         }
 
         /* ---- Privacy Section ---- */
@@ -1190,7 +1207,7 @@
             <h1>Four AI Models.<br><span class="gold-italic">One Decisive Answer.</span></h1>
             <p class="subtitle">The Command Center puts GPT-5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, and Grok 4.1 Fast on every question. They compete, review each other anonymously, and the best answer wins. Then it gets even better.</p>
             <div class="hero-buttons">
-                <a href="#demo" class="btn-primary" onclick="smoothScroll(event, 'demo')">&#9889; Try 3 Free Prompts</a>
+                <a href="#demo" class="btn-primary" onclick="smoothScroll(event, 'demo')">&#9889; Try 5 Free Prompts</a>
                 <a href="#process" class="btn-outline" onclick="smoothScroll(event, 'process')">See How It Works</a>
             </div>
             <div class="hero-model-chips">
@@ -1344,11 +1361,11 @@
             <div class="demo-header reveal">
                 <div class="section-badge">Try It Free</div>
                 <h2>Ask the <span class="gold-italic">Council</span></h2>
-                <p>Three free prompts. No sign-up. No credit card. Type a question and see what four AI models working together can do.</p>
+                <p>Five free prompts. No sign-up. No credit card. Type a question and see what four AI models working together can do.</p>
             </div>
 
             <div class="demo-counter">
-                <span class="count-display" id="promptCounter">3 of 3 Prompts Remaining</span>
+                <span class="count-display" id="promptCounter">5 of 5 Prompts Remaining</span>
             </div>
 
             <div class="demo-chat-container reveal" id="chatContainer">
@@ -1361,24 +1378,31 @@
                     <div id="samplePrompts">
                         <div class="prompt-categories">
                             <button class="prompt-cat-btn active" onclick="switchCategory('survival', this)">Survival</button>
-                            <button class="prompt-cat-btn" onclick="switchCategory('riddles', this)">Brain Teasers</button>
                             <button class="prompt-cat-btn" onclick="switchCategory('hard', this)">Hard Questions</button>
+                            <button class="prompt-cat-btn" onclick="switchCategory('emergency', this)">Emergency</button>
+                            <button class="prompt-cat-btn" onclick="switchCategory('riddles', this)">Brain Teasers</button>
                         </div>
                         <div class="demo-sample-prompts prompt-group active" id="cat-survival">
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How do I purify water in the wild without a filter?</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Best ways to start a fire in wet conditions</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">What are the top 5 items for a wilderness survival kit?</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How to build a basic solar power system for off-grid living</button>
-                        </div>
-                        <div class="demo-sample-prompts prompt-group" id="cat-riddles">
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">A man is looking at a photograph. Someone asks, "Whose picture are you looking at?" He replies: "Brothers and sisters I have none, but that man's father is my father's son." Who is in the photograph?</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Three gods A, B, and C are called True, False, and Random. True always speaks truly, False always speaks falsely, but whether Random speaks truly or falsely is a random matter. You must determine the identities of A, B, and C by asking three yes-no questions, each to a single god. The gods understand English but answer in their own language with "da" or "ja" (one means yes, one means no, but you don't know which). What three questions do you ask?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Design a complete off-grid water purification system for a family of 4 using only materials available at a hardware store. Include flow rates, filter stages, and maintenance schedule.</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Compare the effectiveness of solar, wind, and micro-hydro power for a permanent off-grid homestead in the Pacific Northwest. Include cost per kWh, reliability, and maintenance.</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Design a complete food preservation system for a year's harvest without electricity, covering fermentation, smoking, dehydration, and root cellaring with specific temperatures and timelines.</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Explain the complete process of making penicillin from bread mold in a survival scenario, including the risks, the chemistry, and why this is a last resort.</button>
                         </div>
                         <div class="demo-sample-prompts prompt-group" id="cat-hard">
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Explain the key differences between nuclear fission and fusion reactors, including why fusion is harder to achieve and what recent breakthroughs have been made</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Compare the philosophical frameworks of utilitarianism and deontological ethics using a real-world trolley problem scenario. Which framework gives a more defensible answer and why?</button>
-                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">If you had to design a self-sustaining colony on Mars for 1,000 people, what are the top 10 engineering challenges you'd need to solve, ranked by difficulty?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Explain the measurement problem in quantum mechanics. Why does observation appear to collapse the wave function, and how do the Copenhagen, Many-Worlds, and pilot wave interpretations each resolve this differently? Which has the strongest experimental support?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Steel-man the argument that consciousness is non-computational (Penrose-Hameroff), then steel-man the argument that it is purely computational (functionalism). Which position has fewer unresolved problems?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Design a realistic plan to terraform Mars over 500 years. Include the physics of atmospheric thickening, the biology of soil creation, the engineering of magnetic field generation, and the governance model for decision-making across 20 generations.</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">What would happen to Earth's climate, ecosystems, and human civilization if the Gulf Stream (AMOC) collapsed within the next 5 years? Use current oceanographic data to model the cascading effects decade by decade.</button>
+                        </div>
+                        <div class="demo-sample-prompts prompt-group" id="cat-emergency">
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">A nuclear power plant 50 miles upwind has had a meltdown. You have 2 hours before fallout arrives. What do you do in those 2 hours to maximize your family's survival?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">A wildfire is approaching your rural property from the west at 15 mph. You have 30 minutes. Your vehicle won't start. What is your decision tree?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">You are in a building that has partially collapsed from an earthquake. You can hear rescuers but they cannot hear you. You have a cell phone with 3% battery. What do you do?</button>
+                        </div>
+                        <div class="demo-sample-prompts prompt-group" id="cat-riddles">
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">You have 12 identical-looking balls. One is a different weight (heavier or lighter, you don't know which). Using a balance scale exactly 3 times, identify the odd ball AND determine if it's heavier or lighter. Show your complete decision tree.</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">100 prisoners are each assigned a random hat (red or blue) and lined up so each can see all hats in front but not their own or those behind. Starting from the back, each must guess their own hat color. They can strategize beforehand. What strategy guarantees the most survivors?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Five pirates must divide 100 gold coins. The most senior proposes a split; all vote. If 50%+ approve, it is accepted. Otherwise, the proposer is thrown overboard and the next pirate proposes. Pirates are perfectly logical and greedy. What does the most senior pirate propose?</button>
                         </div>
                     </div>
                 </div>
@@ -1390,7 +1414,7 @@
 
             <div class="demo-exhausted" id="exhaustedMessage" style="display: none;">
                 <h3>Prompts Used</h3>
-                <p>You've used your 3 free prompts. Ready for unlimited access to the full AI Council?</p>
+                <p>You've used your 5 free prompts. Ready for unlimited access to the full AI Council?</p>
                 <a href="https://offgridtoolkit.ai/command" class="btn-primary">&#9889; Launch Full Command Center</a>
             </div>
         </div>
@@ -1444,7 +1468,7 @@
         // and streamed synthesis answer.
         // ================================================================
 
-        const DEMO_LIMIT = 3;
+        const DEMO_LIMIT = 5;
         const STORAGE_KEY = 'cmdcouncil_demo_count';
 
         let promptsUsed = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
