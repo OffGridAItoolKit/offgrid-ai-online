@@ -1186,6 +1186,83 @@
         }
         .final-cta .privacy-note .lock { color: var(--gold); }
 
+        /* ---- Video Showcase Section ---- */
+        .video-showcase {
+            padding: 80px 24px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-deep) 0%, #0a0f14 50%, var(--bg-deep) 100%);
+            position: relative;
+        }
+        .video-showcase::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 30%, rgba(212, 168, 67, 0.05) 0%, transparent 70%);
+        }
+        .video-showcase-inner {
+            max-width: 850px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        .video-showcase h2 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(24px, 3.5vw, 40px);
+            color: var(--cream);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+        .video-showcase h2 .gold { color: var(--gold); }
+        .video-showcase .video-subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+        .video-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        .video-embed iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 12px;
+        }
+        .video-caption {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 28px;
+        }
+        .video-crosslink {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: 1px solid rgba(212, 168, 67, 0.3);
+            border-radius: 8px;
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .video-crosslink:hover {
+            background: rgba(212, 168, 67, 0.1);
+            border-color: var(--gold);
+        }
+
         /* ---- Footer ---- */
         .footer {
             padding: 32px 24px;
@@ -1560,13 +1637,29 @@
         </div>
     </section>
 
+    <div class="section-divider"></div>
+
+    <!-- Video Showcase Section -->
+    <section class="video-showcase">
+        <div class="video-showcase-inner reveal">
+            <div class="section-badge">See It In Action</div>
+            <h2>Command Council + Image Studio. <span class="gold">Limitless.</span></h2>
+            <p class="video-subtitle">Watch the full pipeline on the OffGrid AI ToolKit USB drive — from a single question to a printed field guide with custom diagrams. Under 2 minutes, completely offline.</p>
+            <div class="video-embed">
+                <iframe src="https://www.youtube.com/embed/Ls9xKmv3pOA?si=0aC1VEknUOdSUaK1" title="OffGrid AI Command Center — From Question to Printed Field Guide" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            </div>
+            <p class="video-caption">Recorded in real time on the OffGrid AI ToolKit USB drive. Deliberation and generation trimmed slightly for pacing.</p>
+            <a href="https://imagestudio.offgridtoolkit.ai" class="video-crosslink">🖼️ Explore the Image Studio →</a>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-links">
             <a href="https://offgridtoolkit.ai">OffGrid AI</a>
             <a href="https://offgridtoolkit.ai/command">Command Center</a>
             <a href="https://imagestudio.offgridtoolkit.ai">Image Studio</a>
-            <a href="https://cmdcouncil.com">How the Council Thinks</a>
+            <a href="https://cmdcouncil.offgridtoolkit.ai">How the Council Thinks</a>
         </div>
         <p class="copyright">&copy; 2026 OffGrid AI. All rights reserved.</p>
     </footer>

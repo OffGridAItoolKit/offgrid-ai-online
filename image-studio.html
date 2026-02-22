@@ -655,6 +655,42 @@
             }
         }
 
+        /* ---- Video Embed ---- */
+        .workflow-video {
+            max-width: 800px;
+            margin: 0 auto 48px;
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+        }
+        .workflow-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            border-radius: 12px;
+        }
+        .workflow-video-caption {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .workflow-video-wrapper {
+            margin-bottom: 48px;
+        }
+        .workflow-video-wrapper .workflow-video-caption {
+            position: relative;
+            top: -34px;
+        }
+
         /* ---- Try It CTA Section ---- */
         .try-cta-section {
             padding: 80px 24px;
@@ -1277,6 +1313,13 @@
                 <p>Image Studio doesn't work alone. Inside the Command Center, a single question triggers a pipeline that goes from research to visual reference to actionable supply list — automatically.</p>
             </div>
 
+            <div class="workflow-video-wrapper">
+                <div class="workflow-video">
+                    <iframe src="https://www.youtube.com/embed/Ls9xKmv3pOA?si=0aC1VEknUOdSUaK1" title="OffGrid AI Command Center — From Question to Printed Field Guide" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+                <p class="workflow-video-caption">Watch the full pipeline in action — prompt to printed document in under 2 minutes. Recorded on the OffGrid AI ToolKit USB drive.</p>
+            </div>
+
             <div class="workflow-steps">
                 <!-- Step 1: Ask -->
                 <div class="workflow-step">
@@ -1330,6 +1373,7 @@
             <div class="workflow-bottom-cta">
                 <p><strong>Question → Article → Visual → Parts List.</strong> That's the full pipeline. One question, and you have everything you need to act.</p>
                 <a href="https://offgridtoolkit.ai/command" class="btn-primary">&#9889; Open the Command Center</a>
+                <p style="margin-top: 16px;"><a href="https://cmdcouncil.offgridtoolkit.ai" style="color: var(--gold); text-decoration: none; font-size: 14px;">Try the Command Council free demo →</a></p>
             </div>
         </div>
     </section>
@@ -1433,7 +1477,7 @@
         <div class="footer-links">
             <a href="https://offgridtoolkit.ai">OffGrid AI ToolKit</a>
             <a href="https://offgridtoolkit.ai/command">Command Center</a>
-            <a href="https://cmdcouncil.com">Command Council</a>
+            <a href="https://cmdcouncil.offgridtoolkit.ai">Command Council</a>
             <a href="https://offgridaitoolkit.com">Get the USB Drive</a>
         </div>
         <div class="footer-privacy">No conversations or images are stored. Each session is ephemeral and private.</div>
