@@ -798,42 +798,68 @@
             border: 1px solid #fecaca;
         }
 
-        /* Generation limit overlay */
+        /* Generation limit overlay — replaces demo content with a compact dark card */
         .limit-overlay {
             display: none;
-            position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.97);
-            border-radius: 16px;
-            z-index: 50;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 32px 24px;
+            padding: 60px 24px;
+            min-height: 400px;
         }
         .limit-overlay.active { display: flex; }
+        .limit-overlay-content {
+            background: linear-gradient(135deg, #1a2332 0%, #0f1720 100%);
+            border: 1px solid rgba(212, 168, 67, 0.25);
+            border-radius: 16px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(212, 168, 67, 0.06);
+        }
+        .limit-overlay-content .limit-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
         .limit-overlay-content h3 {
-            font-size: 22px;
-            color: #2c1810;
-            margin-bottom: 10px;
+            font-size: 24px;
+            color: var(--cream);
+            font-family: 'Oswald', sans-serif;
+            margin-bottom: 12px;
         }
         .limit-overlay-content p {
             font-size: 14px;
-            color: #6b7280;
-            margin-bottom: 20px;
-            max-width: 400px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
         }
         .limit-overlay-content .btn-primary {
-            font-size: 14px;
+            font-size: 15px;
+            padding: 14px 36px;
+            display: inline-block;
         }
         .limit-overlay-content .btn-secondary-sm {
             display: inline-block;
-            margin-top: 12px;
+            margin-top: 16px;
             font-size: 13px;
-            color: #6b7280;
+            color: var(--text-muted);
             text-decoration: underline;
+            text-underline-offset: 3px;
         }
         .limit-overlay-content .btn-secondary-sm:hover { color: var(--gold); }
+        .limit-overlay-content .limit-divider {
+            width: 60px;
+            height: 1px;
+            background: rgba(212, 168, 67, 0.3);
+            margin: 20px auto;
+        }
+        @media (max-width: 640px) {
+            .limit-overlay-content { padding: 36px 24px; }
+        }
 
         /* ---- Footer ---- */
         .site-footer {
@@ -1113,16 +1139,19 @@
                 <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Gemini 3 Pro</div>
             </div>
 
-            <!-- Generation Limit Overlay -->
-            <div class="limit-overlay" id="limitOverlay">
-                <div class="limit-overlay-content">
-                    <div style="font-size: 48px; margin-bottom: 16px;">&#127912;</div>
-                    <h3>You Created Something Amazing</h3>
-                    <p>You have used your free preview. Unlock unlimited Image Studio access, the AI Council, Knowledge Base, and more in the full Command Center.</p>
-                    <a href="https://offgridtoolkit.ai/command" class="btn-primary">Open the Full Command Center</a>
-                    <br>
-                    <a href="https://offgridaitoolkit.com" class="btn-secondary-sm">Or get the USB Drive for 100% offline access</a>
-                </div>
+        </div>
+    </section>
+
+    <!-- Generation Limit Section (replaces demo when limit reached) -->
+    <section class="demo-section" id="limitSection" style="display: none;">
+        <div class="limit-overlay active">
+            <div class="limit-overlay-content">
+                <div class="limit-icon">&#127912;</div>
+                <h3>You Created Something Amazing</h3>
+                <p>You've used your free preview. Unlock unlimited Image Studio access, the AI Council, Knowledge Base, and more in the full Command Center.</p>
+                <a href="https://offgridtoolkit.ai/command" class="btn-primary">Open the Full Command Center</a>
+                <div class="limit-divider"></div>
+                <a href="https://offgridaitoolkit.com" class="btn-secondary-sm">Or get the USB Drive for 100% offline access</a>
             </div>
         </div>
     </section>
@@ -1175,8 +1204,11 @@
             return getGenerationCount() >= MAX_FREE_GENERATIONS;
         }
         function showLimitOverlay() {
-            const overlay = document.getElementById('limitOverlay');
-            if (overlay) overlay.classList.add('active');
+            // Hide the entire demo section and show the limit section instead
+            const demoSection = document.getElementById('demo');
+            const limitSection = document.getElementById('limitSection');
+            if (demoSection) demoSection.style.display = 'none';
+            if (limitSection) limitSection.style.display = 'block';
         }
         function updateLimitBadge() {
             const badge = document.getElementById('demoLimitBadge');
@@ -1259,6 +1291,23 @@
             if (e.key === 'Escape') closeLightbox();
             if (e.key === 'ArrowLeft') navigateLightbox(-1);
             if (e.key === 'ArrowRight') navigateLightbox(1);
+        });
+
+        // Dev reset: type 'offgrid' anywhere on the page to reset generation limit
+        let devBuffer = '';
+        document.addEventListener('keypress', (e) => {
+            devBuffer += e.key;
+            if (devBuffer.length > 7) devBuffer = devBuffer.slice(-7);
+            if (devBuffer === 'offgrid') {
+                localStorage.removeItem('offgrid_img_gen_count');
+                devBuffer = '';
+                const demoSection = document.getElementById('demo');
+                const limitSection = document.getElementById('limitSection');
+                if (demoSection) demoSection.style.display = '';
+                if (limitSection) limitSection.style.display = 'none';
+                updateLimitBadge();
+                alert('Dev mode: Generation limit reset!');
+            }
         });
 
         // ---- Example Cards ----
