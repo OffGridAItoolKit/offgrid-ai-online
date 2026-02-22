@@ -419,6 +419,7 @@
     <div class="controls">
         <input type="text" class="search-box" id="searchBox" placeholder="Search prompts..." oninput="filterPrompts()">
         <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+        <button class="filter-btn" data-filter="survival" onclick="setFilter('survival', this)">🏕️ Survival</button>
         <button class="filter-btn" data-filter="kb" onclick="setFilter('kb', this)">📚 KB Builders</button>
         <button class="filter-btn" data-filter="vision" onclick="setFilter('vision', this)">📷 Vision</button>
         <button class="filter-btn" data-filter="challenging" onclick="setFilter('challenging', this)">🧠 Challenging</button>
@@ -494,6 +495,7 @@
             {
                 icon: '🚨',
                 title: 'High-Stakes Survival',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Time-Critical Emergency Scenarios',
@@ -525,6 +527,7 @@
             {
                 icon: '⚡',
                 title: 'Quick Start',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Try These First',
@@ -546,6 +549,7 @@
             {
                 icon: '💧',
                 title: 'Water & Shelter',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -579,6 +583,7 @@
             {
                 icon: '🔥',
                 title: 'Fire & Warmth',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -615,6 +620,7 @@
             {
                 icon: '🌿',
                 title: 'Food, Foraging & Wilderness',
+                survival: true,
                 subcategories: [
                     {
                         title: 'All Prompts (12B Recommended)',
@@ -639,6 +645,7 @@
             {
                 icon: '🧭',
                 title: 'Navigation Without Technology',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -666,6 +673,7 @@
             {
                 icon: '🩹',
                 title: 'First Aid & Medical',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -702,6 +710,7 @@
             {
                 icon: '🏙️',
                 title: 'Urban Survival & Grid Down',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -723,6 +732,7 @@
             {
                 icon: '⚡',
                 title: 'Energy & Power',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -750,6 +760,7 @@
             {
                 icon: '🔧',
                 title: 'Practical DIY & Improvisation',
+                survival: true,
                 subcategories: [
                     {
                         title: '12B or Higher Recommended',
@@ -772,6 +783,7 @@
             {
                 icon: '🔒',
                 title: 'Security & Defense',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -793,6 +805,7 @@
             {
                 icon: '🏕️',
                 title: 'Overlander: Camp Setup',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -821,6 +834,7 @@
             {
                 icon: '🚙',
                 title: 'Vehicle Diagnostics & Repair',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -855,6 +869,7 @@
             {
                 icon: '🍳',
                 title: 'Cooking & Food Management',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -880,6 +895,7 @@
             {
                 icon: '📡',
                 title: 'Emergency Communications',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -904,6 +920,7 @@
             {
                 icon: '🦎',
                 title: 'Wildlife & Environmental Awareness',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -932,6 +949,7 @@
             {
                 icon: '🛡️',
                 title: 'Security & Crisis Response',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Works on All Models',
@@ -960,6 +978,7 @@
             {
                 icon: '🌦️',
                 title: 'Weather Adaptation',
+                survival: true,
                 subcategories: [
                     {
                         title: 'All Prompts',
@@ -977,6 +996,7 @@
             {
                 icon: '🏡',
                 title: 'Homesteading',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Crops & Garden',
@@ -1020,6 +1040,7 @@
             {
                 icon: '⚕️',
                 title: 'Healthcare & First Responders',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Medical Reference',
@@ -1088,6 +1109,7 @@
             {
                 icon: '🏔️',
                 title: 'Wilderness & Outdoor Adventures',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Backcountry Essentials',
@@ -1106,6 +1128,7 @@
             {
                 icon: '🚨',
                 title: 'Emergency Scenarios',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Crisis Response',
@@ -1124,6 +1147,7 @@
             {
                 icon: '🔬',
                 title: 'Field Research & NGO',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Field Operations',
@@ -1140,6 +1164,7 @@
             {
                 icon: '📚',
                 title: 'Knowledge Base Builders',
+                survival: true,
                 subcategories: [
                     {
                         title: 'Comprehensive Guides (Save These!)',
@@ -1186,23 +1211,65 @@
             document.querySelector('.footer p').textContent = 'All prompts have been curated for the Command Center AI Council.';
         }
         
-        // Filter out challenging categories for online context
+        // Filter out challenging categories and survival filter for online context
         if (!isCommandContext) {
             // Remove challenging filter button
             const challengingBtn = document.querySelector('[data-filter="challenging"]');
             if (challengingBtn) challengingBtn.remove();
+            // Remove survival filter button (online doesn't need it - almost all are survival)
+            const survivalBtn = document.querySelector('[data-filter="survival"]');
+            if (survivalBtn) survivalBtn.remove();
         }
         
         // Build the active prompt list based on context
-        const ACTIVE_CATEGORIES = isCommandContext 
-            ? PROMPT_CATEGORIES 
-            : PROMPT_CATEGORIES.filter(cat => {
+        let ACTIVE_CATEGORIES;
+        if (isCommandContext) {
+            // Reorder for Command Center: survival-first ordering
+            const COMMAND_ORDER = [
+                'High-Stakes Survival',
+                'Quick Start',
+                'Water & Shelter',
+                'Fire & Warmth',
+                'Food, Foraging & Wilderness',
+                'Navigation Without Technology',
+                'First Aid & Medical',
+                'Urban Survival & Grid Down',
+                'Energy & Power',
+                'Practical DIY & Improvisation',
+                'Security & Defense',
+                'Overlander: Camp Setup',
+                'Vehicle Diagnostics & Repair',
+                'Cooking & Food Management',
+                'Emergency Communications',
+                'Wildlife & Environmental Awareness',
+                'Security & Crisis Response',
+                'Weather Adaptation',
+                'Homesteading',
+                'Healthcare & First Responders',
+                'Emergency Scenarios',
+                'Wilderness & Outdoor Adventures',
+                'Deep Questions',
+                'Stump the Council',
+                'Education & Homeschool',
+                'Faith & Mission Work',
+                'Privacy & Sensitive Work',
+                'Field Research & NGO',
+                'Knowledge Base Builders'
+            ];
+            ACTIVE_CATEGORIES = [...PROMPT_CATEGORIES].sort((a, b) => {
+                const idxA = COMMAND_ORDER.indexOf(a.title);
+                const idxB = COMMAND_ORDER.indexOf(b.title);
+                return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+            });
+        } else {
+            ACTIVE_CATEGORIES = PROMPT_CATEGORIES.filter(cat => {
                 // Remove categories where ALL prompts are challenging
                 const allChallenging = cat.subcategories.every(sub => 
                     sub.prompts.every(p => p.challenging)
                 );
                 return !allChallenging;
             });
+        }
         
         // ============================================
         // RENDERING
@@ -1230,6 +1297,7 @@
                         if (activeFilter === 'kb' && !p.kb) return;
                         if (activeFilter === 'vision' && p.badge !== 'vision') return;
                         if (activeFilter === 'challenging' && !p.challenging) return;
+                        if (activeFilter === 'survival' && !cat.survival) return;
                         if (searchTerm && !p.text.toLowerCase().includes(searchTerm)) return;
                         
                         subCount++;
