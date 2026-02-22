@@ -577,7 +577,7 @@
         .demo-messages {
             padding: 24px;
             min-height: 300px;
-            max-height: 500px;
+            max-height: 600px;
             overflow-y: auto;
         }
         .demo-message {
@@ -754,6 +754,294 @@
         .sample-prompt-btn:hover {
             background: rgba(212, 168, 67, 0.1);
             border-color: rgba(212, 168, 67, 0.3);
+        }
+
+        /* ---- Deliberation Status UI ---- */
+        .deliberation-panel {
+            background: rgba(15, 20, 25, 0.6);
+            border: 1px solid rgba(212, 168, 67, 0.15);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+        .deliberation-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .deliberation-title .pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+        .delib-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            transition: opacity 0.3s;
+        }
+        .delib-step.pending {
+            opacity: 0.35;
+        }
+        .delib-step.active {
+            opacity: 1;
+            color: var(--gold);
+        }
+        .delib-step.complete {
+            opacity: 1;
+            color: var(--scout-color);
+        }
+        .delib-step .step-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .delib-step.pending .step-icon {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .delib-step.active .step-icon {
+            background: rgba(212, 168, 67, 0.15);
+            border: 1px solid rgba(212, 168, 67, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+        .delib-step.complete .step-icon {
+            background: rgba(74, 222, 128, 0.15);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+        .delib-step .check-mark {
+            color: var(--scout-color);
+            font-weight: 700;
+        }
+
+        /* ---- Council Meta Bar ---- */
+        .council-meta-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 10px 0;
+            margin-top: 12px;
+            border-top: 1px solid var(--border-subtle);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .council-meta-bar .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .council-meta-bar .meta-item .gold-text {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .consensus-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .consensus-bar {
+            width: 80px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+        .consensus-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--scout-color), #22c55e);
+            transition: width 0.5s ease;
+        }
+        .consensus-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .consensus-dominant { color: var(--scout-color); }
+        .consensus-strong { color: #22c55e; }
+        .consensus-moderate { color: var(--ranger-color); }
+
+        /* ---- See Deliberation Button ---- */
+        .see-deliberation-btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--medic-color);
+            background: rgba(96, 165, 250, 0.08);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, border-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .see-deliberation-btn:hover {
+            background: rgba(96, 165, 250, 0.15);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+
+        /* ---- Deliberation Modal ---- */
+        .delib-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            animation: fadeIn 0.3s ease;
+        }
+        .delib-modal {
+            background: var(--bg-card);
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            border-radius: 16px;
+            max-width: 650px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 32px;
+        }
+        .delib-modal h3 {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+        .delib-modal .modal-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .delib-modal .chairman-box {
+            background: rgba(212, 168, 67, 0.08);
+            border: 1px solid rgba(212, 168, 67, 0.2);
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+        }
+        .delib-modal .chairman-box .chairman-label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+        .delib-modal .chairman-box .chairman-name {
+            font-family: 'Oswald', sans-serif;
+            font-size: 20px;
+        }
+        .delib-modal .chairman-box .chairman-score {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .scores-table th {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .scores-table td {
+            font-size: 14px;
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .scores-table tr.chairman-row td {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .delib-modal .close-modal-btn {
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--cream);
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: block;
+            margin: 0 auto;
+        }
+        .delib-modal .close-modal-btn:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        /* ---- Sample Prompt Categories ---- */
+        .prompt-categories {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        .prompt-cat-btn {
+            font-family: 'Oswald', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 6px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .prompt-cat-btn.active {
+            color: var(--gold);
+            border-color: rgba(212, 168, 67, 0.3);
+            background: var(--gold-dim);
+        }
+        .prompt-cat-btn:hover {
+            border-color: rgba(212, 168, 67, 0.2);
+        }
+        .prompt-group {
+            display: none;
+        }
+        .prompt-group.active {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
         }
 
         /* ---- Privacy Section ---- */
@@ -1070,12 +1358,28 @@
                     <span class="mode-badge">Command Mode</span>
                 </div>
                 <div class="demo-messages" id="chatMessages">
-                    <div class="demo-sample-prompts" id="samplePrompts">
-                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How do I purify water without a filter?</button>
-                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Best ways to start a fire in wet conditions</button>
-                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How to build a basic solar power system</button>
-                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Emergency first aid for snake bites</button>
-                        <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How to navigate without GPS or compass</button>
+                    <div id="samplePrompts">
+                        <div class="prompt-categories">
+                            <button class="prompt-cat-btn active" onclick="switchCategory('survival', this)">Survival</button>
+                            <button class="prompt-cat-btn" onclick="switchCategory('riddles', this)">Brain Teasers</button>
+                            <button class="prompt-cat-btn" onclick="switchCategory('hard', this)">Hard Questions</button>
+                        </div>
+                        <div class="demo-sample-prompts prompt-group active" id="cat-survival">
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How do I purify water in the wild without a filter?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Best ways to start a fire in wet conditions</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">What are the top 5 items for a wilderness survival kit?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">How to build a basic solar power system for off-grid living</button>
+                        </div>
+                        <div class="demo-sample-prompts prompt-group" id="cat-riddles">
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">A man is looking at a photograph. Someone asks, "Whose picture are you looking at?" He replies: "Brothers and sisters I have none, but that man's father is my father's son." Who is in the photograph?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Three gods A, B, and C are called True, False, and Random. True always speaks truly, False always speaks falsely, but whether Random speaks truly or falsely is a random matter. You must determine the identities of A, B, and C by asking three yes-no questions, each to a single god. The gods understand English but answer in their own language with "da" or "ja" (one means yes, one means no, but you don't know which). What three questions do you ask?</button>
+                        </div>
+                        <div class="demo-sample-prompts prompt-group" id="cat-hard">
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Explain the key differences between nuclear fission and fusion reactors, including why fusion is harder to achieve and what recent breakthroughs have been made</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Compare the philosophical frameworks of utilitarianism and deontological ethics using a real-world trolley problem scenario. Which framework gives a more defensible answer and why?</button>
+                            <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">If you had to design a self-sustaining colony on Mars for 1,000 people, what are the top 10 engineering challenges you'd need to solve, ranked by difficulty?</button>
+                        </div>
                     </div>
                 </div>
                 <div class="demo-input-area" id="inputArea">
@@ -1134,7 +1438,10 @@
 
     <script>
         // ================================================================
-        // DEMO CHAT FUNCTIONALITY
+        // DEMO CHAT — FULL COUNCIL DELIBERATION
+        // Calls /api/command/council and shows the full deliberation UI
+        // with model status indicators, peer review, chairman selection,
+        // and streamed synthesis answer.
         // ================================================================
 
         const DEMO_LIMIT = 3;
@@ -1142,6 +1449,15 @@
 
         let promptsUsed = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
         let isStreaming = false;
+        let lastCouncilMeta = null; // Store for "See Deliberation" button
+
+        // Model display info (matches server COMMAND_MODELS)
+        const MODEL_INFO = {
+            scout:     { emoji: '🔭', name: 'Scout',     tag: 'GPT-5.2',           color: 'var(--scout-color)' },
+            medic:     { emoji: '🏥', name: 'Medic',     tag: 'Claude Sonnet 4.6',  color: 'var(--medic-color)' },
+            navigator: { emoji: '🧭', name: 'Navigator', tag: 'Gemini 3.1 Pro',     color: 'var(--navigator-color)' },
+            ranger:    { emoji: '🏕️', name: 'Ranger',    tag: 'Grok 4.1 Fast',      color: 'var(--ranger-color)' }
+        };
 
         function updateCounter() {
             const remaining = Math.max(0, DEMO_LIMIT - promptsUsed);
@@ -1152,57 +1468,221 @@
             }
         }
 
+        // ---- Prompt Category Switching ----
+        function switchCategory(cat, btn) {
+            document.querySelectorAll('.prompt-cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.prompt-group').forEach(g => g.classList.remove('active'));
+            const target = document.getElementById('cat-' + cat);
+            if (target) target.classList.add('active');
+        }
+
         function useSamplePrompt(btn) {
             document.getElementById('demoInput').value = btn.textContent;
-            // Remove sample prompts after first use
-            const sampleContainer = document.getElementById('samplePrompts');
-            if (sampleContainer) sampleContainer.style.display = 'none';
             sendDemoMessage();
         }
 
-        function addMessage(role, content, modelName, modelTag) {
-            const messages = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `demo-message ${role}`;
-
-            if (role === 'user') {
-                msgDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(content)}</div>`;
-            } else {
-                const headerHtml = modelName
-                    ? `<div class="msg-header"><span class="model-name" style="color: var(--gold)">${modelName}</span><span class="model-tag">${modelTag || ''}</span></div>`
-                    : '';
-                msgDiv.innerHTML = `${headerHtml}<div class="msg-bubble">${content}</div>`;
-            }
-
-            messages.appendChild(msgDiv);
-            messages.scrollTop = messages.scrollHeight;
-            return msgDiv;
-        }
-
-        function addTypingIndicator() {
-            const messages = document.getElementById('chatMessages');
-            const typing = document.createElement('div');
-            typing.className = 'demo-message assistant';
-            typing.id = 'typingIndicator';
-            typing.innerHTML = `
-                <div class="msg-header"><span class="model-name" style="color: var(--gold)">Council</span><span class="model-tag">Processing...</span></div>
-                <div class="demo-typing"><span></span><span></span><span></span></div>
-            `;
-            messages.appendChild(typing);
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        function removeTypingIndicator() {
-            const typing = document.getElementById('typingIndicator');
-            if (typing) typing.remove();
-        }
-
+        // ---- Message Helpers ----
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
+        function addUserMessage(content) {
+            const messages = document.getElementById('chatMessages');
+            // Hide sample prompts
+            const sp = document.getElementById('samplePrompts');
+            if (sp) sp.style.display = 'none';
+
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'demo-message user';
+            msgDiv.innerHTML = `<div class="msg-bubble">${escapeHtml(content)}</div>`;
+            messages.appendChild(msgDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // ---- Deliberation Panel ----
+        function createDeliberationPanel() {
+            const messages = document.getElementById('chatMessages');
+            const panel = document.createElement('div');
+            panel.className = 'demo-message assistant';
+            panel.id = 'deliberationPanel';
+            panel.innerHTML = `
+                <div class="deliberation-panel">
+                    <div class="deliberation-title">
+                        <span>⭐</span>
+                        <span>Command Council Deliberating...</span>
+                        <div class="pulse-dot"></div>
+                    </div>
+                    <div class="delib-step active" id="delib-scout">
+                        <div class="step-icon">🔭</div>
+                        <span>Scout responding...</span>
+                    </div>
+                    <div class="delib-step pending" id="delib-medic">
+                        <div class="step-icon">🏥</div>
+                        <span>Medic waiting...</span>
+                    </div>
+                    <div class="delib-step pending" id="delib-navigator">
+                        <div class="step-icon">🧭</div>
+                        <span>Navigator waiting...</span>
+                    </div>
+                    <div class="delib-step pending" id="delib-ranger">
+                        <div class="step-icon">🏕️</div>
+                        <span>Ranger waiting...</span>
+                    </div>
+                    <div class="delib-step pending" id="delib-review">
+                        <div class="step-icon">🤝</div>
+                        <span>Anonymous peer review...</span>
+                    </div>
+                    <div class="delib-step pending" id="delib-chairman">
+                        <div class="step-icon">🏆</div>
+                        <span>Selecting Chairman...</span>
+                    </div>
+                    <div class="delib-step pending" id="delib-synthesis">
+                        <div class="step-icon">⭐</div>
+                        <span>Synthesizing from Chairman + advisors...</span>
+                    </div>
+                </div>
+            `;
+            messages.appendChild(panel);
+            messages.scrollTop = messages.scrollHeight;
+            return panel;
+        }
+
+        function updateDelibStep(stepId, status, message) {
+            const step = document.getElementById(stepId);
+            if (!step) return;
+            step.className = `delib-step ${status}`;
+            if (message) {
+                const span = step.querySelector('span:last-child');
+                if (span) span.innerHTML = message;
+            }
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        function markModelComplete(key) {
+            const info = MODEL_INFO[key];
+            if (!info) return;
+            updateDelibStep(`delib-${key}`, 'complete', `${info.name} complete <span class="check-mark">✓</span>`);
+
+            // Activate the next pending model step
+            const order = ['scout', 'medic', 'navigator', 'ranger'];
+            const idx = order.indexOf(key);
+            if (idx < order.length - 1) {
+                const nextKey = order[idx + 1];
+                const nextStep = document.getElementById(`delib-${nextKey}`);
+                if (nextStep && nextStep.classList.contains('pending')) {
+                    updateDelibStep(`delib-${nextKey}`, 'active', `${MODEL_INFO[nextKey].name} responding...`);
+                }
+            }
+        }
+
+        function removeDeliberationPanel() {
+            const panel = document.getElementById('deliberationPanel');
+            if (panel) panel.remove();
+        }
+
+        // ---- Council Meta Bar (shown below the answer) ----
+        function buildCouncilMetaBar(meta) {
+            if (!meta) return '';
+
+            // Calculate consensus from scores
+            const scoreValues = Object.values(meta.scores || {}).map(s => s.councilScore);
+            const maxScore = Math.max(...scoreValues);
+            const secondScore = scoreValues.sort((a, b) => b - a)[1] || 0;
+            const margin = maxScore - secondScore;
+            let consensusLevel = 'Moderate';
+            let consensusClass = 'consensus-moderate';
+            let barWidth = 50;
+            if (margin >= 8) { consensusLevel = 'Dominant'; consensusClass = 'consensus-dominant'; barWidth = 90; }
+            else if (margin >= 4) { consensusLevel = 'Strong'; consensusClass = 'consensus-strong'; barWidth = 70; }
+
+            return `
+                <div class="council-meta-bar">
+                    <div class="meta-item">
+                        <span>⭐</span>
+                        <span class="gold-text">Command Council</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>Chairman:</span>
+                        <span class="gold-text">${meta.chairmanEmoji} ${meta.chairmanName}</span>
+                    </div>
+                    <div class="meta-item consensus-bar-container">
+                        <span>Consensus:</span>
+                        <div class="consensus-bar"><div class="consensus-bar-fill" style="width: ${barWidth}%"></div></div>
+                        <span class="consensus-label ${consensusClass}">${consensusLevel}</span>
+                    </div>
+                    <button class="see-deliberation-btn" onclick="showDeliberationModal()">
+                        📊 See Deliberation
+                    </button>
+                </div>
+            `;
+        }
+
+        // ---- Deliberation Modal ----
+        function showDeliberationModal() {
+            if (!lastCouncilMeta) return;
+            const meta = lastCouncilMeta;
+
+            // Build scores table rows
+            const labelMap = meta.labelMap || {};
+            const scores = meta.scores || {};
+            let tableRows = '';
+            const sortedLabels = Object.keys(scores).sort((a, b) => scores[b].councilScore - scores[a].councilScore);
+
+            for (const label of sortedLabels) {
+                const s = scores[label];
+                const isChairman = s.key === meta.chairmanKey;
+                const info = MODEL_INFO[s.key] || { emoji: '', name: s.model };
+                tableRows += `
+                    <tr class="${isChairman ? 'chairman-row' : ''}">
+                        <td>${info.emoji} ${s.model} ${isChairman ? '👑' : ''}</td>
+                        <td>${s.accPoints}</td>
+                        <td>${s.insightPoints}</td>
+                        <td><strong>${s.councilScore}</strong></td>
+                    </tr>
+                `;
+            }
+
+            // Chairman info
+            const chairmanScore = scores[Object.keys(scores).find(l => scores[l].key === meta.chairmanKey)];
+
+            const overlay = document.createElement('div');
+            overlay.className = 'delib-modal-overlay';
+            overlay.id = 'delibModal';
+            overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+            overlay.innerHTML = `
+                <div class="delib-modal">
+                    <h3>📊 Council Deliberation Report</h3>
+                    <p class="modal-subtitle">Full transparency into how the AI Council reached its decision.</p>
+
+                    <div class="chairman-box">
+                        <div class="chairman-label">🏆 Chairman Elected</div>
+                        <div class="chairman-name">${meta.chairmanEmoji} ${meta.chairmanName}</div>
+                        ${chairmanScore ? `<div class="chairman-score">Council Score: ${chairmanScore.councilScore} (Accuracy: ${chairmanScore.accPoints} × 2 + Insight: ${chairmanScore.insightPoints} × 1)<br>Formula: Score = 2×Accuracy + 1×Insight | Highest score wins. All 4 models voted anonymously.</div>` : ''}
+                    </div>
+
+                    <h4 style="font-size: 15px; margin-bottom: 12px;">📊 Final Scores (Borda Count)</h4>
+                    <table class="scores-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Accuracy</th>
+                                <th>Insight</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+
+                    <button class="close-modal-btn" onclick="document.getElementById('delibModal').remove()">Close</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+
+        // ---- Main Send Function ----
         async function sendDemoMessage() {
             if (isStreaming) return;
             if (promptsUsed >= DEMO_LIMIT) return;
@@ -1211,17 +1691,13 @@
             const query = input.value.trim();
             if (!query) return;
 
-            // Hide sample prompts
-            const sampleContainer = document.getElementById('samplePrompts');
-            if (sampleContainer) sampleContainer.style.display = 'none';
-
             // Increment counter
             promptsUsed++;
             localStorage.setItem(STORAGE_KEY, promptsUsed.toString());
             updateCounter();
 
             // Add user message
-            addMessage('user', query);
+            addUserMessage(query);
             input.value = '';
 
             // Disable input
@@ -1229,37 +1705,43 @@
             document.getElementById('sendBtn').disabled = true;
             input.disabled = true;
 
-            // Show typing
-            addTypingIndicator();
+            // Show deliberation panel
+            createDeliberationPanel();
+
+            // Track timing
+            const startTime = Date.now();
 
             try {
-                const response = await fetch('/api/command/stream', {
+                const response = await fetch('/api/command/council', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        messages: [{ role: 'user', content: query }],
-                        mode: 'command'
+                        messages: [{ role: 'user', content: query }]
                     })
                 });
 
-                removeTypingIndicator();
-
                 if (!response.ok) {
-                    addMessage('assistant', 'The Council is currently unavailable. Please try again later, or <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">launch the full Command Center</a>.', 'System', 'Error');
+                    removeDeliberationPanel();
+                    const errMsg = document.createElement('div');
+                    errMsg.className = 'demo-message assistant';
+                    errMsg.innerHTML = `
+                        <div class="msg-header"><span class="model-name" style="color: var(--gold)">System</span><span class="model-tag">Error</span></div>
+                        <div class="msg-bubble">The Council is currently unavailable. Please try again later, or <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">launch the full Command Center</a>.</div>
+                    `;
+                    document.getElementById('chatMessages').appendChild(errMsg);
                     isStreaming = false;
                     document.getElementById('sendBtn').disabled = false;
                     input.disabled = false;
                     return;
                 }
 
-                // Stream the response
+                // Stream the SSE response
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
                 let fullText = '';
-                let currentMsgDiv = null;
-                let currentModelName = 'Chairman';
-                let currentModelTag = 'Synthesized Answer';
+                let answerMsgDiv = null;
                 let buffer = '';
+                let councilMeta = null;
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -1277,59 +1759,96 @@
                         try {
                             const parsed = JSON.parse(data);
 
-                            // Handle different event types from the Command Center stream
-                            if (parsed.type === 'council_member' || parsed.type === 'member_response') {
-                                // Individual council member response
-                                const name = parsed.name || parsed.model || 'Council Member';
-                                const tag = parsed.modelId || parsed.model || '';
-                                if (parsed.content) {
-                                    addMessage('assistant', marked.parse(parsed.content), name, tag);
+                            // ---- Progress events (model completions) ----
+                            if (parsed.progress) {
+                                const key = parsed.progress;
+
+                                if (key === 'scout' || key === 'medic' || key === 'navigator' || key === 'ranger') {
+                                    markModelComplete(key);
+                                } else if (key === 'review') {
+                                    // All models done, now peer review
+                                    updateDelibStep('delib-review', 'active', '🤝 Running anonymous peer review (accuracy + insight)...');
+                                } else if (key === 'chairman') {
+                                    // Chairman selected
+                                    updateDelibStep('delib-review', 'complete', 'Peer review complete <span class="check-mark">✓</span>');
+                                    const chairmanMsg = parsed.message || 'Chairman selected';
+                                    updateDelibStep('delib-chairman', 'complete', chairmanMsg);
+                                } else if (key === 'synthesis') {
+                                    updateDelibStep('delib-synthesis', 'active', '⭐ Synthesizing Command answer...');
                                 }
-                            } else if (parsed.type === 'chairman' || parsed.type === 'final_answer' || parsed.type === 'synthesis') {
-                                // Chairman/final synthesized answer
-                                if (parsed.content) {
-                                    addMessage('assistant', marked.parse(parsed.content), 'Chairman', 'Final Synthesized Answer');
+                            }
+
+                            // ---- Council metadata (contains scores, reviews, labelMap) ----
+                            if (parsed.councilMeta) {
+                                councilMeta = parsed.councilMeta;
+                                lastCouncilMeta = councilMeta;
+                            }
+
+                            // ---- Streamed synthesis content ----
+                            if (parsed.content) {
+                                if (!answerMsgDiv) {
+                                    // Remove deliberation panel and create answer message
+                                    updateDelibStep('delib-synthesis', 'complete', 'Synthesis complete <span class="check-mark">✓</span>');
+
+                                    // Brief pause to show completion, then swap to answer
+                                    removeDeliberationPanel();
+
+                                    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                                    const chairmanName = councilMeta ? `${councilMeta.chairmanEmoji} ${councilMeta.chairmanName}` : 'Council';
+
+                                    answerMsgDiv = document.createElement('div');
+                                    answerMsgDiv.className = 'demo-message assistant';
+                                    answerMsgDiv.innerHTML = `
+                                        <div class="msg-header">
+                                            <span class="model-name" style="color: var(--gold)">Command Answer</span>
+                                            <span class="model-tag">4 models + peer review | ${elapsed}s</span>
+                                        </div>
+                                        <div class="msg-bubble"></div>
+                                    `;
+                                    document.getElementById('chatMessages').appendChild(answerMsgDiv);
                                 }
-                            } else if (parsed.choices && parsed.choices[0]) {
-                                // Standard OpenAI-style streaming
-                                const delta = parsed.choices[0].delta;
-                                if (delta && delta.content) {
-                                    fullText += delta.content;
-                                    if (!currentMsgDiv) {
-                                        currentMsgDiv = addMessage('assistant', '', currentModelName, currentModelTag);
-                                    }
-                                    const bubble = currentMsgDiv.querySelector('.msg-bubble');
-                                    if (bubble) {
-                                        bubble.innerHTML = marked.parse(fullText);
-                                    }
-                                    document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-                                }
-                            } else if (parsed.content) {
-                                // Simple content field
+
                                 fullText += parsed.content;
-                                if (!currentMsgDiv) {
-                                    currentMsgDiv = addMessage('assistant', '', currentModelName, currentModelTag);
-                                }
-                                const bubble = currentMsgDiv.querySelector('.msg-bubble');
+                                const bubble = answerMsgDiv.querySelector('.msg-bubble');
                                 if (bubble) {
                                     bubble.innerHTML = marked.parse(fullText);
                                 }
                                 document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
                             }
+
+                            // ---- Error from server ----
+                            if (parsed.error) {
+                                removeDeliberationPanel();
+                                const errDiv = document.createElement('div');
+                                errDiv.className = 'demo-message assistant';
+                                errDiv.innerHTML = `
+                                    <div class="msg-header"><span class="model-name" style="color: var(--gold)">System</span><span class="model-tag">Error</span></div>
+                                    <div class="msg-bubble">${escapeHtml(parsed.error)} <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">Try the full Command Center</a>.</div>
+                                `;
+                                document.getElementById('chatMessages').appendChild(errDiv);
+                            }
+
                         } catch (e) {
                             // Skip unparseable lines
                         }
                     }
                 }
 
-                // If we accumulated text but never created a message div
-                if (fullText && !currentMsgDiv) {
-                    addMessage('assistant', marked.parse(fullText), currentModelName, currentModelTag);
+                // Add council meta bar below the answer
+                if (answerMsgDiv && councilMeta) {
+                    const metaBarHtml = buildCouncilMetaBar(councilMeta);
+                    answerMsgDiv.insertAdjacentHTML('beforeend', metaBarHtml);
                 }
 
             } catch (err) {
-                removeTypingIndicator();
-                addMessage('assistant', 'Connection error. The Council may be temporarily unavailable. <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">Try the full Command Center</a>.', 'System', 'Error');
+                removeDeliberationPanel();
+                const errDiv = document.createElement('div');
+                errDiv.className = 'demo-message assistant';
+                errDiv.innerHTML = `
+                    <div class="msg-header"><span class="model-name" style="color: var(--gold)">System</span><span class="model-tag">Error</span></div>
+                    <div class="msg-bubble">Connection error. The Council may be temporarily unavailable. <a href="https://offgridtoolkit.ai/command" style="color: var(--gold)">Try the full Command Center</a>.</div>
+                `;
+                document.getElementById('chatMessages').appendChild(errDiv);
             }
 
             isStreaming = false;
