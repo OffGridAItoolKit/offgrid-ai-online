@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <title>OffGrid AI Command Center | Four AI Models. One Answer.</title>
-    <meta name="description" content="The Command Center puts four of the world's top AI models on every question. Anonymous peer review. No single judge. No bias. Try 3 free prompts.">
+    <meta name="description" content="The Command Center puts four of the world's top AI models on every question. Anonymous peer review. No single judge. No bias. Try 5 free prompts.">
     <meta property="og:title" content="OffGrid AI Command Center">
     <meta property="og:description" content="Four AI models compete on every question. Anonymous peer review. The best answer wins. Try it free.">
     <meta property="og:type" content="website">
@@ -272,7 +272,7 @@
 
         /* ---- Council Section ---- */
         .council-section {
-            padding: 100px 24px;
+            padding: 120px 24px;
             background: linear-gradient(180deg, var(--bg-deep) 0%, var(--slate-deep) 100%);
             position: relative;
         }
@@ -282,7 +282,7 @@
         }
         .council-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 70px;
         }
         .council-header h2 {
             font-size: clamp(28px, 4vw, 48px);
@@ -365,7 +365,7 @@
 
         /* ---- Process Section ---- */
         .process-section {
-            padding: 100px 24px;
+            padding: 120px 24px;
             background: var(--bg-deep);
             position: relative;
         }
@@ -375,7 +375,7 @@
         }
         .process-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 70px;
         }
         .process-header h2 {
             font-size: clamp(28px, 4vw, 48px);
@@ -444,7 +444,7 @@
 
         /* ---- Features Section ---- */
         .features-section {
-            padding: 100px 24px;
+            padding: 120px 24px;
             background: linear-gradient(180deg, var(--bg-deep) 0%, var(--slate-deep) 100%);
         }
         .features-inner {
@@ -453,7 +453,7 @@
         }
         .features-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 70px;
         }
         .features-header h2 {
             font-size: clamp(28px, 4vw, 48px);
@@ -500,7 +500,7 @@
 
         /* ---- Demo Section ---- */
         .demo-section {
-            padding: 100px 24px;
+            padding: 120px 24px;
             background: var(--bg-deep);
             position: relative;
         }
@@ -1098,7 +1098,7 @@
 
         /* ---- Privacy Section ---- */
         .privacy-section {
-            padding: 80px 24px;
+            padding: 100px 24px;
             background: linear-gradient(180deg, var(--bg-deep) 0%, var(--slate-deep) 100%);
         }
         .privacy-inner {
@@ -1142,7 +1142,7 @@
 
         /* ---- Final CTA Section ---- */
         .final-cta {
-            padding: 100px 24px;
+            padding: 120px 24px;
             text-align: center;
             background: var(--bg-deep);
             position: relative;
@@ -1205,6 +1205,65 @@
             color: rgba(156, 163, 175, 0.5);
         }
 
+        /* ---- Answer Action Buttons ---- */
+        .answer-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+        .answer-action-btn {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .answer-action-btn.copy-btn {
+            color: var(--cream);
+            background: rgba(255,255,255,0.06);
+        }
+        .answer-action-btn.copy-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .answer-action-btn.copy-btn.copied {
+            color: var(--scout-color);
+            border-color: rgba(74, 222, 128, 0.3);
+            background: rgba(74, 222, 128, 0.08);
+        }
+        .answer-action-btn.save-btn {
+            color: var(--cream);
+            background: rgba(255,255,255,0.06);
+        }
+        .answer-action-btn.save-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .answer-action-btn.new-btn {
+            color: var(--gold);
+            background: var(--gold-dim);
+            border-color: rgba(212, 168, 67, 0.2);
+        }
+        .answer-action-btn.new-btn:hover {
+            background: rgba(212, 168, 67, 0.25);
+            border-color: rgba(212, 168, 67, 0.4);
+        }
+
+        /* ---- Section Dividers ---- */
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(212, 168, 67, 0.15) 20%, rgba(212, 168, 67, 0.15) 80%, transparent 100%);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
         /* ---- Scroll Animations ---- */
         .reveal {
             opacity: 0;
@@ -1254,6 +1313,8 @@
         </div>
     </section>
 
+    <div class="section-divider"></div>
+
     <!-- AI Council Section -->
     <section class="council-section" id="council">
         <div class="council-inner">
@@ -1299,6 +1360,8 @@
             </div>
         </div>
     </section>
+
+    <div class="section-divider"></div>
 
     <!-- Process Section -->
     <section class="process-section" id="process">
@@ -1346,6 +1409,8 @@
         </div>
     </section>
 
+    <div class="section-divider"></div>
+
     <!-- Features Section -->
     <section class="features-section" id="features">
         <div class="features-inner">
@@ -1389,6 +1454,8 @@
             </div>
         </div>
     </section>
+
+    <div class="section-divider"></div>
 
     <!-- Demo Section -->
     <section class="demo-section" id="demo">
@@ -1455,6 +1522,8 @@
         </div>
     </section>
 
+    <div class="section-divider"></div>
+
     <!-- Privacy Section -->
     <section class="privacy-section">
         <div class="privacy-inner reveal">
@@ -1469,6 +1538,8 @@
             </div>
         </div>
     </section>
+
+    <div class="section-divider"></div>
 
     <!-- Final CTA -->
     <section class="final-cta">
@@ -1767,6 +1838,10 @@
             // Show deliberation panel
             createDeliberationPanel();
 
+            // Reset state for new answer
+            lastFullText = '';
+            lastCouncilMeta = null;
+
             // Track timing
             const startTime = Date.now();
 
@@ -1797,7 +1872,6 @@
                 // Stream the SSE response
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
-                let fullText = '';
                 let answerMsgDiv = null;
                 let buffer = '';
                 let councilMeta = null;
@@ -1845,6 +1919,7 @@
 
                             // ---- Streamed synthesis content ----
                             if (parsed.content) {
+                                lastFullText += parsed.content;
                                 if (!answerMsgDiv) {
                                     // Remove deliberation panel and create answer message
                                     updateDelibStep('delib-synthesis', 'complete', 'Synthesis complete <span class="check-mark">✓</span>');
@@ -1867,10 +1942,9 @@
                                     document.getElementById('chatMessages').appendChild(answerMsgDiv);
                                 }
 
-                                fullText += parsed.content;
                                 const bubble = answerMsgDiv.querySelector('.msg-bubble');
                                 if (bubble) {
-                                    bubble.innerHTML = marked.parse(fullText);
+                                    bubble.innerHTML = marked.parse(lastFullText);
                                 }
                                 document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
                             }
@@ -1899,6 +1973,12 @@
                     answerMsgDiv.insertAdjacentHTML('beforeend', metaBarHtml);
                 }
 
+                // Add action buttons below the answer
+                if (answerMsgDiv && lastFullText) {
+                    const actionsHtml = buildAnswerActions(lastFullText, councilMeta);
+                    answerMsgDiv.insertAdjacentHTML('beforeend', actionsHtml);
+                }
+
             } catch (err) {
                 removeDeliberationPanel();
                 const errDiv = document.createElement('div');
@@ -1915,6 +1995,136 @@
                 document.getElementById('sendBtn').disabled = false;
                 input.disabled = false;
                 input.focus();
+            }
+        }
+
+        // ---- Answer Action Buttons ----
+        function buildAnswerActions(fullText, meta) {
+            const chairmanInfo = meta ? `Chairman: ${meta.chairmanName}` : '';
+            return `
+                <div class="answer-actions">
+                    <button class="answer-action-btn copy-btn" onclick="copyAnswer(this)">
+                        📋 Copy to Clipboard
+                    </button>
+                    <button class="answer-action-btn save-btn" onclick="saveAnswer()">
+                        💾 Save as Text
+                    </button>
+                    <button class="answer-action-btn new-btn" onclick="clearChat()">
+                        ✨ New Question
+                    </button>
+                </div>
+            `;
+        }
+
+        // Store the last full text for copy/save
+        let lastFullText = '';
+
+        function copyAnswer(btn) {
+            if (!lastFullText) return;
+            navigator.clipboard.writeText(lastFullText).then(() => {
+                btn.classList.add('copied');
+                btn.innerHTML = '✓ Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '📋 Copy to Clipboard';
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = lastFullText;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                btn.classList.add('copied');
+                btn.innerHTML = '✓ Copied!';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = '📋 Copy to Clipboard';
+                }, 2000);
+            });
+        }
+
+        function saveAnswer() {
+            if (!lastFullText) return;
+            let content = '';
+            if (lastCouncilMeta) {
+                content += `Command Council Answer\n`;
+                content += `Chairman: ${lastCouncilMeta.chairmanName} (${lastCouncilMeta.chairmanEmoji})\n`;
+                content += `${'='.repeat(50)}\n\n`;
+            }
+            content += lastFullText;
+            content += `\n\n${'='.repeat(50)}\n`;
+            content += `Generated by OffGrid AI Command Center\n`;
+            content += `https://offgridtoolkit.ai/command\n`;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'command-council-answer.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearChat() {
+            const messages = document.getElementById('chatMessages');
+            messages.innerHTML = '';
+
+            // If all prompts used, show exhausted message
+            if (promptsUsed >= DEMO_LIMIT) {
+                const exhaustedDiv = document.getElementById('demoExhausted');
+                if (exhaustedDiv) exhaustedDiv.style.display = 'block';
+                return;
+            }
+
+            // Re-create sample prompts
+            const sp = document.createElement('div');
+            sp.id = 'samplePrompts';
+            sp.innerHTML = `
+                <div class="prompt-categories">
+                    <button class="prompt-cat-btn active" onclick="switchCategory('survival', this)">Survival</button>
+                    <button class="prompt-cat-btn" onclick="switchCategory('hard', this)">Hard Questions</button>
+                    <button class="prompt-cat-btn" onclick="switchCategory('emergency', this)">Emergency</button>
+                    <button class="prompt-cat-btn" onclick="switchCategory('riddles', this)">Brain Teasers</button>
+                </div>
+                <div class="demo-sample-prompts prompt-group active" id="cat-survival">
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Design a complete off-grid water purification system for a family of 4 using only materials available at a hardware store. Include flow rates, filter stages, and maintenance schedule.</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Compare the effectiveness of solar, wind, and micro-hydro power for a permanent off-grid homestead in the Pacific Northwest. Include cost per kWh, reliability, and maintenance.</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Design a complete food preservation system for a year's harvest without electricity, covering fermentation, smoking, dehydration, and root cellaring with specific temperatures and timelines.</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Explain the complete process of making penicillin from bread mold in a survival scenario, including the risks, the chemistry, and why this is a last resort.</button>
+                </div>
+                <div class="demo-sample-prompts prompt-group" id="cat-hard">
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Explain the measurement problem in quantum mechanics. Why does observation appear to collapse the wave function, and how do the Copenhagen, Many-Worlds, and pilot wave interpretations each resolve this differently? Which has the strongest experimental support?</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Steel-man the argument that consciousness is non-computational (Penrose-Hameroff), then steel-man the argument that it is purely computational (functionalism). Which position has fewer unresolved problems?</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Design a realistic plan to terraform Mars over 500 years. Include the physics of atmospheric thickening, the biology of soil creation, the engineering of magnetic field generation, and the governance model for decision-making across 20 generations.</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">What would happen to Earth's climate, ecosystems, and human civilization if the Gulf Stream (AMOC) collapsed within the next 5 years? Use current oceanographic data to model the cascading effects decade by decade.</button>
+                </div>
+                <div class="demo-sample-prompts prompt-group" id="cat-emergency">
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">A nuclear power plant 50 miles upwind has had a meltdown. You have 2 hours before fallout arrives. What do you do in those 2 hours to maximize your family's survival?</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">A wildfire is approaching your rural property from the west at 15 mph. You have 30 minutes. Your vehicle won't start. What is your decision tree?</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">You are in a building that has partially collapsed from an earthquake. You can hear rescuers but they cannot hear you. You have a cell phone with 3% battery. What do you do?</button>
+                </div>
+                <div class="demo-sample-prompts prompt-group" id="cat-riddles">
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">You have 12 identical-looking balls. One is a different weight (heavier or lighter, you don't know which). Using a balance scale exactly 3 times, identify the odd ball AND determine if it's heavier or lighter. Show your complete decision tree.</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">100 prisoners are each assigned a random hat (red or blue) and lined up so each can see all hats in front but not their own or those behind. Starting from the back, each must guess their own hat color. They can strategize beforehand. What strategy guarantees the most survivors?</button>
+                    <button class="sample-prompt-btn" onclick="useSamplePrompt(this)">Five pirates must divide 100 gold coins. The most senior proposes a split; all vote. If 50%+ approve, it is accepted. Otherwise, the proposer is thrown overboard and the next pirate proposes. Pirates are perfectly logical and greedy. What does the most senior pirate propose?</button>
+                </div>
+            `;
+            messages.appendChild(sp);
+
+            // Reset state
+            lastFullText = '';
+            lastCouncilMeta = null;
+
+            // Re-enable input if prompts remain
+            if (promptsUsed < DEMO_LIMIT) {
+                document.getElementById('demoInput').value = '';
+                document.getElementById('demoInput').focus();
             }
         }
 
