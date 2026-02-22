@@ -1298,7 +1298,7 @@
         <div class="hero-bg"></div>
         <div class="hero-content">
             <div class="section-badge">OffGrid AI Command Center</div>
-            <h1>Four AI Models.<br><span class="gold-italic">One Decisive Answer.</span></h1>
+            <h1>Four AI Models.<br><span class="gold-italic">One Unmatched Answer.</span></h1>
             <p class="subtitle">The Command Center puts GPT-5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, and Grok 4.1 Fast on every question. They compete, review each other anonymously, and the best answer wins. Then it gets even better.</p>
             <div class="hero-buttons">
                 <a href="#demo" class="btn-primary" onclick="smoothScroll(event, 'demo')">&#9889; Try 5 Free Prompts</a>
@@ -2158,6 +2158,28 @@
         }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // ---- Hidden dev reset: type 'offgrid' anywhere to reset demo limit ----
+        let devBuffer = '';
+        document.addEventListener('keypress', function(e) {
+            devBuffer += e.key.toLowerCase();
+            if (devBuffer.length > 20) devBuffer = devBuffer.slice(-20);
+            if (devBuffer.includes('offgrid')) {
+                devBuffer = '';
+                localStorage.removeItem(STORAGE_KEY);
+                promptsUsed = 0;
+                updateCounter();
+                // Hide exhausted message if visible
+                const exhausted = document.getElementById('demoExhausted');
+                if (exhausted) exhausted.style.display = 'none';
+                // Re-enable input
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('demoInput').disabled = false;
+                // Clear chat and show prompts
+                clearChat();
+                alert('Dev mode: Demo limit reset!');
+            }
+        });
 
         // Initialize counter on load
         updateCounter();
