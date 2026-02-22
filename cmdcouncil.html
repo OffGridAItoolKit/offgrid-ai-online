@@ -621,37 +621,72 @@
             font-family: 'DM Sans', monospace;
         }
         .demo-message.assistant .msg-bubble {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            padding: 16px 20px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            padding: 20px 24px;
             border-radius: 4px 12px 12px 12px;
             font-size: 14px;
             line-height: 1.7;
-            color: var(--cream);
+            color: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .demo-message.assistant .msg-bubble h1,
         .demo-message.assistant .msg-bubble h2,
         .demo-message.assistant .msg-bubble h3 {
             font-size: 16px;
-            margin: 12px 0 6px;
-            color: var(--cream);
+            margin: 14px 0 6px;
+            color: #111827;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 700;
+        }
+        .demo-message.assistant .msg-bubble h4,
+        .demo-message.assistant .msg-bubble h5 {
+            font-size: 15px;
+            margin: 12px 0 4px;
+            color: #1f2937;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
         }
         .demo-message.assistant .msg-bubble ul,
         .demo-message.assistant .msg-bubble ol {
             padding-left: 20px;
             margin: 8px 0;
+            color: #374151;
         }
         .demo-message.assistant .msg-bubble li {
             margin-bottom: 4px;
         }
         .demo-message.assistant .msg-bubble strong {
-            color: var(--gold);
+            color: #92710a;
+            font-weight: 700;
+        }
+        .demo-message.assistant .msg-bubble em {
+            color: #6b7280;
+        }
+        .demo-message.assistant .msg-bubble a {
+            color: #92710a;
+            text-decoration: underline;
         }
         .demo-message.assistant .msg-bubble p {
             margin-bottom: 8px;
+            color: #374151;
         }
         .demo-message.assistant .msg-bubble p:last-child {
             margin-bottom: 0;
+        }
+        .demo-message.assistant .msg-bubble code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #1f2937;
+        }
+        .demo-message.assistant .msg-bubble blockquote {
+            border-left: 3px solid #d4a843;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #6b7280;
+            font-style: italic;
         }
         .demo-typing {
             display: flex;
@@ -1541,19 +1576,19 @@
                     </div>
                     <div class="delib-step active" id="delib-scout">
                         <div class="step-icon">🔭</div>
-                        <span>Scout responding...</span>
+                        <span>Scout <span style="color:var(--text-muted);font-size:12px">(GPT-5.2)</span> analyzing...</span>
                     </div>
-                    <div class="delib-step pending" id="delib-medic">
+                    <div class="delib-step active" id="delib-medic">
                         <div class="step-icon">🏥</div>
-                        <span>Medic waiting...</span>
+                        <span>Medic <span style="color:var(--text-muted);font-size:12px">(Claude Sonnet 4.6)</span> analyzing...</span>
                     </div>
-                    <div class="delib-step pending" id="delib-navigator">
+                    <div class="delib-step active" id="delib-navigator">
                         <div class="step-icon">🧭</div>
-                        <span>Navigator waiting...</span>
+                        <span>Navigator <span style="color:var(--text-muted);font-size:12px">(Gemini 3.1 Pro)</span> analyzing...</span>
                     </div>
-                    <div class="delib-step pending" id="delib-ranger">
+                    <div class="delib-step active" id="delib-ranger">
                         <div class="step-icon">🏕️</div>
-                        <span>Ranger waiting...</span>
+                        <span>Ranger <span style="color:var(--text-muted);font-size:12px">(Grok 4.1 Fast)</span> analyzing...</span>
                     </div>
                     <div class="delib-step pending" id="delib-review">
                         <div class="step-icon">🤝</div>
@@ -1588,7 +1623,7 @@
         function markModelComplete(key) {
             const info = MODEL_INFO[key];
             if (!info) return;
-            updateDelibStep(`delib-${key}`, 'complete', `${info.name} complete <span class="check-mark">✓</span>`);
+            updateDelibStep(`delib-${key}`, 'complete', `${info.name} <span style="color:var(--text-muted);font-size:12px">(${info.tag})</span> complete <span class="check-mark">✓</span>`);
 
             // Activate the next pending model step
             const order = ['scout', 'medic', 'navigator', 'ranger'];
@@ -1597,7 +1632,7 @@
                 const nextKey = order[idx + 1];
                 const nextStep = document.getElementById(`delib-${nextKey}`);
                 if (nextStep && nextStep.classList.contains('pending')) {
-                    updateDelibStep(`delib-${nextKey}`, 'active', `${MODEL_INFO[nextKey].name} responding...`);
+                    updateDelibStep(`delib-${nextKey}`, 'active', `${MODEL_INFO[nextKey].name} <span style="color:var(--text-muted);font-size:12px">(${MODEL_INFO[nextKey].tag})</span> analyzing...`);
                 }
             }
         }
@@ -1661,7 +1696,7 @@
                 const info = MODEL_INFO[s.key] || { emoji: '', name: s.model };
                 tableRows += `
                     <tr class="${isChairman ? 'chairman-row' : ''}">
-                        <td>${info.emoji} ${s.model} ${isChairman ? '👑' : ''}</td>
+                        <td>${info.emoji} ${info.name} <span style="color:#9ca3af;font-size:12px">(${info.tag})</span> ${isChairman ? '👑' : ''}</td>
                         <td>${s.accPoints}</td>
                         <td>${s.insightPoints}</td>
                         <td><strong>${s.councilScore}</strong></td>
@@ -1683,7 +1718,7 @@
 
                     <div class="chairman-box">
                         <div class="chairman-label">🏆 Chairman Elected</div>
-                        <div class="chairman-name">${meta.chairmanEmoji} ${meta.chairmanName}</div>
+                        <div class="chairman-name">${meta.chairmanEmoji} ${meta.chairmanName} <span style="color:#9ca3af;font-size:14px">(${MODEL_INFO[meta.chairmanKey] ? MODEL_INFO[meta.chairmanKey].tag : ''})</span></div>
                         ${chairmanScore ? `<div class="chairman-score">Council Score: ${chairmanScore.councilScore} (Accuracy: ${chairmanScore.accPoints} × 2 + Insight: ${chairmanScore.insightPoints} × 1)<br>Formula: Score = 2×Accuracy + 1×Insight | Highest score wins. All 4 models voted anonymously.</div>` : ''}
                     </div>
 
