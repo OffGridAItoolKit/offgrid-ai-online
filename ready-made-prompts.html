@@ -1166,6 +1166,45 @@
         ];
         
         // ============================================
+        // CONTEXT DETECTION
+        // ============================================
+        
+        const isCommandContext = window.location.pathname.includes('/command');
+        
+        // Adapt header for context
+        if (isCommandContext) {
+            document.querySelector('.header-title').textContent = 'OFFGRID COMMAND CENTER';
+            const badge = document.querySelector('.online-badge');
+            badge.textContent = 'COMMAND';
+            badge.style.background = 'linear-gradient(135deg, #b8860b 0%, #daa520 100%)';
+            badge.style.setProperty('content', 'none');
+            badge.classList.remove('online-badge');
+            badge.classList.add('command-badge');
+            document.querySelector('.back-link').href = '/command';
+            document.querySelector('.back-link').textContent = '\u2190 Back to Chat';
+            document.querySelector('.hero p').textContent = 'Expert prompts designed to challenge and showcase the AI Council. Click any prompt to copy it, or send it directly to the Command Center.';
+            document.querySelector('.footer p').textContent = 'All prompts have been curated for the Command Center AI Council.';
+        }
+        
+        // Filter out challenging categories for online context
+        if (!isCommandContext) {
+            // Remove challenging filter button
+            const challengingBtn = document.querySelector('[data-filter="challenging"]');
+            if (challengingBtn) challengingBtn.remove();
+        }
+        
+        // Build the active prompt list based on context
+        const ACTIVE_CATEGORIES = isCommandContext 
+            ? PROMPT_CATEGORIES 
+            : PROMPT_CATEGORIES.filter(cat => {
+                // Remove categories where ALL prompts are challenging
+                const allChallenging = cat.subcategories.every(sub => 
+                    sub.prompts.every(p => p.challenging)
+                );
+                return !allChallenging;
+            });
+        
+        // ============================================
         // RENDERING
         // ============================================
         
@@ -1178,7 +1217,7 @@
             let visibleCount = 0;
             const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
             
-            PROMPT_CATEGORIES.forEach((cat, catIdx) => {
+            ACTIVE_CATEGORIES.forEach((cat, catIdx) => {
                 let catPromptCount = 0;
                 let subcatHtml = '';
                 
@@ -1197,7 +1236,7 @@
                         catPromptCount++;
                         
                         const badgeClass = p.badge === 'all' ? 'all-models' : p.badge === 'vision' ? 'vision' : 'advanced';
-                        const badgeText = p.badge === 'all' ? 'All Models' : p.badge === 'vision' ? '📷 Vision' : '12B+';
+                        const badgeText = p.badge === 'all' ? 'All Models' : p.badge === 'vision' ? '📷 Vision' : (isCommandContext ? 'Advanced' : '12B+');
                         const kbHtml = p.kb ? `<div class="kb-tag">📚 ${p.kb}</div>` : '';
                         
                         promptsHtml += `
@@ -1308,7 +1347,7 @@
         // ============================================
         
         // Count total prompts
-        PROMPT_CATEGORIES.forEach(cat => {
+        ACTIVE_CATEGORIES.forEach(cat => {
             cat.subcategories.forEach(sub => {
                 totalPrompts += sub.prompts.length;
             });
