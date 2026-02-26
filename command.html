@@ -334,8 +334,14 @@
             font-family: var(--font-sans);
             line-height: 1.6;
             max-height: 150px;
-            overflow-y: auto;
+            overflow-y: hidden;
             color: var(--text-primary);
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .command-theme .message-input::-webkit-scrollbar {
+            display: none;
         }
 
         .command-theme .message-input::placeholder {

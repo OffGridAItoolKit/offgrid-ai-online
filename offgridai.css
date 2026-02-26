@@ -2562,6 +2562,13 @@ body.command-theme {
 .command-theme .message-input {
     color: #e7e9ea;
     font-family: 'Geist', sans-serif;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.command-theme .message-input::-webkit-scrollbar {
+    display: none;
 }
 
 .command-theme .message-input::placeholder {
