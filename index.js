@@ -1956,16 +1956,17 @@ app.get('/', (req, res) => {
     serveWithExperience(req, res, false);
 });
 
-// Catch-all route - serve prospect experience for any other path
-app.get('*', (req, res) => {
-    serveWithExperience(req, res, false);
-});
-
 // =============================================================================
-// LICENSE SYSTEM ROUTES
+// LICENSE SYSTEM ROUTES (must be before catch-all)
 // =============================================================================
 
 registerLicenseRoutes(app, logToBetterStack);
+
+// Catch-all route - serve prospect experience for any other path
+// IMPORTANT: This must be the LAST route registered
+app.get('*', (req, res) => {
+    serveWithExperience(req, res, false);
+});
 
 // =============================================================================
 // SERVER STARTUP
