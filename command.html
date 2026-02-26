@@ -1951,7 +1951,7 @@
         }
 
         /* ============================================ */
-        /* Deep Mode (Ctrl+Shift+D)                    */
+        /* Deep Mode (Ctrl+Shift+.)                    */
         /* ============================================ */
 
         .command-theme .deep-mode-indicator {
@@ -2045,6 +2045,331 @@
             color: var(--text-muted);
             margin-top: 6px;
             text-align: center;
+        }
+
+        /* ============================================ */
+        /* Deep Mode Analytics Sidebar                 */
+        /* ============================================ */
+
+        .command-theme .deep-analytics-panel {
+            position: fixed;
+            top: 56px;
+            right: 0;
+            bottom: 0;
+            width: 300px;
+            background: var(--bg-surface);
+            border-left: 1px solid var(--border-subtle);
+            z-index: 1000;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-emphasis) transparent;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: var(--font-sans);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .command-theme .deep-analytics-panel.open {
+            transform: translateX(0);
+        }
+
+        .command-theme .deep-analytics-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        .command-theme .deep-analytics-panel::-webkit-scrollbar-thumb {
+            background: var(--border-emphasis);
+            border-radius: 2px;
+        }
+
+        .command-theme.deep-panel-open .main-container {
+            margin-right: 300px;
+            transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .command-theme .deep-panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .command-theme .deep-panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold-primary);
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .command-theme .deep-panel-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 4px;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+        .command-theme .deep-panel-close:hover {
+            color: var(--text-primary);
+        }
+
+        .command-theme .deep-panel-body {
+            padding: 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .command-theme .deep-section {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .command-theme .deep-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 10px;
+            font-family: var(--font-mono);
+        }
+
+        /* Session summary stats */
+        .command-theme .deep-stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .command-theme .deep-stat-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .command-theme .deep-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            line-height: 1.2;
+        }
+
+        .command-theme .deep-stat-label {
+            font-size: 9px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 2px;
+        }
+
+        .command-theme .deep-stat-card.highlight {
+            border-color: rgba(201, 168, 76, 0.3);
+        }
+
+        .command-theme .deep-stat-card.highlight .deep-stat-value {
+            color: var(--gold-primary);
+        }
+
+        /* Chairman leaderboard */
+        .command-theme .deep-leaderboard-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .command-theme .deep-lb-rank {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            width: 16px;
+            text-align: center;
+            font-family: var(--font-mono);
+        }
+
+        .command-theme .deep-lb-name {
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 65px;
+        }
+
+        .command-theme .deep-lb-bar-bg {
+            flex: 1;
+            height: 10px;
+            background: var(--bg-deep);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .command-theme .deep-lb-bar {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.6s ease-out;
+            min-width: 2px;
+        }
+
+        .command-theme .deep-lb-bar.scout { background: var(--scout-color); }
+        .command-theme .deep-lb-bar.medic { background: var(--medic-color); }
+        .command-theme .deep-lb-bar.navigator { background: var(--navigator-color); }
+        .command-theme .deep-lb-bar.ranger { background: var(--ranger-color); }
+
+        .command-theme .deep-lb-stats {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            min-width: 55px;
+            text-align: right;
+            font-family: var(--font-mono);
+        }
+
+        /* Category strength map */
+        .command-theme .deep-category-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .command-theme .deep-cat-name {
+            color: var(--text-secondary);
+            min-width: 70px;
+            font-weight: 500;
+        }
+
+        .command-theme .deep-cat-leader {
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .command-theme .deep-cat-count {
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 10px;
+        }
+
+        /* Score averages */
+        .command-theme .deep-avg-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            font-size: 11px;
+        }
+
+        .command-theme .deep-avg-name {
+            min-width: 65px;
+            font-weight: 600;
+        }
+
+        .command-theme .deep-avg-scores {
+            flex: 1;
+            display: flex;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .command-theme .deep-avg-total {
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 30px;
+            text-align: right;
+            font-family: var(--font-mono);
+        }
+
+        /* Streak indicator */
+        .command-theme .deep-streak {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            background: var(--bg-elevated);
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            margin-top: 8px;
+        }
+
+        .command-theme .deep-streak-fire {
+            font-size: 16px;
+        }
+
+        .command-theme .deep-streak-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .command-theme .deep-streak-model {
+            font-weight: 700;
+        }
+
+        /* Empty state */
+        .command-theme .deep-empty {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .command-theme .deep-empty-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .command-theme .deep-empty-hint {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-style: italic;
+        }
+
+        /* Query log */
+        .command-theme .deep-query-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 11px;
+        }
+
+        .command-theme .deep-query-item:last-child {
+            border-bottom: none;
+        }
+
+        .command-theme .deep-query-text {
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .command-theme .deep-query-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Mobile: hide panel */
+        @media (max-width: 768px) {
+            .command-theme .deep-analytics-panel {
+                display: none;
+            }
+            .command-theme.deep-panel-open .main-container {
+                margin-right: 0;
+            }
         }
 
         /* ============================================ */
@@ -4314,6 +4639,16 @@
                 const saveBtn = document.getElementById('saveToKbBtn');
                 if (saveBtn) saveBtn.disabled = false;
 
+                // Deep Mode Analytics: track this council query
+                updateDeepModeStats({
+                    userMessage: userMessage,
+                    chairmanKey: chairmanKey,
+                    chairmanName: chairmanName,
+                    scores: councilScores,
+                    responseTime: parseFloat(responseTime),
+                    timestamp: new Date()
+                });
+
             } catch (error) {
                 console.error('Council error:', error);
                 if (document.getElementById('councilProgress')) {
@@ -5276,11 +5611,125 @@
         }
 
         // ============================================
-        // DEEP MODE (Ctrl+Shift+D)
+        // DEEP MODE ANALYTICS (Ctrl+Shift+.)
         // ============================================
 
         let deepModeActive = localStorage.getItem('offgrid-deep-mode') === 'true';
         let deliberationViewCount = parseInt(localStorage.getItem('offgrid-delib-views') || '0');
+
+        // Session-scoped analytics data (wiped on page reload, privacy-safe)
+        const deepModeData = {
+            totalQueries: 0,
+            queries: [],
+            models: {
+                scout:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                medic:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                navigator: { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                ranger:    { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} }
+            },
+            currentStreak: { model: null, count: 0 },
+            closestElection: { margin: Infinity, queryIndex: -1 },
+            totalResponseTime: 0
+        };
+
+        const DEEP_MODE_MODELS = [
+            { key: 'scout', name: 'Scout', fullName: 'GPT 5.2', emoji: '\ud83d\udd2d', color: 'scout' },
+            { key: 'medic', name: 'Medic', fullName: 'Claude 4.6', emoji: '\ud83c\udfe5', color: 'medic' },
+            { key: 'navigator', name: 'Navigator', fullName: 'Gemini 3.1', emoji: '\ud83e\udded', color: 'navigator' },
+            { key: 'ranger', name: 'Ranger', fullName: 'Grok 4.1', emoji: '\ud83c\udfd5\ufe0f', color: 'ranger' }
+        ];
+
+        const DEEP_MODE_CATEGORIES = [
+            { id: 'code', label: 'Code', keywords: ['code', 'function', 'debug', 'api', 'javascript', 'python', 'sql', 'algorithm', 'regex', 'deploy', 'programming', 'script', 'html', 'css', 'react', 'node'] },
+            { id: 'analysis', label: 'Analysis', keywords: ['analyze', 'compare', 'research', 'evaluate', 'pros and cons', 'study', 'data', 'statistics', 'review', 'assess', 'examine'] },
+            { id: 'creative', label: 'Creative', keywords: ['write', 'story', 'poem', 'essay', 'blog', 'creative', 'draft', 'rewrite', 'tone', 'copy', 'article', 'narrative'] },
+            { id: 'math', label: 'Math', keywords: ['calculate', 'math', 'equation', 'solve', 'proof', 'logic', 'probability', 'formula', 'number', 'percentage'] },
+            { id: 'strategy', label: 'Strategy', keywords: ['plan', 'strategy', 'roadmap', 'decision', 'prioritize', 'budget', 'timeline', 'workflow', 'organize', 'schedule'] },
+            { id: 'visual', label: 'Visual', keywords: ['image', 'picture', 'photo', 'design', 'logo', 'visual', 'draw', 'illustration', 'diagram', 'infographic'] },
+            { id: 'general', label: 'General', keywords: ['explain', 'what is', 'how does', 'define', 'history', 'science', 'geography', 'tell me', 'describe'] }
+        ];
+
+        function classifyQuery(query) {
+            const lower = query.toLowerCase();
+            for (const cat of DEEP_MODE_CATEGORIES) {
+                for (const kw of cat.keywords) {
+                    if (lower.includes(kw)) return cat.id;
+                }
+            }
+            return 'general';
+        }
+
+        function getCategoryLabel(catId) {
+            const cat = DEEP_MODE_CATEGORIES.find(c => c.id === catId);
+            return cat ? cat.label : 'General';
+        }
+
+        function updateDeepModeStats(data) {
+            if (!data.chairmanKey || !data.scores) return;
+
+            const category = classifyQuery(data.userMessage || '');
+            deepModeData.totalQueries++;
+            deepModeData.totalResponseTime += data.responseTime || 0;
+
+            // Record per-query data
+            const queryRecord = {
+                timestamp: data.timestamp || new Date(),
+                category: category,
+                chairman: data.chairmanKey,
+                scores: {},
+                responseTime: data.responseTime || 0,
+                query: (data.userMessage || '').substring(0, 60)
+            };
+
+            // Process scores for each model
+            if (Array.isArray(data.scores)) {
+                for (const s of data.scores) {
+                    const modelKey = s.model || s.key;
+                    if (modelKey && deepModeData.models[modelKey]) {
+                        const acc = s.accuracy || 0;
+                        const ins = s.insight || 0;
+                        const borda = s.score || (acc * 2 + ins);
+                        deepModeData.models[modelKey].totalAccuracy += acc;
+                        deepModeData.models[modelKey].totalInsight += ins;
+                        deepModeData.models[modelKey].totalBorda += borda;
+                        queryRecord.scores[modelKey] = borda;
+                    }
+                }
+            }
+
+            // Record chairman win
+            if (deepModeData.models[data.chairmanKey]) {
+                deepModeData.models[data.chairmanKey].wins++;
+                // Category wins
+                if (!deepModeData.models[data.chairmanKey].categoryWins[category]) {
+                    deepModeData.models[data.chairmanKey].categoryWins[category] = 0;
+                }
+                deepModeData.models[data.chairmanKey].categoryWins[category]++;
+            }
+
+            // Update streak
+            if (deepModeData.currentStreak.model === data.chairmanKey) {
+                deepModeData.currentStreak.count++;
+            } else {
+                deepModeData.currentStreak.model = data.chairmanKey;
+                deepModeData.currentStreak.count = 1;
+            }
+
+            // Check for closest election
+            const bordaValues = Object.values(queryRecord.scores).sort((a, b) => b - a);
+            if (bordaValues.length >= 2) {
+                const margin = bordaValues[0] - bordaValues[1];
+                if (margin < deepModeData.closestElection.margin) {
+                    deepModeData.closestElection.margin = margin;
+                    deepModeData.closestElection.queryIndex = deepModeData.queries.length;
+                }
+            }
+
+            deepModeData.queries.push(queryRecord);
+
+            // Re-render panel if visible
+            renderDeepModePanel();
+        }
 
         function initDeepMode() {
             // Create the Deep Mode indicator
@@ -5288,17 +5737,49 @@
             indicator.className = 'deep-mode-indicator' + (deepModeActive ? ' active' : '');
             indicator.id = 'deepModeIndicator';
             indicator.innerHTML = '<div class="deep-mode-pulse"></div> DEEP MODE';
-            indicator.title = 'Deep Mode active — enhanced analytics visible. Press Ctrl+Shift+D to toggle.';
+            indicator.title = 'Deep Mode active. Press Ctrl+Shift+. to toggle analytics panel.';
             indicator.onclick = () => toggleDeepMode();
             document.body.appendChild(indicator);
 
-            // Keyboard shortcut listener
+            // Create the analytics panel
+            const panel = document.createElement('div');
+            panel.className = 'deep-analytics-panel';
+            panel.id = 'deepAnalyticsPanel';
+            panel.innerHTML = `
+                <div class="deep-panel-header">
+                    <div class="deep-panel-title">
+                        <div class="deep-mode-pulse"></div>
+                        DEEP MODE ANALYTICS
+                    </div>
+                    <button class="deep-panel-close" onclick="toggleDeepMode()" title="Close">&times;</button>
+                </div>
+                <div class="deep-panel-body" id="deepPanelBody">
+                    <div class="deep-empty">
+                        <div class="deep-empty-icon">\ud83d\udcca</div>
+                        <div>No council queries yet</div>
+                        <div class="deep-empty-hint">Use Command Council mode to start tracking analytics</div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(panel);
+
+            // Keyboard shortcut: Ctrl+Shift+.
             document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === '.') {
+                    e.preventDefault();
+                    toggleDeepMode();
+                }
+                // Also support legacy Ctrl+Shift+D
                 if (e.ctrlKey && e.shiftKey && e.key === 'D') {
                     e.preventDefault();
                     toggleDeepMode();
                 }
             });
+
+            // If Deep Mode was previously active, open the panel
+            if (deepModeActive) {
+                openDeepPanel();
+            }
         }
 
         function toggleDeepMode() {
@@ -5309,19 +5790,195 @@
                 indicator.classList.toggle('active', deepModeActive);
             }
             if (deepModeActive) {
+                openDeepPanel();
                 showDeepModeToast();
+            } else {
+                closeDeepPanel();
             }
+        }
+
+        function openDeepPanel() {
+            const panel = document.getElementById('deepAnalyticsPanel');
+            if (panel) panel.classList.add('open');
+            document.body.classList.add('deep-panel-open');
+            renderDeepModePanel();
+        }
+
+        function closeDeepPanel() {
+            const panel = document.getElementById('deepAnalyticsPanel');
+            if (panel) panel.classList.remove('open');
+            document.body.classList.remove('deep-panel-open');
         }
 
         function showDeepModeToast() {
             const toast = document.createElement('div');
-            toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(135deg,#1a0f05,#2c1810);color:#daa520;padding:14px 20px;border-radius:12px;border:1px solid rgba(218,165,32,0.4);z-index:99999;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;';
-            toast.innerHTML = '<div style="margin-bottom:4px;">\u26a1 Deep Mode Activated</div><div style="font-size:11px;font-weight:400;color:#b8860b;">Enhanced analytics now visible in deliberation reports.<br>Press Ctrl+Shift+D again to toggle off.</div>';
+            toast.style.cssText = 'position:fixed;top:20px;right:320px;background:var(--bg-surface);color:var(--gold-primary);padding:14px 20px;border-radius:12px;border:1px solid rgba(201,168,76,0.4);z-index:99999;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:slideIn 0.3s ease;font-family:var(--font-sans);';
+            toast.innerHTML = '<div style="margin-bottom:4px;">\u26a1 Deep Mode Activated</div><div style="font-size:11px;font-weight:400;color:var(--text-secondary);">Analytics panel open. Press Ctrl+Shift+. to toggle.</div>';
             document.body.appendChild(toast);
             setTimeout(() => {
                 toast.style.animation = 'fadeOut 0.3s ease';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
+        }
+
+        function renderDeepModePanel() {
+            const body = document.getElementById('deepPanelBody');
+            if (!body) return;
+
+            if (deepModeData.totalQueries === 0) {
+                body.innerHTML = `
+                    <div class="deep-empty">
+                        <div class="deep-empty-icon">\ud83d\udcca</div>
+                        <div>No council queries yet</div>
+                        <div class="deep-empty-hint">Use Command Council mode to start tracking analytics</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const avgTime = (deepModeData.totalResponseTime / deepModeData.totalQueries).toFixed(1);
+            const streakModel = DEEP_MODE_MODELS.find(m => m.key === deepModeData.currentStreak.model);
+            const streakText = streakModel ? `${streakModel.emoji} ${streakModel.name}` : 'N/A';
+
+            // Closest election info
+            let closestText = 'N/A';
+            if (deepModeData.closestElection.queryIndex >= 0) {
+                const cq = deepModeData.queries[deepModeData.closestElection.queryIndex];
+                closestText = `${deepModeData.closestElection.margin}pts`;
+            }
+
+            // Session Summary
+            let html = `
+                <div class="deep-section">
+                    <div class="deep-section-title">Session Summary</div>
+                    <div class="deep-stat-grid">
+                        <div class="deep-stat-card highlight">
+                            <div class="deep-stat-value">${deepModeData.totalQueries}</div>
+                            <div class="deep-stat-label">Council Queries</div>
+                        </div>
+                        <div class="deep-stat-card">
+                            <div class="deep-stat-value">${avgTime}s</div>
+                            <div class="deep-stat-label">Avg Response</div>
+                        </div>
+                        <div class="deep-stat-card">
+                            <div class="deep-stat-value">${deepModeData.currentStreak.count}</div>
+                            <div class="deep-stat-label">Win Streak</div>
+                        </div>
+                        <div class="deep-stat-card">
+                            <div class="deep-stat-value">${closestText}</div>
+                            <div class="deep-stat-label">Closest Race</div>
+                        </div>
+                    </div>
+            `;
+
+            // Streak callout
+            if (deepModeData.currentStreak.count >= 2 && streakModel) {
+                html += `
+                    <div class="deep-streak">
+                        <span class="deep-streak-fire">\ud83d\udd25</span>
+                        <span class="deep-streak-text">
+                            <span class="deep-streak-model" style="color: var(--${streakModel.key}-color)">${streakModel.name}</span>
+                            is on a ${deepModeData.currentStreak.count}-win streak
+                        </span>
+                    </div>
+                `;
+            }
+            html += '</div>';
+
+            // Chairman Leaderboard
+            const sorted = [...DEEP_MODE_MODELS].sort((a, b) => deepModeData.models[b.key].wins - deepModeData.models[a.key].wins);
+            const maxWins = Math.max(...sorted.map(m => deepModeData.models[m.key].wins), 1);
+
+            html += '<div class="deep-section"><div class="deep-section-title">Chairman Leaderboard</div>';
+            sorted.forEach((m, i) => {
+                const wins = deepModeData.models[m.key].wins;
+                const pct = deepModeData.totalQueries > 0 ? Math.round((wins / deepModeData.totalQueries) * 100) : 0;
+                const barWidth = maxWins > 0 ? Math.round((wins / maxWins) * 100) : 0;
+                html += `
+                    <div class="deep-leaderboard-row">
+                        <span class="deep-lb-rank">${i + 1}</span>
+                        <span class="deep-lb-name" style="color: var(--${m.key}-color)">${m.emoji} ${m.name}</span>
+                        <div class="deep-lb-bar-bg">
+                            <div class="deep-lb-bar ${m.key}" style="width: ${barWidth}%"></div>
+                        </div>
+                        <span class="deep-lb-stats">${wins}W ${pct}%</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            // Category Strength Map
+            const categoriesUsed = {};
+            for (const q of deepModeData.queries) {
+                if (!categoriesUsed[q.category]) categoriesUsed[q.category] = {};
+                if (!categoriesUsed[q.category][q.chairman]) categoriesUsed[q.category][q.chairman] = 0;
+                categoriesUsed[q.category][q.chairman]++;
+            }
+
+            if (Object.keys(categoriesUsed).length > 0) {
+                html += '<div class="deep-section"><div class="deep-section-title">Category Strength</div>';
+                for (const [catId, winners] of Object.entries(categoriesUsed)) {
+                    const topModel = Object.entries(winners).sort((a, b) => b[1] - a[1])[0];
+                    const modelInfo = DEEP_MODE_MODELS.find(m => m.key === topModel[0]);
+                    if (modelInfo) {
+                        const totalInCat = Object.values(winners).reduce((a, b) => a + b, 0);
+                        html += `
+                            <div class="deep-category-row">
+                                <span class="deep-cat-name">${getCategoryLabel(catId)}</span>
+                                <span class="deep-cat-leader" style="color: var(--${modelInfo.key}-color)">${modelInfo.emoji} ${modelInfo.name}</span>
+                                <span class="deep-cat-count">${topModel[1]}/${totalInCat}</span>
+                            </div>
+                        `;
+                    }
+                }
+                html += '</div>';
+            }
+
+            // Score Averages
+            html += '<div class="deep-section"><div class="deep-section-title">Avg Borda Scores</div>';
+            const sortedByAvg = [...DEEP_MODE_MODELS].sort((a, b) => {
+                const avgA = deepModeData.totalQueries > 0 ? deepModeData.models[a.key].totalBorda / deepModeData.totalQueries : 0;
+                const avgB = deepModeData.totalQueries > 0 ? deepModeData.models[b.key].totalBorda / deepModeData.totalQueries : 0;
+                return avgB - avgA;
+            });
+            for (const m of sortedByAvg) {
+                const md = deepModeData.models[m.key];
+                const avgBorda = deepModeData.totalQueries > 0 ? (md.totalBorda / deepModeData.totalQueries).toFixed(1) : '0';
+                const avgAcc = deepModeData.totalQueries > 0 ? (md.totalAccuracy / deepModeData.totalQueries).toFixed(1) : '0';
+                const avgIns = deepModeData.totalQueries > 0 ? (md.totalInsight / deepModeData.totalQueries).toFixed(1) : '0';
+                html += `
+                    <div class="deep-avg-row">
+                        <span class="deep-avg-name" style="color: var(--${m.key}-color)">${m.emoji} ${m.name}</span>
+                        <span class="deep-avg-scores">A:${avgAcc} I:${avgIns}</span>
+                        <span class="deep-avg-total">${avgBorda}</span>
+                    </div>
+                `;
+            }
+            html += '</div>';
+
+            // Recent Queries Log
+            if (deepModeData.queries.length > 0) {
+                html += '<div class="deep-section"><div class="deep-section-title">Query Log</div>';
+                const recentQueries = deepModeData.queries.slice(-10).reverse();
+                for (const q of recentQueries) {
+                    const winner = DEEP_MODE_MODELS.find(m => m.key === q.chairman);
+                    const winnerName = winner ? `${winner.emoji} ${winner.name}` : q.chairman;
+                    const winnerColor = winner ? `var(--${winner.key}-color)` : 'var(--text-secondary)';
+                    html += `
+                        <div class="deep-query-item">
+                            <div class="deep-query-text">${q.query || 'Query'}</div>
+                            <div class="deep-query-meta">
+                                <span style="color: ${winnerColor}; font-weight: 600;">${winnerName}</span>
+                                <span>${getCategoryLabel(q.category)}</span>
+                                <span>${q.responseTime.toFixed(1)}s</span>
+                            </div>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+
+            body.innerHTML = html;
         }
 
         // ============================================
@@ -5390,7 +6047,7 @@
                 return '<div style="text-align:center;margin-top:12px;font-size:10px;color:#9ca3af;font-style:italic;">There\'s more to discover... \ud83d\udd11</div>';
             }
             if (deliberationViewCount >= 8) {
-                return '<div style="text-align:center;margin-top:12px;font-size:10px;color:#b8860b;font-style:italic;">Power users: try Ctrl+Shift+D \u26a1</div>';
+                return '<div style="text-align:center;margin-top:12px;font-size:10px;color:#b8860b;font-style:italic;">Power users: try Ctrl+Shift+. \u26a1</div>';
             }
             return '';
         }
