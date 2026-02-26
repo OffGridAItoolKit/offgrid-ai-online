@@ -53,6 +53,17 @@
             --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
         }
 
+        /* Global scrollbar hide for Command Center — eliminates flash during streaming */
+        .command-theme *,
+        .command-theme *::before,
+        .command-theme *::after {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        .command-theme *::-webkit-scrollbar {
+            display: none !important;
+        }
+
         /* ---- Layout: Centered Chat Column ---- */
         body.command-theme {
             font-family: var(--font-sans);
