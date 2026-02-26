@@ -961,6 +961,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             const s = scores[r.label];
             scoresSummary[r.label] = {
                 model: r.shortName,
+                fullName: r.name,
                 emoji: r.emoji,
                 key: r.key,
                 accPoints: s.accPoints,
@@ -976,7 +977,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             chairmanLabel: chairmanLabel,
             scores: scoresSummary,
             rawReviews: reviewOutcome.rawReviews,
-            labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, emoji: r.emoji }; return acc; }, {})
+            labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, fullName: r.name, emoji: r.emoji }; return acc; }, {})
         })}\n\n`);
 
         console.log('[Council] Chairman selected:', {
@@ -1053,7 +1054,7 @@ Based on these, write the final Command answer as described.
                 chairmanEmoji: chairmanResult.emoji,
                 scores: scoresSummary,
                 rawReviews: reviewOutcome.rawReviews,
-                labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, emoji: r.emoji }; return acc; }, {})
+                labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, fullName: r.name, emoji: r.emoji }; return acc; }, {})
             }
         })}\n\n`);
         await streamOpenRouter(COMMAND_MODELS.scout.id, synthesisMessages, res, 4096, 0.5);

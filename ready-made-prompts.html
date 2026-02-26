@@ -6,6 +6,9 @@
     <title>Ready-Made Prompts - OffGrid AI Online</title>
     <meta name="description" content="Hundreds of expert prompts for building your offline Knowledge Base. Click to copy or send directly to OffGrid AI.">
     <link rel="icon" type="image/png" href="compasstilted.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -389,6 +392,204 @@
             color: #9ca3af;
             font-size: 16px;
             display: none;
+        }
+
+        /* ============================================ */
+        /* COMMAND CENTER DARK THEME OVERRIDES          */
+        /* ============================================ */
+
+        .command-theme {
+            --bg-deep: #0F1419;
+            --bg-surface: #1A2028;
+            --bg-elevated: #21262D;
+            --border-subtle: #30363D;
+            --border-default: #3D444D;
+            --gold-primary: #C9A84C;
+            --gold-hover: #D4B85C;
+            --text-primary: #E8ECF1;
+            --text-secondary: #8B949E;
+            --text-muted: #656D76;
+            --success: #34D399;
+            --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .command-theme {
+            font-family: var(--font-sans);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        .command-theme .header {
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+        }
+        .command-theme .header-title {
+            font-family: var(--font-sans);
+            color: var(--gold-primary);
+            letter-spacing: 2px;
+        }
+        .command-theme .command-badge {
+            background: linear-gradient(135deg, #b8860b 0%, var(--gold-primary) 100%);
+            color: var(--bg-deep);
+            font-weight: 700;
+        }
+        .command-theme .back-link {
+            color: var(--gold-primary);
+            border-color: var(--border-subtle);
+        }
+        .command-theme .back-link:hover {
+            background: rgba(201, 168, 76, 0.1);
+            border-color: var(--gold-primary);
+        }
+
+        /* Hero */
+        .command-theme .hero h1 {
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+        .command-theme .hero p {
+            color: var(--text-secondary);
+        }
+        .command-theme .hero-badge.kb {
+            background: rgba(201, 168, 76, 0.1);
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+        .command-theme .hero-badge.privacy {
+            background: rgba(52, 211, 153, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        /* Search & Filter */
+        .command-theme .search-box {
+            background: var(--bg-surface);
+            border-color: var(--border-subtle);
+            color: var(--text-primary);
+        }
+        .command-theme .search-box:focus {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.15);
+        }
+        .command-theme .search-box::placeholder {
+            color: var(--text-muted);
+        }
+        .command-theme .filter-btn {
+            background: var(--bg-surface);
+            border-color: var(--border-subtle);
+            color: var(--text-secondary);
+        }
+        .command-theme .filter-btn:hover,
+        .command-theme .filter-btn.active {
+            border-color: var(--gold-primary);
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--gold-primary);
+        }
+
+        /* Category sections */
+        .command-theme .category-header {
+            border-bottom-color: var(--border-subtle);
+        }
+        .command-theme .category-header:hover {
+            border-bottom-color: var(--gold-primary);
+        }
+        .command-theme .category-title {
+            font-family: var(--font-sans);
+            color: var(--text-primary);
+        }
+        .command-theme .category-count {
+            color: var(--text-muted);
+        }
+        .command-theme .category-toggle {
+            color: var(--text-muted);
+        }
+        .command-theme .subcategory-title {
+            color: var(--gold-primary);
+        }
+
+        /* Prompt cards */
+        .command-theme .prompt-card {
+            background: var(--bg-surface);
+            border-color: var(--border-subtle);
+        }
+        .command-theme .prompt-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: 0 2px 12px rgba(201, 168, 76, 0.15);
+        }
+        .command-theme .prompt-card.copied {
+            border-color: var(--success);
+            background: rgba(52, 211, 153, 0.05);
+        }
+        .command-theme .prompt-text {
+            color: var(--text-primary);
+        }
+        .command-theme .prompt-action-btn {
+            background: var(--bg-elevated);
+            border-color: var(--border-subtle);
+            color: var(--text-secondary);
+        }
+        .command-theme .prompt-action-btn:hover {
+            border-color: var(--gold-primary);
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--gold-primary);
+        }
+        .command-theme .prompt-action-btn.use {
+            background: linear-gradient(135deg, #b8860b 0%, var(--gold-primary) 100%);
+            color: var(--bg-deep);
+            border-color: var(--gold-primary);
+            font-weight: 600;
+        }
+        .command-theme .prompt-action-btn.use:hover {
+            opacity: 0.9;
+        }
+
+        /* Badges */
+        .command-theme .prompt-badge.all-models {
+            background: rgba(52, 211, 153, 0.1);
+            color: var(--success);
+        }
+        .command-theme .prompt-badge.advanced {
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--gold-primary);
+        }
+        .command-theme .prompt-badge.vision {
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+        }
+        .command-theme .kb-tag {
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--gold-primary);
+        }
+
+        /* Toast */
+        .command-theme .toast {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Footer */
+        .command-theme .footer {
+            border-top-color: var(--border-subtle);
+        }
+        .command-theme .footer p {
+            color: var(--text-muted);
+        }
+        .command-theme .footer a {
+            color: var(--gold-primary);
+        }
+
+        /* No results */
+        .command-theme .no-results {
+            color: var(--text-muted);
+        }
+
+        /* Prompt count */
+        .command-theme .prompt-count {
+            color: var(--text-muted);
         }
     </style>
 </head>
@@ -1195,6 +1396,11 @@
         // ============================================
         
         const isCommandContext = window.location.pathname.includes('/command');
+        
+        // Apply dark theme for Command Center context
+        if (isCommandContext) {
+            document.body.classList.add('command-theme');
+        }
         
         // Adapt header for context
         if (isCommandContext) {

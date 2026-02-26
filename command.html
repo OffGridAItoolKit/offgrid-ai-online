@@ -845,20 +845,42 @@
             font-style: italic;
         }
 
-        /* Streaming cursor */
+        /* Streaming indicator (replaces blinking cursor) */
         .command-theme .streaming-cursor {
-            display: inline-block;
-            width: 2px;
-            height: 1em;
-            background: var(--gold-primary);
-            margin-left: 2px;
-            animation: blink 0.8s infinite;
-            vertical-align: text-bottom;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 4px;
+            vertical-align: middle;
         }
 
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+        .command-theme .streaming-cursor::before {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--border-emphasis);
+            border-top-color: var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .command-theme .streaming-cursor::after {
+            content: 'Synthesizing...';
+            font-size: 12px;
+            color: var(--text-muted);
+            font-style: italic;
+            font-family: var(--font-sans);
+            letter-spacing: 0.02em;
+        }
+
+        /* When cursor is inline with streamed text, show just the spinner */
+        .command-theme .markdown-content .streaming-cursor::after {
+            content: '';
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         /* Privacy notice */
@@ -1479,6 +1501,29 @@
             background: rgba(52, 211, 153, 0.08);
             border-color: rgba(52, 211, 153, 0.3);
             box-shadow: none;
+        }
+
+        /* Inline Save to KB link (appears after image responses) */
+        .command-theme .save-kb-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--success);
+            cursor: pointer;
+            margin-top: 8px;
+            padding: 4px 0;
+            font-family: var(--font-sans);
+            font-weight: 500;
+            transition: color 0.2s, opacity 0.2s;
+            opacity: 0.8;
+            border: none;
+            background: none;
+        }
+
+        .command-theme .save-kb-inline:hover {
+            opacity: 1;
+            color: var(--gold-primary);
         }
 
         /* Save modal overlay */
@@ -2841,7 +2886,6 @@
         </div>
         <div class="header-center-mobile" style="display: none;"><span class="online-badge" style="margin-left: 0;">COMMAND</span></div>
         <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="/" class="back-link">← Free Version</a>
             <div class="status">
                 <span class="status-dot disconnected" id="statusDot"></span>
                 <span id="statusText" class="status-text desktop-only">Connecting...</span>
@@ -3488,7 +3532,7 @@
                 const rowClass = isChairman ? 'chairman-row' : '';
                 const crown = isChairman ? ' 👑' : '';
                 rows += `<tr class="${rowClass}">
-                    <td>${s.emoji} ${s.model}${crown}</td>
+                    <td>${s.emoji} ${s.fullName || s.model}${crown}</td>
                     <td>${s.accPoints}</td>
                     <td>${s.insightPoints}</td>
                     <td><strong>${s.councilScore}</strong></td>
@@ -3895,6 +3939,15 @@
                 singleVisualBtn.onclick = () => createVisualFromResponse(capturedSingleResponse, singleVisualBtn);
                 messageDiv.querySelector('.message-content').appendChild(singleVisualBtn);
 
+                // Add inline Save to KB link when image was part of the conversation
+                if (imageToSend) {
+                    const saveLink = document.createElement('button');
+                    saveLink.className = 'save-kb-inline';
+                    saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
+                    saveLink.onclick = () => showSaveModal();
+                    messageDiv.querySelector('.message-content').appendChild(saveLink);
+                }
+
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
                 // Enable Save to KB button
@@ -4239,6 +4292,15 @@
                 const capturedResponse = fullResponse;
                 visualBtn.onclick = () => createVisualFromResponse(capturedResponse, visualBtn);
                 messageDiv.querySelector('.message-content').appendChild(visualBtn);
+
+                // Add inline Save to KB link when image was part of the conversation
+                if (imageToSend) {
+                    const saveLink = document.createElement('button');
+                    saveLink.className = 'save-kb-inline';
+                    saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
+                    saveLink.onclick = () => showSaveModal();
+                    messageDiv.querySelector('.message-content').appendChild(saveLink);
+                }
 
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
@@ -5030,7 +5092,7 @@
             for (const label of scoreLabels) {
                 const s = scores[label];
                 const modelInfo = labelMap ? labelMap[label] : null;
-                const modelDisplay = modelInfo ? `${modelInfo.emoji} ${modelInfo.name}` : `Answer ${label}`;
+                const modelDisplay = modelInfo ? `${modelInfo.emoji} ${modelInfo.fullName || modelInfo.name}` : (s.fullName ? `${s.emoji} ${s.fullName}` : `Answer ${label}`);
                 const isChairman = (delib.chairmanKey && modelInfo && modelInfo.key === delib.chairmanKey);
                 const rowClass = isChairman ? 'chairman-highlight' : '';
                 const crown = isChairman ? ' \ud83d\udc51' : '';
@@ -5059,7 +5121,7 @@
                     if (!ranking || !Array.isArray(ranking)) return 'N/A';
                     return ranking.map((label, idx) => {
                         const info = labelMap ? labelMap[label] : null;
-                        const name = info ? `${info.emoji} ${info.name}` : `Answer ${label}`;
+                        const name = info ? `${info.emoji} ${info.fullName || info.name}` : `Answer ${label}`;
                         return `${idx + 1}. ${name}`;
                     }).join(' \u2192 ');
                 };
@@ -5078,7 +5140,7 @@
             // Build chairman summary
             const chairmanModelInfo = labelMap && delib.chairmanLabel ? labelMap[delib.chairmanLabel] : null;
             const chairmanDisplay = chairmanModelInfo
-                ? `${chairmanModelInfo.emoji} ${chairmanModelInfo.name}`
+                ? `${chairmanModelInfo.emoji} ${chairmanModelInfo.fullName || chairmanModelInfo.name}`
                 : (chairmanName ? `${chairmanEmoji} ${chairmanName}` : 'Unknown');
 
             // Find the chairman's score details
