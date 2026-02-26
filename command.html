@@ -100,6 +100,13 @@
             flex-direction: column;
             gap: 24px;
             background: var(--bg-deep);
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+        }
+        .command-theme .messages::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        .command-theme .messages { /* re-open for background-image */
             background-image: radial-gradient(
                 ellipse at 50% 0%,
                 rgba(201, 168, 76, 0.03) 0%,
@@ -5809,20 +5816,44 @@
         let deepModeActive = localStorage.getItem('offgrid-deep-mode') === 'true';
         let deliberationViewCount = parseInt(localStorage.getItem('offgrid-delib-views') || '0');
 
-        // Session-scoped analytics data (wiped on page reload, privacy-safe)
-        const deepModeData = {
-            totalQueries: 0,
-            queries: [],
-            models: {
-                scout:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
-                medic:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
-                navigator: { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
-                ranger:    { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} }
-            },
-            currentStreak: { model: null, count: 0 },
-            closestElection: { margin: Infinity, queryIndex: -1 },
-            totalResponseTime: 0
-        };
+        // Session-scoped analytics data (persisted in sessionStorage for navigation survival, clears on tab close)
+        const DEEP_MODE_STORAGE_KEY = 'offgrid-deep-mode-data';
+        function createEmptyDeepModeData() {
+            return {
+                totalQueries: 0,
+                queries: [],
+                models: {
+                    scout:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                    medic:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                    navigator: { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                    ranger:    { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} }
+                },
+                currentStreak: { model: null, count: 0 },
+                closestElection: { margin: Infinity, queryIndex: -1 },
+                totalResponseTime: 0
+            };
+        }
+        function loadDeepModeData() {
+            try {
+                const saved = sessionStorage.getItem(DEEP_MODE_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // Restore Infinity for closestElection.margin if it was serialized as null
+                    if (parsed.closestElection && parsed.closestElection.margin === null) {
+                        parsed.closestElection.margin = Infinity;
+                    }
+                    return parsed;
+                }
+            } catch (e) { /* ignore parse errors */ }
+            return createEmptyDeepModeData();
+        }
+        function saveDeepModeData() {
+            try {
+                // JSON.stringify converts Infinity to null, which we handle on load
+                sessionStorage.setItem(DEEP_MODE_STORAGE_KEY, JSON.stringify(deepModeData));
+            } catch (e) { /* ignore storage errors */ }
+        }
+        const deepModeData = loadDeepModeData();
 
         const DEEP_MODE_MODELS = [
             { key: 'scout', name: 'Scout', fullName: 'GPT 5.2', emoji: '\ud83d\udd2d', color: 'scout' },
@@ -5919,6 +5950,9 @@
             }
 
             deepModeData.queries.push(queryRecord);
+
+            // Persist to sessionStorage so data survives page navigation
+            saveDeepModeData();
 
             // Re-render panel if visible
             renderDeepModePanel();

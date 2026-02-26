@@ -2396,6 +2396,11 @@ body.command-theme {
 /* Messages area */
 .command-theme .messages {
     background: #0f1419;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.command-theme .messages::-webkit-scrollbar {
+    display: none;
 }
 
 /* Welcome screen */
