@@ -5396,9 +5396,11 @@
         let studioSelectedCategory = 'other';
         let studioCraftedPrompt = '';
 
-        function openImageStudio() {
+        function openImageStudio(options = {}) {
             studioSelectedCategory = 'other';
             studioCraftedPrompt = '';
+
+            const directMode = options.directMode || false;
 
             const overlay = document.createElement('div');
             overlay.className = 'image-studio-overlay';
@@ -5409,9 +5411,9 @@
                         <h3 style="margin-bottom: 0;">\ud83c\udfa8 Image Studio</h3>
                         <span style="font-size: 9px; color: #9ca3af; font-weight: 500; letter-spacing: 0.3px;">by OffGrid AI</span>
                     </div>
-                    <div class="studio-subtitle">Describe what you need. Our AI crafts the perfect prompt for you.</div>
+                    <div class="studio-subtitle" ${directMode ? 'style="display:none;"' : ''}>Describe what you need. Our AI crafts the perfect prompt for you.</div>
 
-                    <div class="studio-categories">
+                    <div class="studio-categories" ${directMode ? 'style="display:none;"' : ''}>
                         <div class="studio-categories-label">What type of visual do you need?</div>
                         <div class="category-chips">
                             <span class="category-chip" data-cat="survival" onclick="selectStudioCategory(this)">\ud83c\udfaf Survival Diagram</span>
@@ -5426,17 +5428,17 @@
                         </div>
                     </div>
 
-                    <div class="example-prompts-section">
+                    <div class="example-prompts-section" ${directMode ? 'style="display:none;"' : ''}>
                         <div class="example-prompts-label">\u2728 Explore examples. Scroll to see more</div>
                         <div class="example-cards-scroll" id="exampleCardsScroll"></div>
                     </div>
 
-                    <div style="position: relative;">
+                    <div class="studio-describe-section" style="position: relative; ${directMode ? 'display:none;' : ''}">
                         <label for="studioDescription" id="studioDescLabel">Describe what you need</label>
                         <textarea id="studioDescription" placeholder="Just describe it naturally, e.g. 'a diagram showing how to build a simple water filter' or 'an infographic about edible plants in the Pacific Northwest'"></textarea>
                     </div>
 
-                    <div class="image-studio-actions" style="position: relative;">
+                    <div class="image-studio-actions studio-craft-actions" style="position: relative; ${directMode ? 'display:none;' : ''}">
                         <button class="studio-cancel-btn" onclick="closeImageStudio()">Cancel</button>
                         <button class="studio-generate-btn" id="studioCraftBtn" onclick="craftImagePrompt()">\u2728 Craft My Prompt</button>
                     </div>
@@ -5444,10 +5446,12 @@
                     <div id="studioAiSuggestion"></div>
                     <div id="studioResult"></div>
 
-                    <button class="direct-prompt-toggle" onclick="toggleDirectPrompt()">\u270f\ufe0f I want to write my own prompt</button>
-                    <div id="directPromptSection" style="display: none; margin-top: 10px;">
+                    <button class="direct-prompt-toggle" ${directMode ? 'style="display:none;"' : ''} onclick="toggleDirectPrompt()">\u270f\ufe0f I want to write my own prompt</button>
+                    <div id="directPromptSection" style="display: ${directMode ? 'block' : 'none'}; margin-top: 10px;">
+                        ${directMode ? '<div style="font-size: 13px; color: var(--gold-primary, #C9A84C); margin-bottom: 8px; font-weight: 500;">\u2728 Prompt ready — review or generate</div>' : ''}
                         <textarea id="imagePrompt" class="edit-prompt-area" placeholder="Write your image generation prompt directly..."></textarea>
                         <div class="image-studio-actions">
+                            <button class="studio-cancel-btn" onclick="closeImageStudio()">Cancel</button>
                             <button class="studio-generate-btn" id="studioGenerateBtn" onclick="window._imageFromConversation = true; generateImage()">\ud83c\udfa8 Generate Image</button>
                         </div>
                     </div>
@@ -5461,12 +5465,19 @@
                 if (e.target === overlay) closeImageStudio();
             });
 
-            // Render the example cards
-            renderExampleCards();
+            // Only render example cards if not in direct mode
+            if (!directMode) {
+                renderExampleCards();
+            }
 
             setTimeout(() => {
-                const descInput = document.getElementById('studioDescription');
-                if (descInput) descInput.focus();
+                if (directMode) {
+                    const promptInput = document.getElementById('imagePrompt');
+                    if (promptInput) promptInput.focus();
+                } else {
+                    const descInput = document.getElementById('studioDescription');
+                    if (descInput) descInput.focus();
+                }
             }, 100);
         }
 
@@ -5949,6 +5960,14 @@
                     </div>
                 `;
                 messagesDiv.appendChild(messageDiv);
+
+                // Add inline Save to KB link after Image Studio images
+                const saveLink = document.createElement('button');
+                saveLink.className = 'save-kb-inline';
+                saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
+                saveLink.onclick = () => showSaveModal();
+                messageDiv.querySelector('.message-content').appendChild(saveLink);
+
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
                 // Clean KB save — just the image, no prompt metadata
@@ -6017,6 +6036,13 @@
                     if (container) container.remove();
                 }
 
+                // Add inline Save to KB link after Image Studio images
+                const saveLink = document.createElement('button');
+                saveLink.className = 'save-kb-inline';
+                saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
+                saveLink.onclick = () => showSaveModal();
+                messageDiv.querySelector('.message-content').appendChild(saveLink);
+
                 // Add to conversationHistory with summary for KB save
                 conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
                 const assistantContent = summaryText
@@ -6079,15 +6105,11 @@
         }
 
         function openImageStudioWithPrompt(prompt) {
-            // Open Image Studio normally
-            openImageStudio();
+            // Open Image Studio in direct mode — clean, minimal UI
+            openImageStudio({ directMode: true });
 
-            // Wait for modal to render, then switch to "write my own" mode and fill the prompt
+            // Wait for modal to render, then fill in the prompt
             setTimeout(() => {
-                // Show the direct prompt section
-                const directSection = document.getElementById('directPromptSection');
-                if (directSection) directSection.style.display = 'block';
-
                 // Fill in the prompt
                 const promptTextarea = document.getElementById('imagePrompt');
                 if (promptTextarea) {
@@ -6096,16 +6118,8 @@
                     promptTextarea.style.height = Math.min(promptTextarea.scrollHeight, 200) + 'px';
                 }
 
-                // Update the toggle button text
-                const toggleBtn = document.querySelector('.direct-prompt-toggle');
-                if (toggleBtn) toggleBtn.textContent = '\u2728 Switch to AI-Assisted mode';
-
                 // Mark this as a "from conversation" prompt so we skip the summary
                 window._imageFromConversation = true;
-
-                // Scroll the modal to show the prompt
-                const modal = document.querySelector('.image-studio-modal');
-                if (modal) modal.scrollTop = modal.scrollHeight;
             }, 200);
         }
 
