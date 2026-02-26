@@ -18,6 +18,16 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 
+// License Key & Usage Limit System
+const {
+    initializeDatabase,
+    registerLicenseRoutes,
+    requireLicense,
+    checkPromptLimit,
+    checkImageLimit,
+    TIER_LIMITS
+} = require('./license-system');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -783,7 +793,7 @@ app.get('/api/command/models', (req, res) => {
  * POST /api/command/stream
  * Streaming endpoint for single Command Center models
  */
-app.post('/api/command/stream', async (req, res) => {
+app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, res) => {
     const cmdStreamStart = Date.now();
     try {
         const { model, messages } = req.body;
@@ -842,7 +852,7 @@ app.post('/api/command/stream', async (req, res) => {
  * 5. Use Scout (GPT-5.2) as Command editor to synthesize final answer
  * 6. Stream the synthesized response to the client
  */
-app.post('/api/command/council', async (req, res) => {
+app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, res) => {
     const councilStartTime = Date.now();
     try {
         const { messages } = req.body;
@@ -1160,7 +1170,7 @@ app.get('/api/health/image-gen', async (req, res) => {
     }
 });
 
-app.post('/api/command/generate-image', async (req, res) => {
+app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (req, res) => {
     const genStartTime = Date.now();
     try {
         const { prompt } = req.body;
@@ -1314,7 +1324,7 @@ app.post('/api/command/generate-image', async (req, res) => {
  * Includes audience-specific context for OffGrid AI ToolKit users.
  * No data is stored — processed in memory and discarded.
  */
-app.post('/api/command/craft-prompt', async (req, res) => {
+app.post('/api/command/craft-prompt', requireLicense, async (req, res) => {
     try {
         const { description, category } = req.body;
 
@@ -1439,7 +1449,7 @@ RULES:
  * Uses GPT-4.1 Mini for fast, cost-effective generation.
  * No data is stored — processed in memory and discarded.
  */
-app.post('/api/command/image-summary', async (req, res) => {
+app.post('/api/command/image-summary', requireLicense, async (req, res) => {
     try {
         const { prompt, category } = req.body;
 
@@ -1546,7 +1556,7 @@ Rules:
  * Uses GPT-4.1 Mini for fast, cost-effective generation.
  * No data is stored — processed in memory and discarded.
  */
-app.post('/api/command/visual-prompt', async (req, res) => {
+app.post('/api/command/visual-prompt', requireLicense, async (req, res) => {
     try {
         const { conversationContext, category } = req.body;
 
@@ -1952,8 +1962,24 @@ app.get('*', (req, res) => {
 });
 
 // =============================================================================
+// LICENSE SYSTEM ROUTES
+// =============================================================================
+
+registerLicenseRoutes(app, logToBetterStack);
+
+// =============================================================================
 // SERVER STARTUP
 // =============================================================================
+
+// Initialize database, then start server
+initializeDatabase()
+    .then(() => {
+        console.log('[License System] ✓ Database connected and initialized');
+    })
+    .catch(err => {
+        console.error('[License System] ✗ Database initialization failed:', err.message);
+        console.error('[License System] Server will start but license features will be unavailable');
+    });
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log('');
@@ -1981,6 +2007,13 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('║    /         → Prospect Demo (sales messaging)            ║');
     console.log('║    /online   → Customer ToolKit (ad-free)                 ║');
     console.log('║    /command  → Command Center (premium)                   ║');
+    console.log('╠═══════════════════════════════════════════════════════════╣');
+    console.log(`║  Database: ${process.env.DATABASE_URL ? '✓ Connected' : '✗ Not configured'}                             ║`);
+    console.log(`║  JWT Secret: ${process.env.JWT_SECRET ? '✓ Configured' : '⚠ Using random (set JWT_SECRET)'}             ║`);
+    console.log('║  License Endpoints:                                       ║');
+    console.log('║    POST /api/license/activate  → Activate a key           ║');
+    console.log('║    POST /api/license/verify    → Verify session token     ║');
+    console.log('║    GET  /api/license/usage     → Get usage stats          ║');
     console.log('╚═══════════════════════════════════════════════════════════╝');
     console.log('');
 

@@ -2384,9 +2384,313 @@
         .error-reason-badge.no_image { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
         .error-reason-badge.max_tokens { background: #fefce8; color: #ca8a04; border: 1px solid #fde68a; }
 
+        /* ============================================
+           LICENSE ACTIVATION GATE
+           ============================================ */
+        .license-gate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.97);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(15px);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .license-gate-content {
+            background: linear-gradient(135deg, #2c1810 0%, #1a0f05 100%);
+            border: 3px solid #b8860b;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 520px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 
+                0 0 60px rgba(184, 134, 11, 0.3),
+                0 20px 40px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(184, 134, 11, 0.2);
+        }
+
+        .license-gate-logo {
+            font-family: 'Black Ops One', cursive;
+            font-size: 24px;
+            color: #daa520;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .license-gate-tagline {
+            color: #cd853f;
+            font-size: 13px;
+            margin-bottom: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .license-input-group {
+            margin-bottom: 20px;
+        }
+
+        .license-input-group label {
+            display: block;
+            color: #deb887;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .license-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(184, 134, 11, 0.3);
+            border-radius: 10px;
+            color: #f5e6d3;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            text-align: center;
+            text-transform: uppercase;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        .license-input:focus {
+            outline: none;
+            border-color: #daa520;
+            box-shadow: 0 0 15px rgba(184, 134, 11, 0.2);
+        }
+
+        .license-input::placeholder {
+            color: rgba(222, 184, 135, 0.3);
+            letter-spacing: 5px;
+            font-size: 16px;
+        }
+
+        .license-activate-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);
+            color: #1a0f05;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.3);
+        }
+
+        .license-activate-btn:hover {
+            background: linear-gradient(135deg, #daa520 0%, #cd853f 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.4);
+        }
+
+        .license-activate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .license-error {
+            color: #ef4444;
+            font-size: 13px;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+
+        .license-success {
+            color: #10b981;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .license-divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: #8b7355;
+            font-size: 12px;
+        }
+
+        .license-divider::before,
+        .license-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+        }
+
+        .license-divider::before { margin-right: 12px; }
+        .license-divider::after { margin-left: 12px; }
+
+        .license-email-btn {
+            width: 100%;
+            background: transparent;
+            color: #deb887;
+            border: 1.5px solid rgba(184, 134, 11, 0.3);
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .license-email-btn:hover {
+            border-color: #daa520;
+            background: rgba(184, 134, 11, 0.1);
+        }
+
+        .license-footer {
+            margin-top: 25px;
+            color: #8b7355;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .license-footer a {
+            color: #daa520;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .license-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .license-usage-bar {
+            margin-top: 15px;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border: 1px solid rgba(184, 134, 11, 0.15);
+        }
+
+        .usage-label {
+            display: flex;
+            justify-content: space-between;
+            color: #deb887;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .usage-track {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .usage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #daa520);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .usage-fill.warning { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+        /* Email login form (hidden by default) */
+        .email-login-form {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .email-login-form.visible { display: block; }
+
+        .email-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(184, 134, 11, 0.3);
+            border-radius: 10px;
+            color: #f5e6d3;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #daa520;
+        }
+
+        @media (max-width: 768px) {
+            .license-gate-content {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            .license-gate-logo {
+                font-size: 20px;
+            }
+            .license-input {
+                font-size: 16px;
+                letter-spacing: 2px;
+            }
+        }
+
     </style>
 </head>
 <body>
+    <!-- License Activation Gate -->
+    <div id="licenseGate" class="license-gate" style="display: none;">
+        <div class="license-gate-content">
+            <div class="license-gate-logo">OffGrid Command Center</div>
+            <div class="license-gate-tagline">Enter your license key to access premium AI</div>
+
+            <!-- Key Activation View -->
+            <div id="keyActivationView">
+                <div class="license-input-group">
+                    <label for="licenseKeyInput">License Key (from your OffGrid AI drive)</label>
+                    <input type="text" id="licenseKeyInput" class="license-input" 
+                           placeholder="XXXX-XXXX-XXXX-XXXX" 
+                           maxlength="19"
+                           autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
+                </div>
+
+                <button id="activateBtn" class="license-activate-btn" onclick="activateLicenseKey()">
+                    Activate Key
+                </button>
+
+                <div id="licenseError" class="license-error"></div>
+                <div id="licenseSuccess" class="license-success" style="display: none;"></div>
+
+                <div class="license-divider">or</div>
+
+                <button class="license-email-btn" onclick="toggleEmailLogin()">
+                    Log in with Email
+                </button>
+
+                <div id="emailLoginForm" class="email-login-form">
+                    <input type="email" id="emailInput" class="email-input" 
+                           placeholder="Enter your email address">
+                    <button class="license-activate-btn" onclick="requestMagicLink()" style="font-size: 14px; padding: 12px;">
+                        Send Login Link
+                    </button>
+                    <div id="emailError" class="license-error"></div>
+                    <div id="emailSuccess" class="license-success" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="license-footer">
+                <p>Don't have a key? <a href="https://offgridaitoolkit.com" target="_blank">Get your OffGrid AI ToolKit</a></p>
+                <p style="margin-top: 8px; font-size: 11px;">Your key is printed on the card inside your OffGrid AI package.</p>
+            </div>
+        </div>
+    </div>
+
     <!-- First Run Banner -->
     <div id="firstRunBanner" class="first-run-banner" style="display: none;">
         <div class="first-run-content">
@@ -2456,6 +2760,8 @@
                 <div class="privacy-notice" style="margin: 0 0 12px 0; padding: 10px;">
                     <strong>🔒 Privacy:</strong> Conversations and images are never stored. Each session is ephemeral.
                 </div>
+                <!-- Usage Stats (populated by license system) -->
+                <div id="usageDisplay"></div>
             </div>
 
             <button class="new-chat-btn" onclick="clearChat()">
@@ -2812,6 +3118,249 @@
         // ============================================
 
         const API_BASE = window.location.origin;
+
+        // ============================================
+        // LICENSE AUTHENTICATION MODULE
+        // ============================================
+
+        const LICENSE_TOKEN_KEY = 'offgrid-license-token';
+        let licenseToken = localStorage.getItem(LICENSE_TOKEN_KEY) || null;
+        let licenseInfo = null; // { tier, promptsUsed, promptsLimit, imagesUsed, imagesLimit }
+
+        // Get auth headers for all API calls
+        function getAuthHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
+            if (licenseToken) {
+                headers['Authorization'] = 'Bearer ' + licenseToken;
+            }
+            return headers;
+        }
+
+        // Verify existing token on page load
+        async function verifyLicenseToken() {
+            if (!licenseToken) return false;
+            try {
+                const response = await fetch(API_BASE + '/api/license/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: licenseToken })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // Map the verify response to our licenseInfo format
+                    if (data.usage) {
+                        licenseInfo = {
+                            tier: data.tier,
+                            tierName: data.tierName,
+                            promptsUsed: data.usage.prompts.used,
+                            promptsLimit: data.usage.prompts.limit,
+                            imagesUsed: data.usage.images.used,
+                            imagesLimit: data.usage.images.limit,
+                            nextReset: data.usage.nextReset
+                        };
+                    }
+                    return true;
+                } else {
+                    // Token invalid or expired, clear it
+                    localStorage.removeItem(LICENSE_TOKEN_KEY);
+                    licenseToken = null;
+                    return false;
+                }
+            } catch (err) {
+                console.error('License verification failed:', err);
+                // Network error: allow access with existing token (offline-friendly)
+                return !!licenseToken;
+            }
+        }
+
+        // Activate a license key
+        async function activateLicenseKey() {
+            const input = document.getElementById('licenseKeyInput');
+            const errorEl = document.getElementById('licenseError');
+            const successEl = document.getElementById('licenseSuccess');
+            const btn = document.getElementById('activateBtn');
+            const key = input.value.trim().toUpperCase();
+
+            errorEl.textContent = '';
+            successEl.style.display = 'none';
+
+            if (!key || key.length < 10) {
+                errorEl.textContent = 'Please enter a valid license key.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Activating...';
+
+            try {
+                const response = await fetch(API_BASE + '/api/license/activate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ key: key })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    licenseToken = data.token;
+                    licenseInfo = {
+                        tier: data.tier,
+                        tierName: data.tierName,
+                        promptsUsed: 0,
+                        promptsLimit: data.limits.monthlyPrompts,
+                        imagesUsed: 0,
+                        imagesLimit: data.limits.monthlyImages
+                    };
+                    localStorage.setItem(LICENSE_TOKEN_KEY, licenseToken);
+
+                    successEl.textContent = 'Key activated! Welcome to the Command Center.';
+                    successEl.style.display = 'block';
+
+                    // Fade out the gate after a brief success message
+                    setTimeout(() => {
+                        const gate = document.getElementById('licenseGate');
+                        gate.style.transition = 'opacity 0.4s ease';
+                        gate.style.opacity = '0';
+                        setTimeout(() => {
+                            gate.style.display = 'none';
+                        }, 400);
+                    }, 1000);
+                } else {
+                    errorEl.textContent = data.error || 'Activation failed. Please check your key.';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Connection error. Please try again.';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Activate Key';
+            }
+        }
+
+        // Toggle email login form visibility
+        function toggleEmailLogin() {
+            const form = document.getElementById('emailLoginForm');
+            form.classList.toggle('visible');
+        }
+
+        // Request magic link email (future feature)
+        async function requestMagicLink() {
+            const emailInput = document.getElementById('emailInput');
+            const errorEl = document.getElementById('emailError');
+            const successEl = document.getElementById('emailSuccess');
+            const email = emailInput.value.trim();
+
+            errorEl.textContent = '';
+            successEl.style.display = 'none';
+
+            if (!email || !email.includes('@')) {
+                errorEl.textContent = 'Please enter a valid email address.';
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE + '/api/license/email-login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successEl.textContent = 'Login link sent! Check your email.';
+                    successEl.style.display = 'block';
+                } else {
+                    errorEl.textContent = data.error || 'Could not send login link.';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Connection error. Please try again.';
+            }
+        }
+
+        // Show the license gate
+        function showLicenseGate() {
+            const gate = document.getElementById('licenseGate');
+            gate.style.display = 'flex';
+            gate.style.opacity = '1';
+            // Auto-format license key input with dashes
+            const input = document.getElementById('licenseKeyInput');
+            input.addEventListener('input', function(e) {
+                let val = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                // Insert dashes every 4 characters
+                let formatted = '';
+                for (let i = 0; i < val.length && i < 16; i++) {
+                    if (i > 0 && i % 4 === 0) formatted += '-';
+                    formatted += val[i];
+                }
+                e.target.value = formatted;
+            });
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') activateLicenseKey();
+            });
+            input.focus();
+        }
+
+        // Fetch and display usage stats
+        async function fetchUsageStats() {
+            if (!licenseToken) return;
+            try {
+                const response = await fetch(API_BASE + '/api/license/usage', {
+                    headers: getAuthHeaders()
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    licenseInfo = {
+                        tier: data.tier,
+                        tierName: data.tierName,
+                        promptsUsed: data.prompts.used,
+                        promptsLimit: data.prompts.limit,
+                        imagesUsed: data.images.used,
+                        imagesLimit: data.images.limit,
+                        nextReset: data.nextReset
+                    };
+                    updateUsageDisplay();
+                }
+            } catch (err) {
+                console.log('Usage fetch failed:', err);
+            }
+        }
+
+        // Update usage display in sidebar (if visible)
+        function updateUsageDisplay() {
+            if (!licenseInfo) return;
+            const container = document.getElementById('usageDisplay');
+            if (!container) return;
+
+            const promptPct = Math.round((licenseInfo.promptsUsed / licenseInfo.promptsLimit) * 100);
+            const imagePct = Math.round((licenseInfo.imagesUsed / licenseInfo.imagesLimit) * 100);
+
+            container.innerHTML = `
+                <div class="license-usage-bar">
+                    <div class="usage-label">
+                        <span>Prompts</span>
+                        <span>${licenseInfo.promptsUsed} / ${licenseInfo.promptsLimit}</span>
+                    </div>
+                    <div class="usage-track">
+                        <div class="usage-fill ${promptPct > 80 ? 'warning' : ''}" style="width: ${Math.min(promptPct, 100)}%"></div>
+                    </div>
+                </div>
+                <div class="license-usage-bar" style="margin-top: 8px;">
+                    <div class="usage-label">
+                        <span>Images</span>
+                        <span>${licenseInfo.imagesUsed} / ${licenseInfo.imagesLimit}</span>
+                    </div>
+                    <div class="usage-track">
+                        <div class="usage-fill ${imagePct > 80 ? 'warning' : ''}" style="width: ${Math.min(imagePct, 100)}%"></div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 8px; font-size: 10px; color: #8b7355;">Resets monthly</div>
+            `;
+        }
+
+        // ============================================
+        // END LICENSE MODULE
+        // ============================================
+
         let selectedModel = 'command';
         let isTyping = false;
         let selectedImage = null;
@@ -3156,7 +3705,7 @@
 
                 const response = await fetch(`${API_BASE}/api/command/stream`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
                         model: selectedModel,
                         messages: messages
@@ -3325,7 +3874,7 @@
 
                 const response = await fetch(`${API_BASE}/api/command/council`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ messages: messages })
                 });
 
@@ -4310,7 +4859,7 @@
             try {
                 const response = await fetch(`${API_BASE}/api/export-pdf`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ markdown: markdownContent, title: title })
                 });
 
@@ -4999,7 +5548,7 @@
             try {
                 const response = await fetch(`${API_BASE}/api/command/craft-prompt`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
                         description: description,
                         category: studioSelectedCategory
@@ -5122,7 +5671,7 @@
             try {
                 const response = await fetch(`${API_BASE}/api/command/generate-image`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({ prompt })
                 });
 
@@ -5281,8 +5830,8 @@
                 let summaryText = '';
                 try {
                     const summaryResponse = await fetch(`${API_BASE}/api/command/image-summary`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                    method: 'POST',
+                    headers: getAuthHeaders(),
                         body: JSON.stringify({ prompt: imagePromptText, category: studioSelectedCategory || 'other' })
                     });
                     const summaryData = await summaryResponse.json();
@@ -5331,7 +5880,7 @@
             try {
                 const response = await fetch(`${API_BASE}/api/command/visual-prompt`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: getAuthHeaders(),
                     body: JSON.stringify({
                         conversationContext: responseText
                     })
@@ -5418,6 +5967,16 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('OffGrid Command Center v2 - Initializing...');
+
+            // ---- LICENSE CHECK ----
+            // Verify existing token or show activation gate
+            const hasValidLicense = await verifyLicenseToken();
+            if (!hasValidLicense) {
+                showLicenseGate();
+            } else {
+                // Token valid: fetch latest usage stats
+                fetchUsageStats();
+            }
 
             // Check first run
             if (!localStorage.getItem('offgrid-command-initialized')) {
