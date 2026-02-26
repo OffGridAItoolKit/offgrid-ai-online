@@ -5640,13 +5640,13 @@
         ];
 
         const DEEP_MODE_CATEGORIES = [
-            { id: 'code', label: 'Code', keywords: ['code', 'function', 'debug', 'api', 'javascript', 'python', 'sql', 'algorithm', 'regex', 'deploy', 'programming', 'script', 'html', 'css', 'react', 'node'] },
-            { id: 'analysis', label: 'Analysis', keywords: ['analyze', 'compare', 'research', 'evaluate', 'pros and cons', 'study', 'data', 'statistics', 'review', 'assess', 'examine'] },
-            { id: 'creative', label: 'Creative', keywords: ['write', 'story', 'poem', 'essay', 'blog', 'creative', 'draft', 'rewrite', 'tone', 'copy', 'article', 'narrative'] },
-            { id: 'math', label: 'Math', keywords: ['calculate', 'math', 'equation', 'solve', 'proof', 'logic', 'probability', 'formula', 'number', 'percentage'] },
-            { id: 'strategy', label: 'Strategy', keywords: ['plan', 'strategy', 'roadmap', 'decision', 'prioritize', 'budget', 'timeline', 'workflow', 'organize', 'schedule'] },
-            { id: 'visual', label: 'Visual', keywords: ['image', 'picture', 'photo', 'design', 'logo', 'visual', 'draw', 'illustration', 'diagram', 'infographic'] },
-            { id: 'general', label: 'General', keywords: ['explain', 'what is', 'how does', 'define', 'history', 'science', 'geography', 'tell me', 'describe'] }
+            { id: 'survival', label: 'Survival Skills', keywords: ['fire', 'shelter', 'navigate', 'navigation', 'compass', 'signal', 'warmth', 'hypothermia', 'exposure', 'wilderness', 'bushcraft', 'knot', 'rope', 'trap', 'snare', 'forage', 'foraging', 'camp', 'campfire', 'survive', 'survival', 'lost', 'stranded'] },
+            { id: 'emergency', label: 'Emergency', keywords: ['emergency', 'disaster', 'evacuate', 'evacuation', 'first aid', 'injury', 'rescue', 'tornado', 'hurricane', 'earthquake', 'flood', 'wildfire', 'blackout', 'power outage', 'shtf', 'bug out', 'bugout', 'crisis', 'medical', 'wound', 'bleeding', 'cpr', 'snake bite', 'bitten'] },
+            { id: 'gear', label: 'Gear & Equipment', keywords: ['gear', 'tool', 'knife', 'axe', 'saw', 'generator', 'solar', 'battery', 'radio', 'flashlight', 'lantern', 'stove', 'fuel', 'gasoline', 'diesel', 'propane', 'kerosene', 'equipment', 'pack', 'backpack', 'tarp', 'tent', 'paracord'] },
+            { id: 'food_water', label: 'Food & Water', keywords: ['water', 'purify', 'purification', 'filter', 'boil', 'food', 'storage', 'preserve', 'can', 'canning', 'dehydrate', 'smoke', 'salt', 'ration', 'stockpile', 'garden', 'hunt', 'fish', 'cook', 'edible', 'plant', 'mushroom', 'berry'] },
+            { id: 'planning', label: 'Planning', keywords: ['plan', 'prepare', 'preparedness', 'checklist', 'strategy', 'route', 'timeline', 'budget', 'stockpile', 'inventory', 'organize', 'priority', 'decision', 'scenario', 'drill', 'practice', 'schedule', 'list', 'steps'] },
+            { id: 'identification', label: 'Identification', keywords: ['identify', 'identification', 'plant', 'animal', 'snake', 'spider', 'insect', 'track', 'tracks', 'scat', 'bird', 'tree', 'mushroom', 'poisonous', 'venomous', 'edible', 'medicinal', 'herb', 'flower', 'leaf', 'bark'] },
+            { id: 'general', label: 'General', keywords: [] }
         ];
 
         function classifyQuery(query) {
@@ -5682,18 +5682,19 @@
             };
 
             // Process scores for each model
-            if (Array.isArray(data.scores)) {
-                for (const s of data.scores) {
-                    const modelKey = s.model || s.key;
-                    if (modelKey && deepModeData.models[modelKey]) {
-                        const acc = s.accuracy || 0;
-                        const ins = s.insight || 0;
-                        const borda = s.score || (acc * 2 + ins);
-                        deepModeData.models[modelKey].totalAccuracy += acc;
-                        deepModeData.models[modelKey].totalInsight += ins;
-                        deepModeData.models[modelKey].totalBorda += borda;
-                        queryRecord.scores[modelKey] = borda;
-                    }
+            // scores is an object keyed by label (A, B, C, D) with properties:
+            // { key, model, fullName, emoji, accPoints, insightPoints, councilScore }
+            const scoreEntries = Array.isArray(data.scores) ? data.scores : Object.values(data.scores || {});
+            for (const s of scoreEntries) {
+                const modelKey = s.key || s.model;
+                if (modelKey && deepModeData.models[modelKey]) {
+                    const acc = s.accPoints || s.accuracy || 0;
+                    const ins = s.insightPoints || s.insight || 0;
+                    const borda = s.councilScore || s.score || (acc * 2 + ins);
+                    deepModeData.models[modelKey].totalAccuracy += acc;
+                    deepModeData.models[modelKey].totalInsight += ins;
+                    deepModeData.models[modelKey].totalBorda += borda;
+                    queryRecord.scores[modelKey] = borda;
                 }
             }
 
