@@ -25,6 +25,7 @@ const {
     requireLicense,
     checkPromptLimit,
     checkImageLimit,
+    incrementUsage,
     TIER_LIMITS
 } = require('./license-system');
 
@@ -814,6 +815,14 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
         res.setHeader('Connection', 'keep-alive');
         
         await streamOpenRouter(modelConfig.id, openRouterMessages, res);
+        
+        // Increment prompt usage ONLY after successful stream
+        if (req.license) {
+            incrementUsage(req.license.licenseKey, 'prompt').catch(err => 
+                console.error('[License System] Post-success prompt increment error:', err.message)
+            );
+        }
+        
         logToBetterStack('info', 'chat.command', {
             summary: `${modelConfig.shortName} streamed in ${Date.now() - cmdStreamStart}ms`,
             model: modelConfig.shortName,
@@ -1048,6 +1057,13 @@ Based on these, write the final Command answer as described.
             }
         })}\n\n`);
         await streamOpenRouter(COMMAND_MODELS.scout.id, synthesisMessages, res, 4096, 0.5);
+        
+        // Increment prompt usage ONLY after successful council completion
+        if (req.license) {
+            incrementUsage(req.license.licenseKey, 'prompt').catch(err => 
+                console.error('[License System] Post-success council increment error:', err.message)
+            );
+        }
         
         res.write('data: [DONE]\n\n');
         res.end();
@@ -1295,6 +1311,13 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
         const successDuration = Date.now() - genStartTime;
         console.log(`[Nano Banana] Image generated successfully in ${successDuration}ms`);
         logImageGen({ status: 'success', durationMs: successDuration, finishReason, errorReason: null, httpStatus: response.status });
+        
+        // Increment image usage ONLY after successful generation
+        if (req.license) {
+            incrementUsage(req.license.licenseKey, 'image').catch(err => 
+                console.error('[License System] Post-success image increment error:', err.message)
+            );
+        }
         
         res.json({
             success: true,

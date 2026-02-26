@@ -215,7 +215,55 @@ function getNextResetDate() {
 }
 
 /**
- * Increment usage counter. Returns { allowed, remaining } or { allowed: false, ... }.
+ * Check if usage is within limits WITHOUT incrementing.
+ * Used by middleware to gate requests before the API call.
+ * Returns { allowed: true } or { allowed: false, ... }.
+ */
+async function checkUsageLimit(licenseKey, type) {
+    await checkAndResetMonthlyUsage(licenseKey);
+    
+    const result = await pool.query(
+        'SELECT tier, prompt_count, image_count FROM licenses WHERE license_key = $1',
+        [licenseKey]
+    );
+    
+    if (result.rows.length === 0) return { allowed: false, reason: 'License not found' };
+    
+    const { tier, prompt_count, image_count } = result.rows[0];
+    const limits = TIER_LIMITS[tier];
+    
+    if (type === 'prompt') {
+        if (prompt_count >= limits.monthlyPrompts) {
+            return {
+                allowed: false,
+                reason: 'monthly_prompt_limit',
+                used: prompt_count,
+                limit: limits.monthlyPrompts,
+                nextReset: getNextResetDate()
+            };
+        }
+        return { allowed: true, used: prompt_count, limit: limits.monthlyPrompts };
+    }
+    
+    if (type === 'image') {
+        if (image_count >= limits.monthlyImages) {
+            return {
+                allowed: false,
+                reason: 'monthly_image_limit',
+                used: image_count,
+                limit: limits.monthlyImages,
+                nextReset: getNextResetDate()
+            };
+        }
+        return { allowed: true, used: image_count, limit: limits.monthlyImages };
+    }
+    
+    return { allowed: false, reason: 'Invalid usage type' };
+}
+
+/**
+ * Increment usage counter. Called AFTER a successful API response.
+ * Returns { allowed, remaining } or { allowed: false, ... }.
  */
 async function incrementUsage(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
@@ -378,6 +426,7 @@ function requireLicense(req, res, next) {
 
 /**
  * Middleware that checks prompt usage limits before allowing a request.
+ * Only CHECKS the limit - does NOT increment. Incrementing happens after success.
  * Must be used AFTER requireLicense middleware.
  */
 function checkPromptLimit(req, res, next) {
@@ -386,7 +435,7 @@ function checkPromptLimit(req, res, next) {
         return next();
     }
     
-    incrementUsage(req.license.licenseKey, 'prompt')
+    checkUsageLimit(req.license.licenseKey, 'prompt')
         .then(result => {
             if (!result.allowed) {
                 return res.status(429).json({
@@ -399,8 +448,6 @@ function checkPromptLimit(req, res, next) {
                     upgradeUrl: 'https://offgridaitoolkit.com/products/offgrid-ai-toolkit-command-center-pro'
                 });
             }
-            // Attach usage info for the response headers
-            req.usageInfo = result;
             next();
         })
         .catch(error => {
@@ -412,6 +459,7 @@ function checkPromptLimit(req, res, next) {
 
 /**
  * Middleware that checks image usage limits before allowing a request.
+ * Only CHECKS the limit - does NOT increment. Incrementing happens after success.
  * Must be used AFTER requireLicense middleware.
  */
 function checkImageLimit(req, res, next) {
@@ -420,7 +468,7 @@ function checkImageLimit(req, res, next) {
         return next();
     }
     
-    incrementUsage(req.license.licenseKey, 'image')
+    checkUsageLimit(req.license.licenseKey, 'image')
         .then(result => {
             if (!result.allowed) {
                 return res.status(429).json({
@@ -433,7 +481,6 @@ function checkImageLimit(req, res, next) {
                     upgradeUrl: 'https://offgridaitoolkit.com/products/offgrid-ai-toolkit-command-center-pro'
                 });
             }
-            req.usageInfo = result;
             next();
         })
         .catch(error => {
@@ -892,6 +939,63 @@ function registerLicenseRoutes(app, logToBetterStack) {
     });
 
     // -------------------------------------------------------------------------
+    // POST /api/admin/credit-back
+    // Credit back prompts or images for a license (support tool)
+    // -------------------------------------------------------------------------
+    app.post('/api/admin/credit-back', requireAdmin, async (req, res) => {
+        try {
+            const { licenseKey, type, count = 1 } = req.body;
+            
+            if (!licenseKey) {
+                return res.status(400).json({ error: 'License key is required' });
+            }
+            if (!['prompt', 'image'].includes(type)) {
+                return res.status(400).json({ error: 'Type must be "prompt" or "image"' });
+            }
+            if (count < 1 || count > 100) {
+                return res.status(400).json({ error: 'Count must be between 1 and 100' });
+            }
+            
+            const column = type === 'prompt' ? 'prompt_count' : 'image_count';
+            const result = await pool.query(
+                `UPDATE licenses SET ${column} = GREATEST(0, ${column} - $1) WHERE license_key = $2 RETURNING *`,
+                [count, licenseKey.trim().toUpperCase()]
+            );
+            
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'License key not found' });
+            }
+            
+            const license = result.rows[0];
+            const tierLimits = TIER_LIMITS[license.tier];
+            
+            await logActivationEvent(licenseKey, 'admin.credit_back', `Credited back ${count} ${type}(s)`);
+            
+            if (logToBetterStack) {
+                logToBetterStack('info', 'admin.credit_back', {
+                    summary: `Credited back ${count} ${type}(s) for ${licenseKey}`,
+                    licenseKey,
+                    type,
+                    count
+                });
+            }
+            
+            res.json({
+                success: true,
+                message: `Credited back ${count} ${type}(s). New count: ${license[column]}/${type === 'prompt' ? tierLimits.monthlyPrompts : tierLimits.monthlyImages}`,
+                license_key: license.license_key,
+                type,
+                new_count: license[column],
+                limit: type === 'prompt' ? tierLimits.monthlyPrompts : tierLimits.monthlyImages
+            });
+            
+        } catch (error) {
+            console.error('[License System] Credit-back error:', error);
+            res.status(500).json({ error: 'Credit-back failed' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
     // POST /api/admin/revoke
     // Revoke a license key (deactivate it)
     // -------------------------------------------------------------------------
@@ -937,6 +1041,7 @@ module.exports = {
     requireLicense,
     checkPromptLimit,
     checkImageLimit,
+    incrementUsage,
     generateLicenseKey,
     getUsageInfo,
     verifyToken,
