@@ -4882,12 +4882,205 @@
         // UI FUNCTIONS
         // ============================================
 
+        function softResetChat() {
+            // Reset conversation state (but NOT deepModeData)
+            conversationHistory = [];
+            lastCouncilDeliberation = null;
+            lastCouncilLabelMap = null;
+            councilScores = null;
+            chairmanKey = null;
+            chairmanName = null;
+            chairmanEmoji = null;
+            selectedImage = null;
+            isTyping = false;
+
+            // Clear messages container and restore welcome screen
+            const messagesContainer = document.getElementById('messages');
+            if (messagesContainer) {
+                messagesContainer.innerHTML = `
+                <div class="welcome" id="welcome">
+                    <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon">
+                    <h2>OffGrid Command Center</h2>
+                    <div class="welcome-subtitle">⭐ Multi-Model AI Council • Premium Intelligence</div>
+                    <div class="feature-badges">
+                        <div class="feature-badge" onclick="selectModelAndFocus('scout')">🔭 Scout</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('medic')">🏥 Medic</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('navigator')">🧭 Navigator</div>
+                        <div class="feature-badge" onclick="selectModelAndFocus('ranger')">🏕️ Ranger</div>
+                    </div>
+                    <div class="welcome-input-area desktop-only" id="welcomeInputArea">
+                        <div class="input-container">
+                            <div class="image-preview" id="imagePreviewWelcome"></div>
+                            <div class="input-wrapper">
+                                <div class="attach-btn" onclick="toggleAttachMenu()" title="Attach files">+</div>
+                                <div class="attach-menu" id="attachMenuWelcome">
+                                    <div class="attach-menu-item" onclick="triggerGalleryUpload(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">🖼️</span>
+                                        <span>Upload Image</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📄</span>
+                                        <span>Upload Document</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupTranslator(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">🌐</span>
+                                        <span>Translate</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupTranscribe(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">✍️</span>
+                                        <span>Transcribe Text from Image</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupFactCheckClaim(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">✅</span>
+                                        <span>Fact Check Claim</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupFactCheckDoc(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📊</span>
+                                        <span>Fact Check Document</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupSummarizeText(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📝</span>
+                                        <span>Summarize Text</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
+                                        <span class="attach-menu-icon">📖</span>
+                                        <span>Summarize Document</span>
+                                    </div>
+                                    <div class="attach-menu-item" onclick="window.location.href='/command/ready-made-prompts'; closeAttachMenu();" style="border-top: 1px solid rgba(184, 134, 11, 0.15); padding-top: 10px;">
+                                        <span class="attach-menu-icon">📋</span>
+                                        <span>Ready-Made Prompts</span>
+                                    </div>
+                                </div>
+                                <textarea 
+                                    id="messageInputWelcome" 
+                                    class="message-input"
+                                    placeholder="Ask the Command Center anything..."
+                                    rows="1"
+                                    onkeydown="handleKeyDown(event)"
+                                    oninput="autoResize(this)"
+                                ></textarea>
+                                <div class="gallery-btn" onclick="triggerGalleryUpload()" title="Upload image">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="button-row">
+                                <div class="button-row-left">
+                                    <div class="model-selector">
+                                        <button class="model-button" id="modelButtonWelcome" onclick="toggleModelDropdown()">
+                                            <span class="model-name" id="selectedModelNameWelcome">⭐ Command</span>
+                                            <span class="model-speed-badge badge-command" id="selectedModelBadgeWelcome">Council</span>
+                                            <svg viewBox="0 0 16 16" fill="currentColor" style="width: 12px; height: 12px;">
+                                                <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
+                                            </svg>
+                                        </button>
+                                        <div class="model-dropdown" id="modelDropdownWelcome">
+                                            <div class="model-list">
+                                                <div class="model-item scout-item" onclick="selectModel('scout')">
+                                                    <div class="model-item-name">🔭 Scout (GPT 5.2) <span class="model-item-badge badge-scout">Vision</span></div>
+                                                    <div class="model-item-desc">Vision specialist, image analysis, visual tasks, and multimodal queries</div>
+                                                </div>
+                                                <div class="model-item medic-item" onclick="selectModel('medic')">
+                                                    <div class="model-item-name">🏥 Medic (Claude Sonnet 4.6) <span class="model-item-badge badge-medic">Safety</span></div>
+                                                    <div class="model-item-desc">Safety and analysis, thorough, careful reasoning with attention to nuance</div>
+                                                </div>
+                                                <div class="model-item navigator-item" onclick="selectModel('navigator')">
+                                                    <div class="model-item-name">🧭 Navigator (Gemini 3.1 Pro) <span class="model-item-badge badge-navigator">Research</span></div>
+                                                    <div class="model-item-desc">Research and planning, deep analysis, strategy, and long-context reasoning</div>
+                                                </div>
+                                                <div class="model-item ranger-item" onclick="selectModel('ranger')">
+                                                    <div class="model-item-name">🏕️ Ranger (Grok 4.1 Fast) <span class="model-item-badge badge-ranger">Creative</span></div>
+                                                    <div class="model-item-desc">Creative solutions, unconventional thinking and rapid problem-solving</div>
+                                                </div>
+                                                <div class="model-item command-item selected" onclick="selectModel('command')">
+                                                    <div class="model-item-name">⭐ Command <span class="model-item-badge badge-command">Council</span></div>
+                                                    <div class="model-item-desc">Peer-reviewed consensus — anonymous scoring elects a Chairman per query</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="command-banner desktop-only" onclick="selectModelAndFocus('command')">
+                        <div class="command-banner-title">⭐ Command • Chairman Council</div>
+                        <div class="command-banner-desc">Choose a single model above, or use <strong style="color: #daa520;">Command mode</strong> for a peer-reviewed council consensus. All 4 models answer → anonymous peer review → a Chairman is elected per query → best answer synthesized.</div>
+                    </div>
+                    <div class="mobile-actions">
+                        <div class="mobile-action-card" onclick="triggerImageUpload()">
+                            <div class="mobile-action-icon">📸</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Take Picture</div>
+                                <div class="mobile-action-desc">Camera capture</div>
+                            </div>
+                        </div>
+                        <div class="mobile-action-card" onclick="triggerGalleryUpload()">
+                            <div class="mobile-action-icon">🖼️</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Upload Image</div>
+                                <div class="mobile-action-desc">From gallery</div>
+                            </div>
+                        </div>
+                        <div class="mobile-action-card" id="voiceInputCard" onclick="startVoiceInput()">
+                            <div class="mobile-action-icon">🎙️</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Voice Input</div>
+                                <div class="mobile-action-desc">Speak your prompt</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="voice-recording" id="voiceRecording">
+                        <div class="voice-pulse"></div>
+                        <span class="voice-recording-text">Listening...</span>
+                        <button class="voice-stop-btn" onclick="stopVoiceInput()">Stop</button>
+                    </div>
+                </div>
+                `;
+            }
+
+            // Hide bottom input area, reset image previews
+            const bottomInputArea = document.getElementById('bottomInputArea');
+            if (bottomInputArea) bottomInputArea.style.display = 'none';
+            const imagePreview = document.getElementById('imagePreview');
+            if (imagePreview) imagePreview.style.display = 'none';
+            const imagePreviewWelcome = document.getElementById('imagePreviewWelcome');
+            if (imagePreviewWelcome) imagePreviewWelcome.innerHTML = '';
+
+            // Reset model selector to Command (Council)
+            selectModel('command');
+
+            // Clear any active streaming indicators
+            const streamingEls = document.querySelectorAll('.streaming-indicator');
+            streamingEls.forEach(el => el.remove());
+            const councilProgress = document.getElementById('councilProgress');
+            if (councilProgress) councilProgress.remove();
+
+            // Re-enable send button
+            const sendBtn = document.getElementById('sendButton');
+            if (sendBtn) sendBtn.disabled = false;
+            const sendBtnWelcome = document.getElementById('sendButtonWelcome');
+            if (sendBtnWelcome) sendBtnWelcome.disabled = false;
+
+            // Clear chairman highlights from sidebar
+            document.querySelectorAll('.roster-item.chairman-elected').forEach(el => {
+                el.classList.remove('chairman-elected');
+            });
+
+            // Focus the welcome input
+            setTimeout(() => {
+                const welcomeInput = document.getElementById('messageInputWelcome');
+                if (welcomeInput) welcomeInput.focus();
+            }, 100);
+        }
+
         function clearChat() {
-            if (confirm('Clear all messages and return to home? This will start a new session.')) {
-                conversationHistory = [];
-                lastCouncilDeliberation = null;
-                lastCouncilLabelMap = null;
-                location.reload();
+            if (confirm('Start a new chat? Your Deep Mode analytics will be preserved.')) {
+                softResetChat();
             }
         }
 
@@ -4897,9 +5090,8 @@
             const hasWelcome = !!document.getElementById('welcome');
 
             if (hasMessages || !hasWelcome) {
-                if (confirm('Return to home? This will start a new session.')) {
-                    conversationHistory = [];
-                    location.reload();
+                if (confirm('Return to home? Your Deep Mode analytics will be preserved.')) {
+                    softResetChat();
                 }
             }
         }
@@ -6892,10 +7084,9 @@
                     const currentTransform = messagesEl.style.transform;
                     messagesEl.style.transition = 'transform 0.3s ease';
                     messagesEl.style.transform = 'translateY(0)';
-                    // If pulled far enough, clear chat
+                    // If pulled far enough, soft reset chat (preserves Deep Mode)
                     if (currentTransform && parseInt(currentTransform.replace(/[^0-9.-]/g, '')) > 20) {
-                        conversationHistory = [];
-                        location.reload();
+                        softResetChat();
                     }
                 }, { passive: true });
             }
