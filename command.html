@@ -6782,6 +6782,9 @@
                     // Store image data in JS variable to avoid onclick attribute overflow
                     window._lastGeneratedImage = imageSrc;
                     window._lastGeneratedPrompt = prompt;
+
+                    // Refresh credit counter after successful generation
+                    fetchUsageStats();
                     
                     resultDiv.innerHTML = `
                         <div class="studio-result">
@@ -6892,19 +6895,7 @@
                 conversationHistory.push({ role: 'assistant', content: `![Generated Image](${imageSrc})\n\n*Generated using Image Studio in OffGrid Command Center.*` });
 
             } else {
-                // AI-ASSISTED flow — full display with user prompt, image, and summary
-                const userDiv = document.createElement('div');
-                userDiv.className = 'message user';
-                const userTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                userDiv.innerHTML = `
-                    <div class="message-content">
-                        <div class="model-indicator" style="background: rgba(168, 85, 247, 0.1); color: #a855f7; border-color: rgba(168, 85, 247, 0.3);">\ud83c\udfa8 Image Studio Request</div>
-                        ${escapeHtml(imagePromptText)}
-                        <div class="message-time">${userTime}</div>
-                    </div>
-                    <div class="message-avatar">You</div>
-                `;
-                messagesDiv.appendChild(userDiv);
+                // AI-ASSISTED flow — show image and Quick Reference summary only (no verbose prompt)
 
                 // Show image + loading state for summary
                 const messageDiv = document.createElement('div');
