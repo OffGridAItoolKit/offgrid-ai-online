@@ -53,14 +53,31 @@
             --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
         }
 
-        /* Global scrollbar hide for Command Center — eliminates flash during streaming */
-        .command-theme *,
-        .command-theme *::before,
-        .command-theme *::after {
+        /* Targeted scrollbar hide — messages area, message content, and textarea only.
+           Sidebar and Deep Mode panel keep their scrollbars for navigation. */
+        .command-theme .messages,
+        .command-theme .message-content,
+        .command-theme .message-content *,
+        .command-theme .message-text,
+        .command-theme .message-text *,
+        .command-theme .markdown-content,
+        .command-theme .markdown-content *,
+        .command-theme #messageInput,
+        .command-theme .input-wrapper,
+        .command-theme .chat-container {
             scrollbar-width: none !important;
             -ms-overflow-style: none !important;
         }
-        .command-theme *::-webkit-scrollbar {
+        .command-theme .messages::-webkit-scrollbar,
+        .command-theme .message-content::-webkit-scrollbar,
+        .command-theme .message-content *::-webkit-scrollbar,
+        .command-theme .message-text::-webkit-scrollbar,
+        .command-theme .message-text *::-webkit-scrollbar,
+        .command-theme .markdown-content::-webkit-scrollbar,
+        .command-theme .markdown-content *::-webkit-scrollbar,
+        .command-theme #messageInput::-webkit-scrollbar,
+        .command-theme .input-wrapper::-webkit-scrollbar,
+        .command-theme .chat-container::-webkit-scrollbar {
             display: none !important;
         }
 
