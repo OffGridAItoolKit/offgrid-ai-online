@@ -50,10 +50,21 @@ async function initializeDatabase() {
                 email_linked_at TIMESTAMP,
                 prompt_count INTEGER NOT NULL DEFAULT 0,
                 image_count INTEGER NOT NULL DEFAULT 0,
+                custom_prompt_limit INTEGER,
+                custom_image_limit INTEGER,
                 usage_reset_at TIMESTAMP NOT NULL DEFAULT NOW(),
                 created_at TIMESTAMP NOT NULL DEFAULT NOW(),
                 notes TEXT
             );
+        `);
+
+        // Add custom limit columns if they don't exist (migration for existing databases)
+        await client.query(`
+            DO $$ BEGIN
+                ALTER TABLE licenses ADD COLUMN IF NOT EXISTS custom_prompt_limit INTEGER;
+                ALTER TABLE licenses ADD COLUMN IF NOT EXISTS custom_image_limit INTEGER;
+            EXCEPTION WHEN duplicate_column THEN NULL;
+            END $$;
         `);
 
         await client.query(`
@@ -117,6 +128,23 @@ const TIER_LIMITS = {
     }
 };
 
+/**
+ * Resolve effective limits for a license.
+ * Custom per-key overrides take priority over tier defaults.
+ * Returns { monthlyPrompts, monthlyImages }.
+ */
+function getEffectiveLimits(license) {
+    const tierLimits = TIER_LIMITS[license.tier] || TIER_LIMITS[2];
+    return {
+        monthlyPrompts: license.custom_prompt_limit !== null && license.custom_prompt_limit !== undefined
+            ? license.custom_prompt_limit
+            : tierLimits.monthlyPrompts,
+        monthlyImages: license.custom_image_limit !== null && license.custom_image_limit !== undefined
+            ? license.custom_image_limit
+            : tierLimits.monthlyImages
+    };
+}
+
 // =============================================================================
 // LICENSE KEY GENERATION
 // =============================================================================
@@ -178,29 +206,31 @@ async function getUsageInfo(licenseKey) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, prompt_count, image_count, usage_reset_at FROM licenses WHERE license_key = $1',
+        'SELECT tier, prompt_count, image_count, custom_prompt_limit, custom_image_limit, usage_reset_at FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return null;
     
-    const { tier, prompt_count, image_count, usage_reset_at } = result.rows[0];
-    const limits = TIER_LIMITS[tier];
+    const license = result.rows[0];
+    const tierInfo = TIER_LIMITS[license.tier];
+    const effective = getEffectiveLimits(license);
     
     return {
-        tier,
-        tierName: limits.name,
+        tier: license.tier,
+        tierName: tierInfo.name,
         prompts: {
-            used: prompt_count,
-            limit: limits.monthlyPrompts,
-            remaining: Math.max(0, limits.monthlyPrompts - prompt_count)
+            used: license.prompt_count,
+            limit: effective.monthlyPrompts,
+            remaining: Math.max(0, effective.monthlyPrompts - license.prompt_count)
         },
         images: {
-            used: image_count,
-            limit: limits.monthlyImages,
-            remaining: Math.max(0, limits.monthlyImages - image_count)
+            used: license.image_count,
+            limit: effective.monthlyImages,
+            remaining: Math.max(0, effective.monthlyImages - license.image_count)
         },
-        resetDate: usage_reset_at,
+        hasCustomLimits: license.custom_prompt_limit !== null || license.custom_image_limit !== null,
+        resetDate: license.usage_reset_at,
         nextReset: getNextResetDate()
     };
 }
@@ -223,39 +253,39 @@ async function checkUsageLimit(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, prompt_count, image_count FROM licenses WHERE license_key = $1',
+        'SELECT tier, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return { allowed: false, reason: 'License not found' };
     
-    const { tier, prompt_count, image_count } = result.rows[0];
-    const limits = TIER_LIMITS[tier];
+    const license = result.rows[0];
+    const effective = getEffectiveLimits(license);
     
     if (type === 'prompt') {
-        if (prompt_count >= limits.monthlyPrompts) {
+        if (license.prompt_count >= effective.monthlyPrompts) {
             return {
                 allowed: false,
                 reason: 'monthly_prompt_limit',
-                used: prompt_count,
-                limit: limits.monthlyPrompts,
+                used: license.prompt_count,
+                limit: effective.monthlyPrompts,
                 nextReset: getNextResetDate()
             };
         }
-        return { allowed: true, used: prompt_count, limit: limits.monthlyPrompts };
+        return { allowed: true, used: license.prompt_count, limit: effective.monthlyPrompts };
     }
     
     if (type === 'image') {
-        if (image_count >= limits.monthlyImages) {
+        if (license.image_count >= effective.monthlyImages) {
             return {
                 allowed: false,
                 reason: 'monthly_image_limit',
-                used: image_count,
-                limit: limits.monthlyImages,
+                used: license.image_count,
+                limit: effective.monthlyImages,
                 nextReset: getNextResetDate()
             };
         }
-        return { allowed: true, used: image_count, limit: limits.monthlyImages };
+        return { allowed: true, used: license.image_count, limit: effective.monthlyImages };
     }
     
     return { allowed: false, reason: 'Invalid usage type' };
@@ -269,22 +299,22 @@ async function incrementUsage(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, prompt_count, image_count FROM licenses WHERE license_key = $1',
+        'SELECT tier, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return { allowed: false, reason: 'License not found' };
     
-    const { tier, prompt_count, image_count } = result.rows[0];
-    const limits = TIER_LIMITS[tier];
+    const license = result.rows[0];
+    const effective = getEffectiveLimits(license);
     
     if (type === 'prompt') {
-        if (prompt_count >= limits.monthlyPrompts) {
+        if (license.prompt_count >= effective.monthlyPrompts) {
             return {
                 allowed: false,
                 reason: 'monthly_prompt_limit',
-                used: prompt_count,
-                limit: limits.monthlyPrompts,
+                used: license.prompt_count,
+                limit: effective.monthlyPrompts,
                 nextReset: getNextResetDate()
             };
         }
@@ -294,19 +324,19 @@ async function incrementUsage(licenseKey, type) {
         );
         return {
             allowed: true,
-            used: prompt_count + 1,
-            limit: limits.monthlyPrompts,
-            remaining: limits.monthlyPrompts - prompt_count - 1
+            used: license.prompt_count + 1,
+            limit: effective.monthlyPrompts,
+            remaining: effective.monthlyPrompts - license.prompt_count - 1
         };
     }
     
     if (type === 'image') {
-        if (image_count >= limits.monthlyImages) {
+        if (license.image_count >= effective.monthlyImages) {
             return {
                 allowed: false,
                 reason: 'monthly_image_limit',
-                used: image_count,
-                limit: limits.monthlyImages,
+                used: license.image_count,
+                limit: effective.monthlyImages,
                 nextReset: getNextResetDate()
             };
         }
@@ -316,9 +346,9 @@ async function incrementUsage(licenseKey, type) {
         );
         return {
             allowed: true,
-            used: image_count + 1,
-            limit: limits.monthlyImages,
-            remaining: limits.monthlyImages - image_count - 1
+            used: license.image_count + 1,
+            limit: effective.monthlyImages,
+            remaining: effective.monthlyImages - license.image_count - 1
         };
     }
     
@@ -996,6 +1026,97 @@ function registerLicenseRoutes(app, logToBetterStack) {
     });
 
     // -------------------------------------------------------------------------
+    // POST /api/admin/update-limits
+    // Set custom per-key limits (overrides tier defaults)
+    // -------------------------------------------------------------------------
+    app.post('/api/admin/update-limits', requireAdmin, async (req, res) => {
+        try {
+            const { licenseKey, monthlyPrompts, monthlyImages, resetCounters = false, notes } = req.body;
+            
+            if (!licenseKey) {
+                return res.status(400).json({ error: 'License key is required' });
+            }
+            if (monthlyPrompts === undefined && monthlyImages === undefined) {
+                return res.status(400).json({ error: 'At least one of monthlyPrompts or monthlyImages is required' });
+            }
+            if (monthlyPrompts !== undefined && (monthlyPrompts < 0 || monthlyPrompts > 10000)) {
+                return res.status(400).json({ error: 'monthlyPrompts must be between 0 and 10000' });
+            }
+            if (monthlyImages !== undefined && (monthlyImages < 0 || monthlyImages > 1000)) {
+                return res.status(400).json({ error: 'monthlyImages must be between 0 and 1000' });
+            }
+            
+            const normalizedKey = licenseKey.trim().toUpperCase();
+            
+            // Build the update query dynamically
+            const updates = [];
+            const params = [];
+            let paramIdx = 1;
+            
+            if (monthlyPrompts !== undefined) {
+                updates.push(`custom_prompt_limit = $${paramIdx++}`);
+                params.push(monthlyPrompts);
+            }
+            if (monthlyImages !== undefined) {
+                updates.push(`custom_image_limit = $${paramIdx++}`);
+                params.push(monthlyImages);
+            }
+            if (resetCounters) {
+                updates.push('prompt_count = 0');
+                updates.push('image_count = 0');
+                updates.push('usage_reset_at = NOW()');
+            }
+            if (notes !== undefined) {
+                updates.push(`notes = $${paramIdx++}`);
+                params.push(notes);
+            }
+            
+            params.push(normalizedKey);
+            const query = `UPDATE licenses SET ${updates.join(', ')} WHERE license_key = $${paramIdx} RETURNING *`;
+            
+            const result = await pool.query(query, params);
+            
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'License key not found' });
+            }
+            
+            const license = result.rows[0];
+            const effective = getEffectiveLimits(license);
+            
+            await logActivationEvent(normalizedKey, 'admin.update_limits', 
+                `Custom limits set: ${effective.monthlyPrompts} prompts, ${effective.monthlyImages} images${resetCounters ? ' (counters reset)' : ''}`);
+            
+            if (logToBetterStack) {
+                logToBetterStack('info', 'admin.update_limits', {
+                    summary: `Custom limits set for ${normalizedKey}: ${effective.monthlyPrompts} prompts, ${effective.monthlyImages} images`,
+                    licenseKey: normalizedKey,
+                    monthlyPrompts: effective.monthlyPrompts,
+                    monthlyImages: effective.monthlyImages,
+                    resetCounters
+                });
+            }
+            
+            res.json({
+                success: true,
+                message: `Custom limits updated for ${normalizedKey}`,
+                license_key: license.license_key,
+                tier: license.tier,
+                tierName: TIER_LIMITS[license.tier]?.name,
+                effectiveLimits: effective,
+                currentUsage: {
+                    prompts: license.prompt_count,
+                    images: license.image_count
+                },
+                countersReset: resetCounters
+            });
+            
+        } catch (error) {
+            console.error('[License System] Update limits error:', error);
+            res.status(500).json({ error: 'Failed to update limits' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
     // POST /api/admin/revoke
     // Revoke a license key (deactivate it)
     // -------------------------------------------------------------------------
@@ -1043,6 +1164,7 @@ module.exports = {
     checkImageLimit,
     incrementUsage,
     generateLicenseKey,
+    getEffectiveLimits,
     getUsageInfo,
     verifyToken,
     pool,
