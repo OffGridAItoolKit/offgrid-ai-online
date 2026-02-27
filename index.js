@@ -1981,6 +1981,16 @@ app.get('/', (req, res) => {
 });
 
 // =============================================================================
+// REDIRECT: /try-command → Command Center "Try Before You Buy"
+// Used on the $129 flash drive version where Command Center is greyed out.
+// Sends users to the live Command Center so they can try it before upgrading.
+// =============================================================================
+
+app.get('/try-command', (req, res) => {
+    res.redirect(301, 'https://cmdcouncil.offgridtoolkit.ai');
+});
+
+// =============================================================================
 // LICENSE SYSTEM ROUTES (must be before catch-all)
 // =============================================================================
 
