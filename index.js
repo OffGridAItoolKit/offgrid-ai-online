@@ -1987,7 +1987,7 @@ app.get('/', (req, res) => {
 // =============================================================================
 
 app.get('/try-command', (req, res) => {
-    res.redirect(301, 'https://cmdcouncil.offgridtoolkit.ai');
+    res.redirect(301, 'https://cmdcouncil.offgridtoolkit.ai?ref=try-command');
 });
 
 // =============================================================================

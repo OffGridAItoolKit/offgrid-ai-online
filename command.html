@@ -1184,9 +1184,125 @@
         .command-theme .model-roster-item.navigator { background: rgba(52, 211, 153, 0.12); color: var(--navigator-color); }
         .command-theme .model-roster-item.ranger { background: rgba(251, 146, 60, 0.12); color: var(--ranger-color); }
 
+        /* ---- Upgrade Banner (shown when arriving via /try-command) ---- */
+        .command-theme .upgrade-banner {
+            background: linear-gradient(135deg, rgba(201, 168, 76, 0.12) 0%, rgba(201, 168, 76, 0.04) 100%);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            border-left: 3px solid var(--gold-primary);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 0 0 0 0;
+            display: none;
+            align-items: flex-start;
+            gap: 14px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .command-theme .upgrade-banner-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .command-theme .upgrade-banner-content {
+            flex: 1;
+        }
+
+        .command-theme .upgrade-banner-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gold-bright);
+            margin-bottom: 6px;
+        }
+
+        .command-theme .upgrade-banner-text {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .command-theme .upgrade-coupon {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-deep);
+            border: 1px dashed var(--gold-primary);
+            border-radius: 6px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .command-theme .upgrade-coupon:hover {
+            background: var(--bg-elevated);
+            border-color: var(--gold-bright);
+        }
+
+        .command-theme .upgrade-coupon-code {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gold-bright);
+            letter-spacing: 0.03em;
+        }
+
+        .command-theme .upgrade-coupon-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        .command-theme .upgrade-coupon:hover .upgrade-coupon-hint {
+            color: var(--gold-primary);
+        }
+
+        .command-theme .upgrade-coupon-copied {
+            color: var(--success) !important;
+        }
+
+        .command-theme .upgrade-banner-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            line-height: 1;
+            transition: color 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .command-theme .upgrade-banner-close:hover {
+            color: var(--text-primary);
+        }
+
+        /* ---- Use With Intelligence notice ---- */
+        .command-theme .intelligence-notice {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-left: 3px solid var(--warning);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .command-theme .intelligence-notice strong {
+            color: var(--warning);
+            font-size: 12px;
+        }
+
         @media (max-width: 768px) {
             .first-run-banner {
                 display: none !important;
+            }
+            .command-theme .upgrade-banner {
+                margin: 0 12px;
+                flex-direction: column;
+                gap: 8px;
             }
         }
 
@@ -3226,10 +3342,13 @@
                     <strong>Privacy First:</strong> We don't store your conversations. Each session is independent and private.
                 </div>
             </div>
+            <div class="intelligence-notice">
+                <strong>⚠️ Powerful But Not Infallible:</strong> While these models are remarkably capable, AI can make mistakes. Always apply common sense, verify critical information when possible, and never rely solely on AI for life-threatening decisions. We provide the tools; you provide the judgment.
+            </div>
             <div class="first-run-terms">
                 <label class="terms-checkbox">
                     <input type="checkbox" id="acceptTermsBanner">
-                    <span>I understand this is a demo and accept the <a href="https://offgridaitoolkit.com/pages/terms-of-service" target="_blank">terms of service</a></span>
+                    <span>I accept the <a href="https://offgridaitoolkit.com/pages/terms-of-service" target="_blank">terms of service</a></span>
                 </label>
             </div>
             <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
@@ -3257,6 +3376,22 @@
                 <span id="statusText" class="status-text desktop-only">Connecting...</span>
             </div>
         </div>
+    </div>
+
+    <!-- Upgrade Banner (shown only when arriving via /try-command) -->
+    <div id="upgradeBanner" class="upgrade-banner">
+        <div class="upgrade-banner-icon">⭐</div>
+        <div class="upgrade-banner-content">
+            <div class="upgrade-banner-title">Upgrade Your OffGrid AI to Command Center</div>
+            <div class="upgrade-banner-text">
+                Already own the OffGrid AI ToolKit? Upgrade to the full Command Center for just $99. Keep your current drive and unlock premium multi-model AI.
+            </div>
+            <div class="upgrade-coupon" onclick="copyUpgradeCoupon(this)">
+                <span class="upgrade-coupon-code">99$cmdUpgrade</span>
+                <span class="upgrade-coupon-hint">click to copy</span>
+            </div>
+        </div>
+        <button class="upgrade-banner-close" onclick="closeUpgradeBanner()" title="Dismiss">&times;</button>
     </div>
 
     <!-- Upload Indicator -->
@@ -7033,6 +7168,69 @@
         }
 
         // ============================================
+        // UPGRADE BANNER (try-command referral)
+        // ============================================
+
+        function checkUpgradeReferral() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('ref') === 'try-command') {
+                const banner = document.getElementById('upgradeBanner');
+                if (banner) {
+                    banner.style.display = 'flex';
+                }
+                // Clean the URL without reloading
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, '', cleanUrl);
+            }
+        }
+
+        function copyUpgradeCoupon(el) {
+            const code = '99$cmdUpgrade';
+            navigator.clipboard.writeText(code).then(() => {
+                const hint = el.querySelector('.upgrade-coupon-hint');
+                if (hint) {
+                    hint.textContent = 'Copied!';
+                    hint.classList.add('upgrade-coupon-copied');
+                    setTimeout(() => {
+                        hint.textContent = 'click to copy';
+                        hint.classList.remove('upgrade-coupon-copied');
+                    }, 2000);
+                }
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = code;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const hint = el.querySelector('.upgrade-coupon-hint');
+                if (hint) {
+                    hint.textContent = 'Copied!';
+                    hint.classList.add('upgrade-coupon-copied');
+                    setTimeout(() => {
+                        hint.textContent = 'click to copy';
+                        hint.classList.remove('upgrade-coupon-copied');
+                    }, 2000);
+                }
+            });
+        }
+
+        function closeUpgradeBanner() {
+            const banner = document.getElementById('upgradeBanner');
+            if (banner) {
+                banner.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                banner.style.opacity = '0';
+                banner.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    banner.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // ============================================
         // FIRST RUN HANDLING
         // ============================================
 
@@ -7083,6 +7281,9 @@
                     });
                 }
             }
+
+            // Check for upgrade referral (/try-command)
+            checkUpgradeReferral();
 
             // Initialize connection check
             checkConnection();
