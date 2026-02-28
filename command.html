@@ -3291,14 +3291,23 @@
                            autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
                 </div>
 
-                <button id="activateBtn" class="license-activate-btn" onclick="activateLicenseKey()">
+                <div class="intelligence-notice" style="margin: 16px 0;">
+                    <strong>⚠️ Powerful But Not Infallible.</strong> AI can make mistakes. Always verify critical information and never rely solely on AI for life-threatening decisions. We provide the tools; you provide the judgment.
+                </div>
+
+                <div class="first-run-terms" style="margin-bottom: 16px;">
+                    <label class="terms-checkbox" style="justify-content: flex-start;">
+                        <input type="checkbox" id="acceptTermsGate">
+                        <span style="color: var(--text-secondary);">I accept the <a href="https://offgridaitoolkit.com/pages/terms-of-service" target="_blank" style="color: var(--gold-primary);">terms of service</a></span>
+                    </label>
+                </div>
+
+                <button id="activateBtn" class="license-activate-btn" onclick="activateLicenseKey()" disabled>
                     Activate Key
                 </button>
 
                 <div id="licenseError" class="license-error"></div>
                 <div id="licenseSuccess" class="license-success" style="display: none;"></div>
-
-                <!-- Email login removed for now. Will revisit when multi-device tracking is solved. -->
             </div>
 
             <div class="license-footer">
@@ -3819,6 +3828,13 @@
             errorEl.textContent = '';
             successEl.style.display = 'none';
 
+            // Verify terms accepted
+            const termsCheckbox = document.getElementById('acceptTermsGate');
+            if (termsCheckbox && !termsCheckbox.checked) {
+                errorEl.textContent = 'Please accept the terms of service to continue.';
+                return;
+            }
+
             if (!key || key.length < 10) {
                 errorEl.textContent = 'Please enter a valid license key.';
                 return;
@@ -3847,6 +3863,9 @@
                         imagesLimit: data.limits.monthlyImages
                     };
                     localStorage.setItem(LICENSE_TOKEN_KEY, licenseToken);
+                    // Mark as initialized so old first-run popup never shows
+                    localStorage.setItem('offgrid-command-initialized', 'true');
+                    localStorage.setItem('offgrid-command-init-date', new Date().toISOString());
 
                     successEl.textContent = 'Key activated! Welcome to the Command Center.';
                     successEl.style.display = 'block';
@@ -3917,6 +3936,18 @@
             const gate = document.getElementById('licenseGate');
             gate.style.display = 'flex';
             gate.style.opacity = '1';
+
+            // Terms checkbox controls Activate Key button
+            const termsCheckbox = document.getElementById('acceptTermsGate');
+            const activateBtn = document.getElementById('activateBtn');
+            if (termsCheckbox && activateBtn) {
+                termsCheckbox.addEventListener('change', function() {
+                    activateBtn.disabled = !this.checked;
+                    activateBtn.style.opacity = this.checked ? '1' : '0.5';
+                    activateBtn.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+                });
+            }
+
             // Auto-format license key input with dashes
             const input = document.getElementById('licenseKeyInput');
             input.addEventListener('input', function(e) {
