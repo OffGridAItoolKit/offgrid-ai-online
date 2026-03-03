@@ -621,6 +621,79 @@
             white-space: nowrap;
             border-bottom: 1px solid var(--border-subtle);
         }
+        thead th.sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        thead th.sortable:hover {
+            color: var(--gold-bright);
+            background: var(--bg-card);
+        }
+        .sort-arrow {
+            display: inline-block;
+            width: 12px;
+            font-size: 0.7rem;
+            color: var(--gold-bright);
+            margin-left: 3px;
+        }
+        .inline-edit-cell .cell-display {
+            cursor: pointer;
+            min-height: 20px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            border: 1px solid transparent;
+            transition: border-color 0.15s;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            max-width: 160px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+        }
+        .inline-edit-cell .cell-display:hover {
+            border-color: var(--gold-muted);
+            color: var(--text-primary);
+        }
+        .inline-edit-cell .cell-display.empty {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .inline-edit-cell input.cell-input {
+            width: 140px;
+            font-size: 0.82rem;
+            padding: 3px 6px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--gold-bright);
+            border-radius: 4px;
+            color: var(--text-primary);
+            outline: none;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .status-active  { background: rgba(74,222,128,0.15); color: var(--success); border: 1px solid rgba(74,222,128,0.3); }
+        .status-inactive { background: rgba(148,163,184,0.1); color: var(--text-muted); border: 1px solid rgba(148,163,184,0.2); }
+        .btn-row-action {
+            padding: 3px 8px;
+            font-size: 0.72rem;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.15s;
+            margin-right: 3px;
+        }
+        .btn-row-action:hover { border-color: var(--error); color: var(--error); }
+        .btn-row-action.lookup { border-color: var(--gold-muted); color: var(--gold-bright); }
+        .btn-row-action.lookup:hover { background: rgba(212,175,55,0.1); }
 
         tbody tr {
             border-bottom: 1px solid var(--border-subtle);
@@ -1365,13 +1438,18 @@
             <div class="panel" id="panel-browse">
                 <div class="panel-header">
                     <h2>Browse All Licenses</h2>
-                    <p>View and filter all license keys in the system</p>
+                    <p>Spreadsheet-style management: sort, filter, search, and edit inline</p>
                 </div>
 
-                <div class="filter-bar">
+                <!-- Toolbar: search + filters + actions -->
+                <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:16px;">
+                    <div class="form-group" style="flex:2; min-width:200px;">
+                        <label>Search</label>
+                        <input type="text" id="browse-search" placeholder="Key, Shopify order, notes, email..." oninput="loadLicenses(1)" />
+                    </div>
                     <div class="form-group">
                         <label>Tier</label>
-                        <select id="filter-tier">
+                        <select id="filter-tier" onchange="loadLicenses(1)">
                             <option value="">All Tiers</option>
                             <option value="1">Tier 1</option>
                             <option value="2">Tier 2</option>
@@ -1380,41 +1458,46 @@
                     </div>
                     <div class="form-group">
                         <label>Status</label>
-                        <select id="filter-activated">
+                        <select id="filter-activated" onchange="loadLicenses(1)">
                             <option value="">All</option>
-                            <option value="true">Activated</option>
-                            <option value="false">Not Activated</option>
+                            <option value="true">Active</option>
+                            <option value="false">Inactive</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Per Page</label>
-                        <select id="filter-limit">
+                        <select id="filter-limit" onchange="loadLicenses(1)">
                             <option value="25">25</option>
                             <option value="50" selected>50</option>
                             <option value="100">100</option>
+                            <option value="250">250</option>
                         </select>
                     </div>
-                    <div style="display:flex; align-items:flex-end;">
-                        <button class="btn btn-gold" onclick="loadLicenses(1)">Filter</button>
+                    <div style="display:flex; align-items:flex-end; gap:8px;">
+                        <button class="btn btn-gold" onclick="loadLicenses(1)">&#8635; Refresh</button>
+                        <button class="btn btn-outline" onclick="exportCSV()" title="Export all licenses as CSV">&#8595; CSV</button>
+                        <button class="btn btn-outline" onclick="downloadBackup()" title="Download full database backup as JSON">&#128190; Backup</button>
                     </div>
                 </div>
 
-                <div class="table-wrap">
-                    <table>
+                <div class="table-wrap" style="overflow-x:auto;">
+                    <table id="browse-table" style="min-width:1100px;">
                         <thead>
                             <tr>
-                                <th>License Key</th>
-                                <th>Tier</th>
-                                <th>Status</th>
-                                <th>Activated</th>
-                                <th>Prompts</th>
-                                <th>Images</th>
-                                <th>Created</th>
+                                <th class="sortable" data-col="license_key" onclick="sortBy('license_key')">License Key <span class="sort-arrow" id="sort-license_key"></span></th>
+                                <th class="sortable" data-col="tier" onclick="sortBy('tier')">Tier <span class="sort-arrow" id="sort-tier"></span></th>
+                                <th class="sortable" data-col="is_activated" onclick="sortBy('is_activated')">Status <span class="sort-arrow" id="sort-is_activated"></span></th>
+                                <th class="sortable" data-col="shopify_order" onclick="sortBy('shopify_order')">Shopify Order <span class="sort-arrow" id="sort-shopify_order"></span></th>
+                                <th class="sortable" data-col="activated_at" onclick="sortBy('activated_at')">Activated <span class="sort-arrow" id="sort-activated_at"></span></th>
+                                <th class="sortable" data-col="prompt_count" onclick="sortBy('prompt_count')">Prompts <span class="sort-arrow" id="sort-prompt_count"></span></th>
+                                <th class="sortable" data-col="image_count" onclick="sortBy('image_count')">Images <span class="sort-arrow" id="sort-image_count"></span></th>
+                                <th class="sortable" data-col="created_at" onclick="sortBy('created_at')">Created <span class="sort-arrow" id="sort-created_at"></span></th>
                                 <th>Notes</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="licenses-tbody">
-                            <tr><td colspan="8" class="empty-state">Click Filter to load licenses</td></tr>
+                            <tr><td colspan="10" class="empty-state">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -1909,6 +1992,8 @@ let ADMIN_KEY = '';
 let currentPage = 1;
 let currentTotal = 0;
 let currentLimit = 50;
+let currentSortCol = 'created_at';
+let currentSortDir = 'desc';
 let confirmCallback = null;
 let lastLookupKey = '';
 
@@ -2379,51 +2464,219 @@ function quickCredit() {
 
 // ---- BROWSE LICENSES ----
 
+function sortBy(col) {
+    if (currentSortCol === col) {
+        currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortCol = col;
+        currentSortDir = 'asc';
+    }
+    loadLicenses(1);
+}
+
+function updateSortArrows() {
+    const cols = ['license_key','tier','is_activated','shopify_order','activated_at','prompt_count','image_count','created_at'];
+    cols.forEach(c => {
+        const el = document.getElementById('sort-' + c);
+        if (!el) return;
+        if (c === currentSortCol) {
+            el.textContent = currentSortDir === 'asc' ? ' \u2191' : ' \u2193';
+        } else {
+            el.textContent = '';
+        }
+    });
+}
+
 async function loadLicenses(page) {
     currentPage = page;
     const tier = document.getElementById('filter-tier').value;
     const activated = document.getElementById('filter-activated').value;
+    const search = (document.getElementById('browse-search') || {}).value || '';
     currentLimit = parseInt(document.getElementById('filter-limit').value);
 
-    let url = `/api/admin/licenses?page=${page}&limit=${currentLimit}`;
+    let url = `/api/admin/licenses?page=${page}&limit=${currentLimit}&sort=${currentSortCol}&dir=${currentSortDir}`;
     if (tier) url += `&tier=${tier}`;
     if (activated !== '') url += `&activated=${activated}`;
+    if (search.trim()) url += `&search=${encodeURIComponent(search.trim())}`;
 
     const tbody = document.getElementById('licenses-tbody');
-    tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><span class="spinner"></span> Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><span class="spinner"></span> Loading...</td></tr>';
+    updateSortArrows();
 
     try {
         const data = await apiGet(url);
         currentTotal = data.total;
 
         if (!data.licenses || data.licenses.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No licenses found matching filters</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No licenses found matching filters</td></tr>';
         } else {
-            tbody.innerHTML = data.licenses.map(l => `
+            tbody.innerHTML = data.licenses.map(l => {
+                const statusBadge = l.is_activated
+                    ? '<span class="status-badge status-active">Active</span>'
+                    : '<span class="status-badge status-inactive">Inactive</span>';
+                const prompts = `${l.prompt_count}${l.custom_prompt_limit !== null ? '<span style="color:var(--gold-muted);font-size:0.72rem;">/' + l.custom_prompt_limit + '</span>' : ''}`;
+                const images  = `${l.image_count}${l.custom_image_limit !== null ? '<span style="color:var(--gold-muted);font-size:0.72rem;">/' + l.custom_image_limit + '</span>' : ''}`;
+                const keyEsc = l.license_key.replace(/'/g, "\\'");
+                return `
                 <tr>
-                    <td class="key-cell" onclick="copyText('${l.license_key}')" style="cursor:pointer;" title="Click to copy">${l.license_key}</td>
+                    <td class="key-cell" onclick="copyText('${keyEsc}')" style="cursor:pointer;" title="Click to copy">${l.license_key}</td>
                     <td>${tierBadge(l.tier)}</td>
-                    <td>${l.is_activated ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
+                    <td>${statusBadge}</td>
+                    <td class="inline-edit-cell" id="so-cell-${l.id}">
+                        <span class="cell-display ${l.shopify_order ? '' : 'empty'}" onclick="startInlineEdit('so', ${l.id}, '${keyEsc}', this)">${l.shopify_order || '+ Add order #'}</span>
+                    </td>
                     <td style="font-size:0.78rem;">${formatDate(l.activated_at) || '-'}</td>
-                    <td>${l.prompt_count}${l.custom_prompt_limit !== null ? `<span style="color:var(--gold-muted);font-size:0.72rem;">/${l.custom_prompt_limit}</span>` : ''}</td>
-                    <td>${l.image_count}${l.custom_image_limit !== null ? `<span style="color:var(--gold-muted);font-size:0.72rem;">/${l.custom_image_limit}</span>` : ''}</td>
+                    <td>${prompts}</td>
+                    <td>${images}</td>
                     <td style="font-size:0.78rem;">${formatDate(l.created_at)}</td>
-                    <td style="color:var(--text-muted); font-size:0.78rem; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
-                </tr>
-            `).join('');
+                    <td class="inline-edit-cell" id="notes-cell-${l.id}">
+                        <span class="cell-display ${l.notes ? '' : 'empty'}" title="${(l.notes||'').replace(/"/g,'&quot;')}" onclick="startInlineEdit('notes', ${l.id}, '${keyEsc}', this)">${l.notes ? l.notes.substring(0,40) + (l.notes.length > 40 ? '...' : '') : '+ Add note'}</span>
+                    </td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-row-action lookup" onclick="jumpToLookup('${keyEsc}')" title="Look up this key">&#128269;</button>
+                        <button class="btn-row-action" onclick="quickRevoke('${keyEsc}')" title="Revoke this key">&#128683;</button>
+                    </td>
+                </tr>`;
+            }).join('');
         }
 
         const totalPages = Math.ceil(currentTotal / currentLimit);
-        document.getElementById('browse-info').textContent = `Showing ${((page-1)*currentLimit)+1}-${Math.min(page*currentLimit, currentTotal)} of ${currentTotal}`;
+        const startItem = currentTotal === 0 ? 0 : ((page-1)*currentLimit)+1;
+        document.getElementById('browse-info').textContent = `Showing ${startItem}-${Math.min(page*currentLimit, currentTotal)} of ${currentTotal}`;
         document.getElementById('prev-btn').disabled = page <= 1;
         document.getElementById('next-btn').disabled = page >= totalPages;
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="8" class="empty-state" style="color:var(--error);">Error: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="empty-state" style="color:var(--error);">Error: ${e.message}</td></tr>`;
     }
 }
 
 function changePage(dir) {
     loadLicenses(currentPage + dir);
+}
+
+// Inline edit: click a cell to edit Shopify order # or notes
+function startInlineEdit(field, rowId, licenseKey, spanEl) {
+    const cellEl = spanEl.parentElement;
+    const currentVal = field === 'notes'
+        ? spanEl.title
+        : (spanEl.classList.contains('empty') ? '' : spanEl.textContent);
+    const input = document.createElement('input');
+    input.className = 'cell-input';
+    input.value = currentVal === '+ Add order #' || currentVal === '+ Add note' ? '' : currentVal;
+    input.placeholder = field === 'notes' ? 'Customer name, notes...' : 'Shopify order #';
+    cellEl.innerHTML = '';
+    cellEl.appendChild(input);
+    input.focus();
+    input.select();
+
+    const save = async () => {
+        const newVal = input.value.trim();
+        const payload = { licenseKey };
+        if (field === 'notes') payload.notes = newVal;
+        else payload.shopifyOrder = newVal;
+        try {
+            await apiPost('/api/admin/update-row', payload);
+            showToast('Saved', 'success');
+            // Update cell display
+            const span = document.createElement('span');
+            span.className = 'cell-display' + (newVal ? '' : ' empty');
+            if (field === 'notes') {
+                span.title = newVal;
+                span.textContent = newVal ? (newVal.substring(0,40) + (newVal.length > 40 ? '...' : '')) : '+ Add note';
+            } else {
+                span.textContent = newVal || '+ Add order #';
+            }
+            span.onclick = () => startInlineEdit(field, rowId, licenseKey, span);
+            cellEl.innerHTML = '';
+            cellEl.appendChild(span);
+        } catch (err) {
+            showToast('Save failed: ' + err.message, 'error');
+            // Restore original
+            const span = document.createElement('span');
+            span.className = 'cell-display' + (currentVal ? '' : ' empty');
+            span.textContent = currentVal || (field === 'notes' ? '+ Add note' : '+ Add order #');
+            if (field === 'notes') span.title = currentVal;
+            span.onclick = () => startInlineEdit(field, rowId, licenseKey, span);
+            cellEl.innerHTML = '';
+            cellEl.appendChild(span);
+        }
+    };
+
+    input.addEventListener('blur', save);
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') {
+            // Cancel: restore original without saving
+            const span = document.createElement('span');
+            span.className = 'cell-display' + (currentVal ? '' : ' empty');
+            span.textContent = currentVal || (field === 'notes' ? '+ Add note' : '+ Add order #');
+            if (field === 'notes') span.title = currentVal;
+            span.onclick = () => startInlineEdit(field, rowId, licenseKey, span);
+            cellEl.innerHTML = '';
+            cellEl.appendChild(span);
+        }
+    });
+}
+
+// Quick revoke from Browse All row
+function quickRevoke(key) {
+    showConfirm(
+        'Revoke License Key',
+        `Revoke ${key}? The customer will need to re-activate on their next visit.`,
+        async () => {
+            try {
+                await apiPost('/api/admin/revoke', { licenseKey: key });
+                showToast('Key revoked: ' + key, 'success');
+                loadLicenses(currentPage);
+                loadStats();
+            } catch (e) {
+                showToast('Revoke failed: ' + e.message, 'error');
+            }
+        }
+    );
+}
+
+// Jump to Lookup panel with key pre-filled
+function jumpToLookup(key) {
+    switchPanel('lookup');
+    const inp = document.getElementById('lookup-key');
+    if (inp) { inp.value = key; }
+    lookupKey();
+}
+
+// Export CSV
+function exportCSV() {
+    const a = document.createElement('a');
+    a.href = `/api/admin/export-csv?adminKey=${encodeURIComponent(ADMIN_KEY)}`;
+    // We need to pass the admin key -- use fetch to get the file with auth header
+    fetch('/api/admin/export-csv', { headers: { 'x-admin-key': ADMIN_KEY } })
+        .then(r => r.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `offgrid-licenses-${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('CSV exported', 'success');
+        })
+        .catch(e => showToast('Export failed: ' + e.message, 'error'));
+}
+
+// Download full JSON backup
+function downloadBackup() {
+    fetch('/api/admin/backup', { headers: { 'x-admin-key': ADMIN_KEY } })
+        .then(r => r.blob())
+        .then(blob => {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `offgrid-db-backup-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup downloaded', 'success');
+        })
+        .catch(e => showToast('Backup failed: ' + e.message, 'error'));
 }
 
 // ---- REVOKE KEY ----

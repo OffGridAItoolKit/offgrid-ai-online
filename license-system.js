@@ -66,6 +66,10 @@ async function initializeDatabase() {
             EXCEPTION WHEN duplicate_column THEN NULL;
             END $$;
         `);
+        // Add shopify_order column if it doesn't exist (migration for existing databases)
+        await client.query(`
+            ALTER TABLE licenses ADD COLUMN IF NOT EXISTS shopify_order VARCHAR(50);
+        `);
 
         await client.query(`
             CREATE TABLE IF NOT EXISTS activation_log (
@@ -928,52 +932,52 @@ function registerLicenseRoutes(app, logToBetterStack) {
     // -------------------------------------------------------------------------
     app.get('/api/admin/licenses', requireAdmin, async (req, res) => {
         try {
-            const { tier, activated, page = 1, limit = 50 } = req.query;
-            
-            let query = 'SELECT * FROM licenses';
+            const { tier, activated, page = 1, limit = 50, sort = 'created_at', dir = 'desc', search = '' } = req.query;
+
+            // Whitelist sortable columns to prevent SQL injection
+            const ALLOWED_SORT = ['license_key','tier','is_activated','shopify_order','activated_at','prompt_count','image_count','created_at'];
+            const sortCol = ALLOWED_SORT.includes(sort) ? sort : 'created_at';
+            const sortDir = dir === 'asc' ? 'ASC' : 'DESC';
+
             const conditions = [];
             const params = [];
-            
+
             if (tier) {
                 params.push(parseInt(tier));
                 conditions.push(`tier = $${params.length}`);
             }
-            if (activated !== undefined) {
+            if (activated !== undefined && activated !== '') {
                 params.push(activated === 'true');
                 conditions.push(`is_activated = $${params.length}`);
             }
-            
-            if (conditions.length > 0) {
-                query += ' WHERE ' + conditions.join(' AND ');
+            if (search && search.trim()) {
+                const s = '%' + search.trim() + '%';
+                params.push(s);
+                conditions.push(`(license_key ILIKE $${params.length} OR COALESCE(shopify_order,'') ILIKE $${params.length} OR COALESCE(notes,'') ILIKE $${params.length} OR COALESCE(email,'') ILIKE $${params.length})`);
             }
-            
-            query += ' ORDER BY created_at DESC';
-            
+
+            let whereClause = conditions.length > 0 ? ' WHERE ' + conditions.join(' AND ') : '';
+
+            const countResult = await pool.query(`SELECT COUNT(*) FROM licenses${whereClause}`, params);
+            const total = parseInt(countResult.rows[0].count);
+
             const offset = (parseInt(page) - 1) * parseInt(limit);
             params.push(parseInt(limit));
-            query += ` LIMIT $${params.length}`;
             params.push(offset);
-            query += ` OFFSET $${params.length}`;
-            
+
+            const query = `SELECT * FROM licenses${whereClause} ORDER BY ${sortCol} ${sortDir} NULLS LAST LIMIT $${params.length - 1} OFFSET $${params.length}`;
             const result = await pool.query(query, params);
-            
-            // Get total count
-            let countQuery = 'SELECT COUNT(*) FROM licenses';
-            if (conditions.length > 0) {
-                countQuery += ' WHERE ' + conditions.join(' AND ');
-            }
-            const countResult = await pool.query(countQuery, params.slice(0, conditions.length));
-            
+
             res.json({
                 licenses: result.rows.map(row => ({
                     ...row,
                     tierName: TIER_LIMITS[row.tier]?.name
                 })),
-                total: parseInt(countResult.rows[0].count),
+                total,
                 page: parseInt(page),
                 limit: parseInt(limit)
             });
-            
+
         } catch (error) {
             console.error('[License System] List error:', error);
             res.status(500).json({ error: 'Failed to list licenses' });
@@ -1318,6 +1322,140 @@ function registerLicenseRoutes(app, logToBetterStack) {
         } catch (error) {
             console.error('[License System] Usage analytics error:', error);
             res.status(500).json({ error: 'Failed to retrieve usage analytics' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // POST /api/admin/update-row
+    // Inline update of notes and/or shopify_order for a single license row
+    // -------------------------------------------------------------------------
+    app.post('/api/admin/update-row', requireAdmin, async (req, res) => {
+        try {
+            const { licenseKey, notes, shopifyOrder } = req.body;
+            if (!licenseKey) {
+                return res.status(400).json({ error: 'licenseKey is required' });
+            }
+            const normalizedKey = licenseKey.trim().toUpperCase();
+
+            const updates = [];
+            const params = [];
+            let idx = 1;
+
+            if (notes !== undefined) {
+                updates.push(`notes = $${idx++}`);
+                params.push(notes);
+            }
+            if (shopifyOrder !== undefined) {
+                updates.push(`shopify_order = $${idx++}`);
+                params.push(shopifyOrder || null);
+            }
+            if (updates.length === 0) {
+                return res.status(400).json({ error: 'Nothing to update' });
+            }
+
+            params.push(normalizedKey);
+            const result = await pool.query(
+                `UPDATE licenses SET ${updates.join(', ')} WHERE license_key = $${idx} RETURNING license_key, notes, shopify_order`,
+                params
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'License key not found' });
+            }
+            await logActivationEvent(normalizedKey, 'admin.update_row',
+                `Row updated: ${updates.map((u, i) => u.split(' = ')[0] + '=' + JSON.stringify(params[i])).join(', ')}`);
+            res.json({ success: true, ...result.rows[0] });
+        } catch (error) {
+            console.error('[License System] Update-row error:', error);
+            res.status(500).json({ error: 'Update failed' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // GET /api/admin/export-csv
+    // Export all licenses as a CSV file download
+    // -------------------------------------------------------------------------
+    app.get('/api/admin/export-csv', requireAdmin, async (req, res) => {
+        try {
+            const result = await pool.query(`
+                SELECT license_key, tier, is_activated, shopify_order, email,
+                       prompt_count, image_count, custom_prompt_limit, custom_image_limit,
+                       activated_at, created_at, usage_reset_at, notes
+                FROM licenses
+                ORDER BY created_at DESC
+            `);
+
+            const headers = [
+                'license_key', 'tier', 'status', 'shopify_order', 'email',
+                'prompts_used', 'images_used', 'custom_prompt_limit', 'custom_image_limit',
+                'activated_at', 'created_at', 'usage_reset_at', 'notes'
+            ];
+
+            const escape = v => {
+                if (v === null || v === undefined) return '';
+                const s = String(v);
+                if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+                    return '"' + s.replace(/"/g, '""') + '"';
+                }
+                return s;
+            };
+
+            const rows = result.rows.map(r => [
+                r.license_key,
+                r.tier,
+                r.is_activated ? 'Active' : 'Inactive',
+                r.shopify_order || '',
+                r.email || '',
+                r.prompt_count,
+                r.image_count,
+                r.custom_prompt_limit || '',
+                r.custom_image_limit || '',
+                r.activated_at ? new Date(r.activated_at).toISOString().slice(0, 10) : '',
+                new Date(r.created_at).toISOString().slice(0, 10),
+                new Date(r.usage_reset_at).toISOString().slice(0, 10),
+                r.notes || ''
+            ].map(escape).join(','));
+
+            const csv = [headers.join(','), ...rows].join('\n');
+            const date = new Date().toISOString().slice(0, 10);
+
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', `attachment; filename="offgrid-licenses-${date}.csv"`);
+            res.send(csv);
+        } catch (error) {
+            console.error('[License System] Export CSV error:', error);
+            res.status(500).json({ error: 'Export failed' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // GET /api/admin/backup
+    // Export full database snapshot as JSON for manual backup
+    // -------------------------------------------------------------------------
+    app.get('/api/admin/backup', requireAdmin, async (req, res) => {
+        try {
+            const [licenses, log, history] = await Promise.all([
+                pool.query('SELECT * FROM licenses ORDER BY created_at DESC'),
+                pool.query('SELECT * FROM activation_log ORDER BY created_at DESC'),
+                pool.query('SELECT * FROM usage_history ORDER BY period DESC, license_key ASC')
+            ]);
+
+            const backup = {
+                exported_at: new Date().toISOString(),
+                version: '1.0',
+                tables: {
+                    licenses: { count: licenses.rows.length, rows: licenses.rows },
+                    activation_log: { count: log.rows.length, rows: log.rows },
+                    usage_history: { count: history.rows.length, rows: history.rows }
+                }
+            };
+
+            const date = new Date().toISOString().slice(0, 10);
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader('Content-Disposition', `attachment; filename="offgrid-db-backup-${date}.json"`);
+            res.json(backup);
+        } catch (error) {
+            console.error('[License System] Backup error:', error);
+            res.status(500).json({ error: 'Backup failed' });
         }
     });
 }
