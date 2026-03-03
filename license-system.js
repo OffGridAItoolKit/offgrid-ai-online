@@ -77,12 +77,32 @@ async function initializeDatabase() {
             );
         `);
 
+        // Usage history table: one row per key per month, written on each monthly reset
+        // Tracks historical usage for financial analysis without storing any conversation content
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS usage_history (
+                id SERIAL PRIMARY KEY,
+                license_key VARCHAR(19) NOT NULL,
+                tier INTEGER NOT NULL,
+                period VARCHAR(7) NOT NULL,
+                prompt_count INTEGER NOT NULL DEFAULT 0,
+                image_count INTEGER NOT NULL DEFAULT 0,
+                recorded_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+        `);
+
         // Create indexes for fast lookups
         await client.query(`
             CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
         `);
         await client.query(`
             CREATE INDEX IF NOT EXISTS idx_licenses_email ON licenses(email);
+        `);
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_usage_history_key ON usage_history(license_key);
+        `);
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_usage_history_period ON usage_history(period);
         `);
 
         console.log('[License System] Database tables initialized');
@@ -187,12 +207,31 @@ async function checkAndResetMonthlyUsage(licenseKey) {
     
     // Reset if we're in a different month than the last reset
     if (now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear()) {
+        const period = lastReset.toISOString().slice(0, 7); // e.g. '2026-02'
+
+        // Fetch current counts and tier before resetting so we can archive them
+        const licenseData = await pool.query(
+            'SELECT tier, prompt_count, image_count FROM licenses WHERE license_key = $1',
+            [licenseKey]
+        );
+
+        if (licenseData.rows.length > 0) {
+            const { tier, prompt_count, image_count } = licenseData.rows[0];
+            // Write historical record (upsert: if a record already exists for this period, update it)
+            await pool.query(
+                `INSERT INTO usage_history (license_key, tier, period, prompt_count, image_count)
+                 VALUES ($1, $2, $3, $4, $5)
+                 ON CONFLICT DO NOTHING`,
+                [licenseKey, tier, period, prompt_count, image_count]
+            );
+        }
+
         await pool.query(
             'UPDATE licenses SET prompt_count = 0, image_count = 0, usage_reset_at = NOW() WHERE license_key = $1',
             [licenseKey]
         );
-        
-        await logActivationEvent(licenseKey, 'usage.reset', `Monthly usage reset. Previous period: ${lastReset.toISOString().slice(0, 7)}`);
+
+        await logActivationEvent(licenseKey, 'usage.reset', `Monthly usage reset. Previous period: ${period}`);
         return true;
     }
     
@@ -1148,6 +1187,137 @@ function registerLicenseRoutes(app, logToBetterStack) {
         } catch (error) {
             console.error('[License System] Revoke error:', error);
             res.status(500).json({ error: 'Revoke failed' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // GET /api/admin/key-details?key=OGTK-XXXX-XXXX-XXXX
+    // Single-key lookup: returns license record + activation log + usage history
+    // -------------------------------------------------------------------------
+    app.get('/api/admin/key-details', requireAdmin, async (req, res) => {
+        try {
+            const { key } = req.query;
+            if (!key) {
+                return res.status(400).json({ error: 'key query parameter is required' });
+            }
+            const normalizedKey = key.trim().toUpperCase();
+
+            // License record
+            const licenseResult = await pool.query(
+                'SELECT * FROM licenses WHERE license_key = $1',
+                [normalizedKey]
+            );
+            if (licenseResult.rows.length === 0) {
+                return res.status(404).json({ error: 'License key not found' });
+            }
+            const license = licenseResult.rows[0];
+
+            // Activation log (most recent 50 events)
+            const logResult = await pool.query(
+                'SELECT event, details, created_at FROM activation_log WHERE license_key = $1 ORDER BY created_at DESC LIMIT 50',
+                [normalizedKey]
+            );
+
+            // Usage history (all months, oldest first)
+            const historyResult = await pool.query(
+                'SELECT period, tier, prompt_count, image_count, recorded_at FROM usage_history WHERE license_key = $1 ORDER BY period ASC',
+                [normalizedKey]
+            );
+
+            res.json({
+                license: { ...license, tierName: TIER_LIMITS[license.tier]?.name },
+                activationLog: logResult.rows,
+                usageHistory: historyResult.rows
+            });
+
+        } catch (error) {
+            console.error('[License System] Key details error:', error);
+            res.status(500).json({ error: 'Failed to retrieve key details' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
+    // GET /api/admin/usage-analytics
+    // System-wide usage analytics: per-month totals and per-key breakdown
+    // -------------------------------------------------------------------------
+    app.get('/api/admin/usage-analytics', requireAdmin, async (req, res) => {
+        try {
+            // Monthly totals across all keys (from usage_history)
+            const monthlyTotals = await pool.query(`
+                SELECT
+                    period,
+                    SUM(prompt_count) AS total_prompts,
+                    SUM(image_count) AS total_images,
+                    COUNT(DISTINCT license_key) AS active_keys
+                FROM usage_history
+                GROUP BY period
+                ORDER BY period ASC
+            `);
+
+            // Current month live stats (from licenses table)
+            const currentStats = await pool.query(`
+                SELECT
+                    SUM(prompt_count) AS total_prompts,
+                    SUM(image_count) AS total_images,
+                    COUNT(*) FILTER (WHERE prompt_count > 0 OR image_count > 0) AS active_keys,
+                    COUNT(*) FILTER (WHERE is_activated = TRUE) AS activated_keys,
+                    MAX(prompt_count) AS max_prompts_single_key,
+                    ROUND(AVG(prompt_count) FILTER (WHERE is_activated = TRUE), 1) AS avg_prompts_activated,
+                    COUNT(*) FILTER (WHERE is_activated = TRUE AND prompt_count::float / NULLIF(
+                        CASE WHEN custom_prompt_limit IS NOT NULL THEN custom_prompt_limit
+                             ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 ELSE 0 END)
+                        END, 0) >= 0.75) AS keys_at_75pct_or_more
+                FROM licenses
+            `);
+
+            // Top 10 heaviest users this month
+            const topUsers = await pool.query(`
+                SELECT license_key, tier, prompt_count, image_count, notes,
+                    custom_prompt_limit,
+                    CASE WHEN custom_prompt_limit IS NOT NULL THEN custom_prompt_limit
+                         ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 ELSE 0 END)
+                    END AS prompt_limit
+                FROM licenses
+                WHERE is_activated = TRUE
+                ORDER BY prompt_count DESC
+                LIMIT 10
+            `);
+
+            // Distribution buckets: 0%, 1-25%, 26-50%, 51-75%, 76-100%, over limit
+            const distribution = await pool.query(`
+                SELECT
+                    CASE
+                        WHEN prompt_limit = 0 THEN 'no_limit'
+                        WHEN prompt_count = 0 THEN 'unused'
+                        WHEN prompt_count::float / prompt_limit < 0.25 THEN '1_to_25pct'
+                        WHEN prompt_count::float / prompt_limit < 0.50 THEN '26_to_50pct'
+                        WHEN prompt_count::float / prompt_limit < 0.75 THEN '51_to_75pct'
+                        WHEN prompt_count::float / prompt_limit < 1.00 THEN '76_to_99pct'
+                        ELSE 'at_limit'
+                    END AS bucket,
+                    COUNT(*) AS key_count
+                FROM (
+                    SELECT prompt_count,
+                        CASE WHEN custom_prompt_limit IS NOT NULL THEN custom_prompt_limit
+                             ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 ELSE 0 END)
+                        END AS prompt_limit
+                    FROM licenses
+                    WHERE is_activated = TRUE
+                ) sub
+                GROUP BY bucket
+                ORDER BY bucket
+            `);
+
+            res.json({
+                monthlyTotals: monthlyTotals.rows,
+                currentMonth: currentStats.rows[0],
+                topUsers: topUsers.rows.map(r => ({ ...r, tierName: TIER_LIMITS[r.tier]?.name })),
+                distribution: distribution.rows
+            });
+
+        } catch (error) {
+            console.error('[License System] Usage analytics error:', error);
+            res.status(500).json({ error: 'Failed to retrieve usage analytics' });
         }
     });
 }

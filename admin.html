@@ -1042,6 +1042,9 @@
                 <button class="nav-btn active" data-panel="dashboard">
                     <span class="nav-icon">&#9783;</span> Dashboard
                 </button>
+                <button class="nav-btn" data-panel="analytics">
+                    <span class="nav-icon">&#128200;</span> Usage Analytics
+                </button>
             </div>
             <div class="sidebar-divider"></div>
             <div class="sidebar-section">
@@ -1164,6 +1167,10 @@
                     <button class="quick-action-btn" onclick="switchPanel('templates')">
                         <span class="qa-icon">&#128221;</span>
                         Templates
+                    </button>
+                    <button class="quick-action-btn" onclick="switchPanel('analytics')">
+                        <span class="qa-icon">&#128200;</span>
+                        Usage Analytics
                     </button>
                 </div>
 
@@ -1309,6 +1316,48 @@
                         </div>
                     </div>
                     <div class="lookup-grid" id="lookup-grid"></div>
+
+                    <!-- Usage History per key -->
+                    <div style="margin-top:20px;">
+                        <h3 style="font-size:0.85rem; font-weight:700; color:var(--gold-bright); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">&#128200; Monthly Usage History</h3>
+                        <div class="table-wrap">
+                            <table id="lookup-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Period</th>
+                                        <th>Tier</th>
+                                        <th>Prompts Used</th>
+                                        <th>Prompt Limit</th>
+                                        <th>% Used</th>
+                                        <th>Images Used</th>
+                                        <th>Image Limit</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lookup-history-tbody">
+                                    <tr><td colspan="7" class="empty-state">No historical data yet — recorded from next monthly reset</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Activation Log per key -->
+                    <div style="margin-top:20px;">
+                        <h3 style="font-size:0.85rem; font-weight:700; color:var(--gold-bright); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;">&#128221; Activation Log</h3>
+                        <div class="table-wrap">
+                            <table id="lookup-log-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Event</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lookup-log-tbody">
+                                    <tr><td colspan="3" class="empty-state">No events logged</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1728,6 +1777,108 @@ Is there anything specific about the experience that didn't work for you? Your f
                 </div>
             </div>
 
+            <!-- ===== USAGE ANALYTICS PANEL ===== -->
+            <div class="panel" id="panel-analytics">
+                <div class="panel-header">
+                    <h2>Usage Analytics</h2>
+                    <p>Financial intelligence: track usage patterns to protect the lifetime pricing model</p>
+                </div>
+
+                <div style="display:flex; gap:10px; margin-bottom:20px;">
+                    <button class="btn btn-gold" onclick="loadAnalytics()">&#8635; Refresh Analytics</button>
+                </div>
+
+                <!-- Current Month Summary -->
+                <div class="stats-grid" id="analytics-stats-grid" style="margin-bottom:24px;">
+                    <div class="stat-card gold">
+                        <div class="stat-label">Prompts This Month</div>
+                        <div class="stat-value" id="an-prompts">--</div>
+                        <div class="stat-sub">All activated keys</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-label">Images This Month</div>
+                        <div class="stat-value" id="an-images">--</div>
+                        <div class="stat-sub">All activated keys</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-label">Active Users</div>
+                        <div class="stat-value" id="an-active">--</div>
+                        <div class="stat-sub">Keys with any usage</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Avg Prompts / Key</div>
+                        <div class="stat-value" id="an-avg">--</div>
+                        <div class="stat-sub">Activated keys only</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Peak Single Key</div>
+                        <div class="stat-value" id="an-peak">--</div>
+                        <div class="stat-sub">Highest usage this month</div>
+                    </div>
+                    <div class="stat-card" style="border-color: var(--warning);">
+                        <div class="stat-label">Keys at 75%+</div>
+                        <div class="stat-value" id="an-heavy" style="color:var(--warning);">--</div>
+                        <div class="stat-sub">Heavy users to watch</div>
+                    </div>
+                </div>
+
+                <!-- Usage Distribution -->
+                <div class="form-card" style="margin-bottom:20px;">
+                    <h3>Usage Distribution (This Month)</h3>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:14px;">How activated keys are distributed across usage buckets based on % of their prompt limit consumed</p>
+                    <div id="analytics-distribution" style="display:flex; flex-direction:column; gap:8px;">
+                        <div class="empty-state">Click Refresh Analytics to load</div>
+                    </div>
+                </div>
+
+                <!-- Top 10 Heaviest Users -->
+                <div class="form-card" style="margin-bottom:20px;">
+                    <h3>Top 10 Heaviest Users This Month</h3>
+                    <div class="table-wrap">
+                        <table id="analytics-top-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>License Key</th>
+                                    <th>Tier</th>
+                                    <th>Prompts Used</th>
+                                    <th>Prompt Limit</th>
+                                    <th>% Used</th>
+                                    <th>Images Used</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analytics-top-tbody">
+                                <tr><td colspan="8" class="empty-state">Click Refresh Analytics to load</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Monthly History Chart (text-based) -->
+                <div class="form-card">
+                    <h3>Monthly Usage History (All Keys)</h3>
+                    <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:14px;">Historical totals recorded at each monthly reset. Data accumulates from this point forward.</p>
+                    <div class="table-wrap">
+                        <table id="analytics-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Total Prompts</th>
+                                    <th>Total Images</th>
+                                    <th>Active Keys</th>
+                                    <th>Avg Prompts/Key</th>
+                                </tr>
+                            </thead>
+                            <tbody id="analytics-history-tbody">
+                                <tr><td colspan="5" class="empty-state">No historical data yet — first record will appear after the next monthly reset (1st of next month)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
         </div><!-- /panel-area -->
     </div><!-- /main-content -->
 </div><!-- /app -->
@@ -1847,6 +1998,8 @@ function switchPanel(panelId) {
 
     // Auto-load browse panel
     if (panelId === 'browse') loadLicenses(1);
+    // Auto-load analytics panel
+    if (panelId === 'analytics') loadAnalytics();
 }
 
 // ---- API HELPERS ----
@@ -1926,6 +2079,114 @@ async function loadRecentActivated() {
     }
 }
 
+// ---- USAGE ANALYTICS ----
+
+async function loadAnalytics() {
+    // Update summary stat cards
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    setEl('an-prompts', '...');
+    setEl('an-images', '...');
+    setEl('an-active', '...');
+    setEl('an-avg', '...');
+    setEl('an-peak', '...');
+    setEl('an-heavy', '...');
+
+    try {
+        const data = await apiGet('/api/admin/usage-analytics');
+        const cm = data.currentMonth || {};
+
+        setEl('an-prompts', cm.total_prompts || 0);
+        setEl('an-images', cm.total_images || 0);
+        setEl('an-active', cm.active_keys || 0);
+        setEl('an-avg', cm.avg_prompts_activated || '0');
+        setEl('an-peak', cm.max_prompts_single_key || 0);
+        setEl('an-heavy', cm.keys_at_75pct_or_more || 0);
+
+        // Distribution bars
+        const distEl = document.getElementById('analytics-distribution');
+        const bucketLabels = {
+            'unused': 'Unused (0%)',
+            '1_to_25pct': 'Light use (1–25%)',
+            '26_to_50pct': 'Moderate use (26–50%)',
+            '51_to_75pct': 'Active use (51–75%)',
+            '76_to_99pct': 'Heavy use (76–99%)',
+            'at_limit': 'At limit (100%)',
+            'no_limit': 'No limit (Tier 1)'
+        };
+        const bucketColors = {
+            'unused': 'var(--text-muted)',
+            '1_to_25pct': 'var(--success)',
+            '26_to_50pct': 'var(--info)',
+            '51_to_75pct': 'var(--gold-bright)',
+            '76_to_99pct': 'var(--warning)',
+            'at_limit': 'var(--error)',
+            'no_limit': 'var(--text-muted)'
+        };
+        const dist = data.distribution || [];
+        const totalActivated = dist.reduce((s, d) => s + parseInt(d.key_count), 0) || 1;
+        if (dist.length === 0) {
+            distEl.innerHTML = '<div class="empty-state">No activated keys yet</div>';
+        } else {
+            distEl.innerHTML = dist.map(d => {
+                const pct = Math.round((parseInt(d.key_count) / totalActivated) * 100);
+                const label = bucketLabels[d.bucket] || d.bucket;
+                const color = bucketColors[d.bucket] || 'var(--text-secondary)';
+                return `<div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:160px; font-size:0.82rem; color:var(--text-secondary); flex-shrink:0;">${label}</div>
+                    <div style="flex:1; background:var(--bg-elevated); border-radius:4px; height:18px; overflow:hidden;">
+                        <div style="height:100%; width:${pct}%; background:${color}; border-radius:4px; transition:width 0.4s;"></div>
+                    </div>
+                    <div style="width:60px; text-align:right; font-size:0.82rem; font-weight:600; color:${color};">${d.key_count} key${d.key_count == 1 ? '' : 's'}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Top users table
+        const topTbody = document.getElementById('analytics-top-tbody');
+        const topUsers = data.topUsers || [];
+        if (topUsers.length === 0) {
+            topTbody.innerHTML = '<tr><td colspan="8" class="empty-state">No activated keys yet</td></tr>';
+        } else {
+            topTbody.innerHTML = topUsers.map((u, i) => {
+                const pct = u.prompt_limit > 0 ? Math.round((u.prompt_count / u.prompt_limit) * 100) : 0;
+                const pctColor = pct >= 75 ? 'var(--warning)' : pct >= 50 ? 'var(--gold-bright)' : 'var(--success)';
+                return `<tr>
+                    <td style="color:var(--text-muted); font-size:0.82rem;">${i + 1}</td>
+                    <td class="key-cell" onclick="copyText('${u.license_key}')" style="cursor:pointer;" title="Click to copy">${u.license_key}</td>
+                    <td>${tierBadge(u.tier)}</td>
+                    <td style="font-weight:600;">${u.prompt_count}</td>
+                    <td>${u.prompt_limit}</td>
+                    <td style="color:${pctColor}; font-weight:700;">${pct}%</td>
+                    <td>${u.image_count}</td>
+                    <td style="color:var(--text-muted); font-size:0.78rem; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${u.notes || ''}">${u.notes || '-'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        // Monthly history table
+        const histTbody = document.getElementById('analytics-history-tbody');
+        const history = data.monthlyTotals || [];
+        if (history.length === 0) {
+            histTbody.innerHTML = '<tr><td colspan="5" class="empty-state">No historical data yet — first record will appear after the next monthly reset</td></tr>';
+        } else {
+            histTbody.innerHTML = history.map(h => {
+                const avg = h.active_keys > 0 ? (parseInt(h.total_prompts) / parseInt(h.active_keys)).toFixed(1) : '0';
+                return `<tr>
+                    <td style="font-weight:600; color:var(--text-primary);">${h.period}</td>
+                    <td>${h.total_prompts}</td>
+                    <td>${h.total_images}</td>
+                    <td>${h.active_keys}</td>
+                    <td>${avg}</td>
+                </tr>`;
+            }).join('');
+        }
+
+    } catch (e) {
+        console.error('Analytics load failed:', e);
+        showToast('Analytics load failed: ' + e.message, 'error');
+    }
+}
+
 // ---- GENERATE KEYS ----
 
 async function generateKeys() {
@@ -1989,21 +2250,16 @@ async function lookupKey() {
     resultEl.classList.remove('visible');
 
     try {
-        // Use the licenses endpoint with a search - fetch all and filter client-side
-        // (The API doesn't have a direct single-key lookup, so we use the list endpoint)
-        const data = await apiGet(`/api/admin/licenses?limit=500&page=1`);
-        const license = data.licenses.find(l => l.license_key === key);
-
-        if (!license) {
-            showAlert(alertEl, 'error', `Key not found: ${key}. Check for typos - the key format is OGTK-XXXX-XXXX-XXXX.`);
-            return;
-        }
+        // Use the dedicated key-details endpoint which returns license + log + history
+        const data = await apiGet(`/api/admin/key-details?key=${encodeURIComponent(key)}`);
 
         lastLookupKey = key;
-        renderLookupResult(license);
+        renderLookupResult(data.license);
+        renderLookupHistory(data.usageHistory || []);
+        renderLookupLog(data.activationLog || []);
         resultEl.classList.add('visible');
     } catch (e) {
-        showAlert(alertEl, 'error', `Error: ${e.message}`);
+        showAlert(alertEl, 'error', `Key not found: ${key}. Check for typos — the key format is OGTK-XXXX-XXXX-XXXX.`);
     }
 }
 
@@ -2055,6 +2311,58 @@ function renderLookupResult(l) {
             <span class="lf-value" style="color:var(--text-secondary);">${l.notes || 'None'}</span>
         </div>
     `;
+}
+
+function renderLookupHistory(history) {
+    const tbody = document.getElementById('lookup-history-tbody');
+    if (!history || history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No historical data yet — recorded from next monthly reset</td></tr>';
+        return;
+    }
+    const tierLimits = { 2: { p: 150, i: 10 }, 3: { p: 400, i: 40 } };
+    tbody.innerHTML = history.map(h => {
+        const lim = tierLimits[h.tier] || { p: 0, i: 0 };
+        const pct = lim.p > 0 ? Math.round((h.prompt_count / lim.p) * 100) : 0;
+        const pctColor = pct >= 75 ? 'var(--warning)' : pct >= 50 ? 'var(--gold-bright)' : 'var(--success)';
+        return `<tr>
+            <td style="font-weight:600; color:var(--text-primary);">${h.period}</td>
+            <td>${tierBadge(h.tier)}</td>
+            <td>${h.prompt_count}</td>
+            <td>${lim.p}</td>
+            <td style="color:${pctColor}; font-weight:600;">${pct}%</td>
+            <td>${h.image_count}</td>
+            <td>${lim.i}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderLookupLog(log) {
+    const tbody = document.getElementById('lookup-log-tbody');
+    if (!log || log.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" class="empty-state">No events logged</td></tr>';
+        return;
+    }
+    const eventColors = {
+        'activate.success': 'var(--success)',
+        'admin.revoked': 'var(--error)',
+        'admin.credit_back': 'var(--info)',
+        'admin.update_limits': 'var(--gold-bright)',
+        'email.linked': 'var(--info)',
+        'usage.reset': 'var(--text-muted)',
+        'activate.duplicate': 'var(--warning)',
+        'activate.invalid': 'var(--error)'
+    };
+    tbody.innerHTML = log.map(e => {
+        const color = eventColors[e.event] || 'var(--text-secondary)';
+        const dt = new Date(e.created_at);
+        const dateStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+            + ' ' + dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        return `<tr>
+            <td style="font-size:0.78rem; white-space:nowrap;">${dateStr}</td>
+            <td><code style="font-size:0.78rem; color:${color}; background:var(--bg-elevated); padding:2px 6px; border-radius:4px;">${e.event}</code></td>
+            <td style="font-size:0.82rem; color:var(--text-secondary);">${e.details || '-'}</td>
+        </tr>`;
+    }).join('');
 }
 
 function quickRevoke() {
