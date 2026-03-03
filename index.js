@@ -1931,6 +1931,15 @@ app.get('/command', (req, res) => {
 });
 
 // =============================================================================
+// ROUTE: /admin - License Key Admin Dashboard
+// Password-protected via client-side admin key check against /api/admin/stats
+// =============================================================================
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// =============================================================================
 // DUAL-EXPERIENCE ROUTING
 // =============================================================================
 // /        = Prospect experience (free demo, sales messaging, CTAs)

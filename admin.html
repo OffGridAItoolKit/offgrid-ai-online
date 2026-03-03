@@ -1,0 +1,2367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffGrid AI - License Admin</title>
+    <link rel="icon" type="image/png" href="compasstilted.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* =============================================
+           OFFGRID AI - LICENSE ADMIN DASHBOARD
+           Dark gold theme matching Command Center
+           ============================================= */
+        :root {
+            --bg-deep:        #0F1419;
+            --bg-surface:     #1A2028;
+            --bg-elevated:    #242C38;
+            --bg-input:       #1E2730;
+            --border-subtle:  #2E3844;
+            --border-emphasis:#3A4654;
+            --gold-primary:   #C9A84C;
+            --gold-muted:     #A08A3E;
+            --gold-glow:      rgba(201, 168, 76, 0.12);
+            --gold-bright:    #E2C86A;
+            --text-primary:   #E8ECF1;
+            --text-secondary: #9BA3AE;
+            --text-muted:     #6B7685;
+            --success:        #34D399;
+            --warning:        #FBBF24;
+            --error:          #FB7185;
+            --info:           #38BDF8;
+            --font-sans:      'Geist', system-ui, sans-serif;
+            --font-mono:      'Geist Mono', 'SF Mono', monospace;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ---- LOGIN SCREEN ---- */
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-deep);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .login-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 52px;
+            height: 52px;
+            margin: 0 auto 20px;
+        }
+
+        .login-card h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+
+        .login-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .login-input-wrap {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .login-input-wrap input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s;
+            letter-spacing: 0.05em;
+        }
+
+        .login-input-wrap input:focus {
+            border-color: var(--gold-primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: var(--gold-primary);
+            color: #0F1419;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.02em;
+        }
+
+        .login-btn:hover { background: var(--gold-bright); }
+        .login-btn:active { transform: scale(0.98); }
+
+        .login-error {
+            margin-top: 14px;
+            font-size: 0.82rem;
+            color: var(--error);
+            display: none;
+        }
+
+        /* ---- MAIN APP LAYOUT ---- */
+        #app {
+            display: none;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ---- TOP BAR ---- */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            height: 56px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-logo {
+            width: 28px;
+            height: 28px;
+            opacity: 0.9;
+        }
+
+        .topbar-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--gold-primary);
+            letter-spacing: -0.01em;
+        }
+
+        .topbar-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            background: var(--gold-glow);
+            border: 1px solid var(--gold-muted);
+            color: var(--gold-primary);
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-pill .stat-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .stat-pill strong { color: var(--text-primary); }
+
+        .topbar-logout {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            transition: color 0.2s, border-color 0.2s;
+        }
+
+        .topbar-logout:hover { color: var(--error); border-color: var(--error); }
+
+        /* ---- MAIN CONTENT AREA ---- */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* ---- SIDEBAR ---- */
+        .sidebar {
+            width: 220px;
+            background: var(--bg-surface);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .sidebar-section {
+            padding: 0 12px;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0 8px;
+            margin-bottom: 4px;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 0.84rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .nav-btn.active {
+            background: var(--gold-glow);
+            color: var(--gold-primary);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+        }
+
+        .nav-btn .nav-icon {
+            font-size: 1rem;
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 8px 12px;
+        }
+
+        /* ---- PANEL AREA ---- */
+        .panel-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-emphasis) transparent;
+        }
+
+        .panel { display: none; }
+        .panel.active { display: block; }
+
+        /* ---- PANEL HEADERS ---- */
+        .panel-header {
+            margin-bottom: 24px;
+        }
+
+        .panel-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .panel-header p {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+        }
+
+        /* ---- STATS GRID ---- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 18px 20px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        .stat-card .stat-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-card.gold .stat-value { color: var(--gold-primary); }
+        .stat-card.green .stat-value { color: var(--success); }
+        .stat-card.blue .stat-value { color: var(--info); }
+
+        /* ---- FORM CARDS ---- */
+        .form-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .form-card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-family: var(--font-sans);
+            font-size: 0.88rem;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--gold-primary);
+        }
+
+        .form-group select option {
+            background: var(--bg-elevated);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+            font-family: var(--font-sans);
+        }
+
+        .form-group input[type="number"] {
+            font-family: var(--font-mono);
+        }
+
+        .form-group input.key-input {
+            font-family: var(--font-mono);
+            letter-spacing: 0.05em;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* ---- BUTTONS ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-family: var(--font-sans);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn:active { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-gold {
+            background: var(--gold-primary);
+            color: #0F1419;
+        }
+        .btn-gold:hover:not(:disabled) { background: var(--gold-bright); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-emphasis);
+            color: var(--text-secondary);
+        }
+        .btn-outline:hover:not(:disabled) {
+            border-color: var(--gold-muted);
+            color: var(--text-primary);
+        }
+
+        .btn-danger {
+            background: rgba(251, 113, 133, 0.12);
+            border: 1px solid rgba(251, 113, 133, 0.3);
+            color: var(--error);
+        }
+        .btn-danger:hover:not(:disabled) {
+            background: rgba(251, 113, 133, 0.2);
+        }
+
+        .btn-success {
+            background: rgba(52, 211, 153, 0.12);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            color: var(--success);
+        }
+        .btn-success:hover:not(:disabled) {
+            background: rgba(52, 211, 153, 0.2);
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.78rem;
+        }
+
+        /* ---- RESULT BOX ---- */
+        .result-box {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-break: break-all;
+            display: none;
+            position: relative;
+        }
+
+        .result-box.visible { display: block; }
+
+        .result-box.success { border-color: rgba(52, 211, 153, 0.3); }
+        .result-box.error { border-color: rgba(251, 113, 133, 0.3); color: var(--error); }
+        .result-box.info { border-color: rgba(56, 189, 248, 0.3); }
+
+        .result-copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: var(--font-sans);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .result-copy-btn:hover { color: var(--gold-primary); }
+
+        /* ---- KEYS DISPLAY ---- */
+        .keys-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .key-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-deep);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .key-item .key-text {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--gold-bright);
+            letter-spacing: 0.05em;
+        }
+
+        .key-item .key-copy {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-subtle);
+            transition: color 0.2s;
+        }
+        .key-item .key-copy:hover { color: var(--gold-primary); }
+
+        /* ---- LICENSES TABLE ---- */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        thead th {
+            background: var(--bg-elevated);
+            padding: 11px 14px;
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.1s;
+        }
+
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: var(--bg-elevated); }
+
+        tbody td {
+            padding: 11px 14px;
+            color: var(--text-secondary);
+            vertical-align: middle;
+        }
+
+        tbody td.key-cell {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-active { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+        .badge-inactive { background: rgba(107, 118, 133, 0.15); color: var(--text-muted); }
+        .badge-t2 { background: rgba(56, 189, 248, 0.12); color: var(--info); }
+        .badge-t3 { background: rgba(201, 168, 76, 0.12); color: var(--gold-primary); }
+        .badge-t1 { background: rgba(107, 118, 133, 0.12); color: var(--text-muted); }
+
+        /* ---- PAGINATION ---- */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 16px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .pagination-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ---- FILTER BAR ---- */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .filter-bar .form-group {
+            min-width: 120px;
+            max-width: 200px;
+        }
+
+        /* ---- LOOKUP RESULT ---- */
+        .lookup-result {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .lookup-result.visible { display: block; }
+
+        .lookup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 14px;
+            margin-top: 14px;
+        }
+
+        .lookup-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .lookup-field .lf-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .lookup-field .lf-value {
+            font-size: 0.88rem;
+            color: var(--text-primary);
+        }
+
+        .lookup-field .lf-value.mono {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--gold-bright);
+        }
+
+        /* ---- TEMPLATES PANEL ---- */
+        .template-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .template-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .template-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border-subtle);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .template-header h4 {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .template-header .toggle-icon {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: transform 0.2s;
+        }
+
+        .template-header.open .toggle-icon { transform: rotate(180deg); }
+
+        .template-body {
+            padding: 16px 18px;
+            display: none;
+        }
+
+        .template-body.open { display: block; }
+
+        .template-text {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            margin-bottom: 10px;
+        }
+
+        /* ---- TOAST NOTIFICATIONS ---- */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 9999;
+        }
+
+        .toast {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 12px 18px;
+            font-size: 0.84rem;
+            color: var(--text-primary);
+            max-width: 340px;
+            animation: slideIn 0.25s ease;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .toast.success { border-color: rgba(52, 211, 153, 0.4); }
+        .toast.error { border-color: rgba(251, 113, 133, 0.4); color: var(--error); }
+        .toast.info { border-color: rgba(56, 189, 248, 0.3); }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* ---- LOADING SPINNER ---- */
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(201, 168, 76, 0.3);
+            border-top-color: var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ---- CONFIRM DIALOG ---- */
+        #confirm-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        #confirm-overlay.visible { display: flex; }
+
+        .confirm-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-emphasis);
+            border-radius: 14px;
+            padding: 28px 32px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .confirm-card h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .confirm-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 22px;
+            line-height: 1.5;
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* ---- SCROLLBAR STYLING ---- */
+        .panel-area::-webkit-scrollbar { width: 6px; }
+        .panel-area::-webkit-scrollbar-track { background: transparent; }
+        .panel-area::-webkit-scrollbar-thumb { background: var(--border-emphasis); border-radius: 3px; }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border-subtle); border-radius: 2px; }
+
+        /* ---- RESPONSIVE ---- */
+        @media (max-width: 768px) {
+            .sidebar { width: 180px; }
+            .topbar { padding: 0 14px; }
+            .stat-pill { display: none; }
+            .panel-area { padding: 16px; }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar { display: none; }
+            body { overflow: auto; }
+            #app { height: auto; }
+            .main-content { flex-direction: column; }
+            .panel-area { overflow: visible; }
+        }
+
+        /* ---- NOTES FIELD FULL WIDTH ---- */
+        .form-group.full { flex: 100%; min-width: 100%; }
+
+        /* ---- CHECKBOX ---- */
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .checkbox-row input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--gold-primary);
+            cursor: pointer;
+        }
+
+        .checkbox-row label {
+            font-size: 0.84rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        /* ---- SECTION DIVIDER ---- */
+        .section-divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 24px 0;
+        }
+
+        /* ---- QUICK ACTIONS ---- */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .quick-action-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 14px 18px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+            font-family: var(--font-sans);
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--gold-muted);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .quick-action-btn .qa-icon { font-size: 1.3rem; }
+
+        /* ---- EMPTY STATE ---- */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* ---- INLINE ALERT ---- */
+        .inline-alert {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .inline-alert.visible { display: block; }
+        .inline-alert.success { background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.3); color: var(--success); }
+        .inline-alert.error { background: rgba(251,113,133,0.1); border: 1px solid rgba(251,113,133,0.3); color: var(--error); }
+        .inline-alert.warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); color: var(--warning); }
+    </style>
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="login-screen">
+    <div class="login-card">
+        <img src="compasstilted.png" alt="OffGrid AI" class="login-logo">
+        <h1>License Admin</h1>
+        <p>OffGrid AI Command Center - Admin Access</p>
+        <div class="login-input-wrap">
+            <input type="password" id="admin-key-input" placeholder="Enter admin key" autocomplete="off" />
+        </div>
+        <button class="login-btn" id="login-btn">Access Dashboard</button>
+        <div class="login-error" id="login-error">Incorrect admin key. Please try again.</div>
+    </div>
+</div>
+
+<!-- ===================== MAIN APP ===================== -->
+<div id="app">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img src="compasstilted.png" alt="OffGrid AI" class="topbar-logo">
+            <span class="topbar-title">OffGrid AI</span>
+            <span class="topbar-badge">License Admin</span>
+        </div>
+        <div class="topbar-right">
+            <div class="stat-pill">
+                <span class="stat-dot"></span>
+                <span>Total Keys: <strong id="stat-total">--</strong></span>
+            </div>
+            <div class="stat-pill">
+                <span>Active: <strong id="stat-active">--</strong></span>
+            </div>
+            <div class="stat-pill">
+                <span>Prompts Used: <strong id="stat-prompts">--</strong></span>
+            </div>
+            <span class="topbar-logout" id="logout-btn">Logout</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-label">Overview</div>
+                <button class="nav-btn active" data-panel="dashboard">
+                    <span class="nav-icon">&#9783;</span> Dashboard
+                </button>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Keys</div>
+                <button class="nav-btn" data-panel="generate">
+                    <span class="nav-icon">&#43;</span> Generate Keys
+                </button>
+                <button class="nav-btn" data-panel="lookup">
+                    <span class="nav-icon">&#128269;</span> Lookup Key
+                </button>
+                <button class="nav-btn" data-panel="browse">
+                    <span class="nav-icon">&#9776;</span> Browse All
+                </button>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Management</div>
+                <button class="nav-btn" data-panel="revoke">
+                    <span class="nav-icon">&#128683;</span> Revoke Key
+                </button>
+                <button class="nav-btn" data-panel="credit">
+                    <span class="nav-icon">&#43;&#9711;</span> Credit Back
+                </button>
+                <button class="nav-btn" data-panel="limits">
+                    <span class="nav-icon">&#9881;</span> Set Limits
+                </button>
+            </div>
+            <div class="sidebar-divider"></div>
+            <div class="sidebar-section">
+                <div class="sidebar-label">Support</div>
+                <button class="nav-btn" data-panel="templates">
+                    <span class="nav-icon">&#128221;</span> Response Templates
+                </button>
+                <button class="nav-btn" data-panel="reference">
+                    <span class="nav-icon">&#128218;</span> Quick Reference
+                </button>
+            </div>
+        </nav>
+
+        <!-- PANEL AREA -->
+        <div class="panel-area">
+
+            <!-- ===== DASHBOARD PANEL ===== -->
+            <div class="panel active" id="panel-dashboard">
+                <div class="panel-header">
+                    <h2>Dashboard</h2>
+                    <p>Live overview of the OffGrid AI license system</p>
+                </div>
+
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card gold">
+                        <div class="stat-label">Total Keys</div>
+                        <div class="stat-value" id="ds-total">--</div>
+                        <div class="stat-sub">All tiers</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-label">Activated</div>
+                        <div class="stat-value" id="ds-activated">--</div>
+                        <div class="stat-sub">In use</div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-label">Tier 2 Keys</div>
+                        <div class="stat-value" id="ds-t2">--</div>
+                        <div class="stat-sub">Command Center ($199)</div>
+                    </div>
+                    <div class="stat-card gold">
+                        <div class="stat-label">Tier 3 Keys</div>
+                        <div class="stat-value" id="ds-t3">--</div>
+                        <div class="stat-sub">Command Center Pro ($469)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Prompts Used</div>
+                        <div class="stat-value" id="ds-prompts">--</div>
+                        <div class="stat-sub">This month (all keys)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Images Used</div>
+                        <div class="stat-value" id="ds-images">--</div>
+                        <div class="stat-sub">This month (all keys)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Email Linked</div>
+                        <div class="stat-value" id="ds-email">--</div>
+                        <div class="stat-sub">Keys with email on file</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Unactivated</div>
+                        <div class="stat-value" id="ds-unactivated">--</div>
+                        <div class="stat-sub">Ready to ship</div>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="panel-header" style="margin-bottom:16px;">
+                    <h2>Quick Actions</h2>
+                </div>
+
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="switchPanel('generate')">
+                        <span class="qa-icon">&#43;</span>
+                        Generate Keys
+                    </button>
+                    <button class="quick-action-btn" onclick="switchPanel('lookup')">
+                        <span class="qa-icon">&#128269;</span>
+                        Lookup Key
+                    </button>
+                    <button class="quick-action-btn" onclick="switchPanel('revoke')">
+                        <span class="qa-icon">&#128683;</span>
+                        Revoke Key
+                    </button>
+                    <button class="quick-action-btn" onclick="switchPanel('credit')">
+                        <span class="qa-icon">&#43;&#9711;</span>
+                        Credit Back
+                    </button>
+                    <button class="quick-action-btn" onclick="switchPanel('browse')">
+                        <span class="qa-icon">&#9776;</span>
+                        Browse All
+                    </button>
+                    <button class="quick-action-btn" onclick="switchPanel('templates')">
+                        <span class="qa-icon">&#128221;</span>
+                        Templates
+                    </button>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <div class="panel-header" style="margin-bottom:16px;">
+                    <h2>Recently Activated</h2>
+                </div>
+                <div class="table-wrap">
+                    <table id="recent-table">
+                        <thead>
+                            <tr>
+                                <th>License Key</th>
+                                <th>Tier</th>
+                                <th>Activated</th>
+                                <th>Prompts</th>
+                                <th>Images</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-tbody">
+                            <tr><td colspan="6" class="empty-state">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== GENERATE KEYS PANEL ===== -->
+            <div class="panel" id="panel-generate">
+                <div class="panel-header">
+                    <h2>Generate Keys</h2>
+                    <p>Create new license keys for Shopify orders, promotions, or scholarship accounts</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>New Key Batch</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Count (1-100)</label>
+                            <input type="number" id="gen-count" value="1" min="1" max="100" />
+                        </div>
+                        <div class="form-group">
+                            <label>Tier</label>
+                            <select id="gen-tier">
+                                <option value="2" selected>Tier 2 - Command Center ($199)</option>
+                                <option value="3">Tier 3 - Command Center Pro ($469)</option>
+                                <option value="1">Tier 1 - ToolKit Only ($129)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label>Notes (optional - highly recommended)</label>
+                            <input type="text" id="gen-notes" placeholder="e.g. Shopify order #1234, Batch March 2026" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-gold" id="gen-btn" onclick="generateKeys()">
+                            <span>Generate Keys</span>
+                        </button>
+                    </div>
+
+                    <div class="inline-alert" id="gen-alert"></div>
+
+                    <div class="result-box" id="gen-result">
+                        <button class="result-copy-btn" onclick="copyResult('gen-result')">Copy All</button>
+                        <div class="keys-list" id="gen-keys-list"></div>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Tier Reference</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tier</th>
+                                    <th>Product</th>
+                                    <th>Price</th>
+                                    <th>Monthly Prompts</th>
+                                    <th>Monthly Images</th>
+                                    <th>Command Center</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-t1">Tier 1</span></td>
+                                    <td>OffGrid AI ToolKit</td>
+                                    <td>$129</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                    <td style="color:var(--error)">No</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-t2">Tier 2</span></td>
+                                    <td>ToolKit + Command Center</td>
+                                    <td>$199</td>
+                                    <td>150</td>
+                                    <td>10</td>
+                                    <td style="color:var(--success)">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-t3">Tier 3</span></td>
+                                    <td>ToolKit + Command Center Pro</td>
+                                    <td>$469</td>
+                                    <td>400</td>
+                                    <td>40</td>
+                                    <td style="color:var(--success)">Yes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== LOOKUP KEY PANEL ===== -->
+            <div class="panel" id="panel-lookup">
+                <div class="panel-header">
+                    <h2>Lookup Key</h2>
+                    <p>Find full details for a specific license key</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Search by License Key</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:2; min-width:200px;">
+                            <label>License Key</label>
+                            <input type="text" id="lookup-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-gold" onclick="lookupKey()">Look Up</button>
+                    </div>
+                    <div class="inline-alert" id="lookup-alert"></div>
+                </div>
+
+                <div class="lookup-result" id="lookup-result">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                        <h3 style="font-size:0.9rem; font-weight:700; color:var(--text-primary);">Key Details</h3>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-sm btn-outline" onclick="quickRevoke()">Revoke</button>
+                            <button class="btn btn-sm btn-success" onclick="quickCredit()">Credit Back</button>
+                        </div>
+                    </div>
+                    <div class="lookup-grid" id="lookup-grid"></div>
+                </div>
+            </div>
+
+            <!-- ===== BROWSE ALL PANEL ===== -->
+            <div class="panel" id="panel-browse">
+                <div class="panel-header">
+                    <h2>Browse All Licenses</h2>
+                    <p>View and filter all license keys in the system</p>
+                </div>
+
+                <div class="filter-bar">
+                    <div class="form-group">
+                        <label>Tier</label>
+                        <select id="filter-tier">
+                            <option value="">All Tiers</option>
+                            <option value="1">Tier 1</option>
+                            <option value="2">Tier 2</option>
+                            <option value="3">Tier 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="filter-activated">
+                            <option value="">All</option>
+                            <option value="true">Activated</option>
+                            <option value="false">Not Activated</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Per Page</label>
+                        <select id="filter-limit">
+                            <option value="25">25</option>
+                            <option value="50" selected>50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </div>
+                    <div style="display:flex; align-items:flex-end;">
+                        <button class="btn btn-gold" onclick="loadLicenses(1)">Filter</button>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>License Key</th>
+                                <th>Tier</th>
+                                <th>Status</th>
+                                <th>Activated</th>
+                                <th>Prompts</th>
+                                <th>Images</th>
+                                <th>Created</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="licenses-tbody">
+                            <tr><td colspan="8" class="empty-state">Click Filter to load licenses</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination">
+                    <span id="browse-info">--</span>
+                    <div class="pagination-btns">
+                        <button class="btn btn-outline btn-sm" id="prev-btn" onclick="changePage(-1)" disabled>Previous</button>
+                        <button class="btn btn-outline btn-sm" id="next-btn" onclick="changePage(1)" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== REVOKE KEY PANEL ===== -->
+            <div class="panel" id="panel-revoke">
+                <div class="panel-header">
+                    <h2>Revoke Key</h2>
+                    <p>Deactivate a license so the customer can re-activate on a new device</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Revoke License</h3>
+                    <div class="inline-alert warning visible" style="margin-bottom:16px;">
+                        Revoking a key deactivates it immediately. The customer will need to re-enter their key to re-activate. Use this when a customer switches devices or clears their browser data.
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:2; min-width:200px;">
+                            <label>License Key</label>
+                            <input type="text" id="revoke-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-danger" onclick="confirmRevoke()">Revoke Key</button>
+                    </div>
+                    <div class="inline-alert" id="revoke-alert"></div>
+                </div>
+
+                <div class="form-card">
+                    <h3>When to Revoke</h3>
+                    <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.7;">
+                        <p style="margin-bottom:8px;"><strong style="color:var(--success)">Always revoke for:</strong> Customer cleared browser data, switching to a new device, token expired after 1 year.</p>
+                        <p style="margin-bottom:8px;"><strong style="color:var(--warning)">Use judgment for:</strong> Repeated device-switch requests from the same customer (possible key sharing).</p>
+                        <p><strong style="color:var(--error)">Escalate to owner:</strong> Suspected key sharing or piracy.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== CREDIT BACK PANEL ===== -->
+            <div class="panel" id="panel-credit">
+                <div class="panel-header">
+                    <h2>Credit Back</h2>
+                    <p>Restore prompts or images for customers who experienced errors or failed generations</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Credit Back Usage</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:2; min-width:200px;">
+                            <label>License Key</label>
+                            <input type="text" id="credit-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                        </div>
+                        <div class="form-group">
+                            <label>Type</label>
+                            <select id="credit-type">
+                                <option value="prompt">Prompts</option>
+                                <option value="image">Images</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Count (1-100)</label>
+                            <input type="number" id="credit-count" value="1" min="1" max="100" />
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-success" onclick="creditBack()">Credit Back</button>
+                    </div>
+                    <div class="inline-alert" id="credit-alert"></div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Policy</h3>
+                    <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.7;">
+                        <p style="margin-bottom:8px;"><strong style="color:var(--success)">Always grant for:</strong> Genuine technical errors, failed generations, server downtime that consumed credits.</p>
+                        <p style="margin-bottom:8px;"><strong style="color:var(--warning)">Use judgment for:</strong> Requests for significantly more credits than the tier allows (offer upgrade first).</p>
+                        <p style="font-style:italic; color:var(--gold-muted);">"We will always make exceptions. That just won't be the rule."</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SET LIMITS PANEL ===== -->
+            <div class="panel" id="panel-limits">
+                <div class="panel-header">
+                    <h2>Set Custom Limits</h2>
+                    <p>Override tier defaults for VIP customers, promotions, or scholarship accounts</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Update Limits</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:2; min-width:200px;">
+                            <label>License Key</label>
+                            <input type="text" id="limits-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Monthly Prompts (leave blank to keep current)</label>
+                            <input type="number" id="limits-prompts" placeholder="e.g. 300" min="0" max="10000" />
+                        </div>
+                        <div class="form-group">
+                            <label>Monthly Images (leave blank to keep current)</label>
+                            <input type="number" id="limits-images" placeholder="e.g. 20" min="0" max="1000" />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label>Notes</label>
+                            <input type="text" id="limits-notes" placeholder="e.g. VIP customer - upgraded limits per support ticket" />
+                        </div>
+                    </div>
+                    <div class="checkbox-row" style="margin-bottom:4px;">
+                        <input type="checkbox" id="limits-reset" />
+                        <label for="limits-reset">Also reset current usage counters to zero</label>
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-gold" onclick="setLimits()">Update Limits</button>
+                    </div>
+                    <div class="inline-alert" id="limits-alert"></div>
+                    <div class="result-box" id="limits-result"></div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Important Notes</h3>
+                    <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.7;">
+                        <p style="margin-bottom:8px;">Custom limits <strong style="color:var(--warning)">permanently override</strong> tier defaults for that key. To revert to tier defaults, the custom fields must be cleared via direct SQL.</p>
+                        <p>Always add a note explaining why custom limits were set. This creates an audit trail for future reference.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== RESPONSE TEMPLATES PANEL ===== -->
+            <div class="panel" id="panel-templates">
+                <div class="panel-header">
+                    <h2>Customer Response Templates</h2>
+                    <p>Copy and adapt these templates for common customer support scenarios</p>
+                </div>
+
+                <div class="template-list">
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Already Activated - Browser Cleared / Same Device</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+Thanks for reaching out! It looks like your license key was already activated, and your browser data was cleared, which removed the saved session.
+
+I've reset your key so you can activate it again. Please visit offgridtoolkit.ai/command and enter your key as before. It should work right away.
+
+Tip: Avoid clearing your browser data for offgridtoolkit.ai to keep your session active. If you ever need to clear your browser data, just know you can always reach out and we'll reset your key.
+
+Let me know if you run into any issues!</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Already Activated - New Device</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+Thanks for reaching out! Your license key can currently be active on one device at a time. Since you'd like to use it on your new [computer/phone], I've reset your key so you can activate it there.
+
+Please visit offgridtoolkit.ai/command on your new device and enter your key. Note that your previous device will no longer have access.
+
+We're working on a multi-device login feature that will make this easier in the future. For now, just let us know whenever you need to switch devices and we'll take care of it right away.</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Monthly Limit Reached</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+You've used all [150/10] of your monthly [prompts/images] - which means you're getting great use out of the Command Center!
+
+Your usage resets automatically on [date]. In the meantime, here are your options:
+
+1. Wait for the reset - your full allocation will be available again on [date]
+2. Upgrade to Command Center Pro - get 400 monthly prompts and 40 images for $469 at [link]
+
+If you experienced any errors or failed generations that used up credits unfairly, let me know and I'll credit those back for you.</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Key Not Found</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+I wasn't able to find that license key in our system. This usually happens when there's a small typo - the keys can be tricky to read.
+
+Could you double-check the key on your card? It should be in the format OGTK-XXXX-XXXX-XXXX. If you can send me a photo of the card, I'll look it up for you.
+
+If you purchased the $129 OffGrid AI ToolKit (without Command Center), that version doesn't include a Command Center license key. You can upgrade to the Command Center version at [link].</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Lost Key</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+No worries - I can help you recover your license key. To verify your identity, could you provide one of the following?
+
+- Your order confirmation email
+- Your Shopify order number
+- The email address you used to purchase
+
+Once I verify your purchase, I'll send you your key right away.</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Upgrade Coupon (via /try-command)</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+Welcome to the Command Center! Since you already own the OffGrid AI ToolKit, your upgrade price is just $99 with coupon code 99$cmdUpgrade.
+
+Here's how to upgrade:
+1. Visit [Shopify Command Center product page]
+2. Add the Command Center to your cart
+3. Enter coupon code 99$cmdUpgrade at checkout
+4. Your new license key will be included with your order
+
+You get to keep your current ToolKit drive, and you'll have full access to all four AI models, Command Mode, and Image Studio.</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Refund Request</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+I'm sorry to hear the Command Center didn't meet your expectations. I've processed your refund through Shopify - you should see it back on your payment method within 5-10 business days.
+
+Your license key has been deactivated. If you change your mind in the future, we'd love to have you back.
+
+Is there anything specific about the experience that didn't work for you? Your feedback helps us improve.</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ===== QUICK REFERENCE PANEL ===== -->
+            <div class="panel" id="panel-reference">
+                <div class="panel-header">
+                    <h2>Quick Reference</h2>
+                    <p>Key facts, policies, and known issues for the license system</p>
+                </div>
+
+                <div class="form-card">
+                    <h3>Standard Policies</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Policy</th><th>Details</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Activations per key</td><td>One device at a time. Revoke to switch.</td></tr>
+                                <tr><td>Monthly usage reset</td><td>Resets on first request of the new month. No credit rollover.</td></tr>
+                                <tr><td>Token lifetime</td><td>365 days. Revoke and re-activate to renew.</td></tr>
+                                <tr><td>Conversation storage</td><td>None. Core product promise. Never log prompts or responses.</td></tr>
+                                <tr><td>Tier 1 + Command Center</td><td>Not allowed. Returns TIER_NO_ACCESS error with upgrade link.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Known Issues and Gotchas</h3>
+                    <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.8; display:flex; flex-direction:column; gap:10px;">
+                        <p><strong style="color:var(--warning)">JWT_SECRET rotation invalidates ALL tokens.</strong> If the JWT_SECRET env var is changed on Render, every customer's session becomes invalid. Only change if absolutely necessary.</p>
+                        <p><strong style="color:var(--info)">Revoke required before re-activation.</strong> The system does not allow re-activating an already-activated key. Always revoke first.</p>
+                        <p><strong style="color:var(--warning)">Tier upgrade requires new token.</strong> After upgrading a key's tier via SQL, the customer must clear browser data and re-activate to get a new JWT with the correct tier.</p>
+                        <p><strong style="color:var(--info)">Custom limits persist permanently.</strong> Once set, custom limits override tier defaults until cleared via direct SQL: SET custom_prompt_limit = NULL, custom_image_limit = NULL.</p>
+                        <p><strong style="color:var(--success)">The notes field is your friend.</strong> Always add notes when making admin changes. This is your audit trail.</p>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Tier Limits</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Tier</th><th>Product</th><th>Price</th><th>Prompts/Month</th><th>Images/Month</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge badge-t1">Tier 1</span></td>
+                                    <td>OffGrid AI ToolKit</td>
+                                    <td>$129</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-t2">Tier 2</span></td>
+                                    <td>ToolKit + Command Center</td>
+                                    <td>$199</td>
+                                    <td>150</td>
+                                    <td>10</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge badge-t3">Tier 3</span></td>
+                                    <td>ToolKit + Command Center Pro</td>
+                                    <td>$469</td>
+                                    <td>400</td>
+                                    <td>40</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3>Key Format</h3>
+                    <div style="font-size:0.84rem; color:var(--text-secondary); line-height:1.7;">
+                        <p>Pattern: <code style="font-family:var(--font-mono); color:var(--gold-bright); background:var(--bg-elevated); padding:2px 6px; border-radius:4px;">OGTK-XXXX-XXXX-XXXX</code></p>
+                        <p style="margin-top:8px;">Character set: <code style="font-family:var(--font-mono); color:var(--text-primary); background:var(--bg-elevated); padding:2px 6px; border-radius:4px;">ABCDEFGHJKLMNPQRSTUVWXYZ23456789</code></p>
+                        <p style="margin-top:8px; color:var(--text-muted);">Characters I, O, 0, and 1 are excluded to prevent visual confusion on printed cards.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /panel-area -->
+    </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- CONFIRM DIALOG -->
+<div id="confirm-overlay">
+    <div class="confirm-card">
+        <h3 id="confirm-title">Confirm Action</h3>
+        <p id="confirm-message">Are you sure you want to proceed?</p>
+        <div class="confirm-actions">
+            <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+            <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<script>
+// =============================================
+//  OFFGRID AI - LICENSE ADMIN DASHBOARD
+//  Client-side JavaScript
+// =============================================
+
+const BASE_URL = 'https://offgridtoolkit.ai';
+let ADMIN_KEY = '';
+let currentPage = 1;
+let currentTotal = 0;
+let currentLimit = 50;
+let confirmCallback = null;
+let lastLookupKey = '';
+
+// ---- LOGIN ----
+
+function initLogin() {
+    const input = document.getElementById('admin-key-input');
+    const btn = document.getElementById('login-btn');
+
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') attemptLogin();
+    });
+    btn.addEventListener('click', attemptLogin);
+    input.focus();
+}
+
+async function attemptLogin() {
+    const key = document.getElementById('admin-key-input').value.trim();
+    if (!key) return;
+
+    const btn = document.getElementById('login-btn');
+    const errEl = document.getElementById('login-error');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    errEl.style.display = 'none';
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/admin/stats`, {
+            headers: { 'x-admin-key': key }
+        });
+
+        if (res.ok) {
+            ADMIN_KEY = key;
+            sessionStorage.setItem('og-admin-key', key);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            initApp();
+        } else {
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = 'Access Dashboard';
+        }
+    } catch (e) {
+        errEl.textContent = 'Connection error. Please try again.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = 'Access Dashboard';
+    }
+}
+
+// ---- APP INIT ----
+
+function initApp() {
+    loadStats();
+    loadRecentActivated();
+    setupNav();
+    document.getElementById('logout-btn').addEventListener('click', logout);
+}
+
+function logout() {
+    ADMIN_KEY = '';
+    sessionStorage.removeItem('og-admin-key');
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-key-input').value = '';
+}
+
+// ---- NAVIGATION ----
+
+function setupNav() {
+    document.querySelectorAll('.nav-btn[data-panel]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchPanel(btn.dataset.panel);
+        });
+    });
+}
+
+function switchPanel(panelId) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+    const panel = document.getElementById(`panel-${panelId}`);
+    if (panel) panel.classList.add('active');
+
+    const navBtn = document.querySelector(`.nav-btn[data-panel="${panelId}"]`);
+    if (navBtn) navBtn.classList.add('active');
+
+    // Auto-load browse panel
+    if (panelId === 'browse') loadLicenses(1);
+}
+
+// ---- API HELPERS ----
+
+async function apiGet(path) {
+    const res = await fetch(`${BASE_URL}${path}`, {
+        headers: { 'x-admin-key': ADMIN_KEY }
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error || err.message || `HTTP ${res.status}`);
+    }
+    return res.json();
+}
+
+async function apiPost(path, body) {
+    const res = await fetch(`${BASE_URL}${path}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-admin-key': ADMIN_KEY
+        },
+        body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }));
+        throw new Error(err.error || err.message || `HTTP ${res.status}`);
+    }
+    return res.json();
+}
+
+// ---- STATS ----
+
+async function loadStats() {
+    try {
+        const data = await apiGet('/api/admin/stats');
+        const total = parseInt(data.total_keys || 0);
+        const activated = parseInt(data.activated_keys || 0);
+
+        document.getElementById('stat-total').textContent = data.total_keys;
+        document.getElementById('stat-active').textContent = data.activated_keys;
+        document.getElementById('stat-prompts').textContent = data.total_prompts_used;
+
+        document.getElementById('ds-total').textContent = data.total_keys;
+        document.getElementById('ds-activated').textContent = data.activated_keys;
+        document.getElementById('ds-t2').textContent = data.tier2_keys;
+        document.getElementById('ds-t3').textContent = data.tier3_keys;
+        document.getElementById('ds-prompts').textContent = data.total_prompts_used;
+        document.getElementById('ds-images').textContent = data.total_images_used;
+        document.getElementById('ds-email').textContent = data.email_linked;
+        document.getElementById('ds-unactivated').textContent = total - activated;
+    } catch (e) {
+        console.error('Stats load failed:', e);
+    }
+}
+
+async function loadRecentActivated() {
+    try {
+        const data = await apiGet('/api/admin/licenses?activated=true&limit=10&page=1');
+        const tbody = document.getElementById('recent-tbody');
+        if (!data.licenses || data.licenses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No activated keys yet</td></tr>';
+            return;
+        }
+        tbody.innerHTML = data.licenses.map(l => `
+            <tr>
+                <td class="key-cell">${l.license_key}</td>
+                <td>${tierBadge(l.tier)}</td>
+                <td>${formatDate(l.activated_at)}</td>
+                <td>${l.prompt_count}${l.custom_prompt_limit ? ` / ${l.custom_prompt_limit}` : ''}</td>
+                <td>${l.image_count}${l.custom_image_limit ? ` / ${l.custom_image_limit}` : ''}</td>
+                <td style="color:var(--text-muted); font-size:0.78rem; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${l.notes || '-'}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error('Recent load failed:', e);
+    }
+}
+
+// ---- GENERATE KEYS ----
+
+async function generateKeys() {
+    const count = parseInt(document.getElementById('gen-count').value);
+    const tier = parseInt(document.getElementById('gen-tier').value);
+    const notes = document.getElementById('gen-notes').value.trim();
+    const alertEl = document.getElementById('gen-alert');
+    const resultEl = document.getElementById('gen-result');
+    const btn = document.getElementById('gen-btn');
+
+    if (!count || count < 1 || count > 100) {
+        showAlert(alertEl, 'error', 'Count must be between 1 and 100.');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Generating...';
+    hideAlert(alertEl);
+    resultEl.classList.remove('visible');
+
+    try {
+        const body = { count, tier };
+        if (notes) body.notes = notes;
+
+        const data = await apiPost('/api/admin/generate-keys', body);
+
+        const keysList = document.getElementById('gen-keys-list');
+        keysList.innerHTML = data.keys.map(k => `
+            <div class="key-item">
+                <span class="key-text">${k}</span>
+                <span class="key-copy" onclick="copyText('${k}', this)">Copy</span>
+            </div>
+        `).join('');
+
+        resultEl.classList.add('visible', 'success');
+        showAlert(alertEl, 'success', `Generated ${data.count} ${data.tierName} key${data.count > 1 ? 's' : ''} successfully.`);
+        showToast(`${data.count} key${data.count > 1 ? 's' : ''} generated`, 'success');
+        loadStats();
+    } catch (e) {
+        showAlert(alertEl, 'error', `Error: ${e.message}`);
+        showToast('Key generation failed', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Generate Keys</span>';
+    }
+}
+
+// ---- LOOKUP KEY ----
+
+async function lookupKey() {
+    const key = document.getElementById('lookup-key').value.trim().toUpperCase();
+    const alertEl = document.getElementById('lookup-alert');
+    const resultEl = document.getElementById('lookup-result');
+
+    if (!key) {
+        showAlert(alertEl, 'error', 'Please enter a license key.');
+        return;
+    }
+
+    hideAlert(alertEl);
+    resultEl.classList.remove('visible');
+
+    try {
+        // Use the licenses endpoint with a search - fetch all and filter client-side
+        // (The API doesn't have a direct single-key lookup, so we use the list endpoint)
+        const data = await apiGet(`/api/admin/licenses?limit=500&page=1`);
+        const license = data.licenses.find(l => l.license_key === key);
+
+        if (!license) {
+            showAlert(alertEl, 'error', `Key not found: ${key}. Check for typos - the key format is OGTK-XXXX-XXXX-XXXX.`);
+            return;
+        }
+
+        lastLookupKey = key;
+        renderLookupResult(license);
+        resultEl.classList.add('visible');
+    } catch (e) {
+        showAlert(alertEl, 'error', `Error: ${e.message}`);
+    }
+}
+
+function renderLookupResult(l) {
+    const grid = document.getElementById('lookup-grid');
+    const tierLimit = l.tier === 2 ? { p: 150, i: 10 } : l.tier === 3 ? { p: 400, i: 40 } : { p: 0, i: 0 };
+    const effectivePrompts = l.custom_prompt_limit !== null ? l.custom_prompt_limit : tierLimit.p;
+    const effectiveImages = l.custom_image_limit !== null ? l.custom_image_limit : tierLimit.i;
+
+    grid.innerHTML = `
+        <div class="lookup-field">
+            <span class="lf-label">License Key</span>
+            <span class="lf-value mono">${l.license_key}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Tier</span>
+            <span class="lf-value">${tierBadge(l.tier)} <span style="font-size:0.78rem; color:var(--text-muted); margin-left:4px;">${l.tierName}</span></span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Status</span>
+            <span class="lf-value">${l.is_activated ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Not Activated</span>'}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Activated At</span>
+            <span class="lf-value">${formatDate(l.activated_at) || 'Never'}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Prompts Used</span>
+            <span class="lf-value">${l.prompt_count} / ${effectiveImages !== undefined ? effectivePrompts : '--'}${l.custom_prompt_limit !== null ? ' <span style="font-size:0.72rem; color:var(--gold-muted);">(custom)</span>' : ''}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Images Used</span>
+            <span class="lf-value">${l.image_count} / ${effectiveImages}${l.custom_image_limit !== null ? ' <span style="font-size:0.72rem; color:var(--gold-muted);">(custom)</span>' : ''}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Email</span>
+            <span class="lf-value">${l.email || 'Not linked'}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Created</span>
+            <span class="lf-value">${formatDate(l.created_at)}</span>
+        </div>
+        <div class="lookup-field">
+            <span class="lf-label">Usage Reset At</span>
+            <span class="lf-value">${formatDate(l.usage_reset_at)}</span>
+        </div>
+        <div class="lookup-field" style="grid-column: 1 / -1;">
+            <span class="lf-label">Notes</span>
+            <span class="lf-value" style="color:var(--text-secondary);">${l.notes || 'None'}</span>
+        </div>
+    `;
+}
+
+function quickRevoke() {
+    if (!lastLookupKey) return;
+    document.getElementById('revoke-key').value = lastLookupKey;
+    switchPanel('revoke');
+}
+
+function quickCredit() {
+    if (!lastLookupKey) return;
+    document.getElementById('credit-key').value = lastLookupKey;
+    switchPanel('credit');
+}
+
+// ---- BROWSE LICENSES ----
+
+async function loadLicenses(page) {
+    currentPage = page;
+    const tier = document.getElementById('filter-tier').value;
+    const activated = document.getElementById('filter-activated').value;
+    currentLimit = parseInt(document.getElementById('filter-limit').value);
+
+    let url = `/api/admin/licenses?page=${page}&limit=${currentLimit}`;
+    if (tier) url += `&tier=${tier}`;
+    if (activated !== '') url += `&activated=${activated}`;
+
+    const tbody = document.getElementById('licenses-tbody');
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><span class="spinner"></span> Loading...</td></tr>';
+
+    try {
+        const data = await apiGet(url);
+        currentTotal = data.total;
+
+        if (!data.licenses || data.licenses.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No licenses found matching filters</td></tr>';
+        } else {
+            tbody.innerHTML = data.licenses.map(l => `
+                <tr>
+                    <td class="key-cell" onclick="copyText('${l.license_key}')" style="cursor:pointer;" title="Click to copy">${l.license_key}</td>
+                    <td>${tierBadge(l.tier)}</td>
+                    <td>${l.is_activated ? '<span class="badge badge-active">Active</span>' : '<span class="badge badge-inactive">Inactive</span>'}</td>
+                    <td style="font-size:0.78rem;">${formatDate(l.activated_at) || '-'}</td>
+                    <td>${l.prompt_count}${l.custom_prompt_limit !== null ? `<span style="color:var(--gold-muted);font-size:0.72rem;">/${l.custom_prompt_limit}</span>` : ''}</td>
+                    <td>${l.image_count}${l.custom_image_limit !== null ? `<span style="color:var(--gold-muted);font-size:0.72rem;">/${l.custom_image_limit}</span>` : ''}</td>
+                    <td style="font-size:0.78rem;">${formatDate(l.created_at)}</td>
+                    <td style="color:var(--text-muted); font-size:0.78rem; max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${l.notes || ''}">${l.notes || '-'}</td>
+                </tr>
+            `).join('');
+        }
+
+        const totalPages = Math.ceil(currentTotal / currentLimit);
+        document.getElementById('browse-info').textContent = `Showing ${((page-1)*currentLimit)+1}-${Math.min(page*currentLimit, currentTotal)} of ${currentTotal}`;
+        document.getElementById('prev-btn').disabled = page <= 1;
+        document.getElementById('next-btn').disabled = page >= totalPages;
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="8" class="empty-state" style="color:var(--error);">Error: ${e.message}</td></tr>`;
+    }
+}
+
+function changePage(dir) {
+    loadLicenses(currentPage + dir);
+}
+
+// ---- REVOKE KEY ----
+
+function confirmRevoke() {
+    const key = document.getElementById('revoke-key').value.trim().toUpperCase();
+    if (!key) {
+        showAlert(document.getElementById('revoke-alert'), 'error', 'Please enter a license key.');
+        return;
+    }
+
+    showConfirm(
+        'Revoke License Key',
+        `Are you sure you want to revoke key ${key}? The customer will need to re-activate on their next visit.`,
+        async () => {
+            await executeRevoke(key);
+        }
+    );
+}
+
+async function executeRevoke(key) {
+    const alertEl = document.getElementById('revoke-alert');
+    try {
+        await apiPost('/api/admin/revoke', { licenseKey: key });
+        showAlert(alertEl, 'success', `Key ${key} has been revoked. The customer can now re-activate.`);
+        showToast('Key revoked successfully', 'success');
+        loadStats();
+    } catch (e) {
+        showAlert(alertEl, 'error', `Error: ${e.message}`);
+        showToast('Revoke failed', 'error');
+    }
+}
+
+// ---- CREDIT BACK ----
+
+async function creditBack() {
+    const key = document.getElementById('credit-key').value.trim().toUpperCase();
+    const type = document.getElementById('credit-type').value;
+    const count = parseInt(document.getElementById('credit-count').value);
+    const alertEl = document.getElementById('credit-alert');
+
+    if (!key) {
+        showAlert(alertEl, 'error', 'Please enter a license key.');
+        return;
+    }
+    if (!count || count < 1 || count > 100) {
+        showAlert(alertEl, 'error', 'Count must be between 1 and 100.');
+        return;
+    }
+
+    hideAlert(alertEl);
+
+    try {
+        const data = await apiPost('/api/admin/credit-back', { licenseKey: key, type, count });
+        showAlert(alertEl, 'success', `Credited back ${count} ${type}(s) to ${key}. New count: ${data.newCount !== undefined ? data.newCount : 'updated'}.`);
+        showToast(`${count} ${type}(s) credited back`, 'success');
+        loadStats();
+    } catch (e) {
+        showAlert(alertEl, 'error', `Error: ${e.message}`);
+        showToast('Credit back failed', 'error');
+    }
+}
+
+// ---- SET LIMITS ----
+
+async function setLimits() {
+    const key = document.getElementById('limits-key').value.trim().toUpperCase();
+    const prompts = document.getElementById('limits-prompts').value;
+    const images = document.getElementById('limits-images').value;
+    const notes = document.getElementById('limits-notes').value.trim();
+    const reset = document.getElementById('limits-reset').checked;
+    const alertEl = document.getElementById('limits-alert');
+    const resultEl = document.getElementById('limits-result');
+
+    if (!key) {
+        showAlert(alertEl, 'error', 'Please enter a license key.');
+        return;
+    }
+    if (!prompts && !images) {
+        showAlert(alertEl, 'error', 'Please enter at least one limit to update.');
+        return;
+    }
+
+    hideAlert(alertEl);
+    resultEl.classList.remove('visible');
+
+    const body = { licenseKey: key };
+    if (prompts !== '') body.monthlyPrompts = parseInt(prompts);
+    if (images !== '') body.monthlyImages = parseInt(images);
+    if (notes) body.notes = notes;
+    if (reset) body.resetCounters = true;
+
+    try {
+        const data = await apiPost('/api/admin/update-limits', body);
+        showAlert(alertEl, 'success', `Limits updated for ${key}.`);
+        resultEl.textContent = JSON.stringify(data, null, 2);
+        resultEl.classList.add('visible', 'success');
+        showToast('Limits updated successfully', 'success');
+    } catch (e) {
+        showAlert(alertEl, 'error', `Error: ${e.message}`);
+        showToast('Limits update failed', 'error');
+    }
+}
+
+// ---- TEMPLATES ----
+
+function toggleTemplate(header) {
+    const body = header.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    header.classList.toggle('open', !isOpen);
+}
+
+function copyTemplate(btn) {
+    const text = btn.previousElementSibling.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy Template'; }, 2000);
+        showToast('Template copied to clipboard', 'success');
+    });
+}
+
+// ---- CONFIRM DIALOG ----
+
+function showConfirm(title, message, callback) {
+    document.getElementById('confirm-title').textContent = title;
+    document.getElementById('confirm-message').textContent = message;
+    confirmCallback = callback;
+    document.getElementById('confirm-overlay').classList.add('visible');
+    document.getElementById('confirm-ok-btn').onclick = async () => {
+        closeConfirm();
+        if (confirmCallback) await confirmCallback();
+    };
+}
+
+function closeConfirm() {
+    document.getElementById('confirm-overlay').classList.remove('visible');
+    confirmCallback = null;
+}
+
+// ---- TOAST ----
+
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+
+// ---- ALERT HELPERS ----
+
+function showAlert(el, type, message) {
+    el.className = `inline-alert visible ${type}`;
+    el.textContent = message;
+}
+
+function hideAlert(el) {
+    el.className = 'inline-alert';
+    el.textContent = '';
+}
+
+// ---- COPY HELPERS ----
+
+function copyText(text, el) {
+    navigator.clipboard.writeText(text).then(() => {
+        if (el) {
+            el.textContent = 'Copied!';
+            setTimeout(() => { el.textContent = 'Copy'; }, 2000);
+        }
+        showToast('Copied to clipboard', 'info');
+    });
+}
+
+function copyResult(id) {
+    const el = document.getElementById(id);
+    const keys = el.querySelectorAll('.key-text');
+    const text = keys.length > 0
+        ? Array.from(keys).map(k => k.textContent).join('\n')
+        : el.textContent;
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('Copied to clipboard', 'success');
+    });
+}
+
+// ---- FORMATTING HELPERS ----
+
+function formatDate(dateStr) {
+    if (!dateStr) return null;
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function tierBadge(tier) {
+    if (tier === 1) return '<span class="badge badge-t1">Tier 1</span>';
+    if (tier === 2) return '<span class="badge badge-t2">Tier 2</span>';
+    if (tier === 3) return '<span class="badge badge-t3">Tier 3</span>';
+    return `<span class="badge">${tier}</span>`;
+}
+
+// ---- AUTO FORMAT KEY INPUT ----
+
+function setupKeyAutoFormat() {
+    const keyInputs = document.querySelectorAll('.key-input');
+    keyInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            let val = this.value.replace(/[^A-Z0-9a-z]/g, '').toUpperCase();
+            // Format as OGTK-XXXX-XXXX-XXXX
+            if (val.startsWith('OGTK')) {
+                let rest = val.slice(4);
+                let parts = ['OGTK'];
+                for (let i = 0; i < rest.length && parts.length < 4; i += 4) {
+                    parts.push(rest.slice(i, i + 4));
+                }
+                this.value = parts.join('-');
+            }
+        });
+    });
+}
+
+// ---- INIT ----
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Check for saved session
+    const savedKey = sessionStorage.getItem('og-admin-key');
+    if (savedKey) {
+        ADMIN_KEY = savedKey;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        initApp();
+    } else {
+        initLogin();
+    }
+
+    setupKeyAutoFormat();
+
+    // Close confirm on overlay click
+    document.getElementById('confirm-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeConfirm();
+    });
+});
+</script>
+</body>
+</html>
