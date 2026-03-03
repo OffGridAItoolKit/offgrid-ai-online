@@ -82,6 +82,11 @@
         }
 
         /* ---- Paper Mode Toggle ---- */
+        /* Allow tooltip to overflow message-content */
+        .command-theme .message-content {
+            overflow: visible;
+        }
+
         /* Message header row: model badge left, reading toggle right */
         .command-theme .message-header-row {
             display: flex;
@@ -125,10 +130,10 @@
 
         .command-theme .reading-mode-toggle .toggle-tooltip {
             position: absolute;
-            bottom: calc(100% + 8px);
+            top: calc(100% + 8px);
             right: 0;
-            background: var(--bg-elevated);
-            color: var(--text-primary);
+            background: #1a1a1a;
+            color: #f0f0f0;
             padding: 5px 10px;
             border-radius: 6px;
             font-size: 11px;
@@ -136,8 +141,9 @@
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s ease;
-            border: 1px solid var(--border-subtle);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            z-index: 100;
         }
 
         .command-theme .reading-mode-toggle:hover .toggle-tooltip {
@@ -146,7 +152,7 @@
 
         /* Paper Mode styles for message content */
         .command-theme .message.assistant.paper-mode .message-content {
-            background: #F5F0E8;
+            background: #FFFFFF;
             border-radius: 8px;
             padding: 20px 24px;
             box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
@@ -174,7 +180,7 @@
         .command-theme .message.assistant.paper-mode .markdown-content blockquote {
             border-left-color: #C9A84C;
             color: #555;
-            background: rgba(0, 0, 0, 0.03);
+            background: rgba(0, 0, 0, 0.02);
             padding: 8px 16px;
             border-radius: 0 6px 6px 0;
         }
@@ -193,29 +199,29 @@
 
         /* Inline code in Paper Mode */
         .command-theme .message.assistant.paper-mode .markdown-content code {
-            background: #e8e3d9;
+            background: #F0F0F0;
             color: #2A2A2A;
         }
 
         /* Tables in Paper Mode */
         .command-theme .message.assistant.paper-mode .markdown-content table {
-            background: #FAF7F0;
+            background: #FAFAFA;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
         .command-theme .message.assistant.paper-mode .markdown-content th {
-            background: #EDE8DD;
-            border-color: #D5CFC3;
+            background: #F0F0F0;
+            border-color: #E0E0E0;
             color: #2A2A2A;
         }
 
         .command-theme .message.assistant.paper-mode .markdown-content td {
-            border-color: #D5CFC3;
+            border-color: #E0E0E0;
             color: #2A2A2A;
         }
 
         .command-theme .message.assistant.paper-mode .markdown-content tr:hover {
-            background: #F0EBE0;
+            background: #F5F5F5;
         }
 
         /* Links in Paper Mode */
@@ -225,18 +231,18 @@
 
         /* List item code in Paper Mode */
         .command-theme .message.assistant.paper-mode .markdown-content li code {
-            background: #e8e3d9;
-            border-color: #D5CFC3;
+            background: #F0F0F0;
+            border-color: #E0E0E0;
             color: #2A2A2A;
         }
 
         .command-theme .message.assistant.paper-mode .markdown-content li code:hover {
-            background: #DDD8CC;
+            background: #E8E8E8;
             border-color: #C9A84C;
         }
 
         .command-theme .message.assistant.paper-mode .markdown-content hr {
-            border-top-color: #D5CFC3;
+            border-top-color: #E0E0E0;
         }
 
         /* Print stylesheet always uses paper mode */
