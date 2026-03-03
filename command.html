@@ -81,6 +81,181 @@
             display: none !important;
         }
 
+        /* ---- Paper Mode Toggle ---- */
+        .command-theme .reading-mode-toggle {
+            position: absolute;
+            top: 12px;
+            right: 20px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            letter-spacing: 0.01em;
+            user-select: none;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .command-theme .reading-mode-toggle.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .command-theme .reading-mode-toggle:hover {
+            border-color: var(--gold-primary);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .command-theme .reading-mode-toggle svg {
+            width: 14px;
+            height: 14px;
+            flex-shrink: 0;
+        }
+
+        .command-theme .reading-mode-toggle .toggle-tooltip {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .command-theme .reading-mode-toggle:hover .toggle-tooltip {
+            opacity: 1;
+        }
+
+        /* Paper Mode styles for message content */
+        .command-theme .message.assistant.paper-mode .message-content {
+            background: #F5F0E8;
+            border-radius: 8px;
+            padding: 20px 24px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .command-theme .message.assistant.paper-mode .message-text,
+        .command-theme .message.assistant.paper-mode .markdown-content {
+            color: #2A2A2A;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content h1,
+        .command-theme .message.assistant.paper-mode .markdown-content h2 {
+            color: #1a1a1a;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content h3 {
+            color: #4a4a4a;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content strong {
+            color: #1a1a1a;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content blockquote {
+            border-left-color: #C9A84C;
+            color: #555;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 8px 16px;
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* Code blocks stay dark in Paper Mode */
+        .command-theme .message.assistant.paper-mode .markdown-content pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content pre code {
+            color: #e2e8f0;
+            background: transparent;
+        }
+
+        /* Inline code in Paper Mode */
+        .command-theme .message.assistant.paper-mode .markdown-content code {
+            background: #e8e3d9;
+            color: #2A2A2A;
+        }
+
+        /* Tables in Paper Mode */
+        .command-theme .message.assistant.paper-mode .markdown-content table {
+            background: #FAF7F0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content th {
+            background: #EDE8DD;
+            border-color: #D5CFC3;
+            color: #2A2A2A;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content td {
+            border-color: #D5CFC3;
+            color: #2A2A2A;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content tr:hover {
+            background: #F0EBE0;
+        }
+
+        /* Links in Paper Mode */
+        .command-theme .message.assistant.paper-mode .markdown-content a {
+            color: #8B6914;
+        }
+
+        /* List item code in Paper Mode */
+        .command-theme .message.assistant.paper-mode .markdown-content li code {
+            background: #e8e3d9;
+            border-color: #D5CFC3;
+            color: #2A2A2A;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content li code:hover {
+            background: #DDD8CC;
+            border-color: #C9A84C;
+        }
+
+        .command-theme .message.assistant.paper-mode .markdown-content hr {
+            border-top-color: #D5CFC3;
+        }
+
+        /* Print stylesheet always uses paper mode */
+        @media print {
+            .command-theme .message.assistant .message-content {
+                background: white !important;
+                padding: 20px !important;
+            }
+            .command-theme .message.assistant .message-text,
+            .command-theme .message.assistant .markdown-content,
+            .command-theme .message.assistant .markdown-content * {
+                color: #111 !important;
+            }
+            .command-theme .reading-mode-toggle {
+                display: none !important;
+            }
+        }
+
         /* ---- Layout: Centered Chat Column ---- */
         body.command-theme {
             font-family: var(--font-sans);
@@ -1577,6 +1752,17 @@
 
             .desktop-only {
                 display: none !important;
+            }
+
+            .reading-mode-toggle {
+                top: 8px !important;
+                right: 12px !important;
+                padding: 4px 10px !important;
+                font-size: 11px !important;
+            }
+
+            .reading-mode-toggle .toggle-label {
+                display: none;
             }
 
             .back-link {
@@ -3476,6 +3662,15 @@
 
         <!-- Chat Container -->
         <div class="chat-container">
+            <!-- Reading Mode Toggle -->
+            <button class="reading-mode-toggle" id="readingModeToggle" onclick="toggleReadingMode()">
+                <span class="toggle-tooltip" id="toggleTooltip">Switch to Paper Mode</span>
+                <svg id="readingModeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <span class="toggle-label" id="readingModeLabel">Paper</span>
+            </button>
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
                     <img src="compass.svg" alt="OffGrid AI Compass" class="welcome-icon">
@@ -4344,6 +4539,8 @@
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = 'message assistant';
+            applyPaperModeToMessage(messageDiv);
+            showReadingToggle();
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
             messageDiv.innerHTML = `
@@ -4568,6 +4765,8 @@
 
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message assistant';
+                applyPaperModeToMessage(messageDiv);
+                showReadingToggle();
                 const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 messageDiv.innerHTML = `
@@ -7022,6 +7221,8 @@
                 // CLEAN image-only display — no prompt text, no summary
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message assistant';
+                applyPaperModeToMessage(messageDiv);
+                showReadingToggle();
                 const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 messageDiv.innerHTML = `
                     <div class="message-avatar" style="background: #a855f7; color: white;">AI</div>
@@ -7052,6 +7253,8 @@
                 // Show image + loading state for summary
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message assistant';
+                applyPaperModeToMessage(messageDiv);
+                showReadingToggle();
                 const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 const summaryContainerId = 'imageSummary_' + Date.now();
 
@@ -7185,6 +7388,77 @@
         }
 
         // ============================================
+        // READING MODE TOGGLE (Paper / Dark)
+        // ============================================
+
+        let paperModeEnabled = localStorage.getItem('offgrid-paper-mode') === 'true';
+
+        function initReadingMode() {
+            if (paperModeEnabled) {
+                applyPaperModeToAll();
+                updateToggleUI(true);
+            }
+        }
+
+        function toggleReadingMode() {
+            paperModeEnabled = !paperModeEnabled;
+            localStorage.setItem('offgrid-paper-mode', paperModeEnabled);
+
+            if (paperModeEnabled) {
+                applyPaperModeToAll();
+            } else {
+                removePaperModeFromAll();
+            }
+            updateToggleUI(paperModeEnabled);
+        }
+
+        function applyPaperModeToAll() {
+            document.querySelectorAll('.message.assistant').forEach(msg => {
+                msg.classList.add('paper-mode');
+            });
+        }
+
+        function removePaperModeFromAll() {
+            document.querySelectorAll('.message.assistant').forEach(msg => {
+                msg.classList.remove('paper-mode');
+            });
+        }
+
+        function applyPaperModeToMessage(msgEl) {
+            if (paperModeEnabled) {
+                msgEl.classList.add('paper-mode');
+            }
+        }
+
+        function updateToggleUI(isPaper) {
+            const icon = document.getElementById('readingModeIcon');
+            const label = document.getElementById('readingModeLabel');
+            const tooltip = document.getElementById('toggleTooltip');
+
+            if (isPaper) {
+                // Show eye icon (switch back to dark)
+                icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                label.textContent = 'Dark';
+                tooltip.textContent = 'Switch to Dark Mode';
+            } else {
+                // Show book icon (switch to paper)
+                icon.innerHTML = '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>';
+                label.textContent = 'Paper';
+                tooltip.textContent = 'Switch to Paper Mode';
+            }
+        }
+
+        function showReadingToggle() {
+            const toggle = document.getElementById('readingModeToggle');
+            if (toggle) toggle.classList.add('visible');
+        }
+
+        function hideReadingToggle() {
+            const toggle = document.getElementById('readingModeToggle');
+            if (toggle) toggle.classList.remove('visible');
+        }
+
+        // ============================================
         // UPGRADE BANNER (try-command referral)
         // ============================================
 
@@ -7301,6 +7575,9 @@
 
             // Check for upgrade referral (/try-command)
             checkUpgradeReferral();
+
+            // Initialize reading mode preference
+            initReadingMode();
 
             // Initialize connection check
             checkConnection();
