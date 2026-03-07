@@ -1,0 +1,1947 @@
+<!-- OffGrid AI Command Center - Dedicated Product Page -->
+<!-- Desert Canyon Theme - Matches Homepage v2 -->
+<!-- Date: March 2026 -->
+<style>
+  /* Reset and Base Styles */
+  main#MainContent {
+    background: #1A1611 !important;
+  }
+
+  .cc-page * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cc-page {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #e8ddd0;
+    line-height: 1.6;
+    background: #1a1611;
+  }
+
+  .cc-section {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .cc-section-title {
+    font-size: 42px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .cc-section-subtitle {
+    text-align: center;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #d4af37;
+    margin-bottom: 15px;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  }
+
+  .cc-section-desc {
+    text-align: center;
+    font-size: 18px;
+    color: #d4c0a8;
+    max-width: 750px;
+    margin: 0 auto 50px;
+    line-height: 1.7;
+  }
+
+  .cc-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 18px 45px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .cc-btn:hover {
+    background: linear-gradient(135deg, #e6c550 0%, #d4af37 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+
+  .cc-btn-secondary {
+    background: transparent;
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    box-shadow: none;
+  }
+
+  .cc-btn-secondary:hover {
+    background: rgba(212, 175, 55, 0.15);
+    color: #e6c550;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+
+  .cc-btn-sm {
+    padding: 12px 28px;
+    font-size: 14px;
+  }
+
+  /* ========================================
+     HERO SECTION
+     ======================================== */
+  .cc-hero {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 60px 20px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cc-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center top, rgba(212, 175, 55, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .cc-hero-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 50px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cc-hero-content {
+    padding-right: 20px;
+  }
+
+  .cc-hero-badge {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 25px;
+  }
+
+  .cc-hero-headline {
+    font-size: 46px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
+  }
+
+  .cc-hero-headline .highlight {
+    color: #d4af37;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+  }
+
+  .cc-hero-sub {
+    font-size: 19px;
+    color: #d4c0a8;
+    line-height: 1.7;
+    margin-bottom: 30px;
+  }
+
+  .cc-hero-hooks {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 35px;
+  }
+
+  .cc-hero-hook {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    color: #e8ddd0;
+  }
+
+  .cc-hero-hook-icon {
+    color: #d4af37;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .cc-hero-cta-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .cc-hero-price {
+    font-size: 15px;
+    color: #b8a088;
+    margin-top: 20px;
+  }
+
+  .cc-hero-price strong {
+    color: #d4af37;
+    font-size: 24px;
+  }
+
+  .cc-hero-visual {
+    position: relative;
+  }
+
+  .cc-hero-img-wrapper {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 16px;
+    padding: 12px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cc-hero-img-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .cc-hero-img-wrapper img {
+    width: 100%;
+    border-radius: 10px;
+    display: block;
+  }
+
+  /* ========================================
+     VIDEO SECTION
+     ======================================== */
+  .cc-video-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-video-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-video-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cc-video-frame {
+    background: linear-gradient(135deg, rgba(26, 22, 17, 0.9), rgba(44, 32, 24, 0.8));
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 140, 66, 0.1);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+    margin-top: 40px;
+  }
+
+  .cc-video-frame iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    border: none;
+  }
+
+  /* ========================================
+     COUNCIL PROCESS SECTION
+     ======================================== */
+  .cc-council-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-council-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-council-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .cc-council-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: start;
+    margin-top: 50px;
+  }
+
+  .cc-council-text h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 18px;
+    line-height: 1.3;
+  }
+
+  .cc-council-text p {
+    font-size: 16px;
+    color: #b8a088;
+    line-height: 1.7;
+    margin-bottom: 18px;
+  }
+
+  .cc-council-text .cc-analogy {
+    background: rgba(212, 175, 55, 0.08);
+    border-left: 3px solid #d4af37;
+    padding: 18px 22px;
+    border-radius: 0 10px 10px 0;
+    margin: 25px 0;
+  }
+
+  .cc-council-text .cc-analogy p {
+    color: #e8ddd0;
+    font-size: 15px;
+    font-style: italic;
+    margin-bottom: 0;
+  }
+
+  .cc-council-text .cc-analogy .cc-analogy-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #d4af37;
+    font-weight: 700;
+    font-style: normal;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .cc-process-steps {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 16px;
+    padding: 35px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cc-process-steps::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .cc-process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-process-step:last-child {
+    border-bottom: none;
+  }
+
+  .cc-step-num {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+  }
+
+  .cc-step-text h4 {
+    font-size: 15px;
+    color: #ffd4a3;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .cc-step-text p {
+    font-size: 13px;
+    color: #b8a088;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* Deliberation Screenshots */
+  .cc-deliberation-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 40px;
+  }
+
+  .cc-screenshot-card {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .cc-screenshot-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .cc-screenshot-card img {
+    width: 100%;
+    border-radius: 8px;
+    display: block;
+  }
+
+  .cc-screenshot-card .cc-screenshot-label {
+    text-align: center;
+    font-size: 13px;
+    color: #b8a088;
+    padding: 12px 8px 4px;
+    font-weight: 500;
+  }
+
+  /* ========================================
+     MODEL ROSTER SECTION
+     ======================================== */
+  .cc-models-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-models-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-models-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .cc-models-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 50px;
+  }
+
+  .cc-model-card {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 16px;
+    padding: 30px 24px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .cc-model-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .cc-model-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .cc-model-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  .cc-model-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 4px;
+  }
+
+  .cc-model-provider {
+    font-size: 12px;
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .cc-model-strength {
+    font-size: 14px;
+    color: #b8a088;
+    line-height: 1.5;
+  }
+
+  .cc-synthesis-callout {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(212, 175, 55, 0.05));
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 16px;
+    padding: 30px 40px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .cc-synthesis-icon {
+    font-size: 48px;
+    flex-shrink: 0;
+  }
+
+  .cc-synthesis-text h4 {
+    font-size: 18px;
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .cc-synthesis-text p {
+    font-size: 15px;
+    color: #b8a088;
+    line-height: 1.6;
+  }
+
+  .cc-synthesis-text strong {
+    color: #d4af37;
+  }
+
+  /* ========================================
+     IMAGE STUDIO SECTION
+     ======================================== */
+  .cc-studio-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-studio-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-studio-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .cc-studio-intro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    margin-top: 50px;
+    margin-bottom: 60px;
+  }
+
+  .cc-studio-text h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 18px;
+    line-height: 1.3;
+  }
+
+  .cc-studio-text p {
+    font-size: 16px;
+    color: #b8a088;
+    line-height: 1.7;
+    margin-bottom: 15px;
+  }
+
+  .cc-studio-features {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+  }
+
+  .cc-studio-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 15px;
+    color: #e8ddd0;
+    line-height: 1.5;
+  }
+
+  .cc-studio-features li span {
+    color: #d4af37;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .cc-studio-screenshots {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  /* Gallery Slider */
+  .cc-gallery-label {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .cc-gallery-label h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+  }
+
+  .cc-gallery-label p {
+    font-size: 15px;
+    color: #b8a088;
+  }
+
+  .cc-gallery-wrapper {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .cc-gallery-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 10px 5px 20px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .cc-gallery-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cc-gallery-item {
+    flex: 0 0 calc(50% - 10px);
+    min-width: 400px;
+    scroll-snap-align: start;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .cc-gallery-item:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.15);
+  }
+
+  .cc-gallery-item img {
+    width: 100%;
+    display: block;
+  }
+
+  .cc-gallery-item .cc-gallery-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(26, 22, 17, 0.95));
+    padding: 30px 16px 14px;
+    font-size: 13px;
+    color: #d4c0a8;
+    text-align: center;
+  }
+
+  .cc-gallery-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #1a1611;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .cc-gallery-nav:hover {
+    background: linear-gradient(135deg, #e6c550 0%, #d4af37 100%);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+  }
+
+  .cc-gallery-nav.prev { left: 10px; }
+  .cc-gallery-nav.next { right: 10px; }
+
+  .cc-gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 25px;
+  }
+
+  .cc-gallery-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .cc-gallery-dot.active,
+  .cc-gallery-dot:hover {
+    background: #d4af37;
+    transform: scale(1.2);
+  }
+
+  .cc-gallery-badge {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    backdrop-filter: blur(8px);
+    background-color: rgba(26, 22, 17, 0.7);
+  }
+
+  /* ========================================
+     KNOWLEDGE BASE SECTION
+     ======================================== */
+  .cc-kb-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-kb-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-kb-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .cc-kb-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 50px;
+    align-items: center;
+    margin-top: 50px;
+  }
+
+  .cc-kb-text h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 18px;
+    line-height: 1.3;
+  }
+
+  .cc-kb-text p {
+    font-size: 16px;
+    color: #b8a088;
+    line-height: 1.7;
+    margin-bottom: 15px;
+  }
+
+  .cc-kb-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 25px 0;
+  }
+
+  .cc-kb-flow-step {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 0;
+    position: relative;
+  }
+
+  .cc-kb-flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 16px;
+    bottom: -2px;
+    width: 2px;
+    height: 16px;
+    background: rgba(212, 175, 55, 0.3);
+  }
+
+  .cc-kb-flow-icon {
+    width: 34px;
+    height: 34px;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .cc-kb-flow-label {
+    font-size: 15px;
+    color: #e8ddd0;
+    font-weight: 500;
+  }
+
+  .cc-kb-flow-label small {
+    display: block;
+    font-size: 13px;
+    color: #b8a088;
+    font-weight: 400;
+    margin-top: 2px;
+  }
+
+  /* ========================================
+     READY-MADE PROMPTS SECTION
+     ======================================== */
+  .cc-prompts-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-prompts-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-prompts-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .cc-prompts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 50px;
+  }
+
+  /* ========================================
+     PRICING SECTION
+     ======================================== */
+  .cc-pricing-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-pricing-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .cc-pricing-container {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .cc-pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 50px;
+  }
+
+  .cc-pricing-card {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 20px;
+    padding: 40px 30px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+  }
+
+  .cc-pricing-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .cc-pricing-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  }
+
+  .cc-pricing-card.featured {
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.15);
+  }
+
+  .cc-pricing-card.featured::before {
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    height: 3px;
+  }
+
+  .cc-pricing-popular {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+  }
+
+  .cc-pricing-tier {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #d4af37;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .cc-pricing-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .cc-pricing-tagline {
+    font-size: 14px;
+    color: #b8a088;
+    text-align: center;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .cc-pricing-amount {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-pricing-amount .price {
+    font-size: 48px;
+    font-weight: 700;
+    color: #d4af37;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+
+  .cc-pricing-amount .period {
+    display: block;
+    font-size: 14px;
+    color: #b8a088;
+    margin-top: 5px;
+  }
+
+  .cc-pricing-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    flex-grow: 1;
+  }
+
+  .cc-pricing-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #e8ddd0;
+    line-height: 1.5;
+  }
+
+  .cc-pricing-features li .check {
+    color: #d4af37;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .cc-pricing-card-cta {
+    text-align: center;
+    margin-top: auto;
+  }
+
+  .cc-pricing-card-cta .cc-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+  }
+
+  .cc-pricing-no-sub {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+  }
+
+  .cc-pricing-no-sub p {
+    font-size: 16px;
+    color: #e8ddd0;
+    font-weight: 600;
+  }
+
+  .cc-pricing-no-sub p strong {
+    color: #d4af37;
+  }
+
+  .cc-pricing-no-sub .detail {
+    font-size: 14px;
+    color: #b8a088;
+    font-weight: 400;
+    margin-top: 8px;
+  }
+
+  .cc-pricing-upgrade {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 15px;
+    color: #b8a088;
+  }
+
+  .cc-pricing-upgrade a {
+    color: #d4af37;
+    text-decoration: underline;
+  }
+
+  /* ========================================
+     FINAL CTA SECTION
+     ======================================== */
+  .cc-final-cta {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 50%, #1a1611 100%);
+    padding: 100px 20px;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .cc-final-cta::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center top, rgba(255, 140, 66, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cc-final-cta::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37 20%, #e6c550 50%, #d4af37 80%, transparent);
+  }
+
+  .cc-final-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cc-final-heading {
+    font-size: 46px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 25px;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .cc-final-heading .highlight {
+    color: #d4af37;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+  }
+
+  .cc-final-body {
+    font-size: 18px;
+    color: #d4c0a8;
+    line-height: 1.8;
+    margin-bottom: 35px;
+  }
+
+  .cc-final-tiers {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+  }
+
+  .cc-final-tier {
+    text-align: center;
+  }
+
+  .cc-final-tier .tier-price {
+    font-size: 32px;
+    font-weight: 700;
+    color: #d4af37;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    display: block;
+  }
+
+  .cc-final-tier .tier-name {
+    font-size: 13px;
+    color: #b8a088;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .cc-final-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 22px 65px;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    cursor: pointer;
+    box-shadow: 0 10px 35px rgba(212, 175, 55, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cc-final-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .cc-final-button:hover {
+    background: linear-gradient(135deg, #e6c550 0%, #d4af37 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 45px rgba(212, 175, 55, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(212, 175, 55, 0.6);
+  }
+
+  .cc-final-button:hover::before { left: 100%; }
+
+  .cc-final-links {
+    margin: 25px 0;
+  }
+
+  .cc-final-links a {
+    color: #d4af37;
+    font-size: 14px;
+    text-decoration: underline;
+    margin: 0 12px;
+  }
+
+  .cc-final-trust {
+    display: flex;
+    justify-content: center;
+    gap: 35px;
+    margin-top: 30px;
+    font-size: 14px;
+    color: #b8a088;
+    flex-wrap: wrap;
+  }
+
+  .cc-final-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cc-final-trust-item::before {
+    content: '\2713';
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* ========================================
+     RESPONSIVE DESIGN
+     ======================================== */
+  @media (max-width: 1024px) {
+    .cc-hero-container {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      text-align: center;
+    }
+    .cc-hero-content { padding-right: 0; }
+    .cc-hero-headline { font-size: 38px; }
+    .cc-hero-hooks { align-items: center; }
+    .cc-hero-cta-group { justify-content: center; }
+
+    .cc-council-grid { grid-template-columns: 1fr; gap: 40px; }
+    .cc-models-grid { grid-template-columns: repeat(2, 1fr); }
+    .cc-studio-intro-grid { grid-template-columns: 1fr; gap: 30px; }
+    .cc-kb-grid { grid-template-columns: 1fr; gap: 40px; }
+    .cc-prompts-grid { grid-template-columns: 1fr; }
+    .cc-pricing-grid { grid-template-columns: 1fr; max-width: 450px; margin-left: auto; margin-right: auto; }
+  }
+
+  @media (max-width: 768px) {
+    .cc-hero { padding: 40px 20px 60px; }
+    .cc-hero-headline { font-size: 32px; }
+    .cc-hero-sub { font-size: 17px; }
+    .cc-section-title { font-size: 32px; }
+
+    .cc-deliberation-grid { grid-template-columns: 1fr; }
+    .cc-models-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+    .cc-studio-screenshots { grid-template-columns: 1fr; }
+
+    .cc-gallery-wrapper { padding: 0 15px; }
+    .cc-gallery-item { flex: 0 0 85%; min-width: 280px; }
+    .cc-gallery-nav { display: none; }
+    .cc-gallery-track { padding: 10px 15px 20px; gap: 15px; }
+
+    .cc-video-section { padding: 60px 20px; }
+    .cc-video-frame { padding: 12px; }
+
+    .cc-final-cta { padding: 60px 20px; }
+    .cc-final-heading { font-size: 32px; }
+    .cc-final-button { padding: 18px 40px; font-size: 18px; }
+    .cc-final-links a { display: block; margin: 10px 0; }
+    .cc-final-trust { flex-direction: column; gap: 12px; align-items: center; }
+
+    .cc-synthesis-callout { flex-direction: column; text-align: center; padding: 25px 20px; }
+
+    .cc-pricing-card { padding: 30px 25px; }
+    .cc-pricing-amount .price { font-size: 38px; }
+  }
+
+  @media (max-width: 480px) {
+    .cc-hero-headline { font-size: 28px; }
+    .cc-hero-cta-group { flex-direction: column; }
+    .cc-hero-cta-group .cc-btn { width: 100%; text-align: center; }
+    .cc-section-title { font-size: 26px; }
+    .cc-models-grid { grid-template-columns: 1fr; }
+    .cc-final-heading { font-size: 28px; }
+    .cc-final-tier .tier-price { font-size: 26px; }
+    .cc-gallery-item { flex: 0 0 92%; }
+  }
+</style>
+
+<div class="cc-page">
+
+  <!-- ========================================
+       HERO SECTION
+       ======================================== -->
+  <section class="cc-hero">
+    <div class="cc-hero-container">
+      <div class="cc-hero-content">
+        <div class="cc-hero-badge">THE COMMAND CENTER</div>
+        <h1 class="cc-hero-headline">
+          Four AI Experts.<br>
+          One Answer.<br>
+          <span class="highlight">Yours Forever.</span>
+        </h1>
+        <p class="cc-hero-sub">
+          The Command Center gives you two things no other product offers at this price: direct access to four leading AI models individually, and the AI Council, where all four deliberate together and deliver one synthesized answer. One purchase. No subscription. Yours forever.
+        </p>
+        <div class="cc-hero-hooks">
+          <div class="cc-hero-hook">
+            <span class="cc-hero-hook-icon">&#10003;</span>
+            <span>Chat one-on-one with GPT-5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, or Grok 4.1 Fast</span>
+          </div>
+          <div class="cc-hero-hook">
+            <span class="cc-hero-hook-icon">&#10003;</span>
+            <span>Or use the AI Council: all 4 models deliberate and synthesize one best answer</span>
+          </div>
+          <div class="cc-hero-hook">
+            <span class="cc-hero-hook-icon">&#10003;</span>
+            <span>Anonymous peer review and Chairman election process</span>
+          </div>
+          <div class="cc-hero-hook">
+            <span class="cc-hero-hook-icon">&#10003;</span>
+            <span>Built-in Image Studio for AI-generated visuals and diagrams</span>
+          </div>
+          <div class="cc-hero-hook">
+            <span class="cc-hero-hook-icon">&#10003;</span>
+            <span>Save everything to your USB Knowledge Base for offline use</span>
+          </div>
+        </div>
+        <div class="cc-hero-cta-group">
+          <a href="#cc-pricing" class="cc-btn">Get Command Center</a>
+          <a href="#cc-video" class="cc-btn cc-btn-secondary">Watch It Work &#8595;</a>
+        </div>
+        <p class="cc-hero-price">Starting at <strong>$249</strong> &nbsp; One-time purchase. No subscription. Ever.</p>
+      </div>
+      <div class="cc-hero-visual">
+        <div class="cc-hero-img-wrapper">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/OffGrid_AI_Command_Center_Dashboard.jpg?v=1772720766" alt="OffGrid AI Command Center Dashboard" loading="eager">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       VIDEO SECTION
+       ======================================== -->
+  <section class="cc-video-section" id="cc-video">
+    <div class="cc-video-container">
+      <div class="cc-section-subtitle">SEE IT IN ACTION</div>
+      <div class="cc-section-title">Watch the Command Center Work</div>
+      <p class="cc-section-desc">
+        From question to final answer. Watch four AI models deliberate in real time, elect a Chairman, and deliver one synthesized response you can trust.
+      </p>
+      <div class="cc-video-frame">
+        <iframe src="https://www.youtube.com/embed/tLpOwz5IUvk?si=MZGyCoKYab439a6L" title="OffGrid AI Command Center Workflow" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       COMMAND COUNCIL SECTION
+       ======================================== -->
+  <section class="cc-council-section">
+    <div class="cc-council-container">
+      <div class="cc-section-subtitle">THE COMMAND COUNCIL</div>
+      <div class="cc-section-title">How Four AI Models Deliver One Best Answer</div>
+      <p class="cc-section-desc">
+        Every AI model has strengths and blind spots. The Command Council eliminates blind spots by making four leading models work together, then choosing the best answer through a process that would feel familiar to any courtroom, hospital, or professional kitchen.
+      </p>
+
+      <div class="cc-council-grid">
+        <div class="cc-council-text">
+          <h3>A Process Built on Accountability</h3>
+          <p>
+            When you ask the Command Council a question, all four models answer independently. They cannot see each other's responses. Then each model scores the others in an anonymous peer review. A Chairman is elected based on quality and accuracy. The Chairman synthesizes the best elements from all four responses into one final answer.
+          </p>
+          <p>
+            The result is an answer that has been challenged, validated, and refined by four different perspectives before it reaches you.
+          </p>
+
+          <div class="cc-analogy">
+            <span class="cc-analogy-label">Think of it like a jury</span>
+            <p>Twelve jurors hear the same case but deliberate independently before reaching a verdict. No single juror decides the outcome. The Command Council works the same way. Four AI models hear your question, form their own answers, then deliberate to find the strongest response.</p>
+          </div>
+
+          <div class="cc-analogy">
+            <span class="cc-analogy-label">Or a team of doctors</span>
+            <p>When a patient has a complex case, the hospital does not rely on one doctor's opinion. They convene a panel. Each specialist reviews the case independently, then they compare findings and build a treatment plan together. That is what the Command Council does with your questions.</p>
+          </div>
+        </div>
+
+        <div>
+          <div class="cc-process-steps">
+            <div class="cc-process-step">
+              <div class="cc-step-num">1</div>
+              <div class="cc-step-text">
+                <h4>You Ask a Question</h4>
+                <p>Type anything into the Command Center. Survival tips, medical references, technical help, research questions, creative projects.</p>
+              </div>
+            </div>
+            <div class="cc-process-step">
+              <div class="cc-step-num">2</div>
+              <div class="cc-step-text">
+                <h4>4 Models Respond Independently</h4>
+                <p>GPT 5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, and Grok 4.1 Fast each generate their own answer at the same time. No model can see the others.</p>
+              </div>
+            </div>
+            <div class="cc-process-step">
+              <div class="cc-step-num">3</div>
+              <div class="cc-step-text">
+                <h4>Anonymous Peer Review</h4>
+                <p>Each model scores the other three answers using Borda count ranking. Scores are tallied. The highest-scoring model is elected Chairman.</p>
+              </div>
+            </div>
+            <div class="cc-process-step">
+              <div class="cc-step-num">4</div>
+              <div class="cc-step-text">
+                <h4>Chairman Synthesizes the Best Answer</h4>
+                <p>The elected Chairman combines the strongest elements from all four responses into one final, comprehensive answer delivered to you.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deliberation Screenshots -->
+      <div class="cc-deliberation-grid">
+        <div class="cc-screenshot-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Command_Council_Deliberation_choosing_a_chariman.jpg?v=1772720766" alt="Command Council Deliberation - Choosing a Chairman" loading="lazy">
+          <div class="cc-screenshot-label">Live deliberation: the Council choosing a Chairman</div>
+        </div>
+        <div class="cc-screenshot-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Council_Deliberation_Report.jpg?v=1772720766" alt="Council Deliberation Report with Scores" loading="lazy">
+          <div class="cc-screenshot-label">Deliberation report: scores, rankings, and the elected Chairman</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       MODEL ROSTER SECTION
+       ======================================== -->
+  <section class="cc-models-section">
+    <div class="cc-models-container">
+      <div class="cc-section-subtitle">MEET THE COUNCIL</div>
+      <div class="cc-section-title">Four Leading AI Models. One Unified Answer.</div>
+      <p class="cc-section-desc">
+        Each model brings different strengths to the table. Together, they cover more ground than any single AI ever could. And because the models auto-update to the newest versions, your Command Center gets smarter over time.
+      </p>
+
+      <div class="cc-models-grid">
+        <div class="cc-model-card">
+          <span class="cc-model-icon">&#129504;</span>
+          <div class="cc-model-name">GPT 5.2</div>
+          <div class="cc-model-provider">OpenAI</div>
+          <p class="cc-model-strength">Deep reasoning, nuanced analysis, and strong performance across virtually every topic.</p>
+        </div>
+        <div class="cc-model-card">
+          <span class="cc-model-icon">&#128218;</span>
+          <div class="cc-model-name">Claude Sonnet 4.6</div>
+          <div class="cc-model-provider">Anthropic</div>
+          <p class="cc-model-strength">Careful, thorough responses with exceptional attention to safety and accuracy.</p>
+        </div>
+        <div class="cc-model-card">
+          <span class="cc-model-icon">&#127760;</span>
+          <div class="cc-model-name">Gemini 3.1 Pro</div>
+          <div class="cc-model-provider">Google</div>
+          <p class="cc-model-strength">Multimodal intelligence with access to the world's largest knowledge index.</p>
+        </div>
+        <div class="cc-model-card">
+          <span class="cc-model-icon">&#9889;</span>
+          <div class="cc-model-name">Grok 4.1 Fast</div>
+          <div class="cc-model-provider">xAI</div>
+          <p class="cc-model-strength">Fast, direct answers with real-time awareness and a no-nonsense approach.</p>
+        </div>
+      </div>
+
+      <div class="cc-synthesis-callout">
+        <span class="cc-synthesis-icon">&#127942;</span>
+        <div class="cc-synthesis-text">
+          <h4>The Chairman Takes the Lead</h4>
+          <p>After peer review, the highest-scoring model is elected <strong>Chairman</strong>. The Chairman synthesizes the best elements from all four responses into one final answer. Different questions may elect different Chairmen, because the best model for the job depends on the question.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       IMAGE STUDIO SECTION
+       ======================================== -->
+  <section class="cc-studio-section">
+    <div class="cc-studio-container">
+      <div class="cc-section-subtitle">IMAGE STUDIO</div>
+      <div class="cc-section-title">Create Visuals with AI</div>
+      <p class="cc-section-desc">
+        Generate diagrams, infographics, field guides, exploded views, and reference images directly inside the Command Center. The Image Studio turns your ideas into visuals you can save, print, and take offline.
+      </p>
+
+      <div class="cc-studio-intro-grid">
+        <div class="cc-studio-text">
+          <h3>From Prompt to Print-Ready Visual</h3>
+          <p>
+            The Image Studio is built right into the Command Center. Ask the Council a question, then generate a visual to go with it. Or go directly to the Image Studio and create standalone images from scratch.
+          </p>
+          <p>
+            Every image you create can be saved to your Knowledge Base, downloaded, or printed. Build an entire library of visual references, field guides, and diagrams that live on your USB drive.
+          </p>
+          <ul class="cc-studio-features">
+            <li><span>&#10003;</span> AI-generated diagrams, infographics, and illustrations</li>
+            <li><span>&#10003;</span> Ready-made prompts for common visual needs</li>
+            <li><span>&#10003;</span> Council-assisted prompt refinement for better results</li>
+            <li><span>&#10003;</span> Save directly to your USB Knowledge Base</li>
+            <li><span>&#10003;</span> Download and print any image you create</li>
+          </ul>
+        </div>
+        <div class="cc-studio-screenshots">
+          <div class="cc-screenshot-card">
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/OffGrid_AI_Image_Studio.jpg?v=1772720766" alt="OffGrid AI Image Studio" loading="lazy">
+          </div>
+          <div class="cc-screenshot-card">
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Create_Visual_with_Image_Studio_prompt_ready_to_go.jpg?v=1772720766" alt="Create Visual with Image Studio" loading="lazy">
+          </div>
+        </div>
+      </div>
+
+      <!-- Image Studio Gallery -->
+      <div class="cc-gallery-label">
+        <h3>Made with Image Studio</h3>
+        <p>Every image below was generated by the OffGrid AI Image Studio. Scroll through to see what's possible.</p>
+      </div>
+
+      <div class="cc-gallery-wrapper">
+        <button class="cc-gallery-nav prev" onclick="slideGallery(-1)" aria-label="Previous">&#8249;</button>
+
+        <div class="cc-gallery-track" id="cc-gallery-track">
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/6_easiest_vegetables_to_grow_by_offgrid_ai_image_studio.jpg?v=1772722172" alt="6 Easiest Vegetables to Grow - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">6 Easiest Vegetables to Grow</div>
+          </div>
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Navigating_with_stars_by_offgrid_ai_image_studio.png?v=1772722179" alt="Navigating with Stars - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">Navigating with the Stars</div>
+          </div>
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/chicken_coop_diagram_created_by_OffGrid_AI_Image_Studio.png?v=1772722179" alt="Chicken Coop Diagram - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">Chicken Coop Construction Diagram</div>
+          </div>
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Human_Skull_anatomy_by_offgrid_ai_image_studio.png?v=1772722176" alt="Human Skull Anatomy - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">Human Skull Anatomy Reference</div>
+          </div>
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/raised_garden_bed_diagram_construction_plan_by_offgrid_ai_image_studio.jpg?v=1772722175" alt="Raised Garden Bed Construction Plan - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">Raised Garden Bed Construction Plan</div>
+          </div>
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Glok_19_exploded_view_diagram_by_offgrid_ai_image_studio.png?v=1772722175" alt="Glock 19 Exploded View Diagram - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">Glock 19 Exploded View Diagram</div>
+          </div>
+          <div class="cc-gallery-item">
+            <span class="cc-gallery-badge">Image Studio</span>
+            <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/6_healthiest_protein-rich_fish_infographic_by_offgrid_ai_image_studio.png?v=1772722180" alt="6 Healthiest Protein-Rich Fish - OffGrid AI Image Studio" loading="lazy">
+            <div class="cc-gallery-caption">6 Healthiest Protein-Rich Fish</div>
+          </div>
+        </div>
+
+        <button class="cc-gallery-nav next" onclick="slideGallery(1)" aria-label="Next">&#8250;</button>
+      </div>
+      <div class="cc-gallery-dots" id="cc-gallery-dots"></div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       KNOWLEDGE BASE SECTION
+       ======================================== -->
+  <section class="cc-kb-section">
+    <div class="cc-kb-container">
+      <div class="cc-section-subtitle">KNOWLEDGE BASE</div>
+      <div class="cc-section-title">Build It Online. Use It Offline.</div>
+      <p class="cc-section-desc">
+        Every answer, every image, every field guide you create in the Command Center can be saved directly to your USB drive's Knowledge Base. Research while you have internet. Use it when you do not.
+      </p>
+
+      <div class="cc-kb-grid">
+        <div class="cc-kb-text">
+          <h3>Your Personal Intelligence Library</h3>
+          <p>
+            The Knowledge Base is the bridge between your online Command Center and your offline ToolKit. While you have internet access, use the full power of four AI models to research, generate, and refine content. Then save everything to your USB.
+          </p>
+          <p>
+            When the internet goes down, when you are in the field, when you are off-grid, your entire library is right there on the drive. Conversations, images, field guides, medical references, technical diagrams. All of it.
+          </p>
+
+          <div class="cc-kb-flow">
+            <div class="cc-kb-flow-step">
+              <div class="cc-kb-flow-icon">&#128172;</div>
+              <div class="cc-kb-flow-label">
+                Ask the Command Council
+                <small>Get answers from four AI models</small>
+              </div>
+            </div>
+            <div class="cc-kb-flow-step">
+              <div class="cc-kb-flow-icon">&#127912;</div>
+              <div class="cc-kb-flow-label">
+                Generate visuals in Image Studio
+                <small>Diagrams, infographics, field guides</small>
+              </div>
+            </div>
+            <div class="cc-kb-flow-step">
+              <div class="cc-kb-flow-icon">&#128190;</div>
+              <div class="cc-kb-flow-label">
+                Save to Knowledge Base
+                <small>One click saves the entire conversation and images</small>
+              </div>
+            </div>
+            <div class="cc-kb-flow-step">
+              <div class="cc-kb-flow-icon">&#128268;</div>
+              <div class="cc-kb-flow-label">
+                Use it offline, anytime
+                <small>Everything lives on your USB drive</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cc-screenshot-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Save_to_Knowledge_Base_popup.jpg?v=1772720766" alt="Save to Knowledge Base - OffGrid AI Command Center" loading="lazy">
+          <div class="cc-screenshot-label">Save, print, or download any conversation and its images</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       READY-MADE PROMPTS SECTION
+       ======================================== -->
+  <section class="cc-prompts-section">
+    <div class="cc-prompts-container">
+      <div class="cc-section-subtitle">READY-MADE PROMPTS</div>
+      <div class="cc-section-title">Hundreds of Expert Prompts. Ready to Go.</div>
+      <p class="cc-section-desc">
+        Not sure what to ask? The Command Center comes loaded with hundreds of pre-built prompts across survival, medical, homesteading, technical, and everyday categories. From serious research to "Stump the Council" logic puzzles, there is always something to explore.
+      </p>
+
+      <div class="cc-prompts-grid">
+        <div class="cc-screenshot-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Ready-Made_Prompts_page.jpg?v=1772720766" alt="Ready-Made Prompts Library - OffGrid AI Command Center" loading="lazy">
+          <div class="cc-screenshot-label">Browse by category, search by keyword, or explore at random</div>
+        </div>
+        <div class="cc-screenshot-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/Stump_the_Council_Logic_Puzzles_and_Brain_Teasers_Ready-Made_prompts.jpg?v=1772720766" alt="Stump the Council - Logic Puzzles and Brain Teasers" loading="lazy">
+          <div class="cc-screenshot-label">Stump the Council: logic puzzles and brain teasers for fun</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       PRICING SECTION
+       ======================================== -->
+  <section class="cc-pricing-section" id="cc-pricing">
+    <div class="cc-pricing-container">
+      <div class="cc-section-subtitle">CHOOSE YOUR COMMAND CENTER</div>
+      <div class="cc-section-title">One Purchase. Yours Forever.</div>
+      <p class="cc-section-desc">
+        Both tiers include the full offline AI ToolKit on a USB drive, unlimited access to the free Online ToolKit, and the complete Command Center with direct access to four frontier AI models, the AI Council, Image Studio, and Knowledge Base.
+      </p>
+
+      <div class="cc-pricing-grid">
+        <!-- Command Center $249 -->
+        <div class="cc-pricing-card featured">
+          <span class="cc-pricing-popular">Most Popular</span>
+          <div class="cc-pricing-tier">Tier 2</div>
+          <div class="cc-pricing-name">Command Center</div>
+          <div class="cc-pricing-tagline">Four AI Experts. One Answer. Yours Forever.</div>
+          <div class="cc-pricing-amount">
+            <span class="price">$249</span>
+            <span class="period">One-time purchase. Yours forever.</span>
+          </div>
+          <ul class="cc-pricing-features">
+            <li><span class="check">&#10003;</span> Everything in the ToolKit ($129 value)</li>
+            <li><span class="check">&#10003;</span> Chat directly with GPT-5.2, Claude, Gemini, or Grok</li>
+            <li><span class="check">&#10003;</span> AI Council: all 4 models deliberate and synthesize</li>
+            <li><span class="check">&#10003;</span> 150 sessions/month shared across all modes</li>
+            <li><span class="check">&#10003;</span> 10 Image Studio generations/month</li>
+            <li><span class="check">&#10003;</span> Anonymous peer review and synthesis</li>
+            <li><span class="check">&#10003;</span> Models auto-update to newest versions</li>
+            <li><span class="check">&#10003;</span> Save everything to Knowledge Base</li>
+            <li><span class="check">&#10003;</span> $0/month. No subscription. Ever.</li>
+          </ul>
+          <div class="cc-pricing-card-cta">
+            <a href="https://offgridaitoolkit.com/products/offgrid-ai-toolkit" class="cc-btn">Get Command Center &#8594;</a>
+          </div>
+        </div>
+
+        <!-- Command Center Pro $469 -->
+        <div class="cc-pricing-card">
+          <div class="cc-pricing-tier">Tier 3</div>
+          <div class="cc-pricing-name">Command Center Pro</div>
+          <div class="cc-pricing-tagline">Maximum Power. Zero Subscriptions.</div>
+          <div class="cc-pricing-amount">
+            <span class="price">$469</span>
+            <span class="period">One-time purchase. Yours forever.</span>
+          </div>
+          <ul class="cc-pricing-features">
+            <li><span class="check">&#10003;</span> Everything in Command Center</li>
+            <li><span class="check">&#10003;</span> 400 sessions/month shared across all modes</li>
+            <li><span class="check">&#10003;</span> 30 Image Studio generations/month</li>
+            <li><span class="check">&#10003;</span> Built for professionals and researchers</li>
+            <li><span class="check">&#10003;</span> Generate complete field guide libraries</li>
+            <li><span class="check">&#10003;</span> Tackle complex multi-part questions</li>
+            <li><span class="check">&#10003;</span> Models auto-update to newest versions</li>
+            <li><span class="check">&#10003;</span> $0/month. No subscription. Ever.</li>
+          </ul>
+          <div class="cc-pricing-card-cta">
+            <a href="https://offgridaitoolkit.com/products/offgrid-ai-toolkit" class="cc-btn">Get Command Pro &#8594;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cc-pricing-no-sub">
+        <p><strong>$0/month.</strong> No subscription. No credit card on file. No recurring charges.</p>
+        <p class="detail">Your monthly sessions and Image Studio allocations are included with your one-time purchase and reset on the 1st of each month at no additional cost.</p>
+      </div>
+
+      <p class="cc-pricing-upgrade">Already own the $129 ToolKit? <a href="mailto:support@offgridaitoolkit.com">Contact us</a> for an upgrade coupon.</p>
+    </div>
+  </section>
+
+  <!-- ========================================
+       FINAL CTA SECTION
+       ======================================== -->
+  <section class="cc-final-cta">
+    <div class="cc-final-container">
+      <div class="cc-section-subtitle">FOUR MODELS. TWO WAYS TO USE THEM. ZERO SUBSCRIPTIONS.</div>
+      <h2 class="cc-final-heading">
+        Own the Only AI That<br>
+        <span class="highlight">Gets a Second Opinion</span>
+      </h2>
+      <p class="cc-final-body">
+        Every other AI tool gives you one model's answer and asks you to trust it. The Command Center gives you four. Chat with any of them directly, or put all four to work at once with the AI Council. One purchase, no subscription, yours forever.
+      </p>
+
+      <div class="cc-final-tiers">
+        <div class="cc-final-tier">
+          <span class="tier-price">$249</span>
+          <span class="tier-name">Command Center</span>
+        </div>
+        <div class="cc-final-tier">
+          <span class="tier-price">$469</span>
+          <span class="tier-name">Command Pro</span>
+        </div>
+      </div>
+
+      <a href="https://offgridaitoolkit.com/products/offgrid-ai-toolkit" class="cc-final-button">GET COMMAND CENTER &#8594;</a>
+
+      <div class="cc-final-links">
+        <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank">Try Command Center Free</a>
+        <a href="https://imagestudio.offgridtoolkit.ai/" target="_blank">Try Image Studio Free</a>
+        <a href="https://cmdcouncil.com/" target="_blank">Learn More</a>
+        <a href="/pages/user-guide">User Guide</a>
+      </div>
+
+      <div class="cc-final-trust">
+        <div class="cc-final-trust-item">4 Premium AI Models</div>
+        <div class="cc-final-trust-item">No Subscription</div>
+        <div class="cc-final-trust-item">Free U.S. Shipping</div>
+        <div class="cc-final-trust-item">30-Day Guarantee</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ========================================
+     JAVASCRIPT
+     ======================================== -->
+<script>
+  // Image Studio Gallery
+  const galleryState = {
+    track: null,
+    items: [],
+    currentIndex: 0,
+    visibleItems: 2
+  };
+
+  function initGallery() {
+    galleryState.track = document.getElementById('cc-gallery-track');
+    if (!galleryState.track) return;
+    galleryState.items = galleryState.track.querySelectorAll('.cc-gallery-item');
+    updateGalleryVisible();
+    createGalleryDots();
+    galleryState.track.addEventListener('scroll', updateGalleryDotsOnScroll);
+    window.addEventListener('resize', () => {
+      updateGalleryVisible();
+      createGalleryDots();
+    });
+  }
+
+  function updateGalleryVisible() {
+    const w = window.innerWidth;
+    if (w <= 768) galleryState.visibleItems = 1;
+    else galleryState.visibleItems = 2;
+  }
+
+  function createGalleryDots() {
+    const dotsContainer = document.getElementById('cc-gallery-dots');
+    if (!dotsContainer || !galleryState.items.length) return;
+    const totalDots = Math.ceil(galleryState.items.length / galleryState.visibleItems);
+    dotsContainer.innerHTML = '';
+    for (let i = 0; i < totalDots; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'cc-gallery-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to image ' + (i + 1));
+      dot.onclick = () => goToGallerySlide(i);
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function slideGallery(direction) {
+    if (!galleryState.items.length) return;
+    const itemWidth = galleryState.items[0].offsetWidth + 20;
+    const maxIndex = galleryState.items.length - galleryState.visibleItems;
+    galleryState.currentIndex = Math.max(0, Math.min(galleryState.currentIndex + direction, maxIndex));
+    galleryState.track.scrollTo({ left: galleryState.currentIndex * itemWidth, behavior: 'smooth' });
+    updateGalleryDots();
+  }
+
+  function goToGallerySlide(index) {
+    if (!galleryState.items.length) return;
+    const itemWidth = galleryState.items[0].offsetWidth + 20;
+    galleryState.currentIndex = index * galleryState.visibleItems;
+    galleryState.track.scrollTo({ left: galleryState.currentIndex * itemWidth, behavior: 'smooth' });
+    updateGalleryDots();
+  }
+
+  function updateGalleryDots() {
+    const dotsContainer = document.getElementById('cc-gallery-dots');
+    if (!dotsContainer) return;
+    const dots = dotsContainer.querySelectorAll('.cc-gallery-dot');
+    const activeIndex = Math.floor(galleryState.currentIndex / galleryState.visibleItems);
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === activeIndex));
+  }
+
+  function updateGalleryDotsOnScroll() {
+    if (!galleryState.items.length) return;
+    const itemWidth = galleryState.items[0].offsetWidth + 20;
+    galleryState.currentIndex = Math.round(galleryState.track.scrollLeft / itemWidth);
+    updateGalleryDots();
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('.cc-page a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', initGallery);
+</script>

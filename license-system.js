@@ -132,10 +132,10 @@ const TIER_LIMITS = {
         monthlyPrompts: 0,
         monthlyImages: 0
     },
-    // Tier 2: ToolKit + Command Center ($199)
+    // Tier 2: ToolKit + Command Center ($249)
     2: {
         name: 'ToolKit + Command Center',
-        price: 199,
+        price: 249,
         hasCommandCenter: true,
         hasImageStudio: true,
         monthlyPrompts: 150,
@@ -148,7 +148,7 @@ const TIER_LIMITS = {
         hasCommandCenter: true,
         hasImageStudio: true,
         monthlyPrompts: 400,
-        monthlyImages: 40
+        monthlyImages: 30
     }
 };
 

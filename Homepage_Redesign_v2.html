@@ -1,0 +1,3146 @@
+<!-- OffGrid AI Toolkit - Desert Canyon Theme - Homepage v2 -->
+<!-- UPDATED: Three-tier pricing, competitive comparison, new CTAs -->
+<!-- Date: February 2026 -->
+<style>
+  /* Reset and Base Styles */
+  main#MainContent {
+    background: #1A1611 !important;
+  }
+
+  .offgrid-content * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  .offgrid-content {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: #e8ddd0;
+    line-height: 1.6;
+    background: #1a1611;
+  }
+
+  .offgrid-section {
+    padding: 80px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .offgrid-section-title {
+    font-size: 42px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 50px;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .offgrid-section-subtitle {
+    text-align: center;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #d4af37;
+    margin-bottom: 15px;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+  }
+
+  .offgrid-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 18px 45px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .offgrid-btn:hover {
+    background: linear-gradient(135deg, #e6c550 0%, #d4af37 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(212, 175, 55, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(212, 175, 55, 0.5);
+  }
+
+  .offgrid-btn-secondary {
+    background: transparent;
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    box-shadow: none;
+  }
+
+  .offgrid-btn-secondary:hover {
+    background: rgba(212, 175, 55, 0.15);
+    color: #e6c550;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+
+  /* ========================================
+     HERO SECTION
+     ======================================== */
+  .hero-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 60px 20px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center top, rgba(212, 175, 55, 0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .hero-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-content {
+    padding-right: 20px;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 25px;
+  }
+
+  .hero-headline {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.15;
+    margin-bottom: 25px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-headline .highlight {
+    color: #d4af37;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+  }
+
+  .hero-subheadline {
+    font-size: 20px;
+    color: #d4c0a8;
+    line-height: 1.7;
+    margin-bottom: 35px;
+  }
+
+  .hero-features {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 35px;
+  }
+
+  .hero-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    color: #e8ddd0;
+  }
+
+  .hero-feature-icon {
+    color: #d4af37;
+    font-size: 18px;
+  }
+
+  .hero-cta-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-price {
+    font-size: 15px;
+    color: #b8a088;
+    margin-top: 20px;
+  }
+
+  .hero-price strong {
+    color: #d4af37;
+    font-size: 24px;
+  }
+
+  .hero-visual {
+    position: relative;
+  }
+
+  .hero-product-wrapper {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-product-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .hero-product-image {
+    width: 100%;
+    border-radius: 12px;
+    display: block;
+  }
+
+  .hero-product-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  }
+
+  /* ========================================
+     PRICING TIERS SECTION
+     ======================================== */
+  .pricing-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .pricing-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .pricing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .pricing-intro {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 50px;
+    font-size: 18px;
+    color: #d4c0a8;
+    line-height: 1.7;
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    align-items: stretch;
+  }
+
+  .pricing-card {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 20px;
+    padding: 40px 30px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+  }
+
+  .pricing-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .pricing-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  }
+
+  .pricing-card.featured {
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(212, 175, 55, 0.15);
+  }
+
+  .pricing-card.featured::before {
+    background: linear-gradient(90deg, transparent, #d4af37, transparent);
+    height: 3px;
+  }
+
+  .pricing-popular-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+  }
+
+  .pricing-card-image {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    margin: 0 auto 20px;
+    display: block;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+  }
+
+  .pricing-card-tier {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #d4af37;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .pricing-card-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .pricing-card-tagline {
+    font-size: 14px;
+    color: #b8a088;
+    text-align: center;
+    margin-bottom: 20px;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .pricing-card-price {
+    text-align: center;
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .pricing-card-price .amount {
+    font-size: 48px;
+    font-weight: 700;
+    color: #d4af37;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+
+  .pricing-card-price .period {
+    display: block;
+    font-size: 14px;
+    color: #b8a088;
+    margin-top: 5px;
+  }
+
+  .pricing-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 30px 0;
+    flex-grow: 1;
+  }
+
+  .pricing-features-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #e8ddd0;
+    line-height: 1.5;
+  }
+
+  .pricing-features-list li .check {
+    color: #d4af37;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .pricing-features-list li.disabled {
+    color: #6b5d50;
+  }
+
+  .pricing-features-list li.disabled .check {
+    color: #4a3f35;
+  }
+
+  .pricing-card-cta {
+    text-align: center;
+    margin-top: auto;
+  }
+
+  .pricing-card-cta .offgrid-btn {
+    width: 100%;
+    text-align: center;
+    padding: 16px 20px;
+  }
+
+  .pricing-card-try {
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  .pricing-card-try a {
+    color: #d4af37;
+    font-size: 13px;
+    text-decoration: underline;
+  }
+
+  .pricing-no-sub {
+    text-align: center;
+    margin-top: 40px;
+    padding: 25px;
+    background: rgba(212, 175, 55, 0.08);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 12px;
+  }
+
+  .pricing-no-sub p {
+    font-size: 16px;
+    color: #e8ddd0;
+    font-weight: 600;
+  }
+
+  .pricing-no-sub p strong {
+    color: #d4af37;
+  }
+
+  .pricing-no-sub .pricing-no-sub-detail {
+    font-size: 14px;
+    color: #b8a088;
+    font-weight: 400;
+    margin-top: 8px;
+  }
+
+  /* ========================================
+     COMPETITIVE COMPARISON SECTION
+     ======================================== */
+  .comparison-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .comparison-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .comparison-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .comparison-table-wrapper {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  }
+
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+  }
+
+  .comparison-table th {
+    padding: 20px 18px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    color: #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.08);
+  }
+
+  .comparison-table td {
+    padding: 16px 18px;
+    font-size: 15px;
+    color: #e8ddd0;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.08);
+  }
+
+  .comparison-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .comparison-table tr.highlight-row {
+    background: rgba(212, 175, 55, 0.06);
+  }
+
+  .comparison-table tr.highlight-row td {
+    color: #ffffff;
+    font-weight: 600;
+  }
+
+  .comparison-table .comp-check {
+    color: #d4af37;
+    font-size: 18px;
+  }
+
+  .comparison-table .comp-x {
+    color: #6b5d50;
+    font-size: 18px;
+  }
+
+  .comparison-table .comp-price-highlight {
+    color: #d4af37;
+    font-weight: 700;
+  }
+
+  .comparison-bottom-note {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 16px;
+    color: #d4c0a8;
+    line-height: 1.7;
+  }
+
+  .comparison-bottom-note strong {
+    color: #d4af37;
+  }
+
+  /* ========================================
+     DUAL MODE SECTION - Online + Offline
+     ======================================== */
+  .dual-mode-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .dual-mode-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .dual-mode-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .dual-mode-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+  }
+
+  .dual-mode-card {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 16px;
+    padding: 40px 35px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dual-mode-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .dual-mode-card-badge {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 18px;
+  }
+
+  .dual-mode-card h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .dual-mode-card p {
+    font-size: 15px;
+    color: #b8a088;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .dual-mode-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .dual-mode-features-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 14px;
+    color: #e8ddd0;
+    line-height: 1.5;
+  }
+
+  .dual-mode-features-list li span {
+    color: #d4af37;
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Synergy Bridge */
+  .synergy-bridge {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    border-radius: 16px;
+    padding: 40px 50px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .synergy-bridge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: synergyShimmer 4s infinite;
+  }
+
+  @keyframes synergyShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  .synergy-bridge h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1611;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .synergy-bridge p {
+    font-size: 16px;
+    color: #2c2018;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ========================================
+     COMMAND CENTER SECTION
+     ======================================== */
+  .command-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .command-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .command-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .command-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  .command-info h3 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 18px;
+    line-height: 1.2;
+  }
+
+  .command-info p {
+    font-size: 16px;
+    color: #b8a088;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .command-models-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .command-model-tag {
+    background: rgba(212, 175, 55, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.25);
+    border-radius: 8px;
+    padding: 12px 16px;
+    text-align: center;
+  }
+
+  .command-model-tag strong {
+    display: block;
+    font-size: 14px;
+    color: #ffd4a3;
+    font-weight: 600;
+  }
+
+  .command-model-tag small {
+    font-size: 11px;
+    color: #b8a088;
+  }
+
+  .command-visual {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 16px;
+    padding: 35px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .command-visual::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .command-process-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .command-process-step:last-child {
+    border-bottom: none;
+  }
+
+  .command-step-num {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+  }
+
+  .command-step-text h4 {
+    font-size: 15px;
+    color: #ffd4a3;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .command-step-text p {
+    font-size: 13px;
+    color: #b8a088;
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .command-cta {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .command-cta .offgrid-btn {
+    margin: 0 8px;
+  }
+
+  /* ========================================
+     TRY BEFORE YOU BUY SECTION
+     ======================================== */
+  .try-demo-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .try-demo-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .try-demo-container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .try-demo-content {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.8), rgba(26, 22, 17, 0.9));
+    border-radius: 20px;
+    padding: 60px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  .try-demo-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.5), transparent);
+  }
+
+  .try-demo-badge {
+    display: inline-block;
+    background: rgba(212, 175, 55, 0.15);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    color: #d4af37;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+
+  .try-demo-headline {
+    font-size: 42px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+  }
+
+  .try-demo-headline .highlight {
+    color: #d4af37;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+  }
+
+  .try-demo-description {
+    font-size: 18px;
+    color: #d4c0a8;
+    line-height: 1.7;
+    margin-bottom: 35px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .try-demo-features {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+  }
+
+  .try-demo-feature {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #e8ddd0;
+  }
+
+  .try-demo-feature-icon {
+    color: #d4af37;
+    font-size: 20px;
+  }
+
+  .try-demo-cta-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .try-demo-note {
+    font-size: 14px;
+    color: #b8a088;
+    margin-top: 20px;
+    font-style: italic;
+  }
+
+  /* ========================================
+     REVIEWS SECTION
+     ======================================== */
+  .reviews-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px 100px 20px;
+    position: relative;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .reviews-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  }
+
+  .reviews-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .reviews-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  /* ========================================
+     PROBLEM SECTION
+     ======================================== */
+  .problem-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 100px 20px 80px 20px;
+    position: relative;
+  }
+
+  .problem-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 140, 66, 0.2), transparent);
+  }
+
+  .problem-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .problem-intro {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .problem-intro h2 {
+    font-size: 36px;
+    color: #ffffff;
+    margin-bottom: 15px;
+  }
+
+  .problem-intro p {
+    font-size: 18px;
+    color: #b8a088;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+
+  .problem-card {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.6), rgba(26, 22, 17, 0.5));
+    border-radius: 12px;
+    padding: 30px;
+    border: 1px solid rgba(255, 140, 66, 0.1);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+  }
+
+  .problem-card:hover {
+    border-color: rgba(255, 140, 66, 0.25);
+    transform: translateY(-3px);
+  }
+
+  .problem-icon {
+    font-size: 32px;
+    flex-shrink: 0;
+    filter: grayscale(0.3);
+  }
+
+  .problem-content h3 {
+    font-size: 18px;
+    color: #ffd4a3;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .problem-content p {
+    font-size: 15px;
+    color: #b8a088;
+    line-height: 1.6;
+  }
+
+  .problem-solution-bridge {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 50px;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .problem-solution-bridge p {
+    font-size: 22px;
+    color: #d4c0a8;
+    font-style: italic;
+    margin-bottom: 25px;
+  }
+
+  .problem-solution-bridge p strong {
+    color: #d4af37;
+    font-style: normal;
+  }
+
+  /* ========================================
+     TRUST BADGES SECTION
+     ======================================== */
+  .trust-badges {
+    background: transparent;
+    padding: 60px 20px;
+    position: relative;
+    z-index: 10;
+  }
+
+  body > .trust-badges,
+  .offgrid-content + .trust-badges {
+    padding: 100px 20px 80px 20px;
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+  }
+
+  .trust-badges-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.95), rgba(26, 22, 17, 0.9));
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 140, 66, 0.1);
+    border: 1px solid rgba(255, 140, 66, 0.15);
+  }
+
+  .trust-badges-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+  }
+
+  .trust-badge {
+    text-align: center;
+    padding: 0;
+    background: transparent;
+    border: none;
+    position: relative;
+  }
+
+  .trust-badge-icon {
+    font-size: 56px;
+    margin-bottom: 18px;
+    display: inline-block;
+    filter: drop-shadow(0 4px 12px rgba(255, 140, 66, 0.3));
+    transition: transform 0.3s;
+  }
+
+  .trust-badge:hover .trust-badge-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .trust-badge-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffd4a3;
+    margin-bottom: 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .trust-badge-desc {
+    font-size: 14px;
+    color: #b8a088;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .trust-badge:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, rgba(255, 140, 66, 0.2) 50%, transparent);
+  }
+
+  /* ========================================
+     WHAT'S INCLUDED SECTION
+     ======================================== */
+  .included-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    position: relative;
+  }
+
+  .included-container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .included-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    align-items: center;
+  }
+
+  .included-visual {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.7), rgba(26, 22, 17, 0.6));
+    border-radius: 16px;
+    padding: 40px;
+    border: 1px solid rgba(255, 140, 66, 0.15);
+    text-align: center;
+  }
+
+  .included-usb-icon {
+    width: 180px;
+    height: auto;
+    margin: 0 auto 20px auto;
+    display: block;
+    filter: drop-shadow(0 8px 20px rgba(212, 175, 55, 0.3));
+  }
+
+  .included-format {
+    font-size: 16px;
+    color: #d4c0a8;
+  }
+
+  .included-format strong {
+    color: #d4af37;
+  }
+
+  .included-list {
+    list-style: none;
+  }
+
+  .included-item {
+    display: flex;
+    gap: 15px;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .included-item:last-child {
+    border-bottom: none;
+  }
+
+  .included-check {
+    color: #d4af37;
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .included-text h4 {
+    font-size: 17px;
+    color: #ffd4a3;
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+
+  .included-text p {
+    font-size: 14px;
+    color: #b8a088;
+    line-height: 1.5;
+  }
+
+  /* ========================================
+     HOW IT WORKS SECTION
+     ======================================== */
+  .how-it-works-section {
+    background: linear-gradient(180deg, #221a14 0%, #2c2018 100%);
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .how-it-works-content-new {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .how-it-works-intro {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .how-it-works-intro p {
+    font-size: 18px;
+    color: #d4c0a8;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .how-it-works-steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+    margin-bottom: 60px;
+  }
+
+  .how-it-works-step-compact {
+    text-align: center;
+    position: relative;
+  }
+
+  .how-it-works-step-compact:not(:last-child)::after {
+    content: '\2192';
+    position: absolute;
+    right: -20px;
+    top: 25px;
+    color: rgba(212, 175, 55, 0.4);
+    font-size: 24px;
+  }
+
+  .step-number-compact {
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 20px;
+    margin: 0 auto 18px;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  }
+
+  .step-title-compact {
+    font-weight: 700;
+    color: #ffd4a3;
+    margin-bottom: 8px;
+    font-size: 16px;
+  }
+
+  .step-desc-compact {
+    color: #b8a088;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .how-it-works-video-centerpiece {
+    max-width: 900px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(26, 22, 17, 0.9), rgba(44, 32, 24, 0.8));
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 140, 66, 0.1);
+    border: 1px solid rgba(255, 140, 66, 0.2);
+  }
+
+  .how-it-works-video-centerpiece iframe {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    border: none;
+  }
+
+  .how-it-works-cta {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .how-it-works-cta .offgrid-btn {
+    margin: 0 8px;
+  }
+
+  /* ========================================
+     CAROUSEL SECTIONS
+     ======================================== */
+  .carousel-section {
+    background: linear-gradient(180deg, #221a14 0%, #1a1611 100%);
+    padding: 80px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .carousel-section.alt-bg {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+  }
+
+  .carousel-header {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .carousel-intro {
+    font-size: 18px;
+    color: #d4c0a8;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .carousel-wrapper {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 60px;
+  }
+
+  .carousel-track {
+    display: flex;
+    gap: 25px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 10px 5px 20px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .carousel-card {
+    flex: 0 0 calc(33.333% - 17px);
+    min-width: 320px;
+    background: linear-gradient(135deg, #2c2018 0%, #221a14 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 140, 66, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 140, 66, 0.1);
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    scroll-snap-align: start;
+  }
+
+  .carousel-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 140, 66, 0.4), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .carousel-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(255, 140, 66, 0.2);
+    border-color: rgba(255, 140, 66, 0.3);
+  }
+
+  .carousel-card:hover::before {
+    opacity: 1;
+  }
+
+  .carousel-card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    filter: brightness(0.85) sepia(0.1);
+    transition: all 0.5s ease;
+  }
+
+  .carousel-card:hover .carousel-card-image {
+    filter: brightness(1) sepia(0);
+    transform: scale(1.05);
+  }
+
+  .carousel-card-content {
+    padding: 24px;
+  }
+
+  .carousel-card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .carousel-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffd4a3;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+
+  .carousel-card-desc {
+    font-size: 14px;
+    color: #b8a088;
+    line-height: 1.6;
+  }
+
+  .carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #1a1611;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+
+  .carousel-nav:hover {
+    background: linear-gradient(135deg, #e6c550 0%, #d4af37 100%);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
+  }
+
+  .carousel-nav.prev { left: 10px; }
+  .carousel-nav.next { right: 10px; }
+
+  .carousel-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .carousel-nav:disabled:hover {
+    transform: translateY(-50%);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+  }
+
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+  }
+
+  .carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(212, 175, 55, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+
+  .carousel-dot.active,
+  .carousel-dot:hover {
+    background: #d4af37;
+    transform: scale(1.2);
+  }
+
+  .carousel-cta {
+    text-align: center;
+    margin-top: 40px;
+    padding: 0 20px;
+  }
+
+  /* ========================================
+     SOCIAL PROOF SECTION
+     ======================================== */
+  .social-proof-section {
+    background: linear-gradient(180deg, #1a1611 0%, #221a14 100%);
+    padding: 80px 20px;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .social-proof-container {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .social-proof-quote {
+    font-size: 24px;
+    color: #e8ddd0;
+    font-style: italic;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    position: relative;
+    padding: 0 40px;
+  }
+
+  .social-proof-quote::before {
+    content: '\201C';
+    position: absolute;
+    left: 0;
+    top: -10px;
+    font-size: 60px;
+    color: rgba(212, 175, 55, 0.3);
+    font-style: normal;
+    line-height: 1;
+  }
+
+  .social-proof-author {
+    font-size: 16px;
+    color: #d4af37;
+    font-weight: 600;
+  }
+
+  .social-proof-role {
+    font-size: 14px;
+    color: #b8a088;
+    margin-top: 5px;
+  }
+
+  .social-proof-stats {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin-top: 50px;
+    padding-top: 50px;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .stat-item { text-align: center; }
+
+  .stat-number {
+    font-size: 42px;
+    font-weight: 700;
+    color: #d4af37;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #b8a088;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ========================================
+     FAQ SECTION
+     ======================================== */
+  .faq-section {
+    background: linear-gradient(180deg, #221a14 0%, #2c2018 100%);
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .faq-container {
+    max-width: 850px;
+    margin: 0 auto;
+  }
+
+  .faq-item {
+    background: linear-gradient(135deg, rgba(44, 32, 24, 0.7), rgba(26, 22, 17, 0.6));
+    border-radius: 10px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 140, 66, 0.05);
+    border: 1px solid rgba(255, 140, 66, 0.12);
+    transition: all 0.3s;
+  }
+
+  .faq-item:hover {
+    border-color: rgba(255, 140, 66, 0.25);
+  }
+
+  .faq-question {
+    padding: 22px 28px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #ffd4a3;
+    font-size: 17px;
+    transition: background 0.3s;
+  }
+
+  .faq-question:hover {
+    background: rgba(255, 140, 66, 0.06);
+  }
+
+  .faq-icon {
+    font-size: 24px;
+    color: #d4af37;
+    transition: transform 0.3s;
+    font-weight: 300;
+  }
+
+  .faq-item.active .faq-icon {
+    transform: rotate(45deg);
+  }
+
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+
+  .faq-item.active .faq-answer {
+    max-height: 400px;
+  }
+
+  .faq-answer-content {
+    padding: 0 28px 22px 28px;
+    color: #b8a088;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .faq-answer-content a {
+    color: #d4af37;
+    text-decoration: underline;
+  }
+
+  .faq-cta {
+    text-align: center;
+    margin-top: 40px;
+  }
+
+  .faq-cta p { color: #b8a088; margin-bottom: 15px; }
+  .faq-cta a { color: #d4af37; text-decoration: underline; }
+
+  /* ========================================
+     FINAL CTA SECTION
+     ======================================== */
+  .final-cta-section {
+    background: linear-gradient(180deg, #2c2018 0%, #1a1611 50%, #221a14 100%);
+    padding: 100px 20px;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 140, 66, 0.1);
+  }
+
+  .final-cta-section::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center top, rgba(255, 140, 66, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .final-cta-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #d4af37 20%, #e6c550 50%, #d4af37 80%, transparent);
+  }
+
+  .final-cta-container {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .final-cta-eyebrow {
+    text-align: center;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #d4af37;
+    margin-bottom: 20px;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  }
+
+  .final-cta-heading {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 25px;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .final-cta-body {
+    font-size: 18px;
+    color: #d4c0a8;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+
+  .final-cta-body p { margin-bottom: 15px; }
+
+  .final-cta-tiers {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 35px 0;
+    flex-wrap: wrap;
+  }
+
+  .final-cta-tier-item {
+    text-align: center;
+  }
+
+  .final-cta-tier-item .tier-price {
+    font-size: 32px;
+    font-weight: 700;
+    color: #d4af37;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    display: block;
+  }
+
+  .final-cta-tier-item .tier-name {
+    font-size: 13px;
+    color: #b8a088;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .final-cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+    color: #1a1611;
+    padding: 22px 65px;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(212, 175, 55, 0.4);
+    cursor: pointer;
+    box-shadow: 0 10px 35px rgba(212, 175, 55, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    margin: 20px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .final-cta-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .final-cta-button:hover {
+    background: linear-gradient(135deg, #e6c550 0%, #d4af37 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 45px rgba(212, 175, 55, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+    border-color: rgba(212, 175, 55, 0.6);
+  }
+
+  .final-cta-button:hover::before { left: 100%; }
+
+  .final-cta-links { margin: 25px 0; }
+
+  .final-cta-links a {
+    color: #d4af37;
+    font-size: 15px;
+    text-decoration: underline;
+    margin: 0 15px;
+  }
+
+  .final-cta-trust {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 30px;
+    font-size: 14px;
+    color: #b8a088;
+  }
+
+  .final-cta-trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .final-cta-trust-item::before {
+    content: '\2713';
+    color: #d4af37;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* ========================================
+     RESPONSIVE DESIGN
+     ======================================== */
+  @media (max-width: 1024px) {
+    .hero-container {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      text-align: center;
+    }
+
+    .hero-content { padding-right: 0; }
+    .hero-headline { font-size: 40px; }
+    .hero-features { align-items: center; }
+    .hero-cta-group { justify-content: center; }
+
+    .pricing-grid {
+      grid-template-columns: 1fr;
+      max-width: 450px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .how-it-works-steps-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .how-it-works-step-compact:not(:last-child)::after {
+      display: none;
+    }
+
+    .carousel-card {
+      flex: 0 0 calc(50% - 13px);
+      min-width: 300px;
+    }
+
+    .carousel-wrapper { padding: 0 50px; }
+
+    .command-content {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .comparison-table { font-size: 13px; }
+    .comparison-table th, .comparison-table td { padding: 14px 12px; }
+  }
+
+  @media (max-width: 992px) {
+    .trust-badges-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 35px;
+    }
+
+    .trust-badge:nth-child(2)::after,
+    .trust-badge:nth-child(4)::after {
+      display: none;
+    }
+
+    .included-grid {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .problem-grid { grid-template-columns: 1fr; }
+    .social-proof-stats { gap: 40px; }
+
+    .dual-mode-grid {
+      grid-template-columns: 1fr;
+      gap: 25px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .offgrid-content { padding: 20px 15px; }
+
+    .pricing-section { padding: 60px 20px; }
+
+    .pricing-grid {
+      grid-template-columns: 1fr;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .pricing-card { padding: 30px 25px; }
+    .pricing-card-image { width: 120px; height: 120px; }
+    .pricing-card-name { font-size: 20px; }
+    .pricing-card-price .amount { font-size: 38px; }
+
+    .try-demo-section { padding: 60px 20px; }
+    .try-demo-content { padding: 40px 25px; }
+    .try-demo-headline { font-size: 32px; }
+    .try-demo-description { font-size: 16px; }
+
+    .try-demo-features {
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .try-demo-cta-group {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .offgrid-section-title {
+      font-size: 32px;
+      margin-bottom: 35px;
+    }
+
+    .hero-section { padding: 40px 20px 60px; }
+    .hero-headline { font-size: 32px; }
+    .hero-subheadline { font-size: 17px; }
+    .hero-product-wrapper { padding: 25px; }
+
+    .reviews-section { padding: 60px 20px 80px 20px; }
+
+    .trust-badges { padding: 40px 15px; }
+    .trust-badges-container { padding: 35px 25px; }
+
+    .trust-badges-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px 15px;
+    }
+
+    .trust-badge:not(:last-child)::after { display: none; }
+    .trust-badge-icon { font-size: 36px; margin-bottom: 10px; }
+    .trust-badge-title { font-size: 14px; margin-bottom: 6px; line-height: 1.2; }
+    .trust-badge-desc { font-size: 11px; line-height: 1.4; }
+    .trust-badge:not(:last-child) { padding-bottom: 0; border-bottom: none; }
+
+    .problem-intro h2 { font-size: 28px; }
+
+    .how-it-works-steps-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px 15px;
+    }
+
+    .step-number-compact { width: 40px; height: 40px; font-size: 16px; margin-bottom: 12px; }
+    .step-title-compact { font-size: 14px; margin-bottom: 5px; }
+    .step-desc-compact { font-size: 11px; line-height: 1.4; }
+    .how-it-works-video-centerpiece { padding: 12px; }
+
+    .how-it-works-cta .offgrid-btn {
+      display: block;
+      margin: 10px auto;
+      max-width: 280px;
+    }
+
+    .carousel-section { padding: 60px 0; }
+    .carousel-wrapper { padding: 0 15px; }
+    .carousel-card { flex: 0 0 85%; min-width: 280px; }
+    .carousel-nav { display: none; }
+    .carousel-track { padding: 10px 15px 20px; gap: 15px; }
+    .carousel-dots { margin-top: 20px; }
+
+    .social-proof-quote { font-size: 20px; padding: 0 20px; }
+    .social-proof-stats { flex-direction: column; gap: 30px; }
+    .stat-number { font-size: 36px; }
+
+    .final-cta-section { padding: 60px 20px; }
+    .final-cta-heading { font-size: 32px; }
+    .final-cta-body { font-size: 16px; }
+    .final-cta-trust { flex-direction: column; gap: 12px; }
+    .final-cta-button { padding: 18px 40px; font-size: 18px; }
+    .final-cta-links a { display: block; margin: 10px 0; }
+    .final-cta-tiers { gap: 20px; }
+    .final-cta-tier-item .tier-price { font-size: 26px; }
+
+    .dual-mode-section { padding: 60px 20px; }
+    .dual-mode-card { padding: 30px 25px; }
+    .dual-mode-card h3 { font-size: 20px; }
+    .synergy-bridge { padding: 30px 25px; }
+    .synergy-bridge h3 { font-size: 20px; }
+    .synergy-bridge p { font-size: 14px; }
+
+    .command-section { padding: 60px 20px; }
+    .command-info h3 { font-size: 26px; }
+    .command-models-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .command-cta .offgrid-btn {
+      display: block;
+      margin: 10px auto;
+      max-width: 280px;
+    }
+
+    .comparison-table th, .comparison-table td { padding: 12px 10px; font-size: 13px; }
+  }
+
+  @media (max-width: 480px) {
+    .hero-headline { font-size: 28px; }
+
+    .hero-cta-group {
+      flex-direction: column;
+    }
+
+    .hero-cta-group .offgrid-btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .offgrid-section-title { font-size: 26px; }
+    .carousel-card { flex: 0 0 90%; }
+    .final-cta-heading { font-size: 28px; }
+    .final-cta-tier-item .tier-price { font-size: 22px; }
+    .command-models-grid { grid-template-columns: 1fr; }
+
+    .pricing-card-price .amount { font-size: 32px; }
+    .pricing-no-sub { padding: 20px 15px; }
+  }
+</style>
+
+<div class="offgrid-content">
+
+  <!-- ========================================
+       HERO SECTION
+       ======================================== -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">OFFLINE + ONLINE AI TOOLKIT</div>
+        <h1 class="hero-headline">
+          AI That Works<br>
+          <span class="highlight">When Nothing Else Does</span>
+        </h1>
+        <p class="hero-subheadline">
+          Get your own copy of the world's knowledge. A plug-and-play USB with powerful AI models that run entirely offline, plus an online Command Center that taps into GPT, Claude, Gemini, and Grok when you have internet. One toolkit, three tiers, zero subscriptions.
+        </p>
+        <div class="hero-features">
+          <div class="hero-feature">
+            <span class="hero-feature-icon">&#10003;</span>
+            <span>Works in deserts, mountains, and off-grid cabins</span>
+          </div>
+          <div class="hero-feature">
+            <span class="hero-feature-icon">&#10003;</span>
+            <span>Vision AI, Medical AI, and Gemma3 models included</span>
+          </div>
+          <div class="hero-feature">
+            <span class="hero-feature-icon">&#10003;</span>
+            <span>Command Center queries 4 top AI models at once</span>
+          </div>
+          <div class="hero-feature">
+            <span class="hero-feature-icon">&#10003;</span>
+            <span>Save research online, use it offline. Knowledge Base syncs to USB</span>
+          </div>
+        </div>
+        <div class="hero-cta-group">
+          <a href="#choose-your-toolkit" class="offgrid-btn">Choose Your Toolkit</a>
+          <a href="https://offgridtoolkit.ai/" target="_blank" class="offgrid-btn offgrid-btn-secondary">Try It Free &#8594;</a>
+        </div>
+        <p class="hero-price">Starting at <strong>$129</strong> &nbsp; One-time purchase. Free shipping. 30-day guarantee.</p>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-product-wrapper">
+          <div class="hero-product-badge">USB 3.2</div>
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/offgrid_usb_no_branding-stroke.png?v=1764605050" alt="OffGrid AI Toolkit USB Drive" class="hero-product-image">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       REVIEWS SECTION
+       ======================================== -->
+  <section class="reviews-section">
+    <div class="reviews-container">
+      <div class="reviews-header">
+        <div class="offgrid-section-subtitle">REAL CUSTOMERS</div>
+        <div class="offgrid-section-title">What Our Customers Are Saying</div>
+      </div>
+     <!-- Elfsight Google Reviews | Offgrid AI -->
+<script src="https://elfsightcdn.com/platform.js" async></script>
+<div class="elfsight-app-fc5feebb-3f61-4274-8dc5-c92721c08436" data-elfsight-app-lazy></div>
+  </section>
+
+  <!-- ========================================
+       PROBLEM SECTION - Why You Need This
+       ======================================== -->
+  <section class="problem-section">
+    <div class="problem-container">
+      <div class="problem-intro">
+        <h2>There's A Flaw In Our Plan</h2>
+        <p>We've become dependent on technology we don't own and can't control. What happens when it's not there?</p>
+      </div>
+      <div class="problem-grid">
+        <div class="problem-card">
+          <div class="problem-icon">&#127760;</div>
+          <div class="problem-content">
+            <h3>Internet Goes Down</h3>
+            <p>Natural disasters, outages, or remote locations. When the grid fails, so does every cloud AI service you depend on.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#128274;</div>
+          <div class="problem-content">
+            <h3>Privacy Doesn't Exist</h3>
+            <p>Every question you ask ChatGPT, Claude, or Gemini is stored, analyzed, and used to train their models. Your data is their product.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#128176;</div>
+          <div class="problem-content">
+            <h3>Monthly Fees Never End</h3>
+            <p>$20/month for ChatGPT Plus. $200/month for Pro. That's $240 to $2,400 per year for access you can lose at any time.</p>
+          </div>
+        </div>
+        <div class="problem-card">
+          <div class="problem-icon">&#9888;&#65039;</div>
+          <div class="problem-content">
+            <h3>Single Points of Failure</h3>
+            <p>One AI model. One company. One outage or policy change and your access disappears overnight.</p>
+          </div>
+        </div>
+      </div>
+      <div class="problem-solution-bridge">
+        <p>What if you could <strong>own your AI</strong>, use it offline, and still access the best models online when you want to?</p>
+        <a href="#choose-your-toolkit" class="offgrid-btn">See the Solution &#8594;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       TRUST BADGES SECTION
+       ======================================== -->
+  <section class="trust-badges">
+    <div class="trust-badges-container">
+      <div class="trust-badges-grid">
+        <div class="trust-badge">
+          <div class="trust-badge-icon">&#128737;</div>
+          <div class="trust-badge-title">100% Private</div>
+          <div class="trust-badge-desc">Your data never leaves your device. No cloud. No tracking. No accounts.</div>
+        </div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">&#128268;</div>
+          <div class="trust-badge-title">Plug &amp; Play</div>
+          <div class="trust-badge-desc">Insert USB, double-click, start chatting. No installation or technical skills needed.</div>
+        </div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">&#128176;</div>
+          <div class="trust-badge-title">Zero Subscriptions</div>
+          <div class="trust-badge-desc">Buy once, own forever. No monthly fees. No recurring charges. Ever.</div>
+        </div>
+        <div class="trust-badge">
+          <div class="trust-badge-icon">&#128230;</div>
+          <div class="trust-badge-title">30-Day Guarantee</div>
+          <div class="trust-badge-desc">Not satisfied? Full refund within 30 days. No questions asked.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       PRICING TIERS SECTION
+       ======================================== -->
+  <section class="pricing-section" id="choose-your-toolkit">
+    <div class="pricing-container">
+      <div class="offgrid-section-subtitle">CHOOSE YOUR TOOLKIT</div>
+      <div class="offgrid-section-title">Three Tiers. Zero Subscriptions.</div>
+      <p class="pricing-intro">Every tier includes the full offline AI ToolKit on a USB flash drive. Choose the level of online power that fits your needs. Buy once, own forever.</p>
+
+      <div class="pricing-grid">
+        <!-- TIER 1: OffGrid AI ToolKit - $129 -->
+        <div class="pricing-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/tier1-toolkit.png" alt="OffGrid AI ToolKit" class="pricing-card-image">
+          <div class="pricing-card-tier">Tier 1</div>
+          <div class="pricing-card-name">OffGrid AI ToolKit</div>
+          <div class="pricing-card-tagline">Your AI. Your Drive. No Internet Required.</div>
+          <div class="pricing-card-price">
+            <span class="amount">$129</span>
+            <span class="period">One-time purchase. Yours forever.</span>
+          </div>
+          <ul class="pricing-features-list">
+            <li><span class="check">&#10003;</span> Full offline AI powered by Gemma 3</li>
+            <li><span class="check">&#10003;</span> Multimodal: text, images, voice input</li>
+            <li><span class="check">&#10003;</span> Vision AI &amp; Medical AI (MedGemma)</li>
+            <li><span class="check">&#10003;</span> Knowledge Base folder system</li>
+            <li><span class="check">&#10003;</span> Unlimited Online ToolKit access</li>
+            <li><span class="check">&#10003;</span> Camera capture &amp; image upload</li>
+            <li><span class="check">&#10003;</span> Hundreds of ready-made prompts</li>
+            <li><span class="check">&#10003;</span> Desktop + mobile compatible</li>
+            <li class="disabled"><span class="check">&#8212;</span> AI Council (4 frontier models)</li>
+            <li class="disabled"><span class="check">&#8212;</span> Image Studio generations</li>
+          </ul>
+          <div class="pricing-card-cta">
+            <a href="/products/offgrid-ai-toolkit" class="offgrid-btn">Get the ToolKit</a>
+          </div>
+          <div class="pricing-card-try">
+            <a href="https://offgridtoolkit.ai/" target="_blank">Try it free &#8594;</a>
+          </div>
+        </div>
+
+        <!-- TIER 2: + Command Center - $249 (FEATURED) -->
+        <div class="pricing-card featured">
+          <div class="pricing-popular-badge">MOST POPULAR</div>
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/tier2-command-center.png" alt="OffGrid AI ToolKit + Command Center" class="pricing-card-image">
+          <div class="pricing-card-tier">Tier 2</div>
+          <div class="pricing-card-name">+ Command Center</div>
+          <div class="pricing-card-tagline">Four AI Experts. One Answer. Yours Forever.</div>
+          <div class="pricing-card-price">
+            <span class="amount">$249</span>
+            <span class="period">One-time purchase. Yours forever.</span>
+          </div>
+          <ul class="pricing-features-list">
+            <li><span class="check">&#10003;</span> <strong>Everything in the ToolKit</strong></li>
+            <li><span class="check">&#10003;</span> Chat directly with GPT-5.2, Claude, Gemini, or Grok</li>
+            <li><span class="check">&#10003;</span> AI Council: all 4 models deliberate &amp; synthesize</li>
+            <li><span class="check">&#10003;</span> 150 sessions/month shared across all modes</li>
+            <li><span class="check">&#10003;</span> 10 Image Studio generations/month</li>
+            <li><span class="check">&#10003;</span> Anonymous peer review &amp; synthesis</li>
+            <li><span class="check">&#10003;</span> Models auto-update to newest versions</li>
+            <li><span class="check">&#10003;</span> Save everything to Knowledge Base</li>
+            <li><span class="check">&#10003;</span> $0/month. No subscription. Ever.</li>
+          </ul>
+          <div class="pricing-card-cta">
+            <a href="/products/offgrid-ai-toolkit-command-center" class="offgrid-btn">Get Command Center</a>
+          </div>
+          <div class="pricing-card-try">
+            <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank">Try Command Center &#8594;</a> &nbsp;|&nbsp;
+            <a href="https://imagestudio.offgridtoolkit.ai/" target="_blank">Try Image Studio &#8594;</a>
+          </div>
+        </div>
+
+        <!-- TIER 3: + Command Center Pro - $469 -->
+        <div class="pricing-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/tier3-command-pro.png" alt="OffGrid AI ToolKit + Command Center Pro" class="pricing-card-image">
+          <div class="pricing-card-tier">Tier 3</div>
+          <div class="pricing-card-name">+ Command Center Pro</div>
+          <div class="pricing-card-tagline">Maximum Power. Zero Subscriptions.</div>
+          <div class="pricing-card-price">
+            <span class="amount">$469</span>
+            <span class="period">One-time purchase. Yours forever.</span>
+          </div>
+          <ul class="pricing-features-list">
+            <li><span class="check">&#10003;</span> <strong>Everything in Command Center</strong></li>
+            <li><span class="check">&#10003;</span> 400 sessions/month shared across all modes</li>
+            <li><span class="check">&#10003;</span> 30 Image Studio generations/month</li>
+            <li><span class="check">&#10003;</span> Built for professionals &amp; researchers</li>
+            <li><span class="check">&#10003;</span> Generate complete field guide libraries</li>
+            <li><span class="check">&#10003;</span> Tackle complex multi-part questions</li>
+            <li><span class="check">&#10003;</span> Models auto-update to newest versions</li>
+            <li><span class="check">&#10003;</span> $0/month. No subscription. Ever.</li>
+          </ul>
+          <div class="pricing-card-cta">
+            <a href="/products/offgrid-ai-toolkit-command-center-pro" class="offgrid-btn">Get Command Pro</a>
+          </div>
+          <div class="pricing-card-try">
+            <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank">Try Command Center &#8594;</a> &nbsp;|&nbsp;
+            <a href="https://imagestudio.offgridtoolkit.ai/" target="_blank">Try Image Studio &#8594;</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Subscription Callout -->
+      <div class="pricing-no-sub">
+        <p><strong>No subscriptions. No monthly fees. No credit card on file.</strong> Buy the drive, own the AI.</p>
+        <p class="pricing-no-sub-detail">When monthly limits are reached, your offline ToolKit and free online ToolKit keep working without interruption. Only premium Command Council and Image Studio features pause until the next month.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       COMPETITIVE COMPARISON SECTION
+       ======================================== -->
+  <section class="comparison-section">
+    <div class="comparison-container">
+      <div class="offgrid-section-subtitle">THE MATH IS SIMPLE</div>
+      <div class="offgrid-section-title">Why Pay Rent When You Can Own?</div>
+
+      <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Model</th>
+              <th>Price</th>
+              <th>Offline</th>
+              <th>Privacy</th>
+              <th>Multi-Model</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ChatGPT Plus</td>
+              <td>Subscription</td>
+              <td>$20/mo ($240/yr)</td>
+              <td><span class="comp-x">&#10007;</span></td>
+              <td><span class="comp-x">&#10007;</span></td>
+              <td><span class="comp-x">&#10007;</span></td>
+            </tr>
+            <tr>
+              <td>ChatGPT Pro</td>
+              <td>Subscription</td>
+              <td>$200/mo ($2,400/yr)</td>
+              <td><span class="comp-x">&#10007;</span></td>
+              <td><span class="comp-x">&#10007;</span></td>
+              <td><span class="comp-check">&#10003;</span></td>
+            </tr>
+            <tr>
+              <td>Claude Pro</td>
+              <td>Subscription</td>
+              <td>$20/mo ($240/yr)</td>
+              <td><span class="comp-x">&#10007;</span></td>
+              <td><span class="comp-x">&#10007;</span></td>
+              <td><span class="comp-x">&#10007;</span></td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>OffGrid AI ToolKit</strong></td>
+              <td>One-time</td>
+              <td class="comp-price-highlight">$129</td>
+              <td><span class="comp-check">&#10003;</span></td>
+              <td><span class="comp-check">&#10003;</span></td>
+              <td><span class="comp-check">&#10003;</span></td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>+ Command Center</strong></td>
+              <td>One-time</td>
+              <td class="comp-price-highlight">$249</td>
+              <td><span class="comp-check">&#10003;</span></td>
+              <td><span class="comp-check">&#10003;</span></td>
+              <td><span class="comp-check">&#10003;</span> (4 models)</td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>+ Command Center Pro</strong></td>
+              <td>One-time</td>
+              <td class="comp-price-highlight">$469</td>
+              <td><span class="comp-check">&#10003;</span></td>
+              <td><span class="comp-check">&#10003;</span></td>
+              <td><span class="comp-check">&#10003;</span> (4 models)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="comparison-bottom-note">For the price of <strong>1 to 2 months</strong> of ChatGPT Pro, you get a physical product, full offline capability, 4 frontier AI models, image generation, a knowledge base system, and <strong>zero recurring fees</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ========================================
+       DUAL MODE SECTION - Offline + Online
+       ======================================== -->
+  <section class="dual-mode-section">
+    <div class="dual-mode-container">
+      <div class="offgrid-section-subtitle">TWO MODES, ONE TOOLKIT</div>
+      <div class="offgrid-section-title">Offline When You Need It, Online When You Want It.</div>
+
+      <div class="dual-mode-grid">
+        <!-- Offline Mode Card -->
+        <div class="dual-mode-card">
+          <div class="dual-mode-card-badge">OFFLINE MODE</div>
+          <h3>Your AI. No Internet. No Cloud.</h3>
+          <p>Plug in the USB and get a fully functional AI assistant running locally on your machine. Your data never leaves your device. Works in deserts, mountains, bunkers, or anywhere the grid goes down.</p>
+          <ul class="dual-mode-features-list">
+            <li><span>&#10003;</span> Gemma3 models (4B, 12B, 27B) run locally</li>
+            <li><span>&#10003;</span> MedGemma for medical triage guidance</li>
+            <li><span>&#10003;</span> Vision AI for image analysis</li>
+            <li><span>&#10003;</span> Knowledge Base stored on your USB</li>
+            <li><span>&#10003;</span> Access from phone/tablet via QR code</li>
+          </ul>
+        </div>
+
+        <!-- Online Mode Card -->
+        <div class="dual-mode-card">
+          <div class="dual-mode-card-badge">ONLINE MODE</div>
+          <h3>Cloud Power When You Have Internet</h3>
+          <p>When you're connected, the Online ToolKit gives you the same Gemma 3 experience in your browser. Upgrade to Command Center and unlock four frontier AI models working together, plus an Image Studio for generating custom visuals.</p>
+          <ul class="dual-mode-features-list">
+            <li><span>&#10003;</span> Free Online ToolKit (included with all tiers)</li>
+            <li><span>&#10003;</span> Command Center: 4 AI models working together</li>
+            <li><span>&#10003;</span> Image Studio: generate images from text</li>
+            <li><span>&#10003;</span> Knowledge Base: save conversations to USB</li>
+            <li><span>&#10003;</span> Works on any computer with a browser</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Synergy Bridge -->
+      <div class="synergy-bridge">
+        <h3>The Best Part: They Work Together</h3>
+        <p>Build up your Knowledge Base while you're online. Research survival guides, medical references, homesteading tips, anything you need. Save it all to the USB. Then when the internet goes down, everything you saved is right there waiting. Pick up the same conversation, images and all, completely offline.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       COMMAND CENTER SECTION
+       ======================================== -->
+  <section class="command-section">
+    <div class="command-container">
+      <div class="offgrid-section-subtitle">PREMIUM INTELLIGENCE</div>
+      <div class="offgrid-section-title">The Command Center</div>
+
+      <div class="command-content">
+        <div class="command-info">
+          <h3>4 Leading AI Models.<br>One Unified Answer.</h3>
+          <p>The Command Center doesn't just pick one AI. It queries all four at once. Each model scores the others in an anonymous peer review, a Chairman is elected, and the best answer is synthesized into a single, highly accurate response.</p>
+
+          <div class="command-models-grid">
+            <div class="command-model-tag">
+              <strong>GPT-5.2</strong>
+              <small>OpenAI</small>
+            </div>
+            <div class="command-model-tag">
+              <strong>Claude Sonnet 4.6</strong>
+              <small>Anthropic</small>
+            </div>
+            <div class="command-model-tag">
+              <strong>Gemini 3.1 Pro</strong>
+              <small>Google</small>
+            </div>
+            <div class="command-model-tag">
+              <strong>Grok 4.1 Fast</strong>
+              <small>xAI</small>
+            </div>
+          </div>
+
+          <p>Plus a built-in Image Studio for generating AI images, diagrams, and field guides. Everything you create can be saved directly to your USB's Knowledge Base for offline access later.</p>
+        </div>
+
+        <div class="command-visual">
+          <div class="command-process-step">
+            <div class="command-step-num">1</div>
+            <div class="command-step-text">
+              <h4>You Ask a Question</h4>
+              <p>Type your question into the Command Center. Anything from survival tips to medical references to technical help.</p>
+            </div>
+          </div>
+          <div class="command-process-step">
+            <div class="command-step-num">2</div>
+            <div class="command-step-text">
+              <h4>4 Models Respond Independently</h4>
+              <p>GPT-5.2, Claude, Gemini Pro, and Grok each generate their own answer at the same time.</p>
+            </div>
+          </div>
+          <div class="command-process-step">
+            <div class="command-step-num">3</div>
+            <div class="command-step-text">
+              <h4>Anonymous Peer Review</h4>
+              <p>Each model scores the other answers. A Chairman is elected based on quality and accuracy.</p>
+            </div>
+          </div>
+          <div class="command-process-step">
+            <div class="command-step-num">4</div>
+            <div class="command-step-text">
+              <h4>One Synthesized Answer</h4>
+              <p>The best response is combined and delivered. More reliable than any single AI alone.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="command-cta">
+        <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank" class="offgrid-btn offgrid-btn-secondary">Try Command Center Free &#8594;</a>
+        <a href="https://imagestudio.offgridtoolkit.ai/" target="_blank" class="offgrid-btn offgrid-btn-secondary">Try Image Studio Free &#8594;</a>
+        <a href="#choose-your-toolkit" class="offgrid-btn">Choose Your Toolkit</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       WHAT'S INCLUDED SECTION
+       ======================================== -->
+  <section class="included-section offgrid-section">
+    <div class="offgrid-section-subtitle">WHAT YOU GET</div>
+    <div class="offgrid-section-title">Everything on One USB</div>
+    <div class="included-container">
+      <div class="included-grid">
+        <div class="included-visual">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/offgrid_usb_no_branding-stroke.png?v=1764605050" alt="OffGrid AI Toolkit USB Drive" class="included-usb-icon">
+          <p class="included-format"><strong>64GB SanDisk USB 3.2</strong><br>Pre-loaded &amp; ready to use</p>
+        </div>
+        <ul class="included-list">
+          <li class="included-item">
+            <span class="included-check">&#10003;</span>
+            <div class="included-text">
+              <h4>Gemma3 AI Models (4B, 12B, 27B)</h4>
+              <p>Google's powerful language models optimized for offline use. Ask anything.</p>
+            </div>
+          </li>
+          <li class="included-item">
+            <span class="included-check">&#10003;</span>
+            <div class="included-text">
+              <h4>Medical AI (MedGemma)</h4>
+              <p>Emergency triage guidance, symptom analysis, and first-aid support.</p>
+            </div>
+          </li>
+          <li class="included-item">
+            <span class="included-check">&#10003;</span>
+            <div class="included-text">
+              <h4>Vision AI Capabilities</h4>
+              <p>Analyze photos for plant ID, wound assessment, parts identification, and more.</p>
+            </div>
+          </li>
+          <li class="included-item">
+            <span class="included-check">&#10003;</span>
+            <div class="included-text">
+              <h4>Free Online ToolKit (All Tiers)</h4>
+              <p>Use the same Gemma 3 AI in your browser. Desktop and mobile. Unlimited access.</p>
+            </div>
+          </li>
+          <li class="included-item">
+            <span class="included-check">&#10003;</span>
+            <div class="included-text">
+              <h4>Knowledge Base + Save System</h4>
+              <p>Save conversations, images, and research to your USB. Build a library you own.</p>
+            </div>
+          </li>
+          <li class="included-item">
+            <span class="included-check">&#10003;</span>
+            <div class="included-text">
+              <h4>Ready-Made Prompt Library</h4>
+              <p>Hundreds of pre-built prompts for survival, medical, homestead, and everyday scenarios.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       HOW IT WORKS SECTION
+       ======================================== -->
+  <section class="how-it-works-section offgrid-section" id="up-and-running">
+    <div class="offgrid-section-subtitle">SIMPLE SETUP</div>
+    <div class="offgrid-section-title">Up and Running in 60 Seconds</div>
+    <div class="how-it-works-content-new">
+      <div class="how-it-works-intro">
+        <p>No installation, no configuration, no technical knowledge required. If you can plug in a USB drive, you can use the OffGrid AI Toolkit.</p>
+      </div>
+      <div class="how-it-works-steps-grid">
+        <div class="how-it-works-step-compact">
+          <span class="step-number-compact">1</span>
+          <div class="step-title-compact">Plug In</div>
+          <div class="step-desc-compact">Insert into any USB 3.0 port on your Windows PC</div>
+        </div>
+        <div class="how-it-works-step-compact">
+          <span class="step-number-compact">2</span>
+          <div class="step-title-compact">Launch</div>
+          <div class="step-desc-compact">Double-click to start. Opens in your browser</div>
+        </div>
+        <div class="how-it-works-step-compact">
+          <span class="step-number-compact">3</span>
+          <div class="step-title-compact">Ask Away</div>
+          <div class="step-desc-compact">Chat with AI, analyze images. All offline</div>
+        </div>
+        <div class="how-it-works-step-compact">
+          <span class="step-number-compact">4</span>
+          <div class="step-title-compact">Go Mobile</div>
+          <div class="step-desc-compact">Scan QR to access from phone or tablet</div>
+        </div>
+      </div>
+      <div class="how-it-works-video-centerpiece">
+        <iframe src="https://www.youtube.com/embed/PgnQ7Bjsoa4" title="OffGrid AI Toolkit Demo"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen></iframe>
+      </div>
+      <div class="how-it-works-cta">
+        <a href="https://offgridtoolkit.ai/" target="_blank" class="offgrid-btn offgrid-btn-secondary">Try Before You Buy &#8594;</a>
+        <a href="/pages/user-guide" class="offgrid-btn offgrid-btn-secondary">Detailed Setup Guide</a>
+        <a href="#choose-your-toolkit" class="offgrid-btn">Choose Your Toolkit</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       WHO IT'S FOR CAROUSEL SECTION
+       ======================================== -->
+  <section class="carousel-section" id="who-its-for-carousel">
+    <div class="carousel-header">
+      <div class="offgrid-section-subtitle">WHO IT'S FOR</div>
+      <div class="offgrid-section-title">Built for People Who Value Independence</div>
+      <p class="carousel-intro">From preppers to homesteaders, overlanders to field medics. Anyone who values self-reliance will find the OffGrid AI Toolkit indispensable.</p>
+    </div>
+
+    <div class="carousel-wrapper">
+      <button class="carousel-nav prev" onclick="slideCarousel('who-its-for', -1)" aria-label="Previous">&#8249;</button>
+
+      <div class="carousel-track" id="who-its-for-track">
+        <!-- Card 1: Preppers -->
+        <a href="/pages/survival-minded" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/survival.jpg?v=1763678737" alt="Survival & Emergency Preparedness" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#127957;&#65039;</span>
+            <h3 class="carousel-card-title">Preppers &amp; Survivalists</h3>
+            <p class="carousel-card-desc">Emergency triage, wild edibles, water purification, and crisis decision-making when the grid goes down.</p>
+          </div>
+        </a>
+
+        <!-- Card 2: Overlanders -->
+        <a href="/pages/overlanders-adventurers" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/outlanders.jpg?v=1763678738" alt="Vanlifers & Overlanders" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#128656;</span>
+            <h3 class="carousel-card-title">Vanlifers &amp; Overlanders</h3>
+            <p class="carousel-card-desc">Vehicle troubleshooting, camp setup, route planning, and mechanical guidance on remote trails.</p>
+          </div>
+        </a>
+
+        <!-- Card 3: Homesteaders -->
+        <a href="/pages/homesteaders" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/homesteaders.jpg?v=1763678737" alt="Homesteaders" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#127793;</span>
+            <h3 class="carousel-card-title">Homesteaders</h3>
+            <p class="carousel-card-desc">Crop planning, livestock care, food preservation, and DIY building guidance for self-sufficient living.</p>
+          </div>
+        </a>
+
+        <!-- Card 4: Outdoors -->
+        <a href="/pages/overlanders-adventurers" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/outdoors.jpg?v=1763678737" alt="Track & Terrain Analysis" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#129517;</span>
+            <h3 class="carousel-card-title">Track &amp; Terrain Analysis</h3>
+            <p class="carousel-card-desc">Identify animal tracks, terrain hazards, and plants while hiking or fishing.</p>
+          </div>
+        </a>
+
+        <!-- Card 5: Technical -->
+        <a href="/pages/field-researchers-ngos" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/technical_and_mechanical_assistance_-_use_case_-_ai_offgrid_toolkit.jpg?v=1763465327" alt="Technical Assistance" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#128295;</span>
+            <h3 class="carousel-card-title">On-Site Troubleshooting</h3>
+            <p class="carousel-card-desc">Upload a photo of a damaged part or wiring layout for step-by-step guidance.</p>
+          </div>
+        </a>
+
+        <!-- Card 6: Teaching -->
+        <a href="/pages/field-researchers-ngos" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/remote_teaching_and_outreach_support_-_use_case_-_ai_offgrid_toolkit.jpg?v=1763465327" alt="Remote Teaching Support" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#128218;</span>
+            <h3 class="carousel-card-title">Education Anywhere</h3>
+            <p class="carousel-card-desc">Translate educational content into local languages or simplify complex lessons.</p>
+          </div>
+        </a>
+
+        <!-- Card 7: Medical -->
+        <a href="/pages/healthcare-professionals" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/offline_medical_support_-_use_case_-_ai_offgrid_toolkit.jpg?v=1763465327" alt="Offline Medical Support" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#127973;</span>
+            <h3 class="carousel-card-title">Triage &amp; Care Guidance</h3>
+            <p class="carousel-card-desc">Upload wound or rash photos for triage-level assessment and care steps.</p>
+          </div>
+        </a>
+
+        <!-- Card 8: Privacy -->
+        <a href="/pages/privacy-advocates" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/private_offline_workflows_-_use_case_-_ai_offgrid_toolkit.jpg?v=1763465599" alt="Private Offline Workflows" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#128274;</span>
+            <h3 class="carousel-card-title">Private Knowledge Management</h3>
+            <p class="carousel-card-desc">Turn journal entries or planning notes into summaries and guides without the cloud.</p>
+          </div>
+        </a>
+
+        <!-- Card 9: Sacred Text Study -->
+        <a href="/pages/spiritual-guidance-sacred-texts" class="carousel-card">
+          <img src="https://cdn.shopify.com/s/files/1/0706/9355/2278/files/faith_based_support_anywhere_-_use_case_-_ai_offgrid_toolkit.jpg?v=1763465327" alt="Sacred Text Study" class="carousel-card-image">
+          <div class="carousel-card-content">
+            <span class="carousel-card-icon">&#128220;</span>
+            <h3 class="carousel-card-title">Sacred Text Study &amp; Spiritual Guidance</h3>
+            <p class="carousel-card-desc">Study the Bible, Quran, Torah, Vedas, Buddhist sutras, and wisdom from all traditions. Privately and offline.</p>
+          </div>
+        </a>
+      </div>
+
+      <button class="carousel-nav next" onclick="slideCarousel('who-its-for', 1)" aria-label="Next">&#8250;</button>
+    </div>
+
+    <div class="carousel-dots" id="who-its-for-dots"></div>
+
+    <div class="carousel-cta">
+      <a href="/pages/use-cases" class="offgrid-btn offgrid-btn-secondary">Explore All Use Cases</a>
+    </div>
+  </section>
+
+  <!-- ========================================
+       SOCIAL PROOF SECTION
+       ======================================== -->
+  <section class="social-proof-section">
+    <div class="social-proof-container">
+      <div class="offgrid-section-subtitle">THE BOTTOM LINE</div>
+      <p class="social-proof-quote">
+        We rely on AI and the internet, yet we don't own either. I've been buying books lately because at least I own them. Now with Offgrid AI, I feel a lot better knowing I have a vast store of knowledge and even thinking power that is actually mine to use as I wish, when I wish. You never know when you will need it the most.
+      </p>
+      <p class="social-proof-author">A Self-Reliance Advocate</p>
+      <p class="social-proof-role">Who's tired of depending on Big Tech</p>
+
+      <div class="social-proof-stats">
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Offline</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4</div>
+          <div class="stat-label">AI Models Online</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">$0</div>
+          <div class="stat-label">Monthly Fees</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">30</div>
+          <div class="stat-label">Day Guarantee</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       FAQ SECTION
+       ======================================== -->
+  <section class="faq-section offgrid-section">
+    <div class="offgrid-section-subtitle">COMMON QUESTIONS</div>
+    <div class="offgrid-section-title">Frequently Asked Questions</div>
+    <div class="faq-container">
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Does it really work without any internet?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">Yes, 100% offline. All AI models run locally from the USB drive. Your data never leaves your device. No cloud, no tracking, no external connections whatsoever. This is included with every tier.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>What's the difference between the three tiers?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">All three tiers include the full offline AI ToolKit on a USB drive, plus free unlimited access to the Online ToolKit. The <strong>$129 ToolKit</strong> gives you everything you need for offline AI. The <strong>$249 Command Center</strong> adds direct access to GPT-5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, and Grok individually, plus the AI Council where all 4 deliberate together. You get 150 sessions/month shared across all modes, and 10 Image Studio generations/month. The <strong>$469 Command Center Pro</strong> increases that to 400 sessions and 30 images/month for professionals and power users. No tier requires a subscription.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>What is the Command Center?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">The Command Center is a premium online feature included with the $249 and $469 tiers. You get two ways to use it. First, chat directly with any of the four frontier models one-on-one: GPT-5.2, Claude Sonnet 4.6, Gemini 3.1 Pro, or Grok 4.1 Fast. Second, use the AI Council, where all four models answer your question independently, score each other in a blind peer review, elect a Chairman, and synthesize one final answer. Your 150 sessions/month work across both modes. You can <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank">try it free right now</a>.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>What happens when I hit my monthly limit?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">Graceful degradation. When you reach your monthly Command Council or Image Studio limit, those premium features pause until the next month. But your offline ToolKit and the free Online ToolKit (Gemma 3) continue working without any interruption. You never lose access to your core AI.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>What is the Knowledge Base?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">The Knowledge Base lets you save entire conversations, including generated images, directly to your USB drive while you're online. Research survival guides, medical references, homesteading tips, anything you need. When the internet goes down, everything you saved is right there on the USB, ready to pick up where you left off, completely offline.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Do the AI models update automatically?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">Yes. For Command Center and Command Center Pro tiers, the online AI models update automatically to the newest, most trusted versions. When the AI world advances, your Command Center advances with it. No extra charge. No upgrade fees. Your toolkit gets better over time.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>What are the system requirements?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">For offline mode: Windows PC with 16GB RAM (32GB recommended), USB 3.0 port, and a modern processor (Intel i7 2022+ or equivalent). A dedicated GPU improves performance but isn't required. For online mode: any computer with a web browser. No special hardware needed.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Can I use it on my phone or tablet?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">Yes! Once plugged into a Windows PC, the built-in web server creates a local network. Scan the QR code to access AI from any phone, tablet, or Mac on the same Wi-Fi. No internet required. The online features also work on any mobile browser.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>Is there really no subscription?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">Really. No subscription. No monthly fees. No credit card on file. You buy the drive, you own the AI. The monthly Command Council and Image Studio allocations are included with your one-time purchase and reset on the 1st of each month at no additional cost.</div>
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFAQ(this)">
+          <span>What's your return policy?</span>
+          <span class="faq-icon">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">30-day money-back guarantee. If the OffGrid AI Toolkit doesn't meet your needs, return it within 30 days for a full refund. Contact <a href="mailto:support@offgridaitoolkit.com">support@offgridaitoolkit.com</a> to start a return.</div>
+        </div>
+      </div>
+    </div>
+    <div class="faq-cta">
+      <p>Still have questions? Check our <a href="/pages/what-to-expect">What to Expect</a> page or <a href="/pages/user-guide">User Guide</a>.</p>
+    </div>
+  </section>
+
+  <!-- ========================================
+       TRY BEFORE YOU BUY SECTION
+       ======================================== -->
+  <section class="try-demo-section">
+    <div class="try-demo-container">
+      <div class="try-demo-content">
+        <div class="try-demo-badge">TRY IT NOW. NO DOWNLOAD NEEDED</div>
+        <h2 class="try-demo-headline">
+          Not Sure Yet? <span class="highlight">Test Drive It Free</span>
+        </h2>
+        <p class="try-demo-description">
+          Experience the same AI in our cloud-powered online demo. Try the Gemma 3 models, explore the Command Center with four top AI models, and see the Image Studio in action. All before you buy.
+        </p>
+
+        <div class="try-demo-features">
+          <div class="try-demo-feature">
+            <span class="try-demo-feature-icon">&#129504;</span>
+            <span>Gemma 3 AI</span>
+          </div>
+          <div class="try-demo-feature">
+            <span class="try-demo-feature-icon">&#127894;&#65039;</span>
+            <span>Command Center</span>
+          </div>
+          <div class="try-demo-feature">
+            <span class="try-demo-feature-icon">&#127912;</span>
+            <span>Image Studio</span>
+          </div>
+          <div class="try-demo-feature">
+            <span class="try-demo-feature-icon">&#128065;&#65039;</span>
+            <span>Vision AI</span>
+          </div>
+        </div>
+
+        <div class="try-demo-cta-group">
+          <a href="https://offgridtoolkit.ai/" target="_blank" class="offgrid-btn">Try the Online ToolKit &#8594;</a>
+          <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank" class="offgrid-btn offgrid-btn-secondary">Try Command Center &#8594;</a>
+          <a href="https://imagestudio.offgridtoolkit.ai/" target="_blank" class="offgrid-btn offgrid-btn-secondary">Try Image Studio &#8594;</a>
+        </div>
+
+        <p class="try-demo-note">
+          Online demos require internet. Want 100% offline capability? Get the USB version and have both.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================
+       FINAL CTA SECTION
+       ======================================== -->
+  <section class="final-cta-section">
+    <div class="final-cta-container">
+      <div class="final-cta-eyebrow">OFFLINE BY DESIGN. ONLINE BY CHOICE. YOURS FOREVER.</div>
+      <h2 class="final-cta-heading">Own the Only AI<br>That Works Anywhere</h2>
+      <div class="final-cta-body">
+        <p>Stop renting intelligence from corporations that track your every query. Stop being helpless when the internet fails. Stop paying monthly fees for something you should own outright.</p>
+        <p>The OffGrid AI Toolkit gives you private AI offline and four premium AI models online, with a Knowledge Base that bridges both worlds. One purchase, yours forever.</p>
+      </div>
+
+      <div class="final-cta-tiers">
+        <div class="final-cta-tier-item">
+          <span class="tier-price">$129</span>
+          <span class="tier-name">ToolKit</span>
+        </div>
+        <div class="final-cta-tier-item">
+          <span class="tier-price">$249</span>
+          <span class="tier-name">+ Command Center</span>
+        </div>
+        <div class="final-cta-tier-item">
+          <span class="tier-price">$469</span>
+          <span class="tier-name">+ Command Pro</span>
+        </div>
+      </div>
+
+      <a href="#choose-your-toolkit" class="final-cta-button">CHOOSE YOUR TOOLKIT &#8594;</a>
+      <div class="final-cta-links">
+        <a href="https://offgridtoolkit.ai/" target="_blank">Try Before You Buy</a>
+        <a href="https://cmdcouncil.offgridtoolkit.ai/" target="_blank">Command Center Demo</a>
+        <a href="https://imagestudio.offgridtoolkit.ai/" target="_blank">Image Studio Demo</a>
+        <a href="/pages/what-to-expect">What to Expect</a>
+        <a href="/pages/user-guide">User Guide</a>
+      </div>
+      <div class="final-cta-trust">
+        <div class="final-cta-trust-item">100% Offline Operation</div>
+        <div class="final-cta-trust-item">4 Premium AI Models Online</div>
+        <div class="final-cta-trust-item">Free U.S. Shipping</div>
+        <div class="final-cta-trust-item">30-Day Guarantee</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // FAQ Toggle Function
+  function toggleFAQ(element) {
+    const faqItem = element.closest('.faq-item');
+    const isActive = faqItem.classList.contains('active');
+
+    // Close all FAQs
+    document.querySelectorAll('.faq-item').forEach(item => {
+      item.classList.remove('active');
+    });
+
+    // Open clicked FAQ if it was not already active
+    if (!isActive) {
+      faqItem.classList.add('active');
+    }
+  }
+
+  // Carousel Functionality
+  const carousels = {
+    'who-its-for': {
+      track: null,
+      cards: [],
+      currentIndex: 0,
+      visibleCards: 3
+    }
+  };
+
+  function initCarousels() {
+    // Initialize Who It's For Carousel
+    carousels['who-its-for'].track = document.getElementById('who-its-for-track');
+    if (carousels['who-its-for'].track) {
+      carousels['who-its-for'].cards = carousels['who-its-for'].track.querySelectorAll('.carousel-card');
+
+      // Set visible cards based on screen width
+      updateVisibleCards();
+
+      // Create dots
+      createDots('who-its-for');
+
+      // Add scroll event listener
+      carousels['who-its-for'].track.addEventListener('scroll', () => updateDotsOnScroll('who-its-for'));
+
+      // Update on resize
+      window.addEventListener('resize', () => {
+        updateVisibleCards();
+        createDots('who-its-for');
+      });
+    }
+  }
+
+  function updateVisibleCards() {
+    const width = window.innerWidth;
+    if (width <= 768) {
+      carousels['who-its-for'].visibleCards = 1;
+    } else if (width <= 1024) {
+      carousels['who-its-for'].visibleCards = 2;
+    } else {
+      carousels['who-its-for'].visibleCards = 3;
+    }
+  }
+
+  function createDots(carouselId) {
+    const carousel = carousels[carouselId];
+    const dotsContainer = document.getElementById(carouselId + '-dots');
+    if (!dotsContainer || !carousel.cards.length) return;
+    const totalDots = Math.ceil(carousel.cards.length / carousel.visibleCards);
+
+    dotsContainer.innerHTML = '';
+
+    for (let i = 0; i < totalDots; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      dot.onclick = () => goToSlide(carouselId, i);
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function slideCarousel(carouselId, direction) {
+    const carousel = carousels[carouselId];
+    if (!carousel || !carousel.cards.length) return;
+    const cardWidth = carousel.cards[0].offsetWidth + 25;
+    const maxIndex = carousel.cards.length - carousel.visibleCards;
+
+    carousel.currentIndex = Math.max(0, Math.min(carousel.currentIndex + direction, maxIndex));
+
+    carousel.track.scrollTo({
+      left: carousel.currentIndex * cardWidth,
+      behavior: 'smooth'
+    });
+
+    updateDots(carouselId);
+  }
+
+  function goToSlide(carouselId, index) {
+    const carousel = carousels[carouselId];
+    if (!carousel || !carousel.cards.length) return;
+    const cardWidth = carousel.cards[0].offsetWidth + 25;
+
+    carousel.currentIndex = index * carousel.visibleCards;
+
+    carousel.track.scrollTo({
+      left: carousel.currentIndex * cardWidth,
+      behavior: 'smooth'
+    });
+
+    updateDots(carouselId);
+  }
+
+  function updateDots(carouselId) {
+    const carousel = carousels[carouselId];
+    const dotsContainer = document.getElementById(carouselId + '-dots');
+    if (!dotsContainer) return;
+    const dots = dotsContainer.querySelectorAll('.carousel-dot');
+    const activeIndex = Math.floor(carousel.currentIndex / carousel.visibleCards);
+
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === activeIndex);
+    });
+  }
+
+  function updateDotsOnScroll(carouselId) {
+    const carousel = carousels[carouselId];
+    if (!carousel || !carousel.cards.length) return;
+    const cardWidth = carousel.cards[0].offsetWidth + 25;
+    const scrollLeft = carousel.track.scrollLeft;
+
+    carousel.currentIndex = Math.round(scrollLeft / cardWidth);
+    updateDots(carouselId);
+  }
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', initCarousels);
+</script>
