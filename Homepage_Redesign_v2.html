@@ -553,6 +553,40 @@
     font-weight: 700;
   }
 
+  /* Privacy Guarantee Callout */
+  .privacy-guarantee {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #c9a84c;
+    border-left: 4px solid #c9a84c;
+    border-radius: 8px;
+    padding: 32px 40px;
+    margin: 0 auto 40px;
+    max-width: 860px;
+    text-align: center;
+  }
+  .privacy-guarantee-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .privacy-guarantee-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    color: #c9a84c;
+    margin-bottom: 12px;
+    letter-spacing: 0.05em;
+  }
+  .privacy-guarantee-text {
+    color: #ccc;
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .privacy-guarantee-text strong {
+    color: #e8d5a3;
+  }
+
   .comparison-bottom-note {
     text-align: center;
     margin-top: 30px;
@@ -2119,7 +2153,7 @@
           <span class="highlight">When Nothing Else Does</span>
         </h1>
         <p class="hero-subheadline">
-          Get your own copy of the world's knowledge. A plug-and-play USB with powerful AI models that run entirely offline, plus an online Command Center that taps into GPT, Claude, Gemini, and Grok when you have internet. One toolkit, three tiers, zero subscriptions.
+          Get your own copy of the world's knowledge. A plug-and-play USB with powerful AI models that run entirely offline, plus an online Command Center that taps into GPT, Claude, Gemini, and Grok when you have internet. One toolkit, three tiers, zero subscriptions. Zero data collected.
         </p>
         <div class="hero-features">
           <div class="hero-feature">
@@ -2361,6 +2395,15 @@
       <div class="offgrid-section-subtitle">THE MATH IS SIMPLE</div>
       <div class="offgrid-section-title">Why Pay Rent When You Can Own?</div>
 
+      <!-- Privacy Guarantee Callout -->
+      <div class="privacy-guarantee">
+        <span class="privacy-guarantee-icon">&#128274;</span>
+        <div class="privacy-guarantee-title">Your Conversations Are Yours. Full Stop.</div>
+        <p class="privacy-guarantee-text">
+          No conversation is ever stored on our servers. No session history. No data sold. <strong>No AI training on your queries.</strong> When your session ends, it is gone permanently. In a world where AI platforms are moving toward ad-supported models and data harvesting, OffGrid AI is moving in the opposite direction.
+        </p>
+      </div>
+
       <div class="comparison-table-wrapper">
         <table class="comparison-table">
           <thead>
@@ -2369,7 +2412,7 @@
               <th>Model</th>
               <th>Price</th>
               <th>Offline</th>
-              <th>Privacy</th>
+              <th>No Data Stored</th>
               <th>Multi-Model</th>
             </tr>
           </thead>
@@ -2395,7 +2438,7 @@
               <td>Subscription</td>
               <td>$20/mo ($240/yr)</td>
               <td><span class="comp-x">&#10007;</span></td>
-              <td><span class="comp-x">&#10007;</span></td>
+              <td><span style="color:#c9a84c;font-weight:700;">~</span></td>
               <td><span class="comp-x">&#10007;</span></td>
             </tr>
             <tr>
@@ -2442,6 +2485,7 @@
         </table>
       </div>
 
+      <p class="comparison-bottom-note" style="font-size:13px;color:#999;margin-bottom:8px;">~ Claude Pro does not train on paid conversations but still stores them on Anthropic servers.</p>
       <p class="comparison-bottom-note">For the price of <strong>1 to 2 months</strong> of ChatGPT Pro, you get a physical product, full offline capability, 4 frontier AI models, image generation, a knowledge base system, and zero recurring fees. When OpenAI, Anthropic, Google, and xAI release new models, your Command Center updates with them automatically -- no extra cost, no action required.</p>
     </div>
   </section>
