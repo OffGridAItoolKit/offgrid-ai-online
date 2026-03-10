@@ -138,6 +138,52 @@
             z-index: 9999;
         }
         
+        /* Quick Prompts Helper Text */
+        .quick-prompts-hint {
+            font-size: 11px;
+            color: #10b981;
+            font-weight: 500;
+            margin-top: -8px;
+            margin-bottom: 8px;
+            padding-left: 2px;
+            letter-spacing: 0.3px;
+            opacity: 0.9;
+        }
+
+        /* Image Upload Tooltip */
+        .image-upload-tooltip {
+            position: absolute;
+            top: -44px;
+            right: -8px;
+            background: linear-gradient(135deg, #2c1810 0%, #3d2216 100%);
+            color: #daa520;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 100;
+            border: 1px solid rgba(184, 134, 11, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: tooltipBounce 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .image-upload-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            right: 16px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 6px solid #2c1810;
+        }
+        @keyframes tooltipBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
         /* Prompt Accordion Styles */
         .prompt-accordion-container {
             display: flex;
@@ -759,6 +805,7 @@
             <!-- Quick Prompts Accordion Section -->
             <div class="sidebar-section">
                 <div class="sidebar-title">Quick Prompts</div>
+                <div class="quick-prompts-hint">Click any prompt to auto-fill your chat</div>
                 <div class="prompt-accordion-container">
                     <!-- Survival & Emergency -->
                     <div class="prompt-category" data-category="survival">
@@ -967,11 +1014,14 @@
                                     onkeydown="handleWelcomeKeyDown(event)"
                                     oninput="autoResizeWelcome(this)"
                                 ></textarea>
-                                <svg class="welcome-gallery-btn" onclick="triggerGalleryUpload()" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload from Gallery">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                </svg>
+                                <div style="position: relative;">
+                                    <div class="image-upload-tooltip" id="imageUploadTooltip">Try uploading an image!</div>
+                                    <svg class="welcome-gallery-btn" onclick="triggerGalleryUpload(); dismissImageTooltip();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload from Gallery">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                        <polyline points="21 15 16 10 5 21"></polyline>
+                                    </svg>
+                                </div>
                             </div>
                             <div class="welcome-button-row">
                                 <div class="welcome-model-selector">
@@ -2107,6 +2157,17 @@
         // ============================================
         
         let activeCategory = null;
+
+        // Dismiss the image upload tooltip
+        function dismissImageTooltip() {
+            const tooltip = document.getElementById('imageUploadTooltip');
+            if (tooltip) {
+                tooltip.style.transition = 'opacity 0.3s ease';
+                tooltip.style.opacity = '0';
+                setTimeout(() => tooltip.remove(), 300);
+                localStorage.setItem('offgrid-image-tooltip-dismissed', 'true');
+            }
+        }
         
         function togglePromptCategory(category) {
             const promptList = document.getElementById(category + '-prompts');
@@ -2689,6 +2750,21 @@
             const welcomeInput = document.getElementById('welcomeMessageInput');
             if (welcomeInput && document.getElementById('welcome')) {
                 welcomeInput.focus();
+            }
+            
+            // Auto-open the Survival & Emergency accordion on page load
+            setTimeout(() => {
+                togglePromptCategory('survival');
+            }, 300);
+            
+            // Hide image upload tooltip if already dismissed, or auto-dismiss after 8 seconds
+            if (localStorage.getItem('offgrid-image-tooltip-dismissed')) {
+                const tooltip = document.getElementById('imageUploadTooltip');
+                if (tooltip) tooltip.remove();
+            } else {
+                setTimeout(() => {
+                    dismissImageTooltip();
+                }, 8000);
             }
             
             // Pull-to-refresh for mobile
