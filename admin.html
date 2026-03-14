@@ -694,6 +694,8 @@
         .btn-row-action:hover { border-color: var(--error); color: var(--error); }
         .btn-row-action.lookup { border-color: var(--gold-muted); color: var(--gold-bright); }
         .btn-row-action.lookup:hover { background: rgba(212,175,55,0.1); }
+        .btn-row-action.delete { border-color: var(--error); color: var(--error); opacity: 0.6; }
+        .btn-row-action.delete:hover { opacity: 1; background: rgba(251,113,133,0.1); }
 
         tbody tr {
             border-bottom: 1px solid var(--border-subtle);
@@ -1385,7 +1387,7 @@
                     <div class="form-row">
                         <div class="form-group" style="flex:2; min-width:200px;">
                             <label>License Key</label>
-                            <input type="text" id="lookup-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                            <input type="text" id="lookup-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX or OGTK-MOB-XXXX-XXXX" maxlength="19" />
                         </div>
                     </div>
                     <div class="form-actions">
@@ -1541,7 +1543,7 @@
                     <div class="form-row">
                         <div class="form-group" style="flex:2; min-width:200px;">
                             <label>License Key</label>
-                            <input type="text" id="revoke-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                            <input type="text" id="revoke-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX or OGTK-MOB-XXXX-XXXX" maxlength="19" />
                         </div>
                     </div>
                     <div class="form-actions">
@@ -1572,7 +1574,7 @@
                     <div class="form-row">
                         <div class="form-group" style="flex:2; min-width:200px;">
                             <label>License Key</label>
-                            <input type="text" id="credit-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                            <input type="text" id="credit-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX or OGTK-MOB-XXXX-XXXX" maxlength="19" />
                         </div>
                         <div class="form-group">
                             <label>Type</label>
@@ -1614,7 +1616,7 @@
                     <div class="form-row">
                         <div class="form-group" style="flex:2; min-width:200px;">
                             <label>License Key</label>
-                            <input type="text" id="limits-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX" maxlength="19" />
+                            <input type="text" id="limits-key" class="key-input" placeholder="OGTK-XXXX-XXXX-XXXX or OGTK-MOB-XXXX-XXXX" maxlength="19" />
                         </div>
                     </div>
                     <div class="form-row">
@@ -2368,7 +2370,7 @@ async function lookupKey() {
         renderLookupLog(data.activationLog || []);
         resultEl.classList.add('visible');
     } catch (e) {
-        showAlert(alertEl, 'error', `Key not found: ${key}. Check for typos — the key format is OGTK-XXXX-XXXX-XXXX.`);
+        showAlert(alertEl, 'error', `Key not found: ${key}. Check for typos — standard keys use OGTK-XXXX-XXXX-XXXX, mobile keys use OGTK-MOB-XXXX-XXXX.`);
     }
 }
 
@@ -2562,7 +2564,7 @@ async function loadLicenses(page) {
                     </td>
                     <td style="white-space:nowrap;">
                         <button class="btn-row-action lookup" onclick="jumpToLookup('${keyEsc}')" title="Look up this key">&#128269;</button>
-                        <button class="btn-row-action" onclick="quickRevoke('${keyEsc}')" title="Revoke this key">&#128683;</button>
+                        <button class="btn-row-action delete" onclick="quickDelete('${keyEsc}', ${l.id})" title="Permanently delete this key">&#128465;</button>
                     </td>
                 </tr>`;
             }).join('');
@@ -2659,6 +2661,23 @@ function quickRevoke(key) {
                 loadStats();
             } catch (e) {
                 showToast('Revoke failed: ' + e.message, 'error');
+            }
+        }
+    );
+}
+
+function quickDelete(key) {
+    showConfirm(
+        'Permanently Delete Key',
+        `Delete ${key} forever? This cannot be undone. The key will be removed from the database entirely.`,
+        async () => {
+            try {
+                await apiPost('/api/admin/delete-key', { licenseKey: key });
+                showToast('Key deleted: ' + key, 'success');
+                loadLicenses(currentPage);
+                loadStats();
+            } catch (e) {
+                showToast('Delete failed: ' + e.message, 'error');
             }
         }
     );
@@ -2918,14 +2937,24 @@ function setupKeyAutoFormat() {
     keyInputs.forEach(input => {
         input.addEventListener('input', function() {
             let val = this.value.replace(/[^A-Z0-9a-z]/g, '').toUpperCase();
-            // Format as OGTK-XXXX-XXXX-XXXX
             if (val.startsWith('OGTK')) {
-                let rest = val.slice(4);
-                let parts = ['OGTK'];
-                for (let i = 0; i < rest.length && parts.length < 4; i += 4) {
-                    parts.push(rest.slice(i, i + 4));
+                const rest = val.slice(4); // everything after 'OGTK'
+                // Mobile keys: OGTK-MOB-XXXX-XXXX (rest starts with 'MOB')
+                if (rest.startsWith('MOB')) {
+                    const afterMob = rest.slice(3); // everything after 'MOB'
+                    let parts = ['OGTK', 'MOB'];
+                    for (let i = 0; i < afterMob.length && parts.length < 4; i += 4) {
+                        parts.push(afterMob.slice(i, i + 4));
+                    }
+                    this.value = parts.join('-');
+                } else {
+                    // Standard keys: OGTK-XXXX-XXXX-XXXX
+                    let parts = ['OGTK'];
+                    for (let i = 0; i < rest.length && parts.length < 4; i += 4) {
+                        parts.push(rest.slice(i, i + 4));
+                    }
+                    this.value = parts.join('-');
                 }
-                this.value = parts.join('-');
             }
         });
     });
