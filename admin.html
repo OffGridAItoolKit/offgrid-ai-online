@@ -2314,8 +2314,7 @@ async function generateKeys() {
         const tierRaw = document.getElementById('gen-tier').value;
         const body = { count };
         if (tierRaw === 'mobile') {
-            body.is_mobile = true;
-            body.tier = 2; // mobile keys default to tier 2 context
+            body.tier = 'mobile'; // send the string 'mobile' so backend sets is_mobile=true and OGTK-MOB prefix
         } else {
             body.tier = parseInt(tierRaw);
         }
