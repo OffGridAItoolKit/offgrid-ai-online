@@ -268,6 +268,26 @@
             .command-theme .message-header-row {
                 margin-bottom: 6px;
             }
+
+            /* Fix 3: Left-align council timing text on mobile */
+            .command-theme .response-time {
+                margin-left: 0 !important;
+                text-align: left;
+            }
+
+            /* Fix 4: Balance AI message bubble spacing on mobile - hide avatar, use full width */
+            .message.assistant .message-avatar {
+                display: none;
+            }
+            .message.assistant .message-content {
+                margin-left: 0;
+                padding-left: 12px;
+                padding-right: 12px;
+                max-width: calc(100vw - 24px) !important;
+            }
+            .message.assistant {
+                gap: 0;
+            }
         }
 
         /* ---- Layout: Centered Chat Column ---- */
@@ -1653,7 +1673,7 @@
 
             .messages {
                 padding: 12px !important;
-                padding-bottom: 140px !important;
+                padding-bottom: 100px !important;
                 padding-top: 12px !important;
                 padding-right: 12px !important;
                 overscroll-behavior-y: none;
@@ -1668,22 +1688,26 @@
                 padding: 8px 16px;
                 padding-top: 10px;
                 justify-content: flex-start;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px;
             }
 
             .welcome h2 {
                 font-size: 19px;
-                margin-bottom: 3px;
+                margin-bottom: 0;
             }
 
+            /* Hide Multi-Model tagline and model buttons on mobile */
             .welcome-subtitle {
-                font-size: 12px;
-                margin-bottom: 6px;
+                display: none !important;
             }
 
             .welcome-icon {
-                width: 38px;
-                height: 38px;
-                margin-bottom: 4px;
+                width: 34px;
+                height: 34px;
+                margin-bottom: 0;
             }
 
             .welcome-description {
@@ -1691,7 +1715,7 @@
             }
 
             .feature-badges {
-                margin-bottom: 12px;
+                display: none !important;
             }
 
             .feature-badge {
@@ -2163,6 +2187,27 @@
                ============================================ */
             .swipe-dismissable {
                 touch-action: pan-y;
+            }
+
+            /* ============================================
+               FIX 5: IMAGE STUDIO MOBILE CLEANUP
+               Hide prompt editing area, Cancel/Generate buttons,
+               and footer once an image has been generated.
+               Only show: image + Download + Send to Chat
+               ============================================ */
+            .image-studio-modal .studio-result ~ #directPromptSection,
+            .image-studio-modal .studio-result ~ .studio-privacy,
+            .image-studio-modal .studio-result ~ div[style*="Powered by"] {
+                display: none !important;
+            }
+            /* Also hide the "Prompt ready" text and prompt textarea when result exists */
+            .image-studio-modal.has-result .direct-prompt-toggle,
+            .image-studio-modal.has-result .studio-categories,
+            .image-studio-modal.has-result .example-prompts-section,
+            .image-studio-modal.has-result .studio-describe-section,
+            .image-studio-modal.has-result .studio-craft-actions,
+            .image-studio-modal.has-result .studio-subtitle {
+                display: none !important;
             }
 
         }
@@ -7593,6 +7638,19 @@
                             ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
                         </div>
                     `;
+
+                    // Mobile: hide prompt area below the result
+                    if (window.innerWidth <= 768) {
+                        const modal = document.querySelector('.image-studio-modal');
+                        if (modal) modal.classList.add('has-result');
+                        const directSection = document.getElementById('directPromptSection');
+                        if (directSection) directSection.style.display = 'none';
+                        const privacyEl = modal?.querySelector('.studio-privacy');
+                        if (privacyEl) privacyEl.style.display = 'none';
+                        // Hide the "Powered by" line
+                        const poweredBy = modal?.querySelector('div[style*="Powered by"]');
+                        if (poweredBy) poweredBy.style.display = 'none';
+                    }
                 } else {
                     const reason = data.errorReason || 'unknown';
                     const reasonLabels = {
@@ -8162,10 +8220,11 @@
             haptic('light');
             // Clean markdown for sharing
             const cleanText = text.replace(/[#*_`~]/g, '').replace(/\n{3,}/g, '\n\n').trim();
+            // Share full text with branded footer, no URL (the URL requires a license key so it's useless to recipients)
+            const shareText = cleanText + '\n\n---\nPowered by OffGrid Command Center | offgridtoolkit.ai';
             const shareData = {
                 title: 'OffGrid Command Center',
-                text: cleanText.substring(0, 500) + (cleanText.length > 500 ? '...' : ''),
-                url: 'https://offgridtoolkit.ai/command'
+                text: shareText
             };
 
             if (navigator.share) {
