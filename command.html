@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0f1419">
     <title>OffGrid Command Center — Multi-Model AI Council</title>
     <meta name="description" content="OffGrid Command Center: Access GPT 5.2, Claude, Gemini, and Grok through one interface. Command mode synthesizes the best answer from all four AI models.">
     
@@ -14,6 +18,8 @@
     <meta property="og:image" content="https://offgridtoolkit.ai/og-image.png">
     
     <link rel="icon" type="image/png" href="compasstilted.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
+    <link rel="manifest" href="/manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1591,8 +1597,13 @@
         @media (max-width: 768px) {
             body.command-theme {
                 background: var(--bg-deep);
-                /* Enable pull-to-refresh */
-                overscroll-behavior-y: contain;
+                /* DISABLE pull-to-refresh - prevents accidental chat reset */
+                overscroll-behavior-y: none;
+                /* Safe area insets for notched phones */
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
             }
 
             .sidebar {
@@ -1645,6 +1656,8 @@
                 padding-bottom: 140px !important;
                 padding-top: 12px !important;
                 padding-right: 12px !important;
+                overscroll-behavior-y: none;
+                -webkit-overflow-scrolling: touch;
             }
 
             .message {
@@ -1726,6 +1739,7 @@
                 left: 0;
                 right: 0;
                 padding: 8px 10px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
@@ -1774,19 +1788,383 @@
                 display: none !important;
             }
 
-            /* Pull-to-refresh indicator */
+            /* Pull-to-refresh indicator - DEPRECATED, kept for compat */
             .pull-refresh-indicator {
-                display: none;
-                text-align: center;
-                padding: 12px;
-                color: var(--gold-primary);
-                font-size: 13px;
-                font-weight: 500;
+                display: none !important;
             }
 
-            .pull-refresh-indicator.visible {
+            /* ============================================
+               SCROLL-TO-BOTTOM FLOATING BUTTON
+               ============================================ */
+            .scroll-to-bottom-btn {
+                position: fixed;
+                bottom: 90px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                color: var(--gold-primary);
+                display: none;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                z-index: 99;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                transition: all 0.2s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .scroll-to-bottom-btn.visible {
+                display: flex;
+            }
+            .scroll-to-bottom-btn:active {
+                transform: scale(0.9);
+            }
+            .scroll-to-bottom-btn svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            /* ============================================
+               MOBILE USAGE BAR (compact header)
+               ============================================ */
+            .mobile-usage-bar {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 4px 12px;
+                background: var(--bg-surface);
+                border-bottom: 1px solid var(--border-subtle);
+                font-size: 11px;
+                color: var(--text-secondary);
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                z-index: 49;
+                height: 28px;
+            }
+            .mobile-usage-bar .usage-pill {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                padding: 2px 8px;
+                background: var(--bg-elevated);
+                border-radius: 10px;
+                font-size: 10px;
+                font-weight: 500;
+            }
+            .mobile-usage-bar .usage-pill .usage-icon {
+                font-size: 10px;
+            }
+            .mobile-usage-bar .usage-pill.warning {
+                color: var(--warning);
+                background: rgba(245, 158, 11, 0.1);
+            }
+            .mobile-usage-bar .tier-label {
+                font-weight: 600;
+                color: var(--gold-primary);
+                font-size: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .mobile-usage-bar .usage-spacer {
+                flex: 1;
+            }
+
+            /* Adjust main container for usage bar */
+            .main-container {
+                height: calc(100vh - 84px) !important;
+                margin-top: 84px !important;
+            }
+
+            /* ============================================
+               BOTTOM SHEET MODEL SELECTOR
+               ============================================ */
+            .bottom-sheet-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 200;
+                display: none;
+                opacity: 0;
+                transition: opacity 0.25s ease;
+            }
+            .bottom-sheet-overlay.open {
+                display: block;
+                opacity: 1;
+            }
+            .bottom-sheet {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: var(--bg-surface);
+                border-radius: 16px 16px 0 0;
+                z-index: 201;
+                transform: translateY(100%);
+                transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+                max-height: 70vh;
+                overflow-y: auto;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+            .bottom-sheet.open {
+                transform: translateY(0);
+            }
+            .bottom-sheet-handle {
+                width: 36px;
+                height: 4px;
+                background: var(--text-muted);
+                border-radius: 2px;
+                margin: 10px auto 6px;
+            }
+            .bottom-sheet-title {
+                padding: 8px 16px 12px;
+                font-size: 15px;
+                font-weight: 600;
+                color: var(--text-primary);
+                border-bottom: 1px solid var(--border-subtle);
+            }
+            .bottom-sheet .model-item {
+                padding: 14px 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                transition: background 0.15s;
+                border-bottom: 1px solid var(--border-subtle);
+                -webkit-tap-highlight-color: transparent;
+            }
+            .bottom-sheet .model-item:active {
+                background: var(--bg-elevated);
+            }
+            .bottom-sheet .model-item.selected {
+                background: var(--bg-elevated);
+            }
+            .bottom-sheet .model-item .model-color-dot {
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+            .bottom-sheet .model-item .model-info {
+                flex: 1;
+            }
+            .bottom-sheet .model-item .model-name {
+                font-weight: 600;
+                font-size: 14px;
+                color: var(--text-primary);
+            }
+            .bottom-sheet .model-item .model-desc {
+                font-size: 11px;
+                color: var(--text-secondary);
+                margin-top: 2px;
+            }
+            .bottom-sheet .model-item .model-check {
+                color: var(--gold-primary);
+                font-size: 16px;
+                display: none;
+            }
+            .bottom-sheet .model-item.selected .model-check {
                 display: block;
             }
+
+            /* ============================================
+               MOBILE QUICK-ACTIONS TOOLBAR
+               ============================================ */
+            .mobile-quick-toolbar {
+                display: none;
+                position: fixed;
+                bottom: 70px;
+                left: 0;
+                right: 0;
+                padding: 6px 10px;
+                padding-bottom: calc(6px);
+                background: var(--bg-deep);
+                z-index: 99;
+                gap: 6px;
+                justify-content: center;
+                border-top: 1px solid var(--border-subtle);
+            }
+            .mobile-quick-toolbar.visible {
+                display: flex;
+            }
+            .mobile-quick-toolbar .quick-btn {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                padding: 6px 12px;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                border-radius: 20px;
+                color: var(--text-secondary);
+                font-size: 11px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.15s;
+                white-space: nowrap;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .mobile-quick-toolbar .quick-btn:active {
+                background: var(--bg-elevated);
+                border-color: var(--gold-primary);
+                color: var(--gold-primary);
+                transform: scale(0.95);
+            }
+            .mobile-quick-toolbar .quick-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            /* Adjust messages padding when toolbar is visible */
+            .messages.has-toolbar {
+                padding-bottom: 170px !important;
+            }
+
+            /* ============================================
+               SHARE BUTTON ON MESSAGES
+               ============================================ */
+            .share-response-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 5px 12px;
+                margin-top: 6px;
+                background: transparent;
+                border: 1px solid var(--border-subtle);
+                border-radius: 6px;
+                color: var(--text-secondary);
+                font-size: 11px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.15s;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .share-response-btn:active {
+                border-color: var(--gold-primary);
+                color: var(--gold-primary);
+            }
+            .share-response-btn svg {
+                width: 13px;
+                height: 13px;
+            }
+
+            /* ============================================
+               LONG-PRESS CONTEXT MENU
+               ============================================ */
+            .mobile-context-menu {
+                position: fixed;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                border-radius: 12px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+                z-index: 300;
+                min-width: 180px;
+                overflow: hidden;
+                animation: contextMenuIn 0.15s ease;
+            }
+            @keyframes contextMenuIn {
+                from { opacity: 0; transform: scale(0.9); }
+                to { opacity: 1; transform: scale(1); }
+            }
+            .mobile-context-menu .ctx-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 16px;
+                font-size: 13px;
+                color: var(--text-primary);
+                cursor: pointer;
+                border-bottom: 1px solid var(--border-subtle);
+                -webkit-tap-highlight-color: transparent;
+            }
+            .mobile-context-menu .ctx-item:last-child {
+                border-bottom: none;
+            }
+            .mobile-context-menu .ctx-item:active {
+                background: var(--bg-elevated);
+            }
+            .mobile-context-menu .ctx-icon {
+                font-size: 16px;
+                width: 20px;
+                text-align: center;
+            }
+
+            /* ============================================
+               OLED DARK MODE
+               ============================================ */
+            body.command-theme.oled-mode {
+                background: #000000 !important;
+            }
+            body.command-theme.oled-mode .header {
+                background: #000000 !important;
+                border-bottom-color: #1a1a1a !important;
+            }
+            body.command-theme.oled-mode .mobile-usage-bar {
+                background: #000000 !important;
+                border-bottom-color: #1a1a1a !important;
+            }
+            body.command-theme.oled-mode .messages {
+                background: #000000 !important;
+            }
+            body.command-theme.oled-mode .message.assistant .message-content {
+                background: #0a0a0a !important;
+                border-color: #1a1a1a !important;
+            }
+            body.command-theme.oled-mode .input-area {
+                background: #000000 !important;
+                border-top-color: #1a1a1a !important;
+            }
+            body.command-theme.oled-mode .input-container {
+                background: #0a0a0a !important;
+                border-color: #1a1a1a !important;
+            }
+            body.command-theme.oled-mode .bg-surface,
+            body.command-theme.oled-mode .bottom-sheet,
+            body.command-theme.oled-mode .mobile-quick-toolbar {
+                background: #000000 !important;
+            }
+            body.command-theme.oled-mode .mobile-context-menu {
+                background: #0a0a0a !important;
+            }
+
+            /* ============================================
+               OFFLINE INDICATOR
+               ============================================ */
+            .offline-indicator {
+                position: fixed;
+                top: 56px;
+                left: 0;
+                right: 0;
+                background: var(--error);
+                color: white;
+                text-align: center;
+                padding: 6px;
+                font-size: 12px;
+                font-weight: 600;
+                z-index: 200;
+                display: none;
+                animation: slideDown 0.3s ease;
+            }
+            .offline-indicator.visible {
+                display: block;
+            }
+            @keyframes slideDown {
+                from { transform: translateY(-100%); }
+                to { transform: translateY(0); }
+            }
+
+            /* ============================================
+               SWIPE-TO-DISMISS OVERLAYS
+               ============================================ */
+            .swipe-dismissable {
+                touch-action: pan-y;
+            }
+
         }
 
         /* Hide mobile-only on desktop */
@@ -3945,8 +4323,47 @@
             </div>
             </div>
             </div>
-        </div>
+         </div>
     </div>
+
+    <!-- MOBILE: Scroll-to-bottom button -->
+    <button class="scroll-to-bottom-btn" id="scrollToBottomBtn" onclick="scrollToBottom()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </button>
+
+    <!-- MOBILE: Usage bar (populated by JS) -->
+    <div class="mobile-usage-bar" id="mobileUsageBar" style="display: none;"></div>
+
+    <!-- MOBILE: Bottom sheet model selector -->
+    <div class="bottom-sheet-overlay" id="bottomSheetOverlay" onclick="closeBottomSheet()"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-title">Select Model</div>
+        <div id="bottomSheetModels"></div>
+    </div>
+
+    <!-- MOBILE: Quick-actions toolbar -->
+    <div class="mobile-quick-toolbar" id="mobileQuickToolbar">
+        <button class="quick-btn" onclick="openImageStudio()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+            Image
+        </button>
+        <button class="quick-btn" onclick="triggerGalleryUpload()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Upload
+        </button>
+        <button class="quick-btn" onclick="softResetChat()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            New Chat
+        </button>
+        <button class="quick-btn" id="oledToggleBtn" onclick="toggleOLEDMode()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            OLED
+        </button>
+    </div>
+
+    <!-- MOBILE: Offline indicator -->
+    <div class="offline-indicator" id="offlineIndicator">No internet connection</div>
 
     <script>
         // ============================================
@@ -4213,6 +4630,11 @@
                 </div>
                 <div style="text-align: center; margin-top: 8px; font-size: 10px; color: #8b7355;">Resets monthly</div>
             `;
+
+            // Also update mobile usage bar
+            if (typeof updateMobileUsageBar === 'function') {
+                updateMobileUsageBar();
+            }
         }
 
         // ============================================
@@ -4654,6 +5076,15 @@
                 singleVisualBtn.onclick = () => createVisualFromResponse(capturedSingleResponse, singleVisualBtn);
                 messageDiv.querySelector('.message-content').appendChild(singleVisualBtn);
 
+                // Add share button on mobile
+                if (typeof addShareButtonToMessage === 'function') {
+                    addShareButtonToMessage(messageDiv);
+                }
+                // Apply paper mode if active
+                if (typeof applyPaperModeToMessage === 'function') {
+                    applyPaperModeToMessage(messageDiv);
+                }
+
                 // Add inline Save to KB link when image was part of the conversation
                 if (imageToSend) {
                     const saveLink = document.createElement('button');
@@ -5012,6 +5443,15 @@
                 const capturedResponse = fullResponse;
                 visualBtn.onclick = () => createVisualFromResponse(capturedResponse, visualBtn);
                 messageDiv.querySelector('.message-content').appendChild(visualBtn);
+
+                // Add share button on mobile
+                if (typeof addShareButtonToMessage === 'function') {
+                    addShareButtonToMessage(messageDiv);
+                }
+                // Apply paper mode if active
+                if (typeof applyPaperModeToMessage === 'function') {
+                    applyPaperModeToMessage(messageDiv);
+                }
 
                 // Add inline Save to KB link when image was part of the conversation
                 if (imageToSend) {
@@ -7118,10 +7558,13 @@
             `;
 
             try {
+                // Enhance prompt for mobile-friendly output
+                const finalPrompt = (typeof enhanceImagePromptForMobile === 'function') ? enhanceImagePromptForMobile(prompt) : prompt;
+
                 const response = await fetch(`${API_BASE}/api/command/generate-image`, {
                     method: 'POST',
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ prompt })
+                    body: JSON.stringify({ prompt: finalPrompt })
                 });
 
                 const data = await response.json();
@@ -7552,6 +7995,469 @@
         }
 
         // ============================================
+        // MOBILE ENHANCEMENT FUNCTIONS
+        // ============================================
+
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
+        // Haptic feedback helper
+        function haptic(type = 'light') {
+            if (!navigator.vibrate) return;
+            switch(type) {
+                case 'light': navigator.vibrate(10); break;
+                case 'medium': navigator.vibrate(20); break;
+                case 'heavy': navigator.vibrate(40); break;
+                case 'success': navigator.vibrate([10, 50, 10]); break;
+            }
+        }
+
+        // ---- Scroll-to-bottom button ----
+        function scrollToBottom() {
+            const messages = document.getElementById('messages');
+            if (messages) {
+                messages.scrollTo({ top: messages.scrollHeight, behavior: 'smooth' });
+                haptic('light');
+            }
+        }
+
+        function initScrollToBottom() {
+            const messages = document.getElementById('messages');
+            const btn = document.getElementById('scrollToBottomBtn');
+            if (!messages || !btn) return;
+
+            messages.addEventListener('scroll', () => {
+                const distFromBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight;
+                if (distFromBottom > 200) {
+                    btn.classList.add('visible');
+                } else {
+                    btn.classList.remove('visible');
+                }
+            });
+        }
+
+        // ---- Mobile usage bar ----
+        function updateMobileUsageBar() {
+            if (!isMobile() || !licenseInfo) return;
+            const bar = document.getElementById('mobileUsageBar');
+            if (!bar) return;
+
+            const promptsLeft = licenseInfo.promptsLimit - licenseInfo.promptsUsed;
+            const imagesLeft = licenseInfo.imagesLimit - licenseInfo.imagesUsed;
+            const promptWarning = (licenseInfo.promptsUsed / licenseInfo.promptsLimit) > 0.8;
+            const imageWarning = (licenseInfo.imagesUsed / licenseInfo.imagesLimit) > 0.8;
+
+            bar.innerHTML = `
+                <span class="tier-label">${licenseInfo.tierName || 'Command'}</span>
+                <span class="usage-pill ${promptWarning ? 'warning' : ''}">
+                    <span class="usage-icon">💬</span>
+                    ${promptsLeft} left
+                </span>
+                <span class="usage-pill ${imageWarning ? 'warning' : ''}">
+                    <span class="usage-icon">🎨</span>
+                    ${imagesLeft} left
+                </span>
+                <span class="usage-spacer"></span>
+            `;
+            bar.style.display = 'flex';
+        }
+
+        // ---- Bottom sheet model selector ----
+        function openBottomSheet() {
+            haptic('medium');
+            const overlay = document.getElementById('bottomSheetOverlay');
+            const sheet = document.getElementById('bottomSheet');
+            const container = document.getElementById('bottomSheetModels');
+            if (!overlay || !sheet || !container) return;
+
+            // Build model list
+            const models = [
+                { key: 'command', name: 'Command Mode', desc: 'AI Council consensus — all 4 models', color: 'var(--gold-primary)', emoji: '🎖️' },
+                { key: 'scout', name: 'Scout (GPT 5.2)', desc: 'Creative writing & analysis', color: 'var(--scout-color)', emoji: '🔭' },
+                { key: 'medic', name: 'Medic (Claude)', desc: 'Careful reasoning & safety', color: 'var(--medic-color)', emoji: '🏥' },
+                { key: 'navigator', name: 'Navigator (Gemini)', desc: 'Research & multimodal', color: 'var(--navigator-color)', emoji: '🧭' },
+                { key: 'ranger', name: 'Ranger (Grok)', desc: 'Direct & unfiltered', color: 'var(--ranger-color)', emoji: '🏹' }
+            ];
+
+            container.innerHTML = models.map(m => `
+                <div class="model-item ${selectedModel === m.key ? 'selected' : ''}" onclick="selectModelFromSheet('${m.key}')">
+                    <div class="model-color-dot" style="background: ${m.color}"></div>
+                    <div class="model-info">
+                        <div class="model-name">${m.emoji} ${m.name}</div>
+                        <div class="model-desc">${m.desc}</div>
+                    </div>
+                    <div class="model-check">✓</div>
+                </div>
+            `).join('');
+
+            overlay.classList.add('open');
+            setTimeout(() => sheet.classList.add('open'), 10);
+
+            // Swipe-to-dismiss
+            let sheetStartY = 0;
+            let sheetCurrentY = 0;
+            sheet.addEventListener('touchstart', (e) => {
+                sheetStartY = e.touches[0].clientY;
+            }, { passive: true });
+            sheet.addEventListener('touchmove', (e) => {
+                sheetCurrentY = e.touches[0].clientY;
+                const diff = sheetCurrentY - sheetStartY;
+                if (diff > 0) {
+                    sheet.style.transform = `translateY(${diff}px)`;
+                    sheet.style.transition = 'none';
+                }
+            }, { passive: true });
+            sheet.addEventListener('touchend', () => {
+                const diff = sheetCurrentY - sheetStartY;
+                sheet.style.transition = 'transform 0.3s cubic-bezier(0.32, 0.72, 0, 1)';
+                if (diff > 100) {
+                    closeBottomSheet();
+                } else {
+                    sheet.style.transform = 'translateY(0)';
+                }
+                sheetCurrentY = 0;
+            }, { passive: true });
+        }
+
+        function closeBottomSheet() {
+            const overlay = document.getElementById('bottomSheetOverlay');
+            const sheet = document.getElementById('bottomSheet');
+            if (sheet) {
+                sheet.classList.remove('open');
+                sheet.style.transform = '';
+            }
+            if (overlay) {
+                overlay.classList.remove('open');
+            }
+        }
+
+        function selectModelFromSheet(model) {
+            haptic('success');
+            selectModel(model);
+            closeBottomSheet();
+            // Update the model button text
+            syncModelUI(model);
+        }
+
+        // ---- Quick-actions toolbar ----
+        function showMobileToolbar() {
+            const toolbar = document.getElementById('mobileQuickToolbar');
+            const messages = document.getElementById('messages');
+            if (toolbar && !document.getElementById('welcome')) {
+                toolbar.classList.add('visible');
+                if (messages) messages.classList.add('has-toolbar');
+            }
+        }
+
+        function hideMobileToolbar() {
+            const toolbar = document.getElementById('mobileQuickToolbar');
+            const messages = document.getElementById('messages');
+            if (toolbar) toolbar.classList.remove('visible');
+            if (messages) messages.classList.remove('has-toolbar');
+        }
+
+        // ---- Web Share API ----
+        function shareResponse(text) {
+            haptic('light');
+            // Clean markdown for sharing
+            const cleanText = text.replace(/[#*_`~]/g, '').replace(/\n{3,}/g, '\n\n').trim();
+            const shareData = {
+                title: 'OffGrid Command Center',
+                text: cleanText.substring(0, 500) + (cleanText.length > 500 ? '...' : ''),
+                url: 'https://offgridtoolkit.ai/command'
+            };
+
+            if (navigator.share) {
+                navigator.share(shareData).catch(() => {
+                    // User cancelled or error - fallback to copy
+                    copyTextToClipboard(cleanText);
+                });
+            } else {
+                copyTextToClipboard(cleanText);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showSaveToast('Copied to clipboard', 'Paste anywhere to share');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.cssText = 'position:fixed;opacity:0';
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                ta.remove();
+                showSaveToast('Copied to clipboard');
+            });
+        }
+
+        // ---- Long-press context menu ----
+        let longPressTimer = null;
+        let longPressTarget = null;
+
+        function initLongPress() {
+            const messages = document.getElementById('messages');
+            if (!messages) return;
+
+            messages.addEventListener('touchstart', (e) => {
+                const msgEl = e.target.closest('.message.assistant');
+                if (!msgEl) return;
+
+                longPressTimer = setTimeout(() => {
+                    haptic('heavy');
+                    longPressTarget = msgEl;
+                    showContextMenu(e.touches[0].clientX, e.touches[0].clientY, msgEl);
+                }, 500);
+            }, { passive: true });
+
+            messages.addEventListener('touchmove', () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            }, { passive: true });
+
+            messages.addEventListener('touchend', () => {
+                if (longPressTimer) {
+                    clearTimeout(longPressTimer);
+                    longPressTimer = null;
+                }
+            }, { passive: true });
+
+            // Dismiss context menu on tap outside
+            document.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.mobile-context-menu')) {
+                    dismissContextMenu();
+                }
+            }, { passive: true });
+        }
+
+        function showContextMenu(x, y, msgEl) {
+            dismissContextMenu();
+            const menu = document.createElement('div');
+            menu.className = 'mobile-context-menu';
+
+            const msgText = msgEl.querySelector('.message-text')?.textContent || '';
+
+            // Build items with event listeners (safer than inline onclick with escaped strings)
+            const items = [
+                { icon: '📋', label: 'Copy Response', action: () => copyTextToClipboard(msgText) },
+                { icon: '📤', label: 'Share', action: () => shareResponse(msgText) },
+                { icon: '📖', label: 'Toggle Paper Mode', action: () => toggleReadingMode() }
+            ];
+
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'ctx-item';
+                el.innerHTML = `<span class="ctx-icon">${item.icon}</span> ${item.label}`;
+                el.addEventListener('click', () => {
+                    item.action();
+                    dismissContextMenu();
+                });
+                menu.appendChild(el);
+            });
+
+            // Position the menu
+            const menuWidth = 180;
+            const menuHeight = 144; // approx 3 items * 48px
+            let left = Math.min(x, window.innerWidth - menuWidth - 10);
+            let top = y - menuHeight;
+            if (top < 60) top = y + 10;
+            menu.style.left = left + 'px';
+            menu.style.top = top + 'px';
+
+            document.body.appendChild(menu);
+        }
+
+        function dismissContextMenu() {
+            document.querySelectorAll('.mobile-context-menu').forEach(m => m.remove());
+        }
+
+        // ---- OLED Dark Mode ----
+        function toggleOLEDMode() {
+            haptic('medium');
+            const body = document.body;
+            const isOLED = body.classList.toggle('oled-mode');
+            localStorage.setItem('offgrid-oled-mode', isOLED);
+            const btn = document.getElementById('oledToggleBtn');
+            if (btn) {
+                btn.innerHTML = isOLED
+                    ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Normal'
+                    : '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg> OLED';
+            }
+        }
+
+        function initOLEDMode() {
+            if (localStorage.getItem('offgrid-oled-mode') === 'true') {
+                document.body.classList.add('oled-mode');
+                const btn = document.getElementById('oledToggleBtn');
+                if (btn) {
+                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg> Normal';
+                }
+            }
+        }
+
+        // ---- Offline indicator ----
+        function initOfflineIndicator() {
+            const indicator = document.getElementById('offlineIndicator');
+            if (!indicator) return;
+
+            function updateOnlineStatus() {
+                if (!navigator.onLine) {
+                    indicator.classList.add('visible');
+                } else {
+                    indicator.classList.remove('visible');
+                }
+            }
+
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+            updateOnlineStatus();
+        }
+
+        // ---- Swipe-to-dismiss overlays ----
+        function initSwipeToDismiss() {
+            // Image Studio overlay
+            const addSwipe = (overlayId, closeFn) => {
+                let startY = 0;
+                let currentY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    const overlay = document.getElementById(overlayId);
+                    if (!overlay) return;
+                    const modal = overlay.querySelector('.image-studio-modal, .deliberation-modal');
+                    if (modal && modal.contains(e.target)) {
+                        startY = e.touches[0].clientY;
+                    }
+                }, { passive: true });
+                document.addEventListener('touchmove', (e) => {
+                    const overlay = document.getElementById(overlayId);
+                    if (!overlay) return;
+                    currentY = e.touches[0].clientY;
+                    const diff = currentY - startY;
+                    const modal = overlay.querySelector('.image-studio-modal, .deliberation-modal');
+                    if (modal && diff > 0) {
+                        modal.style.transform = `translateY(${diff}px)`;
+                        modal.style.transition = 'none';
+                        overlay.style.opacity = Math.max(0, 1 - diff / 300);
+                    }
+                }, { passive: true });
+                document.addEventListener('touchend', () => {
+                    const overlay = document.getElementById(overlayId);
+                    if (!overlay) return;
+                    const diff = currentY - startY;
+                    const modal = overlay.querySelector('.image-studio-modal, .deliberation-modal');
+                    if (modal) {
+                        if (diff > 120) {
+                            closeFn();
+                        } else {
+                            modal.style.transition = 'transform 0.3s ease';
+                            modal.style.transform = 'translateY(0)';
+                            overlay.style.opacity = '1';
+                        }
+                    }
+                    currentY = 0;
+                    startY = 0;
+                }, { passive: true });
+            };
+            // These will only fire when the overlays exist in DOM
+            addSwipe('imageStudioModal', closeImageStudio);
+            addSwipe('deliberationModal', closeDeliberationModal);
+        }
+
+        // ---- Mobile model button override ----
+        function overrideModelButton() {
+            // On mobile, tap the model button to open bottom sheet instead of dropdown
+            const modelBtns = document.querySelectorAll('.model-button');
+            modelBtns.forEach(btn => {
+                btn.removeAttribute('onclick');
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openBottomSheet();
+                });
+            });
+        }
+
+        // ---- Add share button to messages ----
+        function addShareButtonToMessage(msgEl) {
+            if (!isMobile() || !navigator.share) return;
+            const content = msgEl.querySelector('.message-content');
+            if (!content) return;
+            const text = msgEl.querySelector('.message-text')?.textContent || '';
+            if (!text.trim()) return;
+
+            const shareBtn = document.createElement('button');
+            shareBtn.className = 'share-response-btn';
+            shareBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share';
+            shareBtn.onclick = () => shareResponse(text);
+            content.appendChild(shareBtn);
+        }
+
+        // ---- Mobile image prompt enhancement ----
+        // Appends mobile-friendly orientation hint to image prompts on mobile
+        function enhanceImagePromptForMobile(prompt) {
+            if (!isMobile()) return prompt;
+            // Only add if user hasn't specified orientation
+            const orientationWords = ['landscape', 'portrait', 'horizontal', 'vertical', 'wide', 'tall', '16:9', '9:16', '4:3', '3:4'];
+            const hasOrientation = orientationWords.some(w => prompt.toLowerCase().includes(w));
+            if (!hasOrientation) {
+                return prompt + ', vertical portrait orientation suitable for mobile phone wallpaper';
+            }
+            return prompt;
+        }
+
+        // ---- Master mobile init ----
+        function initMobileEnhancements() {
+            console.log('Initializing mobile enhancements...');
+
+            // Scroll-to-bottom
+            initScrollToBottom();
+
+            // Usage bar (update after license check)
+            updateMobileUsageBar();
+
+            // Bottom sheet model selector
+            overrideModelButton();
+
+            // Show quick toolbar when chat is active
+            const observer = new MutationObserver(() => {
+                if (!document.getElementById('welcome')) {
+                    showMobileToolbar();
+                } else {
+                    hideMobileToolbar();
+                }
+            });
+            observer.observe(document.getElementById('messages') || document.body, { childList: true, subtree: true });
+
+            // Long-press context menu
+            initLongPress();
+
+            // OLED mode
+            initOLEDMode();
+
+            // Offline indicator
+            initOfflineIndicator();
+
+            // Swipe-to-dismiss overlays
+            initSwipeToDismiss();
+
+            // Add haptic to send button
+            const sendBtn = document.getElementById('sendButton');
+            if (sendBtn) {
+                const origClick = sendBtn.onclick;
+                sendBtn.onclick = function(e) {
+                    haptic('light');
+                    if (origClick) origClick.call(this, e);
+                };
+            }
+
+            console.log('Mobile enhancements ready!');
+        }
+
+        // ============================================
         // INITIALIZATION
         // ============================================
 
@@ -7615,40 +8521,11 @@
                 }
             }
 
-            // Pull-to-refresh for mobile
+            // ============================================
+            // MOBILE ENHANCEMENTS (replaces pull-to-refresh)
+            // ============================================
             if (window.innerWidth <= 768) {
-                let touchStartY = 0;
-                let pulling = false;
-                const messagesEl = document.getElementById('messages');
-
-                messagesEl.addEventListener('touchstart', function(e) {
-                    if (messagesEl.scrollTop <= 0) {
-                        touchStartY = e.touches[0].clientY;
-                        pulling = true;
-                    }
-                }, { passive: true });
-
-                messagesEl.addEventListener('touchmove', function(e) {
-                    if (!pulling) return;
-                    const diff = e.touches[0].clientY - touchStartY;
-                    if (diff > 80 && messagesEl.scrollTop <= 0) {
-                        // Show visual feedback
-                        messagesEl.style.transform = `translateY(${Math.min(diff * 0.3, 40)}px)`;
-                        messagesEl.style.transition = 'none';
-                    }
-                }, { passive: true });
-
-                messagesEl.addEventListener('touchend', function(e) {
-                    if (!pulling) return;
-                    pulling = false;
-                    const currentTransform = messagesEl.style.transform;
-                    messagesEl.style.transition = 'transform 0.3s ease';
-                    messagesEl.style.transform = 'translateY(0)';
-                    // If pulled far enough, soft reset chat (preserves Deep Mode)
-                    if (currentTransform && parseInt(currentTransform.replace(/[^0-9.-]/g, '')) > 20) {
-                        softResetChat();
-                    }
-                }, { passive: true });
+                initMobileEnhancements();
             }
 
             // Check for ready-made prompt from prompts page

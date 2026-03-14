@@ -1,0 +1,24 @@
+{
+    "name": "OffGrid Command Center",
+    "short_name": "Command",
+    "description": "Multi-Model AI Council: GPT 5.2, Claude, Gemini, and Grok",
+    "start_url": "/command",
+    "display": "standalone",
+    "background_color": "#0f1419",
+    "theme_color": "#b8860b",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/compass-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/compass-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
