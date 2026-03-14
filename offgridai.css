@@ -2478,24 +2478,24 @@ body.command-theme {
 
 /* Message text */
 .command-theme .message-text {
-    color: #e7e9ea;
+    color: #f0f2f4;
 }
 
 .command-theme .markdown-content {
-    color: #e7e9ea;
+    color: #f0f2f4;
 }
 
 .command-theme .markdown-content h1 {
-    color: #e7e9ea;
+    color: #ffffff;
     border-bottom: 2px solid #2d333b;
 }
 
 .command-theme .markdown-content h2 {
-    color: #e7e9ea;
+    color: #ffffff;
 }
 
 .command-theme .markdown-content h3 {
-    color: #8b949e;
+    color: #c9d1d9;
 }
 
 .command-theme .markdown-content code {
@@ -2515,11 +2515,11 @@ body.command-theme {
 
 .command-theme .markdown-content blockquote {
     border-left: 4px solid #c9a84c;
-    color: #8b949e;
+    color: #b1bac4;
 }
 
 .command-theme .markdown-content strong {
-    color: #e7e9ea;
+    color: #ffffff;
 }
 
 .command-theme .markdown-content table {
@@ -2535,7 +2535,7 @@ body.command-theme {
 
 .command-theme .markdown-content td {
     border: 1px solid #2d333b;
-    color: #e7e9ea;
+    color: #f0f2f4;
 }
 
 .command-theme .markdown-content tr:hover {

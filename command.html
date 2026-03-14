@@ -288,6 +288,11 @@
             .message.assistant {
                 gap: 0;
             }
+            /* Bump font size on mobile for readability */
+            .message-text, .markdown-content {
+                font-size: 15.5px !important;
+                line-height: 1.7 !important;
+            }
         }
 
         /* ---- Layout: Centered Chat Column ---- */
@@ -1672,12 +1677,16 @@
             }
 
             .messages {
-                padding: 12px !important;
-                padding-bottom: 100px !important;
-                padding-top: 12px !important;
-                padding-right: 12px !important;
+                padding: 8px !important;
+                padding-bottom: 72px !important;
+                padding-top: 8px !important;
+                padding-right: 8px !important;
                 overscroll-behavior-y: none;
                 -webkit-overflow-scrolling: touch;
+            }
+
+            .messages.has-toolbar {
+                padding-bottom: 110px !important;
             }
 
             .message {
@@ -1686,12 +1695,15 @@
 
             .welcome {
                 padding: 8px 16px;
-                padding-top: 10px;
-                justify-content: flex-start;
+                padding-top: 12px;
+                justify-content: flex-start !important;
+                align-content: flex-start;
                 flex-direction: row;
                 flex-wrap: wrap;
                 align-items: center;
                 gap: 10px;
+                height: auto !important;
+                min-height: 0 !important;
             }
 
             .welcome h2 {
@@ -1762,8 +1774,8 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                padding: 8px 10px;
-                padding-bottom: calc(8px + env(safe-area-inset-bottom));
+                padding: 4px 8px;
+                padding-bottom: calc(3px + env(safe-area-inset-bottom));
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
@@ -2003,7 +2015,7 @@
             .mobile-quick-toolbar {
                 display: none;
                 position: fixed;
-                bottom: 70px;
+                bottom: 64px;
                 left: 0;
                 right: 0;
                 padding: 6px 10px;
@@ -2046,7 +2058,7 @@
 
             /* Adjust messages padding when toolbar is visible */
             .messages.has-toolbar {
-                padding-bottom: 170px !important;
+                padding-bottom: 120px !important;
             }
 
             /* ============================================
@@ -2084,27 +2096,30 @@
                 position: fixed;
                 background: var(--bg-surface);
                 border: 1px solid var(--border-subtle);
-                border-radius: 12px;
-                box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+                border-radius: 14px;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
                 z-index: 300;
-                min-width: 180px;
+                min-width: 220px;
                 overflow: hidden;
-                animation: contextMenuIn 0.15s ease;
+                animation: contextMenuIn 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
             }
             @keyframes contextMenuIn {
-                from { opacity: 0; transform: scale(0.9); }
-                to { opacity: 1; transform: scale(1); }
+                from { opacity: 0; transform: scale(0.85) translateY(8px); }
+                to { opacity: 1; transform: scale(1) translateY(0); }
             }
             .mobile-context-menu .ctx-item {
                 display: flex;
                 align-items: center;
-                gap: 10px;
-                padding: 12px 16px;
-                font-size: 13px;
+                gap: 12px;
+                padding: 14px 18px;
+                font-size: 14.5px;
+                font-weight: 500;
                 color: var(--text-primary);
                 cursor: pointer;
-                border-bottom: 1px solid var(--border-subtle);
                 -webkit-tap-highlight-color: transparent;
+                transition: background 0.1s;
             }
             .mobile-context-menu .ctx-item:last-child {
                 border-bottom: none;
@@ -2113,8 +2128,8 @@
                 background: var(--bg-elevated);
             }
             .mobile-context-menu .ctx-icon {
-                font-size: 16px;
-                width: 20px;
+                font-size: 18px;
+                width: 24px;
                 text-align: center;
             }
 
@@ -2197,7 +2212,9 @@
                ============================================ */
             .image-studio-modal .studio-result ~ #directPromptSection,
             .image-studio-modal .studio-result ~ .studio-privacy,
-            .image-studio-modal .studio-result ~ div[style*="Powered by"] {
+            .image-studio-modal .studio-result ~ div[style*="Powered by"],
+            .image-studio-modal.has-result .studio-powered-by,
+            .image-studio-modal.has-result .studio-privacy {
                 display: none !important;
             }
             /* Also hide the "Prompt ready" text and prompt textarea when result exists */
@@ -7234,7 +7251,7 @@
                     </div>
 
                     <div class="studio-privacy"><span class="lock-icon">\ud83d\udd12</span> Images are generated on-demand and never stored on our servers.</div>
-                    <div style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Gemini 3 Pro</div>
+                    <div class="studio-powered-by" style="font-size: 9px; color: #c4c4c4; text-align: center; margin-top: 6px;">Powered by Gemini 3 Pro</div>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -7668,8 +7685,10 @@
                         const privacyEl = modal?.querySelector('.studio-privacy');
                         if (privacyEl) privacyEl.style.display = 'none';
                         // Hide the "Powered by" line
-                        const poweredBy = modal?.querySelector('div[style*="Powered by"]');
+                        const poweredBy = modal?.querySelector('.studio-powered-by');
                         if (poweredBy) poweredBy.style.display = 'none';
+                        // Add has-result class to modal for CSS hiding
+                        if (modal) modal.classList.add('has-result');
                     }
                 } else {
                     const reason = data.errorReason || 'unknown';
@@ -8316,21 +8335,59 @@
 
         function showContextMenu(x, y, msgEl) {
             dismissContextMenu();
+            haptic('medium');
             const menu = document.createElement('div');
             menu.className = 'mobile-context-menu';
 
-            const msgText = msgEl.querySelector('.message-text')?.textContent || '';
+            const msgTextEl = msgEl.querySelector('.message-text') || msgEl.querySelector('.markdown-content');
+            const msgText = msgTextEl ? msgTextEl.innerText : '';
+            const hasImage = msgEl.querySelector('img');
+            const imgSrc = hasImage ? hasImage.src : null;
 
-            // Build items with event listeners (safer than inline onclick with escaped strings)
-            const items = [
-                { icon: '📋', label: 'Copy Response', action: () => copyTextToClipboard(msgText) },
-                { icon: '📤', label: 'Share', action: () => shareResponse(msgText) },
-                { icon: '📖', label: 'Toggle Paper Mode', action: () => toggleReadingMode() }
-            ];
+            // Build context-aware items
+            const items = [];
+
+            // Always show copy
+            items.push({ icon: '📋', label: 'Copy Response', action: () => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(msgText).then(() => {
+                        showSaveToast('Copied to clipboard', 'Paste anywhere to share');
+                    }).catch(() => {
+                        fallbackCopy(msgText);
+                    });
+                } else {
+                    fallbackCopy(msgText);
+                }
+            }});
+
+            // Share
+            items.push({ icon: '📤', label: 'Share', action: () => shareResponse(msgText) });
+
+            // Image-specific options
+            if (imgSrc) {
+                items.push({ icon: '🖼️', label: 'Open Image', action: () => window.open(imgSrc, '_blank') });
+                items.push({ icon: '💾', label: 'Download Image', action: () => {
+                    const a = document.createElement('a');
+                    a.href = imgSrc;
+                    a.download = 'offgrid-image.png';
+                    a.click();
+                }});
+            }
+
+            // Paper mode
+            items.push({ icon: '📖', label: 'Toggle Paper Mode', action: () => toggleReadingMode() });
+
+            // Separator + Clear Chat
+            items.push({ icon: '🗑️', label: 'Clear Chat', action: () => {
+                if (confirm('Clear the conversation?')) {
+                    softResetChat();
+                }
+            }, separator: true });
 
             items.forEach(item => {
                 const el = document.createElement('div');
                 el.className = 'ctx-item';
+                if (item.separator) el.style.borderTop = '1px solid var(--border-subtle)';
                 el.innerHTML = `<span class="ctx-icon">${item.icon}</span> ${item.label}`;
                 el.addEventListener('click', () => {
                     item.action();
@@ -8339,16 +8396,30 @@
                 menu.appendChild(el);
             });
 
-            // Position the menu
-            const menuWidth = 180;
-            const menuHeight = 144; // approx 3 items * 48px
-            let left = Math.min(x, window.innerWidth - menuWidth - 10);
+            // Position the menu centered on screen for better mobile UX
+            const menuWidth = 220;
+            const itemCount = items.length;
+            const menuHeight = itemCount * 48;
+            let left = Math.max(10, (window.innerWidth - menuWidth) / 2);
             let top = y - menuHeight;
-            if (top < 60) top = y + 10;
+            if (top < 80) top = y + 10;
+            if (top + menuHeight > window.innerHeight - 80) top = window.innerHeight - menuHeight - 80;
             menu.style.left = left + 'px';
             menu.style.top = top + 'px';
+            menu.style.width = menuWidth + 'px';
 
             document.body.appendChild(menu);
+        }
+
+        function fallbackCopy(text) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            ta.remove();
+            showSaveToast('Copied to clipboard');
         }
 
         function dismissContextMenu() {
