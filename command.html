@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="offgridai.css?v=4.2">
+    <link rel="stylesheet" href="offgridai.css?v=4.3">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* ============================================
@@ -1633,7 +1633,9 @@
             .bottom-sheet,
             .mobile-quick-toolbar,
             .mobile-context-menu,
-            .offline-indicator {
+            .offline-indicator,
+            .tts-indicator,
+            .chat-search-bar {
                 display: none !important;
             }
         }
@@ -1702,6 +1704,13 @@
                 padding-right: 8px !important;
                 overscroll-behavior-y: none;
                 -webkit-overflow-scrolling: touch;
+                justify-content: flex-start !important;
+                align-content: flex-start !important;
+            }
+
+            /* Override offgridai.css 65px padding - command.html uses margin-top on main-container instead */
+            .command-theme .messages:has(.welcome) {
+                padding-top: 8px !important;
             }
 
             .messages.has-toolbar {
@@ -1796,7 +1805,7 @@
                 left: 0;
                 right: 0;
                 padding: 6px 8px;
-                padding-bottom: calc(8px + env(safe-area-inset-bottom));
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
@@ -2152,6 +2161,150 @@
                 font-size: 18px;
                 width: 24px;
                 text-align: center;
+            }
+            .mobile-context-menu .ctx-divider {
+                height: 1px;
+                background: var(--border-subtle);
+                margin: 4px 0;
+            }
+            .mobile-context-menu .ctx-section-label {
+                padding: 6px 18px 2px;
+                font-size: 10px;
+                font-weight: 600;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            /* TTS Reading Indicator */
+            .tts-indicator {
+                position: fixed;
+                top: 90px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--bg-surface);
+                border: 1px solid var(--gold-primary);
+                border-radius: 24px;
+                padding: 8px 16px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                z-index: 400;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+                animation: ttsSlideIn 0.25s ease;
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+            }
+            @keyframes ttsSlideIn {
+                from { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0); }
+            }
+            .tts-indicator .tts-label {
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--text-primary);
+            }
+            .tts-indicator .tts-pulse {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: var(--gold-primary);
+                animation: ttsPulse 1s ease-in-out infinite;
+            }
+            @keyframes ttsPulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.5; transform: scale(0.8); }
+            }
+            .tts-indicator .tts-stop-btn {
+                background: rgba(239, 68, 68, 0.15);
+                color: #ef4444;
+                border: 1px solid rgba(239, 68, 68, 0.3);
+                border-radius: 14px;
+                padding: 4px 12px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .tts-indicator .tts-stop-btn:active {
+                background: rgba(239, 68, 68, 0.3);
+            }
+            body.command-theme.oled-mode .tts-indicator {
+                background: #0a0a0a;
+                border-color: var(--gold-primary);
+            }
+
+            /* Chat Search Bar */
+            .chat-search-bar {
+                position: fixed;
+                top: 58px;
+                left: 0;
+                right: 0;
+                background: var(--bg-surface);
+                border-bottom: 1px solid var(--border-subtle);
+                padding: 8px 12px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                z-index: 150;
+                animation: searchSlideDown 0.2s ease;
+            }
+            @keyframes searchSlideDown {
+                from { opacity: 0; transform: translateY(-100%); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .chat-search-bar input {
+                flex: 1;
+                background: var(--bg-elevated);
+                border: 1px solid var(--border-subtle);
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-size: 14px;
+                color: var(--text-primary);
+                outline: none;
+                font-family: var(--font-sans);
+            }
+            .chat-search-bar input:focus {
+                border-color: var(--gold-primary);
+            }
+            .chat-search-bar input::placeholder {
+                color: var(--text-muted);
+            }
+            .chat-search-bar .search-nav {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 12px;
+                color: var(--text-secondary);
+            }
+            .chat-search-bar .search-nav-btn {
+                background: none;
+                border: none;
+                color: var(--text-secondary);
+                font-size: 18px;
+                padding: 4px;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .chat-search-bar .search-close-btn {
+                background: none;
+                border: none;
+                color: var(--text-muted);
+                font-size: 20px;
+                padding: 4px 8px;
+                cursor: pointer;
+                -webkit-tap-highlight-color: transparent;
+            }
+            .chat-search-highlight {
+                background: rgba(201, 168, 76, 0.3) !important;
+                border-radius: 2px;
+            }
+            .chat-search-highlight-active {
+                background: rgba(201, 168, 76, 0.6) !important;
+                border-radius: 2px;
+            }
+            body.command-theme.oled-mode .chat-search-bar {
+                background: #0a0a0a;
             }
 
             /* ============================================
@@ -8365,24 +8518,34 @@
             const hasImage = msgEl.querySelector('img');
             const imgSrc = hasImage ? hasImage.src : null;
 
-            // Build context-aware items
+            // Find raw markdown from conversationHistory for this message
+            const allAssistantMsgs = document.querySelectorAll('#messages .message.assistant');
+            let msgIndex = -1;
+            allAssistantMsgs.forEach((m, i) => { if (m === msgEl) msgIndex = i; });
+            const assistantHistory = conversationHistory.filter(h => h.role === 'assistant');
+            const rawMarkdown = (msgIndex >= 0 && assistantHistory[msgIndex]) ? assistantHistory[msgIndex].content : msgText;
+
+            // Build context-aware items with sections
             const items = [];
 
-            // Always show copy
+            // --- Section: Copy & Share ---
             items.push({ icon: '📋', label: 'Copy Response', action: () => {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(msgText).then(() => {
-                        showSaveToast('Copied to clipboard', 'Paste anywhere to share');
-                    }).catch(() => {
-                        fallbackCopy(msgText);
-                    });
-                } else {
-                    fallbackCopy(msgText);
-                }
+                copyToClipboardReliable(msgText);
             }});
 
-            // Share
+            items.push({ icon: '📝', label: 'Copy as Markdown', action: () => {
+                copyToClipboardReliable(rawMarkdown);
+            }});
+
             items.push({ icon: '📤', label: 'Share', action: () => shareResponse(msgText) });
+
+            // Read Aloud
+            items.push({ icon: '🔊', label: window.speechSynthesis && window.speechSynthesis.speaking ? 'Stop Reading' : 'Read Aloud', action: () => {
+                toggleReadAloud(msgText);
+            }});
+
+            // --- Divider ---
+            items.push({ divider: true });
 
             // Image-specific options
             if (imgSrc) {
@@ -8393,22 +8556,44 @@
                     a.download = 'offgrid-image.png';
                     a.click();
                 }});
+                items.push({ divider: true });
             }
 
-            // Paper mode
+            // --- Section: Tools ---
+            items.push({ icon: '🔍', label: 'Search in Chat', action: () => {
+                openChatSearch();
+            }});
+
+            items.push({ icon: '📁', label: 'Export Chat', action: () => {
+                exportChat();
+            }});
+
+            // --- Divider ---
+            items.push({ divider: true });
+
+            // --- Section: Display & Actions ---
             items.push({ icon: '📖', label: 'Toggle Paper Mode', action: () => toggleReadingMode() });
 
-            // Separator + Clear Chat
+            items.push({ icon: '✋', label: 'Select Text', action: () => {
+                enableTextSelection(msgEl);
+            }});
+
             items.push({ icon: '🗑️', label: 'Clear Chat', action: () => {
                 if (confirm('Clear the conversation?')) {
                     softResetChat();
                 }
-            }, separator: true });
+            }});
 
+            // Render menu items
             items.forEach(item => {
+                if (item.divider) {
+                    const div = document.createElement('div');
+                    div.className = 'ctx-divider';
+                    menu.appendChild(div);
+                    return;
+                }
                 const el = document.createElement('div');
                 el.className = 'ctx-item';
-                if (item.separator) el.style.borderTop = '1px solid var(--border-subtle)';
                 el.innerHTML = `<span class="ctx-icon">${item.icon}</span> ${item.label}`;
                 el.addEventListener('click', () => {
                     item.action();
@@ -8418,12 +8603,14 @@
             });
 
             // Position the menu centered on screen for better mobile UX
-            const menuWidth = 220;
-            const itemCount = items.length;
-            const menuHeight = itemCount * 48;
+            const menuWidth = 230;
+            // Count only non-divider items for height calculation
+            const visibleItems = items.filter(i => !i.divider).length;
+            const dividerCount = items.filter(i => i.divider).length;
+            const menuHeight = (visibleItems * 46) + (dividerCount * 9);
             let left = Math.max(10, (window.innerWidth - menuWidth) / 2);
-            let top = y - menuHeight;
-            if (top < 80) top = y + 10;
+            let top = y - menuHeight / 2;
+            if (top < 80) top = 80;
             if (top + menuHeight > window.innerHeight - 80) top = window.innerHeight - menuHeight - 80;
             menu.style.left = left + 'px';
             menu.style.top = top + 'px';
@@ -8432,19 +8619,320 @@
             document.body.appendChild(menu);
         }
 
+        function copyToClipboardReliable(text) {
+            // Primary: synchronous execCommand approach (works reliably on mobile)
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;z-index:9999';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                ta.setSelectionRange(0, text.length);
+                const success = document.execCommand('copy');
+                ta.remove();
+                if (success) {
+                    showSaveToast('Copied to clipboard', 'Paste anywhere to share');
+                    return;
+                }
+            } catch (e) {
+                // Fall through to clipboard API
+            }
+            // Fallback: Clipboard API (may fail without user gesture on some mobile browsers)
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showSaveToast('Copied to clipboard', 'Paste anywhere to share');
+                }).catch(() => {
+                    showSaveToast('Could not copy', 'Try selecting text manually');
+                });
+            } else {
+                showSaveToast('Could not copy', 'Try selecting text manually');
+            }
+        }
+
+        // Legacy alias
         function fallbackCopy(text) {
-            const ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.cssText = 'position:fixed;opacity:0;left:-9999px';
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            ta.remove();
-            showSaveToast('Copied to clipboard');
+            copyToClipboardReliable(text);
         }
 
         function dismissContextMenu() {
             document.querySelectorAll('.mobile-context-menu').forEach(m => m.remove());
+        }
+
+        // ---- Text-to-Speech: Read Aloud ----
+        let ttsUtterance = null;
+
+        function toggleReadAloud(text) {
+            if (!window.speechSynthesis) {
+                showSaveToast('Not supported', 'Your browser does not support text-to-speech');
+                return;
+            }
+
+            // If already speaking, stop
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                dismissTTSIndicator();
+                return;
+            }
+
+            // Clean text for speech (remove markdown artifacts)
+            const cleanText = text
+                .replace(/```[\s\S]*?```/g, ' code block ')
+                .replace(/`([^`]+)`/g, '$1')
+                .replace(/[#*_~>|]/g, '')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                .replace(/\n{2,}/g, '. ')
+                .replace(/\n/g, ' ')
+                .trim();
+
+            ttsUtterance = new SpeechSynthesisUtterance(cleanText);
+            ttsUtterance.rate = 1.0;
+            ttsUtterance.pitch = 1.0;
+
+            // Try to pick a good voice
+            const voices = window.speechSynthesis.getVoices();
+            const preferred = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'));
+            if (preferred) ttsUtterance.voice = preferred;
+
+            ttsUtterance.onend = () => dismissTTSIndicator();
+            ttsUtterance.onerror = () => dismissTTSIndicator();
+
+            window.speechSynthesis.speak(ttsUtterance);
+            showTTSIndicator();
+        }
+
+        function showTTSIndicator() {
+            dismissTTSIndicator();
+            const indicator = document.createElement('div');
+            indicator.className = 'tts-indicator';
+            indicator.id = 'ttsIndicator';
+            indicator.innerHTML = `
+                <div class="tts-pulse"></div>
+                <span class="tts-label">Reading aloud...</span>
+                <button class="tts-stop-btn" onclick="stopReadAloud()">Stop</button>
+            `;
+            document.body.appendChild(indicator);
+        }
+
+        function dismissTTSIndicator() {
+            const el = document.getElementById('ttsIndicator');
+            if (el) el.remove();
+        }
+
+        function stopReadAloud() {
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            dismissTTSIndicator();
+        }
+
+        // ---- Search in Chat ----
+        let chatSearchMatches = [];
+        let chatSearchIndex = -1;
+
+        function openChatSearch() {
+            // Remove existing search bar if open
+            closeChatSearch();
+
+            const bar = document.createElement('div');
+            bar.className = 'chat-search-bar';
+            bar.id = 'chatSearchBar';
+            bar.innerHTML = `
+                <input type="text" id="chatSearchInput" placeholder="Search in conversation..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <div class="search-nav">
+                    <span id="chatSearchCount"></span>
+                    <button class="search-nav-btn" onclick="chatSearchPrev()">&uarr;</button>
+                    <button class="search-nav-btn" onclick="chatSearchNext()">&darr;</button>
+                </div>
+                <button class="search-close-btn" onclick="closeChatSearch()">&times;</button>
+            `;
+            document.body.appendChild(bar);
+
+            const input = document.getElementById('chatSearchInput');
+            input.focus();
+
+            let debounceTimer = null;
+            input.addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => performChatSearch(input.value), 200);
+            });
+
+            // Enter key goes to next match
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    chatSearchNext();
+                }
+            });
+        }
+
+        function performChatSearch(query) {
+            // Clear previous highlights
+            clearChatSearchHighlights();
+            chatSearchMatches = [];
+            chatSearchIndex = -1;
+
+            if (!query || query.length < 2) {
+                updateSearchCount();
+                return;
+            }
+
+            const messages = document.querySelectorAll('#messages .message .message-text, #messages .message .markdown-content');
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+
+            messages.forEach(msgEl => {
+                const walker = document.createTreeWalker(msgEl, NodeFilter.SHOW_TEXT, null, false);
+                const textNodes = [];
+                while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+                textNodes.forEach(node => {
+                    const text = node.textContent;
+                    if (!regex.test(text)) return;
+                    regex.lastIndex = 0;
+
+                    const frag = document.createDocumentFragment();
+                    let lastIdx = 0;
+                    let match;
+
+                    while ((match = regex.exec(text)) !== null) {
+                        // Text before match
+                        if (match.index > lastIdx) {
+                            frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+                        }
+                        // Highlighted match
+                        const mark = document.createElement('mark');
+                        mark.className = 'chat-search-highlight';
+                        mark.textContent = match[0];
+                        frag.appendChild(mark);
+                        chatSearchMatches.push(mark);
+                        lastIdx = regex.lastIndex;
+                    }
+                    // Remaining text
+                    if (lastIdx < text.length) {
+                        frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+                    }
+                    node.parentNode.replaceChild(frag, node);
+                });
+            });
+
+            if (chatSearchMatches.length > 0) {
+                chatSearchIndex = 0;
+                chatSearchMatches[0].classList.add('chat-search-highlight-active');
+                chatSearchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            updateSearchCount();
+        }
+
+        function chatSearchNext() {
+            if (chatSearchMatches.length === 0) return;
+            chatSearchMatches[chatSearchIndex].classList.remove('chat-search-highlight-active');
+            chatSearchIndex = (chatSearchIndex + 1) % chatSearchMatches.length;
+            chatSearchMatches[chatSearchIndex].classList.add('chat-search-highlight-active');
+            chatSearchMatches[chatSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            updateSearchCount();
+        }
+
+        function chatSearchPrev() {
+            if (chatSearchMatches.length === 0) return;
+            chatSearchMatches[chatSearchIndex].classList.remove('chat-search-highlight-active');
+            chatSearchIndex = (chatSearchIndex - 1 + chatSearchMatches.length) % chatSearchMatches.length;
+            chatSearchMatches[chatSearchIndex].classList.add('chat-search-highlight-active');
+            chatSearchMatches[chatSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            updateSearchCount();
+        }
+
+        function updateSearchCount() {
+            const el = document.getElementById('chatSearchCount');
+            if (!el) return;
+            if (chatSearchMatches.length === 0) {
+                el.textContent = '';
+            } else {
+                el.textContent = `${chatSearchIndex + 1}/${chatSearchMatches.length}`;
+            }
+        }
+
+        function clearChatSearchHighlights() {
+            document.querySelectorAll('.chat-search-highlight').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+        }
+
+        function closeChatSearch() {
+            clearChatSearchHighlights();
+            chatSearchMatches = [];
+            chatSearchIndex = -1;
+            const bar = document.getElementById('chatSearchBar');
+            if (bar) bar.remove();
+        }
+
+        // ---- Export Chat ----
+        function exportChat() {
+            if (conversationHistory.length === 0) {
+                showSaveToast('Nothing to export', 'Start a conversation first');
+                return;
+            }
+
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            let md = `# OffGrid Command Center\n`;
+            md += `## Chat Export - ${dateStr} ${timeStr}\n\n`;
+            md += `---\n\n`;
+
+            conversationHistory.forEach(msg => {
+                const role = msg.role === 'user' ? 'You' : 'Command Center';
+                const icon = msg.role === 'user' ? '**You:**' : '**Command Center:**';
+                md += `${icon}\n\n${msg.content}\n\n---\n\n`;
+            });
+
+            md += `\n*Exported from OffGrid Command Center | offgridtoolkit.ai*\n`;
+            md += `*Privacy first. No conversations stored.*\n`;
+
+            // Create and download file
+            const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `offgrid-chat-${dateStr}.md`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            showSaveToast('Chat exported', 'Saved as Markdown file');
+        }
+
+        // ---- Select Text ----
+        function enableTextSelection(msgEl) {
+            const textEl = msgEl.querySelector('.message-text') || msgEl.querySelector('.markdown-content');
+            if (!textEl) return;
+
+            // Temporarily enable user-select on this message
+            textEl.style.userSelect = 'text';
+            textEl.style.webkitUserSelect = 'text';
+
+            // Select all text in the message
+            const range = document.createRange();
+            range.selectNodeContents(textEl);
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+
+            showSaveToast('Text selected', 'Use your browser\'s copy to copy');
+
+            // Re-disable after selection is cleared (user taps elsewhere)
+            const cleanup = () => {
+                setTimeout(() => {
+                    textEl.style.userSelect = '';
+                    textEl.style.webkitUserSelect = '';
+                }, 3000);
+                document.removeEventListener('touchstart', cleanup);
+            };
+            // Wait a tick so the current touch doesn't immediately clear it
+            setTimeout(() => {
+                document.addEventListener('touchstart', cleanup, { once: true, passive: true });
+            }, 100);
         }
 
         // ---- OLED Dark Mode ----
