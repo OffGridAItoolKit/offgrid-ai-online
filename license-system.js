@@ -1244,6 +1244,48 @@ function registerLicenseRoutes(app, logToBetterStack) {
     });
 
     // -------------------------------------------------------------------------
+    // POST /api/admin/delete-key
+    // Permanently delete a license key and all associated records
+    // -------------------------------------------------------------------------
+    app.post('/api/admin/delete-key', requireAdmin, async (req, res) => {
+        try {
+            const { licenseKey } = req.body;
+            
+            if (!licenseKey) {
+                return res.status(400).json({ error: 'License key is required' });
+            }
+            
+            const key = licenseKey.trim().toUpperCase();
+            
+            // Delete activation log entries first (foreign key)
+            await pool.query('DELETE FROM activation_log WHERE license_key = $1', [key]);
+            
+            // Delete usage history entries
+            await pool.query('DELETE FROM usage_history WHERE license_key = $1', [key]);
+            
+            // Delete the license itself
+            const result = await pool.query(
+                'DELETE FROM licenses WHERE license_key = $1 RETURNING license_key',
+                [key]
+            );
+            
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'License key not found' });
+            }
+            
+            res.json({
+                success: true,
+                message: `License key ${key} permanently deleted.`,
+                deleted_key: key
+            });
+            
+        } catch (error) {
+            console.error('[License System] Delete key error:', error);
+            res.status(500).json({ error: 'Delete failed' });
+        }
+    });
+
+    // -------------------------------------------------------------------------
     // GET /api/admin/key-details?key=OGTK-XXXX-XXXX-XXXX
     // Single-key lookup: returns license record + activation log + usage history
     // -------------------------------------------------------------------------
