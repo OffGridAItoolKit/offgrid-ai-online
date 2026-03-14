@@ -1188,6 +1188,11 @@
                         <div class="stat-value" id="ds-t3">--</div>
                         <div class="stat-sub">Command Center Pro ($469)</div>
                     </div>
+                    <div class="stat-card" style="border-color:#6c8ebf;">
+                        <div class="stat-label">Mobile Keys</div>
+                        <div class="stat-value" id="ds-mobile" style="color:#6c8ebf;">--</div>
+                        <div class="stat-sub" id="ds-mobile-sub">Companion keys issued</div>
+                    </div>
                     <div class="stat-card">
                         <div class="stat-label">Prompts Used</div>
                         <div class="stat-value" id="ds-prompts">--</div>
@@ -1291,6 +1296,7 @@
                                 <option value="2" selected>Tier 2 - Command Center ($249)</option>
                                 <option value="3">Tier 3 - Command Center Pro ($469)</option>
                                 <option value="1">Tier 1 - ToolKit Only ($129)</option>
+                                <option value="mobile">Mobile Companion - Bonus Key (75 prompts / 5 images)</option>
                             </select>
                         </div>
                     </div>
@@ -1350,7 +1356,15 @@
                                     <td>ToolKit + Command Center Pro</td>
                                     <td>$469</td>
                                     <td>400</td>
-                                    <td>40</td>
+                                    <td>30</td>
+                                    <td style="color:var(--success)">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge" style="background:#6c8ebf;color:#fff;">Mobile</span></td>
+                                    <td>Mobile Companion (Bonus Key)</td>
+                                    <td>Free</td>
+                                    <td>75</td>
+                                    <td>5</td>
                                     <td style="color:var(--success)">Yes</td>
                                 </tr>
                             </tbody>
@@ -1454,6 +1468,7 @@
                             <option value="1">Tier 1</option>
                             <option value="2">Tier 2</option>
                             <option value="3">Tier 3</option>
+                            <option value="mobile">Mobile</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -2132,6 +2147,10 @@ async function loadStats() {
         document.getElementById('ds-activated').textContent = data.activated_keys;
         document.getElementById('ds-t2').textContent = data.tier2_keys;
         document.getElementById('ds-t3').textContent = data.tier3_keys;
+        const mobileKeys = parseInt(data.mobile_keys || 0);
+        const mobileActivated = parseInt(data.mobile_activated || 0);
+        document.getElementById('ds-mobile').textContent = mobileKeys;
+        document.getElementById('ds-mobile-sub').textContent = `${mobileActivated} activated`;
         document.getElementById('ds-prompts').textContent = data.total_prompts_used;
         document.getElementById('ds-images').textContent = data.total_images_used;
         document.getElementById('ds-email').textContent = data.email_linked;
@@ -2276,7 +2295,6 @@ async function loadAnalytics() {
 
 async function generateKeys() {
     const count = parseInt(document.getElementById('gen-count').value);
-    const tier = parseInt(document.getElementById('gen-tier').value);
     const notes = document.getElementById('gen-notes').value.trim();
     const alertEl = document.getElementById('gen-alert');
     const resultEl = document.getElementById('gen-result');
@@ -2293,7 +2311,14 @@ async function generateKeys() {
     resultEl.classList.remove('visible');
 
     try {
-        const body = { count, tier };
+        const tierRaw = document.getElementById('gen-tier').value;
+        const body = { count };
+        if (tierRaw === 'mobile') {
+            body.is_mobile = true;
+            body.tier = 2; // mobile keys default to tier 2 context
+        } else {
+            body.tier = parseInt(tierRaw);
+        }
         if (notes) body.notes = notes;
 
         const data = await apiPost('/api/admin/generate-keys', body);
@@ -2350,9 +2375,12 @@ async function lookupKey() {
 
 function renderLookupResult(l) {
     const grid = document.getElementById('lookup-grid');
-    const tierLimit = l.tier === 2 ? { p: 150, i: 10 } : l.tier === 3 ? { p: 400, i: 40 } : { p: 0, i: 0 };
+    const isMobile = l.is_mobile || false;
+    const tierLimit = isMobile ? { p: 75, i: 5 } : l.tier === 2 ? { p: 150, i: 10 } : l.tier === 3 ? { p: 400, i: 30 } : { p: 0, i: 0 };
     const effectivePrompts = l.custom_prompt_limit !== null ? l.custom_prompt_limit : tierLimit.p;
     const effectiveImages = l.custom_image_limit !== null ? l.custom_image_limit : tierLimit.i;
+    const tierDisplay = isMobile ? 'mobile' : l.tier;
+    const tierNameDisplay = isMobile ? 'Mobile Companion' : (l.tierName || '');
 
     grid.innerHTML = `
         <div class="lookup-field">
@@ -2361,7 +2389,7 @@ function renderLookupResult(l) {
         </div>
         <div class="lookup-field">
             <span class="lf-label">Tier</span>
-            <span class="lf-value">${tierBadge(l.tier)} <span style="font-size:0.78rem; color:var(--text-muted); margin-left:4px;">${l.tierName}</span></span>
+            <span class="lf-value">${tierBadge(tierDisplay)} <span style="font-size:0.78rem; color:var(--text-muted); margin-left:4px;">${tierNameDisplay}</span></span>
         </div>
         <div class="lookup-field">
             <span class="lf-label">Status</span>
@@ -2517,10 +2545,11 @@ async function loadLicenses(page) {
                 const prompts = `${l.prompt_count}${l.custom_prompt_limit !== null ? '<span style="color:var(--gold-muted);font-size:0.72rem;">/' + l.custom_prompt_limit + '</span>' : ''}`;
                 const images  = `${l.image_count}${l.custom_image_limit !== null ? '<span style="color:var(--gold-muted);font-size:0.72rem;">/' + l.custom_image_limit + '</span>' : ''}`;
                 const keyEsc = l.license_key.replace(/'/g, "\\'");
+                const tierDisplay = l.is_mobile ? 'mobile' : l.tier;
                 return `
                 <tr>
                     <td class="key-cell" onclick="copyText('${keyEsc}')" style="cursor:pointer;" title="Click to copy">${l.license_key}</td>
-                    <td>${tierBadge(l.tier)}</td>
+                    <td>${tierBadge(tierDisplay)}</td>
                     <td>${statusBadge}</td>
                     <td class="inline-edit-cell" id="so-cell-${l.id}">
                         <span class="cell-display ${l.shopify_order ? '' : 'empty'}" onclick="startInlineEdit('so', ${l.id}, '${keyEsc}', this)">${l.shopify_order || '+ Add order #'}</span>
@@ -2879,6 +2908,7 @@ function tierBadge(tier) {
     if (tier === 1) return '<span class="badge badge-t1">Tier 1</span>';
     if (tier === 2) return '<span class="badge badge-t2">Tier 2</span>';
     if (tier === 3) return '<span class="badge badge-t3">Tier 3</span>';
+    if (tier === 'mobile') return '<span class="badge" style="background:#6c8ebf;color:#fff;">Mobile</span>';
     return `<span class="badge">${tier}</span>`;
 }
 
