@@ -2854,8 +2854,9 @@ function showConfirm(title, message, callback) {
     confirmCallback = callback;
     document.getElementById('confirm-overlay').classList.add('visible');
     document.getElementById('confirm-ok-btn').onclick = async () => {
+        const cb = confirmCallback; // capture before closeConfirm nulls it
         closeConfirm();
-        if (confirmCallback) await confirmCallback();
+        if (cb) await cb();
     };
 }
 

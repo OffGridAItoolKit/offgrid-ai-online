@@ -3855,7 +3855,7 @@
                 <div class="license-input-group">
                     <label for="licenseKeyInput">License Key (from your OffGrid AI drive)</label>
                     <input type="text" id="licenseKeyInput" class="license-input" 
-                           placeholder="XXXX-XXXX-XXXX-XXXX" 
+                           placeholder="OGTK-XXXX-XXXX-XXXX" 
                            maxlength="19"
                            autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
                 </div>
@@ -4561,11 +4561,31 @@
             const input = document.getElementById('licenseKeyInput');
             input.addEventListener('input', function(e) {
                 let val = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-                // Insert dashes every 4 characters
                 let formatted = '';
-                for (let i = 0; i < val.length && i < 16; i++) {
-                    if (i > 0 && i % 4 === 0) formatted += '-';
-                    formatted += val[i];
+                if (val.startsWith('OGTK')) {
+                    const rest = val.slice(4);
+                    if (rest.startsWith('MOB')) {
+                        // Mobile key: OGTK-MOB-XXXX-XXXX
+                        const afterMob = rest.slice(3);
+                        let parts = ['OGTK', 'MOB'];
+                        for (let i = 0; i < afterMob.length && parts.length < 4; i += 4) {
+                            parts.push(afterMob.slice(i, i + 4));
+                        }
+                        formatted = parts.join('-');
+                    } else {
+                        // Standard key: OGTK-XXXX-XXXX-XXXX
+                        let parts = ['OGTK'];
+                        for (let i = 0; i < rest.length && parts.length < 4; i += 4) {
+                            parts.push(rest.slice(i, i + 4));
+                        }
+                        formatted = parts.join('-');
+                    }
+                } else {
+                    // Fallback: insert dashes every 4 chars
+                    for (let i = 0; i < val.length && i < 16; i++) {
+                        if (i > 0 && i % 4 === 0) formatted += '-';
+                        formatted += val[i];
+                    }
                 }
                 e.target.value = formatted;
             });
