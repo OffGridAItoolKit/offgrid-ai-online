@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
@@ -23,7 +23,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="offgridai.css?v=4.1">
+    <link rel="stylesheet" href="offgridai.css?v=4.2">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* ============================================
@@ -1619,6 +1619,25 @@
             cursor: pointer;
         }
 
+        /* ============================================
+           DESKTOP: Hide mobile-only elements
+           These elements have CSS only inside the mobile
+           media query. Without this rule, they render with
+           browser defaults on desktop (display:block,
+           position:static) and break the flex layout.
+           ============================================ */
+        @media (min-width: 769px) {
+            .scroll-to-bottom-btn,
+            .mobile-usage-bar,
+            .bottom-sheet-overlay,
+            .bottom-sheet,
+            .mobile-quick-toolbar,
+            .mobile-context-menu,
+            .offline-indicator {
+                display: none !important;
+            }
+        }
+
         @media (max-width: 768px) {
             body.command-theme {
                 background: var(--bg-deep);
@@ -1693,17 +1712,19 @@
                 max-width: 100% !important;
             }
 
+            .command-theme .welcome,
             .welcome {
-                padding: 8px 16px;
-                padding-top: 12px;
+                padding: 8px 16px !important;
+                padding-top: 12px !important;
                 justify-content: flex-start !important;
-                align-content: flex-start;
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 10px;
+                align-content: flex-start !important;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                align-items: center !important;
+                gap: 10px !important;
                 height: auto !important;
                 min-height: 0 !important;
+                flex: none !important;
             }
 
             .welcome h2 {
@@ -1774,8 +1795,8 @@
                 bottom: 0;
                 left: 0;
                 right: 0;
-                padding: 4px 8px;
-                padding-bottom: calc(3px + env(safe-area-inset-bottom));
+                padding: 6px 8px;
+                padding-bottom: calc(8px + env(safe-area-inset-bottom));
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
@@ -8624,21 +8645,11 @@
                 fetchUsageStats();
             }
 
-            // Check first run
+            // First-run banner removed — license gate already handles
+            // terms acceptance. Auto-mark as initialized.
             if (!localStorage.getItem('offgrid-command-initialized')) {
-                const banner = document.getElementById('firstRunBanner');
-                const checkbox = document.getElementById('acceptTermsBanner');
-                const button = document.getElementById('acceptBannerBtn');
-
-                if (banner && checkbox && button) {
-                    banner.style.display = 'flex';
-
-                    checkbox.addEventListener('change', function() {
-                        button.disabled = !this.checked;
-                        button.style.opacity = this.checked ? '1' : '0.5';
-                        button.style.cursor = this.checked ? 'pointer' : 'not-allowed';
-                    });
-                }
+                localStorage.setItem('offgrid-command-initialized', 'true');
+                localStorage.setItem('offgrid-command-init-date', new Date().toISOString());
             }
 
             // Check for upgrade referral (/try-command)
