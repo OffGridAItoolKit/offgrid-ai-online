@@ -1635,7 +1635,8 @@
             .mobile-context-menu,
             .offline-indicator,
             .tts-indicator,
-            .chat-search-bar {
+            .chat-search-bar,
+            .quick-action-chips {
                 display: none !important;
             }
         }
@@ -1699,7 +1700,7 @@
 
             .messages {
                 padding: 8px !important;
-                padding-bottom: 180px !important;
+                padding-bottom: 140px !important;
                 padding-top: 8px !important;
                 padding-right: 8px !important;
                 overscroll-behavior-y: none;
@@ -1714,7 +1715,7 @@
             }
 
             .messages.has-toolbar {
-                padding-bottom: 220px !important;
+                padding-bottom: 190px !important;
             }
 
             .message {
@@ -1723,19 +1724,16 @@
 
             .command-theme .welcome,
             .welcome {
-                padding: 8px 16px !important;
-                padding-top: 12px !important;
-                padding-bottom: 180px !important;
-                justify-content: flex-start !important;
-                align-content: flex-start !important;
+                padding: 30px 16px 16px 16px !important;
+                justify-content: center !important;
+                align-items: center !important;
                 flex-direction: column !important;
                 flex-wrap: nowrap !important;
-                align-items: flex-start !important;
-                gap: 10px !important;
+                gap: 8px !important;
                 height: auto !important;
-                min-height: 100% !important;
-                flex: 1 1 auto !important;
-                box-sizing: border-box !important;
+                min-height: 0 !important;
+                flex: none !important;
+                text-align: center !important;
             }
 
             .welcome h2 {
@@ -1772,13 +1770,7 @@
             }
 
             .mobile-actions {
-                display: flex;
-                flex-direction: column;
-                gap: 6px;
-                width: 100%;
-                max-width: 400px;
-                margin-top: auto !important;
-                margin-bottom: 0;
+                display: none !important;
             }
 
             .mobile-action-card {
@@ -1812,6 +1804,45 @@
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
+            }
+
+            /* Quick Action Chips - shown above textarea on welcome screen */
+            .quick-action-chips {
+                display: none;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 4px 4px 8px 4px;
+                justify-content: center;
+            }
+            .quick-action-chips.visible {
+                display: flex;
+            }
+            .quick-chip {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                border-radius: 20px;
+                color: var(--text-secondary);
+                font-size: 13px;
+                font-weight: 500;
+                font-family: inherit;
+                cursor: pointer;
+                transition: all 0.2s;
+                -webkit-tap-highlight-color: transparent;
+                white-space: nowrap;
+            }
+            .quick-chip:active {
+                background: var(--bg-elevated);
+                border-color: var(--gold-primary);
+                color: var(--gold-primary);
+                transform: scale(0.95);
+            }
+            .quick-chip svg {
+                flex-shrink: 0;
+                stroke: currentColor;
             }
 
             .input-container {
@@ -2091,7 +2122,7 @@
 
             /* Adjust messages padding when toolbar is visible */
             .messages.has-toolbar {
-                padding-bottom: 220px !important;
+                padding-bottom: 190px !important;
             }
 
             /* ============================================
@@ -2346,6 +2377,10 @@
             }
             body.command-theme.oled-mode .mobile-context-menu {
                 background: #0a0a0a !important;
+            }
+            body.command-theme.oled-mode .quick-chip {
+                background: #0a0a0a !important;
+                border-color: #1a1a1a !important;
             }
 
             /* ============================================
@@ -4444,6 +4479,25 @@
 
             <!-- Input Area -->
             <div class="input-area" id="bottomInputArea" style="display: none;">
+        <!-- Mobile Quick Action Chips (shown only on welcome screen) -->
+        <div class="quick-action-chips" id="quickActionChips">
+            <button class="quick-chip" onclick="triggerImageUpload()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                Camera
+            </button>
+            <button class="quick-chip" onclick="triggerGalleryUpload()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                Image
+            </button>
+            <button class="quick-chip" onclick="startVoiceInput()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                Voice
+            </button>
+            <button class="quick-chip" onclick="window.location.href='/command/ready-made-prompts'">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                Prompts
+            </button>
+        </div>
         <div class="input-container">
             <!-- Image preview -->
             <div class="image-preview" id="imagePreview">
@@ -5171,6 +5225,9 @@
                 welcome.remove();
                 const bottomInputArea = document.querySelector('.input-area');
                 if (bottomInputArea) bottomInputArea.style.display = '';
+                // Hide quick action chips when conversation starts
+                const quickChips = document.getElementById('quickActionChips');
+                if (quickChips) quickChips.classList.remove('visible');
             }
 
             // Add user message to UI
@@ -6164,6 +6221,12 @@
                 const welcomeInput = document.getElementById('messageInputWelcome');
                 if (welcomeInput) welcomeInput.focus();
             }, 100);
+
+            // Re-show quick action chips on mobile
+            if (window.innerWidth <= 768) {
+                const quickChips = document.getElementById('quickActionChips');
+                if (quickChips) quickChips.classList.add('visible');
+            }
         }
 
         function clearChat() {
@@ -7930,6 +7993,9 @@
                 welcome.remove();
                 const bottomInputArea = document.querySelector('.input-area');
                 if (bottomInputArea) bottomInputArea.style.display = '';
+                // Hide quick action chips when conversation starts
+                const quickChips = document.getElementById('quickActionChips');
+                if (quickChips) quickChips.classList.remove('visible');
             }
 
             const imagePromptText = promptText || 'Image generation request';
@@ -9171,6 +9237,14 @@
                         alert('Voice input requires Chrome or Safari on HTTPS.');
                     };
                 }
+                // Also disable the voice quick action chip
+                const voiceChip = document.querySelector('.quick-chip[onclick*="startVoiceInput"]');
+                if (voiceChip) {
+                    voiceChip.style.opacity = '0.4';
+                    voiceChip.onclick = function() {
+                        alert('Voice input requires Chrome or Safari on HTTPS.');
+                    };
+                }
             }
 
             // ============================================
@@ -9178,6 +9252,11 @@
             // ============================================
             if (window.innerWidth <= 768) {
                 initMobileEnhancements();
+                // Show quick action chips if welcome screen is present
+                const quickChips = document.getElementById('quickActionChips');
+                if (quickChips && document.getElementById('welcome')) {
+                    quickChips.classList.add('visible');
+                }
             }
 
             // Check for ready-made prompt from prompts page
