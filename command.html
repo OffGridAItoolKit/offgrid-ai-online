@@ -5924,31 +5924,54 @@
         // ============================================
 
         function triggerImageUpload() {
-            document.getElementById('imageInput').click();
+            const input = document.getElementById('imageInput');
+            // Reset value so the same file can be re-selected, and re-bind handler
+            input.value = '';
+            input.onchange = handleImageSelect;
+            input.click();
         }
 
         function triggerGalleryUpload() {
-            document.getElementById('galleryInput').click();
+            const input = document.getElementById('galleryInput');
+            // Reset value so the same file can be re-selected, and re-bind handler
+            input.value = '';
+            input.onchange = handleImageSelect;
+            input.click();
         }
 
         function handleImageSelect(event) {
             const file = event.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                if (window.innerWidth <= 768) {
-                    const indicator = document.getElementById('uploadIndicator');
+            if (!file) return;
+            
+            // Accept any image type, or files with image extensions even if MIME is missing
+            // (Android file managers sometimes don't set MIME type correctly)
+            const isImage = file.type.startsWith('image/') || 
+                            /\.(jpe?g|png|gif|webp|bmp|heic|heif|avif)$/i.test(file.name) ||
+                            file.type === '' || file.type === 'application/octet-stream';
+            
+            if (!isImage) {
+                console.warn('File rejected - not an image:', file.name, file.type);
+                return;
+            }
+            
+            console.log('Image selected:', file.name, 'type:', file.type, 'size:', file.size);
+            
+            if (window.innerWidth <= 768) {
+                const indicator = document.getElementById('uploadIndicator');
+                if (indicator) {
                     indicator.classList.add('active');
                     setTimeout(() => indicator.classList.remove('active'), 2000);
                 }
-
-                resizeImage(file, 1024, 1024, function(resizedDataUrl) {
-                    selectedImage = {
-                        base64: resizedDataUrl.split(',')[1],
-                        name: file.name,
-                        dataUrl: resizedDataUrl
-                    };
-                    showImagePreview();
-                });
             }
+
+            resizeImage(file, 1024, 1024, function(resizedDataUrl) {
+                selectedImage = {
+                    base64: resizedDataUrl.split(',')[1],
+                    name: file.name || 'image.jpg',
+                    dataUrl: resizedDataUrl
+                };
+                showImagePreview();
+            });
         }
 
         function handleDocSelect(event) {
@@ -5961,6 +5984,33 @@
 
         function resizeImage(file, maxWidth, maxHeight, callback) {
             const reader = new FileReader();
+            reader.onerror = function() {
+                console.error('FileReader error for:', file.name);
+                // Fallback: try to use the file directly via createObjectURL
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.85));
+                    URL.revokeObjectURL(url);
+                };
+                img.onerror = function() {
+                    console.error('Image load failed via ObjectURL for:', file.name);
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+            };
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
@@ -5979,6 +6029,30 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
                     callback(canvas.toDataURL('image/jpeg', 0.85));
+                };
+                img.onerror = function() {
+                    console.error('Image decode failed for:', file.name, 'type:', file.type);
+                    // Fallback: try createObjectURL approach
+                    const url = URL.createObjectURL(file);
+                    const img2 = new Image();
+                    img2.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        let w = img2.width, h = img2.height;
+                        if (w > maxWidth || h > maxHeight) {
+                            const r = Math.min(maxWidth / w, maxHeight / h);
+                            w *= r; h *= r;
+                        }
+                        canvas.width = w;
+                        canvas.height = h;
+                        canvas.getContext('2d').drawImage(img2, 0, 0, w, h);
+                        callback(canvas.toDataURL('image/jpeg', 0.85));
+                        URL.revokeObjectURL(url);
+                    };
+                    img2.onerror = function() {
+                        console.error('All image load attempts failed for:', file.name);
+                        URL.revokeObjectURL(url);
+                    };
+                    img2.src = url;
                 };
                 img.src = e.target.result;
             };
@@ -9228,7 +9302,8 @@
                         if (keyboardLikelyOpen) {
                             // Keyboard is open — position input above keyboard
                             // bottomOffset includes keyboard + nav bar height
-                            const keyboardOffset = Math.max(bottomOffset, 0);
+                            // Add 4px buffer so the input border is fully visible above keyboard
+                            const keyboardOffset = Math.max(bottomOffset, 0) + 4;
                             applyOffset(keyboardOffset);
                             // Scroll messages to bottom so user sees latest content
                             const msgs = document.getElementById('messages');
@@ -9364,8 +9439,8 @@
         });
     </script>
     <!-- Hidden file inputs (outside any display:none containers so they always work) -->
-    <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
-    <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
+    <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment">
+    <input type="file" id="galleryInput" class="image-upload-input" accept="image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif,image/avif,image/bmp,image/*">
     <input type="file" id="docInput" class="image-upload-input" accept=".pdf,.doc,.docx,.txt" onchange="handleDocSelect(event)">
 </body>
 </html>

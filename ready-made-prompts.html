@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ready-Made Prompts - OffGrid AI Online</title>
     <meta name="description" content="Hundreds of expert prompts for building your offline Knowledge Base. Click to copy or send directly to OffGrid AI.">
-    <link rel="icon" type="image/png" href="compasstilted.png">
+    <link rel="icon" type="image/png" href="/compasstilted.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -373,7 +373,14 @@
         
         /* Mobile responsive */
         @media (max-width: 768px) {
-            .header-title { font-size: 13px; }
+            .header { padding: 10px 14px; }
+            .header-left { gap: 8px; }
+            .header-left img { width: 26px; height: 26px; }
+            .header-title { font-size: 12px; letter-spacing: 1px; }
+            .online-badge, .command-badge { font-size: 9px; padding: 3px 8px; }
+            .online-badge::before { display: none; }
+            .command-badge::before { display: none; }
+            .back-link { font-size: 12px; padding: 5px 10px; }
             .hero h1 { font-size: 24px; }
             .hero p { font-size: 14px; }
             .hero { padding: 24px 16px 20px; }
@@ -597,7 +604,7 @@
     <!-- Header -->
     <div class="header">
         <div class="header-left">
-            <img src="compasstilted.png" alt="OffGrid AI">
+            <img src="/compasstilted.png" alt="OffGrid AI">
             <span class="header-title">OffGrid AI ToolKit</span>
             <span class="online-badge">ONLINE</span>
         </div>
@@ -1404,11 +1411,12 @@
         
         // Adapt header for context
         if (isCommandContext) {
-            document.querySelector('.header-title').textContent = 'OFFGRID COMMAND CENTER';
+            // Shorter title on mobile to prevent clutter
+            const isMobileView = window.innerWidth <= 768;
+            document.querySelector('.header-title').textContent = isMobileView ? 'OFFGRID COMMAND' : 'OFFGRID COMMAND CENTER';
             const badge = document.querySelector('.online-badge');
             badge.textContent = 'COMMAND';
             badge.style.background = 'linear-gradient(135deg, #b8860b 0%, #daa520 100%)';
-            badge.style.setProperty('content', 'none');
             badge.classList.remove('online-badge');
             badge.classList.add('command-badge');
             document.querySelector('.back-link').href = '/command';
