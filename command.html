@@ -4466,13 +4466,6 @@
                                 <div class="mobile-action-desc">From gallery</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" id="voiceInputCard" onclick="startVoiceInput()">
-                            <div class="mobile-action-icon">🎙️</div>
-                            <div class="mobile-action-text">
-                                <div class="mobile-action-title">Voice Input</div>
-                                <div class="mobile-action-desc">Speak your prompt</div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Voice recording indicator -->
@@ -6161,13 +6154,6 @@
                             <div class="mobile-action-text">
                                 <div class="mobile-action-title">Upload Image</div>
                                 <div class="mobile-action-desc">From gallery</div>
-                            </div>
-                        </div>
-                        <div class="mobile-action-card" id="voiceInputCard" onclick="startVoiceInput()">
-                            <div class="mobile-action-icon">🎙️</div>
-                            <div class="mobile-action-text">
-                                <div class="mobile-action-title">Voice Input</div>
-                                <div class="mobile-action-desc">Speak your prompt</div>
                             </div>
                         </div>
                     </div>
@@ -9158,7 +9144,10 @@
                         // and the keyboard is NOT open (keyboard makes vv.height much smaller)
                         const keyboardLikelyOpen = vv.height < window.innerHeight * 0.75;
                         if (!keyboardLikelyOpen && bottomOffset > 5) {
-                            document.documentElement.style.setProperty('--mobile-input-bottom', bottomOffset + 'px');
+                            // Ensure at least 36px on Android for gesture nav bar
+                            const isAndroid = /android/i.test(navigator.userAgent);
+                            const finalOffset = isAndroid ? Math.max(bottomOffset, 36) : bottomOffset;
+                            document.documentElement.style.setProperty('--mobile-input-bottom', finalOffset + 'px');
                         } else if (keyboardLikelyOpen) {
                             // When keyboard is open, let the browser handle positioning
                             document.documentElement.style.setProperty('--mobile-input-bottom', '0px');
@@ -9183,7 +9172,7 @@
                         // Only apply if we detect Android
                         const isAndroid = /android/i.test(navigator.userAgent);
                         if (isAndroid) {
-                            document.documentElement.style.setProperty('--mobile-input-bottom', '24px');
+                            document.documentElement.style.setProperty('--mobile-input-bottom', '36px');
                         }
                     }
                 }, 500);
@@ -9255,18 +9244,6 @@
                 autoResize(activeInput);
             }
 
-            // Check voice support and update card
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) {
-                const voiceCard = document.getElementById('voiceInputCard');
-                if (voiceCard) {
-                    voiceCard.querySelector('.mobile-action-desc').textContent = 'Not supported in this browser';
-                    voiceCard.style.opacity = '0.5';
-                    voiceCard.onclick = function() {
-                        alert('Voice input requires Chrome or Safari on HTTPS.');
-                    };
-                }
-            }
 
             // ============================================
             // MOBILE ENHANCEMENTS (replaces pull-to-refresh)
