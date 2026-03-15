@@ -1723,7 +1723,7 @@
 
             .command-theme .welcome,
             .welcome {
-                padding: 30px 16px calc(140px + var(--mobile-input-bottom, 0px)) 16px !important;
+                padding: 20px 16px 16px 16px !important;
                 justify-content: center !important;
                 align-items: center !important;
                 flex-direction: column !important;
@@ -2074,7 +2074,7 @@
             .mobile-quick-toolbar {
                 display: none;
                 position: fixed;
-                bottom: 64px;
+                bottom: calc(64px + var(--mobile-input-bottom, 0px));
                 left: 0;
                 right: 0;
                 padding: 6px 10px;
@@ -9134,23 +9134,34 @@
             (function adjustInputForNavBar() {
                 const inputArea = document.getElementById('bottomInputArea');
                 if (!inputArea) return;
+                const isAndroid = /android/i.test(navigator.userAgent);
+                
+                // Store the nav bar offset once detected — never let layout changes reset it
+                let storedNavBarOffset = isAndroid ? 36 : 0; // sensible default for Android
+                let navBarDetected = false;
+
+                function applyOffset(offset) {
+                    document.documentElement.style.setProperty('--mobile-input-bottom', offset + 'px');
+                }
 
                 function updateBottomOffset() {
                     if (window.visualViewport) {
                         const vv = window.visualViewport;
-                        // Calculate how much of the window is hidden by system UI at the bottom
                         const bottomOffset = window.innerHeight - (vv.height + vv.offsetTop);
-                        // Only apply if there's a meaningful offset (nav bar present)
-                        // and the keyboard is NOT open (keyboard makes vv.height much smaller)
                         const keyboardLikelyOpen = vv.height < window.innerHeight * 0.75;
-                        if (!keyboardLikelyOpen && bottomOffset > 5) {
-                            // Ensure at least 36px on Android for gesture nav bar
-                            const isAndroid = /android/i.test(navigator.userAgent);
-                            const finalOffset = isAndroid ? Math.max(bottomOffset, 36) : bottomOffset;
-                            document.documentElement.style.setProperty('--mobile-input-bottom', finalOffset + 'px');
-                        } else if (keyboardLikelyOpen) {
-                            // When keyboard is open, let the browser handle positioning
-                            document.documentElement.style.setProperty('--mobile-input-bottom', '0px');
+                        
+                        if (keyboardLikelyOpen) {
+                            // Keyboard is open — let browser handle positioning
+                            applyOffset(0);
+                        } else {
+                            // Keyboard is closed — detect and store nav bar height
+                            if (bottomOffset > 5) {
+                                const finalOffset = isAndroid ? Math.max(bottomOffset, 36) : bottomOffset;
+                                storedNavBarOffset = finalOffset;
+                                navBarDetected = true;
+                            }
+                            // Always apply the stored offset when keyboard is closed
+                            applyOffset(storedNavBarOffset);
                         }
                     }
                 }
@@ -9158,22 +9169,16 @@
                 // Run on load
                 updateBottomOffset();
 
-                // Also listen for viewport changes (keyboard open/close, orientation)
+                // Listen for viewport changes (keyboard open/close, orientation)
                 if (window.visualViewport) {
                     window.visualViewport.addEventListener('resize', updateBottomOffset);
                     window.visualViewport.addEventListener('scroll', updateBottomOffset);
                 }
 
-                // Fallback: if visualViewport isn't available or reports 0, use a safe default
+                // Fallback: ensure Android always has at least 36px
                 setTimeout(() => {
-                    const currentBottom = getComputedStyle(document.documentElement).getPropertyValue('--mobile-input-bottom').trim();
-                    if (!currentBottom || currentBottom === '0px' || currentBottom === '') {
-                        // On Android without visualViewport data, assume ~48px for gesture nav
-                        // Only apply if we detect Android
-                        const isAndroid = /android/i.test(navigator.userAgent);
-                        if (isAndroid) {
-                            document.documentElement.style.setProperty('--mobile-input-bottom', '36px');
-                        }
+                    if (!navBarDetected && isAndroid) {
+                        applyOffset(36);
                     }
                 }, 500);
             })();
