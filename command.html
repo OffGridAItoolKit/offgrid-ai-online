@@ -1699,7 +1699,7 @@
 
             .messages {
                 padding: 8px !important;
-                padding-bottom: 72px !important;
+                padding-bottom: 180px !important;
                 padding-top: 8px !important;
                 padding-right: 8px !important;
                 overscroll-behavior-y: none;
@@ -1714,7 +1714,7 @@
             }
 
             .messages.has-toolbar {
-                padding-bottom: 110px !important;
+                padding-bottom: 220px !important;
             }
 
             .message {
@@ -1725,15 +1725,17 @@
             .welcome {
                 padding: 8px 16px !important;
                 padding-top: 12px !important;
+                padding-bottom: 180px !important;
                 justify-content: flex-start !important;
                 align-content: flex-start !important;
-                flex-direction: row !important;
-                flex-wrap: wrap !important;
-                align-items: center !important;
+                flex-direction: column !important;
+                flex-wrap: nowrap !important;
+                align-items: flex-start !important;
                 gap: 10px !important;
                 height: auto !important;
-                min-height: 0 !important;
-                flex: none !important;
+                min-height: 100% !important;
+                flex: 1 1 auto !important;
+                box-sizing: border-box !important;
             }
 
             .welcome h2 {
@@ -1775,6 +1777,7 @@
                 gap: 6px;
                 width: 100%;
                 max-width: 400px;
+                margin-top: auto !important;
                 margin-bottom: 0;
             }
 
@@ -2088,7 +2091,7 @@
 
             /* Adjust messages padding when toolbar is visible */
             .messages.has-toolbar {
-                padding-bottom: 120px !important;
+                padding-bottom: 220px !important;
             }
 
             /* ============================================
