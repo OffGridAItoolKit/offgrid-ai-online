@@ -1674,7 +1674,7 @@
 
             .title {
                 font-size: 11px;
-                max-width: 80px;
+                max-width: none;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -1682,19 +1682,21 @@
 
             .header-left {
                 gap: 6px;
-                flex: 0 0 auto;
-                max-width: 120px;
+                flex: 1 1 auto;
+                min-width: 0;
+                overflow: hidden;
             }
 
             .header-left .online-badge {
-                display: none;
+                display: inline-flex;
+                padding: 3px 10px;
+                font-size: 10px;
+                margin-left: 8px;
+                flex-shrink: 0;
             }
 
             .header-center-mobile {
-                display: flex !important;
-                position: absolute;
-                left: 50%;
-                transform: translateX(-50%);
+                display: none !important;
             }
 
             .messages {
@@ -2734,67 +2736,88 @@
             background: var(--bg-surface);
             border: 1px solid var(--border-emphasis);
             border-top: 3px solid var(--gold-primary);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 28px;
             max-width: 700px;
             width: 92%;
             max-height: 85vh;
             overflow-y: auto;
             animation: slideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(201, 168, 76, 0.1);
         }
         .command-theme .deliberation-modal h3 {
             color: var(--text-primary);
-            font-size: 18px;
-            margin-bottom: 4px;
-            font-weight: 600;
+            font-size: 20px;
+            margin-bottom: 6px;
+            font-weight: 700;
             font-family: var(--font-sans);
-            letter-spacing: -0.01em;
+            letter-spacing: -0.02em;
         }
         .command-theme .deliberation-modal .delib-subtitle {
             color: var(--text-secondary);
-            font-size: 12px;
-            margin-bottom: 20px;
+            font-size: 13px;
+            margin-bottom: 24px;
+            line-height: 1.5;
         }
         .command-theme .deliberation-modal .delib-section {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         .command-theme .deliberation-modal .delib-section-title {
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            letter-spacing: -0.01em;
         }
         .command-theme .deliberation-modal .delib-summary {
             background: var(--gold-glow);
-            border: 1px solid rgba(201, 168, 76, 0.2);
-            border-radius: 8px;
-            padding: 14px 16px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 20px;
+            border: 1px solid rgba(201, 168, 76, 0.25);
+            border-radius: 12px;
+            padding: 18px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+        .command-theme .deliberation-modal .delib-summary strong {
+            color: var(--gold-bright);
+        }
+        .command-theme .deliberation-modal .delib-summary span {
+            color: var(--text-secondary) !important;
+            font-size: 13px !important;
         }
         .command-theme .deliberation-modal table {
             width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
             margin-bottom: 12px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
         }
         .command-theme .deliberation-modal th {
             background: var(--bg-deep);
-            padding: 10px 12px;
+            padding: 12px 14px;
             text-align: left;
             font-weight: 600;
+            font-size: 12px;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             border-bottom: 2px solid var(--border-emphasis);
         }
         .command-theme .deliberation-modal td {
-            padding: 10px 12px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .command-theme .deliberation-modal tr:last-child td {
+            border-bottom: none;
         }
         .command-theme .deliberation-modal tr.chairman-highlight td {
             background: var(--gold-glow);
@@ -2804,40 +2827,54 @@
         .command-theme .deliberation-modal .reviewer-card {
             background: var(--bg-elevated);
             border: 1px solid var(--border-subtle);
-            border-radius: 8px;
-            padding: 14px 16px;
+            border-radius: 12px;
+            padding: 16px 18px;
             margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+        .command-theme .deliberation-modal .reviewer-card:hover {
+            border-color: rgba(201, 168, 76, 0.3);
         }
         .command-theme .deliberation-modal .reviewer-name {
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 700;
+            font-size: 14px;
             color: var(--text-primary);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .command-theme .deliberation-modal .reviewer-ranking {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            line-height: 1.5;
+        }
+        .command-theme .deliberation-modal .reviewer-ranking strong {
+            color: var(--text-primary);
         }
         .command-theme .deliberation-modal .reviewer-explanation {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-secondary);
             font-style: italic;
-            line-height: 1.5;
-            margin-top: 6px;
-            padding-left: 10px;
-            border-left: 2px solid var(--gold-primary);
+            line-height: 1.6;
+            margin-top: 8px;
+            padding: 10px 14px;
+            border-left: 3px solid var(--gold-primary);
+            background: rgba(201, 168, 76, 0.04);
+            border-radius: 0 8px 8px 0;
+        }
+        .command-theme .deliberation-modal .reviewer-explanation strong {
+            font-style: normal;
+            color: var(--text-primary);
         }
         .command-theme .deliberation-close-btn {
             display: block;
-            margin: 16px auto 0;
-            padding: 10px 28px;
+            margin: 20px auto 0;
+            padding: 12px 36px;
             background: var(--gold-primary);
             color: var(--text-inverse);
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 14px;
             cursor: pointer;
             transition: all 0.2s;
             font-family: var(--font-sans);
@@ -2845,7 +2882,45 @@
         .command-theme .deliberation-close-btn:hover {
             transform: translateY(-1px);
             background: var(--gold-bright);
-            box-shadow: 0 2px 8px var(--gold-glow);
+            box-shadow: 0 4px 16px rgba(201, 168, 76, 0.3);
+        }
+
+        /* Mobile deliberation modal adjustments */
+        @media (max-width: 768px) {
+            .command-theme .deliberation-modal {
+                padding: 20px 16px;
+                width: 95%;
+                max-height: 90vh;
+                border-radius: 14px;
+            }
+            .command-theme .deliberation-modal h3 {
+                font-size: 18px;
+            }
+            .command-theme .deliberation-modal .delib-summary {
+                padding: 14px 16px;
+                font-size: 13px;
+            }
+            .command-theme .deliberation-modal th {
+                padding: 10px 10px;
+                font-size: 11px;
+            }
+            .command-theme .deliberation-modal td {
+                padding: 10px 10px;
+                font-size: 12px;
+            }
+            .command-theme .deliberation-modal .reviewer-card {
+                padding: 14px 14px;
+            }
+            .command-theme .deliberation-modal .reviewer-name {
+                font-size: 13px;
+            }
+            .command-theme .deliberation-modal .reviewer-ranking {
+                font-size: 12px;
+            }
+            .command-theme .deliberation-modal .reviewer-explanation {
+                font-size: 12px;
+                padding: 8px 12px;
+            }
         }
 
         /* ============================================ */
@@ -9151,8 +9226,13 @@
                         const keyboardLikelyOpen = vv.height < window.innerHeight * 0.75;
                         
                         if (keyboardLikelyOpen) {
-                            // Keyboard is open — let browser handle positioning
-                            applyOffset(0);
+                            // Keyboard is open — position input above keyboard
+                            // bottomOffset includes keyboard + nav bar height
+                            const keyboardOffset = Math.max(bottomOffset, 0);
+                            applyOffset(keyboardOffset);
+                            // Scroll messages to bottom so user sees latest content
+                            const msgs = document.getElementById('messages');
+                            if (msgs) setTimeout(() => msgs.scrollTop = msgs.scrollHeight, 50);
                         } else {
                             // Keyboard is closed — detect and store nav bar height
                             if (bottomOffset > 5) {
