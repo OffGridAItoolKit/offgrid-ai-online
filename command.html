@@ -1635,8 +1635,7 @@
             .mobile-context-menu,
             .offline-indicator,
             .tts-indicator,
-            .chat-search-bar,
-            .quick-action-chips {
+            .chat-search-bar {
                 display: none !important;
             }
         }
@@ -1724,7 +1723,7 @@
 
             .command-theme .welcome,
             .welcome {
-                padding: 30px 16px 16px 16px !important;
+                padding: 30px 16px 140px 16px !important;
                 justify-content: center !important;
                 align-items: center !important;
                 flex-direction: column !important;
@@ -1770,26 +1769,60 @@
             }
 
             .mobile-actions {
-                display: none !important;
+                display: flex !important;
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+                max-width: 400px;
+                margin: 0 auto;
+                padding: 0 4px;
             }
 
             .mobile-action-card {
-                padding: 10px 14px;
-                gap: 12px;
+                display: flex;
+                align-items: center;
+                padding: 12px 16px;
+                gap: 14px;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                border-radius: 14px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                -webkit-tap-highlight-color: transparent;
+            }
+
+            .mobile-action-card:active {
+                transform: scale(0.98);
+                border-color: var(--gold-primary);
+            }
+
+            .mobile-action-card.featured {
+                border-color: rgba(218, 165, 32, 0.35);
+                box-shadow: 0 0 12px rgba(218, 165, 32, 0.08), inset 0 0 0 1px rgba(218, 165, 32, 0.06);
             }
 
             .mobile-action-icon {
-                font-size: 18px;
-                width: 36px;
-                height: 36px;
+                font-size: 20px;
+                width: 38px;
+                height: 38px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--bg-elevated);
+                border-radius: 10px;
+                flex-shrink: 0;
             }
 
             .mobile-action-title {
                 font-size: 14px;
+                font-weight: 600;
+                color: var(--text-primary);
             }
 
             .mobile-action-desc {
                 font-size: 11px;
+                color: var(--text-secondary);
+                margin-top: 1px;
             }
 
             /* Input area mobile - always visible */
@@ -1800,49 +1833,10 @@
                 left: 0;
                 right: 0;
                 padding: 6px 8px;
-                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+                padding-bottom: max(20px, calc(12px + env(safe-area-inset-bottom)));
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
-            }
-
-            /* Quick Action Chips - shown above textarea on welcome screen */
-            .quick-action-chips {
-                display: none;
-                flex-wrap: wrap;
-                gap: 8px;
-                padding: 4px 4px 8px 4px;
-                justify-content: center;
-            }
-            .quick-action-chips.visible {
-                display: flex;
-            }
-            .quick-chip {
-                display: flex;
-                align-items: center;
-                gap: 6px;
-                padding: 8px 14px;
-                background: var(--bg-surface);
-                border: 1px solid var(--border-subtle);
-                border-radius: 20px;
-                color: var(--text-secondary);
-                font-size: 13px;
-                font-weight: 500;
-                font-family: inherit;
-                cursor: pointer;
-                transition: all 0.2s;
-                -webkit-tap-highlight-color: transparent;
-                white-space: nowrap;
-            }
-            .quick-chip:active {
-                background: var(--bg-elevated);
-                border-color: var(--gold-primary);
-                color: var(--gold-primary);
-                transform: scale(0.95);
-            }
-            .quick-chip svg {
-                flex-shrink: 0;
-                stroke: currentColor;
             }
 
             .input-container {
@@ -2378,11 +2372,16 @@
             body.command-theme.oled-mode .mobile-context-menu {
                 background: #0a0a0a !important;
             }
-            body.command-theme.oled-mode .quick-chip {
+            body.command-theme.oled-mode .mobile-action-card {
                 background: #0a0a0a !important;
                 border-color: #1a1a1a !important;
             }
-
+            body.command-theme.oled-mode .mobile-action-card.featured {
+                border-color: rgba(218, 165, 32, 0.25) !important;
+            }
+            body.command-theme.oled-mode .mobile-action-icon {
+                background: #111 !important;
+            }
             /* ============================================
                OFFLINE INDICATOR
                ============================================ */
@@ -4445,6 +4444,13 @@
 
                     <!-- Mobile action cards -->
                     <div class="mobile-actions">
+                        <div class="mobile-action-card featured" onclick="window.location.href='/command/ready-made-prompts'">
+                            <div class="mobile-action-icon">💡</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Ready-Made Prompts</div>
+                                <div class="mobile-action-desc">Expert prompts for your library</div>
+                            </div>
+                        </div>
                         <div class="mobile-action-card" onclick="triggerImageUpload()">
                             <div class="mobile-action-icon">📸</div>
                             <div class="mobile-action-text">
@@ -4479,25 +4485,6 @@
 
             <!-- Input Area -->
             <div class="input-area" id="bottomInputArea" style="display: none;">
-        <!-- Mobile Quick Action Chips (shown only on welcome screen) -->
-        <div class="quick-action-chips" id="quickActionChips">
-            <button class="quick-chip" onclick="triggerImageUpload()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-                Camera
-            </button>
-            <button class="quick-chip" onclick="triggerGalleryUpload()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                Image
-            </button>
-            <button class="quick-chip" onclick="startVoiceInput()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-                Voice
-            </button>
-            <button class="quick-chip" onclick="window.location.href='/command/ready-made-prompts'">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                Prompts
-            </button>
-        </div>
         <div class="input-container">
             <!-- Image preview -->
             <div class="image-preview" id="imagePreview">
@@ -5225,9 +5212,6 @@
                 welcome.remove();
                 const bottomInputArea = document.querySelector('.input-area');
                 if (bottomInputArea) bottomInputArea.style.display = '';
-                // Hide quick action chips when conversation starts
-                const quickChips = document.getElementById('quickActionChips');
-                if (quickChips) quickChips.classList.remove('visible');
             }
 
             // Add user message to UI
@@ -6157,6 +6141,13 @@
                         <div class="command-banner-desc">Choose a single model above, or use <strong style="color: #daa520;">Command mode</strong> for a peer-reviewed council consensus. All 4 models answer → anonymous peer review → a Chairman is elected per query → best answer synthesized.</div>
                     </div>
                     <div class="mobile-actions">
+                        <div class="mobile-action-card featured" onclick="window.location.href='/command/ready-made-prompts'">
+                            <div class="mobile-action-icon">💡</div>
+                            <div class="mobile-action-text">
+                                <div class="mobile-action-title">Ready-Made Prompts</div>
+                                <div class="mobile-action-desc">Expert prompts for your library</div>
+                            </div>
+                        </div>
                         <div class="mobile-action-card" onclick="triggerImageUpload()">
                             <div class="mobile-action-icon">📸</div>
                             <div class="mobile-action-text">
@@ -6222,11 +6213,6 @@
                 if (welcomeInput) welcomeInput.focus();
             }, 100);
 
-            // Re-show quick action chips on mobile
-            if (window.innerWidth <= 768) {
-                const quickChips = document.getElementById('quickActionChips');
-                if (quickChips) quickChips.classList.add('visible');
-            }
         }
 
         function clearChat() {
@@ -7993,9 +7979,6 @@
                 welcome.remove();
                 const bottomInputArea = document.querySelector('.input-area');
                 if (bottomInputArea) bottomInputArea.style.display = '';
-                // Hide quick action chips when conversation starts
-                const quickChips = document.getElementById('quickActionChips');
-                if (quickChips) quickChips.classList.remove('visible');
             }
 
             const imagePromptText = promptText || 'Image generation request';
@@ -9237,14 +9220,6 @@
                         alert('Voice input requires Chrome or Safari on HTTPS.');
                     };
                 }
-                // Also disable the voice quick action chip
-                const voiceChip = document.querySelector('.quick-chip[onclick*="startVoiceInput"]');
-                if (voiceChip) {
-                    voiceChip.style.opacity = '0.4';
-                    voiceChip.onclick = function() {
-                        alert('Voice input requires Chrome or Safari on HTTPS.');
-                    };
-                }
             }
 
             // ============================================
@@ -9252,11 +9227,6 @@
             // ============================================
             if (window.innerWidth <= 768) {
                 initMobileEnhancements();
-                // Show quick action chips if welcome screen is present
-                const quickChips = document.getElementById('quickActionChips');
-                if (quickChips && document.getElementById('welcome')) {
-                    quickChips.classList.add('visible');
-                }
             }
 
             // Check for ready-made prompt from prompts page
@@ -9267,7 +9237,9 @@
                     const welcomeInput = document.getElementById('messageInputWelcome');
                     const chatInput = document.getElementById('messageInput');
                     const welcome = document.getElementById('welcome');
-                    if (welcomeInput && welcome && welcome.style.display !== 'none') {
+                    // Check if welcomeInput is actually visible (on mobile it's hidden via CSS)
+                    const welcomeInputVisible = welcomeInput && welcomeInput.offsetParent !== null;
+                    if (welcomeInputVisible && welcome) {
                         welcomeInput.value = readyPrompt;
                         welcomeInput.focus();
                         autoResize(welcomeInput);
