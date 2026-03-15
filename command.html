@@ -1699,7 +1699,7 @@
 
             .messages {
                 padding: 8px !important;
-                padding-bottom: 140px !important;
+                padding-bottom: calc(140px + var(--mobile-input-bottom, 0px)) !important;
                 padding-top: 8px !important;
                 padding-right: 8px !important;
                 overscroll-behavior-y: none;
@@ -1714,7 +1714,7 @@
             }
 
             .messages.has-toolbar {
-                padding-bottom: 190px !important;
+                padding-bottom: calc(190px + var(--mobile-input-bottom, 0px)) !important;
             }
 
             .message {
@@ -1723,7 +1723,7 @@
 
             .command-theme .welcome,
             .welcome {
-                padding: 30px 16px 140px 16px !important;
+                padding: 30px 16px calc(140px + var(--mobile-input-bottom, 0px)) 16px !important;
                 justify-content: center !important;
                 align-items: center !important;
                 flex-direction: column !important;
@@ -1829,7 +1829,7 @@
             .input-area {
                 display: block !important;
                 position: fixed;
-                bottom: 0;
+                bottom: var(--mobile-input-bottom, 0px);
                 left: 0;
                 right: 0;
                 padding: 6px 8px;
@@ -1837,6 +1837,7 @@
                 background: var(--bg-deep);
                 z-index: 100;
                 border-top: 1px solid var(--border-subtle);
+                transition: bottom 0.15s ease;
             }
 
             .input-container {
@@ -2116,7 +2117,7 @@
 
             /* Adjust messages padding when toolbar is visible */
             .messages.has-toolbar {
-                padding-bottom: 190px !important;
+                padding-bottom: calc(190px + var(--mobile-input-bottom, 0px)) !important;
             }
 
             /* ============================================
@@ -9142,6 +9143,51 @@
                 }
             });
             observer.observe(document.getElementById('messages') || document.body, { childList: true, subtree: true });
+
+            // Fix Android nav bar overlap: dynamically adjust input area bottom position
+            (function adjustInputForNavBar() {
+                const inputArea = document.getElementById('bottomInputArea');
+                if (!inputArea) return;
+
+                function updateBottomOffset() {
+                    if (window.visualViewport) {
+                        const vv = window.visualViewport;
+                        // Calculate how much of the window is hidden by system UI at the bottom
+                        const bottomOffset = window.innerHeight - (vv.height + vv.offsetTop);
+                        // Only apply if there's a meaningful offset (nav bar present)
+                        // and the keyboard is NOT open (keyboard makes vv.height much smaller)
+                        const keyboardLikelyOpen = vv.height < window.innerHeight * 0.75;
+                        if (!keyboardLikelyOpen && bottomOffset > 5) {
+                            document.documentElement.style.setProperty('--mobile-input-bottom', bottomOffset + 'px');
+                        } else if (keyboardLikelyOpen) {
+                            // When keyboard is open, let the browser handle positioning
+                            document.documentElement.style.setProperty('--mobile-input-bottom', '0px');
+                        }
+                    }
+                }
+
+                // Run on load
+                updateBottomOffset();
+
+                // Also listen for viewport changes (keyboard open/close, orientation)
+                if (window.visualViewport) {
+                    window.visualViewport.addEventListener('resize', updateBottomOffset);
+                    window.visualViewport.addEventListener('scroll', updateBottomOffset);
+                }
+
+                // Fallback: if visualViewport isn't available or reports 0, use a safe default
+                setTimeout(() => {
+                    const currentBottom = getComputedStyle(document.documentElement).getPropertyValue('--mobile-input-bottom').trim();
+                    if (!currentBottom || currentBottom === '0px' || currentBottom === '') {
+                        // On Android without visualViewport data, assume ~48px for gesture nav
+                        // Only apply if we detect Android
+                        const isAndroid = /android/i.test(navigator.userAgent);
+                        if (isAndroid) {
+                            document.documentElement.style.setProperty('--mobile-input-bottom', '24px');
+                        }
+                    }
+                }, 500);
+            })();
 
             // Long-press context menu
             initLongPress();
