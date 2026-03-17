@@ -6704,6 +6704,33 @@
             return frontmatter + content;
         }
 
+        // Generate a short descriptive slug from the first user message in the conversation
+        function getTopicSlug() {
+            const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+            if (!firstUserMsg || !firstUserMsg.content) return 'session';
+            // Extract first ~5 meaningful words
+            const words = firstUserMsg.content
+                .replace(/[^a-zA-Z0-9\s]/g, '')
+                .trim()
+                .split(/\s+/)
+                .filter(w => w.length > 2)
+                .slice(0, 5)
+                .join('-')
+                .toLowerCase();
+            return words || 'session';
+        }
+
+        // Generate a compact timestamp: YYYYMMDD-HHmm
+        function getTimestamp() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const mo = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const h = String(now.getHours()).padStart(2, '0');
+            const mi = String(now.getMinutes()).padStart(2, '0');
+            return `${y}${mo}${d}-${h}${mi}`;
+        }
+
         function generateFilename(title) {
             const safeTitle = title
                 .replace(/[^a-zA-Z0-9\s-]/g, '')
@@ -8156,7 +8183,10 @@
         function downloadGeneratedImage(imageSrc) {
             const a = document.createElement('a');
             a.href = imageSrc;
-            a.download = `offgrid-image-${new Date().toISOString().split('T')[0]}.png`;
+            // Generate descriptive filename from the prompt or conversation context
+            const slug = getTopicSlug();
+            const ts = getTimestamp();
+            a.download = `offgrid-image-${slug}-${ts}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -8804,7 +8834,9 @@
                 items.push({ icon: '💾', label: 'Download Image', action: () => {
                     const a = document.createElement('a');
                     a.href = imgSrc;
-                    a.download = 'offgrid-image.png';
+                    const slug = getTopicSlug();
+                    const ts = getTimestamp();
+                    a.download = `offgrid-image-${slug}-${ts}.png`;
                     a.click();
                 }});
                 items.push({ divider: true });
@@ -8955,7 +8987,7 @@
         }
 
         function splitTextForTTS(text) {
-            const MAX_CHUNK = 180;
+            const MAX_CHUNK = 100;
             const chunks = [];
             
             // First split on sentence boundaries
@@ -9009,7 +9041,8 @@
 
             ttsUtterance.onend = () => {
                 ttsChunkIndex++;
-                speakNextChunk();
+                // Small delay between chunks to prevent Chrome from auto-canceling rapid queuing
+                setTimeout(() => speakNextChunk(), 150);
             };
             ttsUtterance.onerror = (e) => {
                 console.warn('TTS chunk error:', e.error, 'at chunk', ttsChunkIndex);
@@ -9028,15 +9061,15 @@
 
             window.speechSynthesis.speak(ttsUtterance);
 
-            // Chrome Android workaround: Chrome pauses speech after ~15s
-            // Periodically call pause/resume to keep it alive
+            // Chrome Android workaround: Chrome kills speech after ~10-15s
+            // Periodically call pause/resume to keep it alive (every 5s)
             if (!ttsKeepAliveTimer) {
                 ttsKeepAliveTimer = setInterval(() => {
                     if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
                         window.speechSynthesis.pause();
-                        window.speechSynthesis.resume();
+                        setTimeout(() => window.speechSynthesis.resume(), 50);
                     }
-                }, 10000);
+                }, 5000);
             }
         }
 
@@ -9254,7 +9287,9 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `offgrid-chat-${dateStr}.md`;
+            const chatSlug = getTopicSlug();
+            const exportTs = getTimestamp();
+            a.download = `offgrid-chat-${chatSlug}-${exportTs}.md`;
             a.click();
             URL.revokeObjectURL(url);
 
