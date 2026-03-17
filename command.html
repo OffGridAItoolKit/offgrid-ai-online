@@ -1524,6 +1524,42 @@
            MOBILE STYLES
            ============================================ */
         
+        /* Mobile image preview (welcome screen) */
+        .command-theme .mobile-image-preview {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            margin: 0 20px 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--gold-primary);
+            border-radius: 10px;
+        }
+        .command-theme .mobile-image-preview.active {
+            display: flex;
+        }
+        .command-theme .mobile-image-preview .preview-image {
+            width: 52px;
+            height: 52px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .command-theme .mobile-image-preview .preview-filename {
+            color: var(--text-primary);
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .command-theme .mobile-image-preview .remove-image {
+            margin-left: auto;
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
         /* Mobile quick action cards */
         .command-theme .mobile-actions {
             display: none;
@@ -4518,6 +4554,13 @@
                         <div class="command-banner-desc">Choose a single model above, or use <strong style="color: #daa520;">Command mode</strong> for a peer-reviewed council consensus. All 4 models answer → anonymous peer review → a Chairman is elected per query → best answer synthesized.</div>
                     </div>
 
+                    <!-- Mobile image preview (visible on welcome screen) -->
+                    <div class="mobile-image-preview" id="mobileImagePreview" style="display: none;">
+                        <img class="preview-image" id="mobilePreviewImg" src="" alt="Preview">
+                        <div class="preview-info"><div class="preview-filename" id="mobilePreviewFilename"></div></div>
+                        <button class="remove-image" onclick="removeImage()">Remove</button>
+                    </div>
+
                     <!-- Mobile action cards -->
                     <div class="mobile-actions">
                         <div class="mobile-action-card featured" onclick="window.location.href='/command/ready-made-prompts'">
@@ -6065,15 +6108,18 @@
             const previewWelcome = document.getElementById('imagePreviewWelcome');
             const previewImg = document.getElementById('previewImg');
             const previewFilename = document.getElementById('previewFilename');
+            const mobilePreview = document.getElementById('mobileImagePreview');
+            const mobilePreviewImg = document.getElementById('mobilePreviewImg');
+            const mobilePreviewFilename = document.getElementById('mobilePreviewFilename');
 
-            // Bottom input area preview
+            // Bottom input area preview (active chat)
             if (preview && previewImg && previewFilename && selectedImage) {
                 previewImg.src = selectedImage.dataUrl;
                 previewFilename.textContent = selectedImage.name;
                 preview.classList.add('active');
             }
 
-            // Welcome screen preview (if still visible)
+            // Welcome screen preview - desktop (if still visible)
             if (previewWelcome && selectedImage) {
                 previewWelcome.innerHTML = `
                     <img class="preview-image" src="${selectedImage.dataUrl}" alt="Preview">
@@ -6082,14 +6128,24 @@
                 `;
                 previewWelcome.classList.add('active');
             }
+
+            // Mobile welcome screen preview
+            if (mobilePreview && mobilePreviewImg && mobilePreviewFilename && selectedImage) {
+                mobilePreviewImg.src = selectedImage.dataUrl;
+                mobilePreviewFilename.textContent = selectedImage.name;
+                mobilePreview.classList.add('active');
+                mobilePreview.style.display = 'flex';
+            }
         }
 
         function removeImage() {
             selectedImage = null;
             const preview = document.getElementById('imagePreview');
             const previewWelcome = document.getElementById('imagePreviewWelcome');
+            const mobilePreview = document.getElementById('mobileImagePreview');
             if (preview) preview.classList.remove('active');
             if (previewWelcome) { previewWelcome.classList.remove('active'); previewWelcome.innerHTML = ''; }
+            if (mobilePreview) { mobilePreview.classList.remove('active'); mobilePreview.style.display = 'none'; }
             const imageInput = document.getElementById('imageInput');
             const galleryInput = document.getElementById('galleryInput');
             if (imageInput) imageInput.value = '';
@@ -6283,6 +6339,11 @@
                         <div class="command-banner-title">⭐ Command • Chairman Council</div>
                         <div class="command-banner-desc">Choose a single model above, or use <strong style="color: #daa520;">Command mode</strong> for a peer-reviewed council consensus. All 4 models answer → anonymous peer review → a Chairman is elected per query → best answer synthesized.</div>
                     </div>
+                    <div class="mobile-image-preview" id="mobileImagePreview" style="display: none;">
+                        <img class="preview-image" id="mobilePreviewImg" src="" alt="Preview">
+                        <div class="preview-info"><div class="preview-filename" id="mobilePreviewFilename"></div></div>
+                        <button class="remove-image" onclick="removeImage()">Remove</button>
+                    </div>
                     <div class="mobile-actions">
                         <div class="mobile-action-card featured" onclick="window.location.href='/command/ready-made-prompts'">
                             <div class="mobile-action-icon">💡</div>
@@ -6322,6 +6383,8 @@
             if (imagePreview) imagePreview.style.display = 'none';
             const imagePreviewWelcome = document.getElementById('imagePreviewWelcome');
             if (imagePreviewWelcome) imagePreviewWelcome.innerHTML = '';
+            const mobileImagePreview = document.getElementById('mobileImagePreview');
+            if (mobileImagePreview) { mobileImagePreview.style.display = 'none'; mobileImagePreview.classList.remove('active'); }
 
             // Reset model selector to Command (Council)
             selectModel('command');
@@ -8849,6 +8912,9 @@
 
         // ---- Text-to-Speech: Read Aloud ----
         let ttsUtterance = null;
+        let ttsChunks = [];
+        let ttsChunkIndex = 0;
+        let ttsKeepAliveTimer = null;
 
         function toggleReadAloud(text) {
             if (!window.speechSynthesis) {
@@ -8857,9 +8923,8 @@
             }
 
             // If already speaking, stop
-            if (window.speechSynthesis.speaking) {
-                window.speechSynthesis.cancel();
-                dismissTTSIndicator();
+            if (window.speechSynthesis.speaking || ttsChunks.length > 0) {
+                stopReadAloud();
                 return;
             }
 
@@ -8871,9 +8936,69 @@
                 .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
                 .replace(/\n{2,}/g, '. ')
                 .replace(/\n/g, ' ')
+                .replace(/\s+/g, ' ')
                 .trim();
 
-            ttsUtterance = new SpeechSynthesisUtterance(cleanText);
+            if (!cleanText) {
+                showSaveToast('Nothing to read', 'No text content found');
+                return;
+            }
+
+            // Split into chunks at sentence boundaries (max ~180 chars per chunk)
+            // This avoids the Web Speech API character limit on mobile browsers
+            ttsChunks = splitTextForTTS(cleanText);
+            ttsChunkIndex = 0;
+
+            console.log('TTS: Starting read aloud,', ttsChunks.length, 'chunks, total length:', cleanText.length);
+            showTTSIndicator();
+            speakNextChunk();
+        }
+
+        function splitTextForTTS(text) {
+            const MAX_CHUNK = 180;
+            const chunks = [];
+            
+            // First split on sentence boundaries
+            const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
+            let current = '';
+            
+            for (const sentence of sentences) {
+                if ((current + sentence).length > MAX_CHUNK && current.length > 0) {
+                    chunks.push(current.trim());
+                    current = '';
+                }
+                // If a single sentence is longer than MAX_CHUNK, split on commas/semicolons
+                if (sentence.length > MAX_CHUNK) {
+                    const parts = sentence.match(/[^,;]+[,;]?[\s]*/g) || [sentence];
+                    for (const part of parts) {
+                        if ((current + part).length > MAX_CHUNK && current.length > 0) {
+                            chunks.push(current.trim());
+                            current = '';
+                        }
+                        current += part;
+                    }
+                } else {
+                    current += sentence;
+                }
+            }
+            if (current.trim()) chunks.push(current.trim());
+            
+            return chunks.length > 0 ? chunks : [text.substring(0, MAX_CHUNK)];
+        }
+
+        function speakNextChunk() {
+            if (ttsChunkIndex >= ttsChunks.length) {
+                // All chunks done
+                ttsChunks = [];
+                ttsChunkIndex = 0;
+                clearInterval(ttsKeepAliveTimer);
+                ttsKeepAliveTimer = null;
+                dismissTTSIndicator();
+                return;
+            }
+
+            const chunk = ttsChunks[ttsChunkIndex];
+            ttsUtterance = new SpeechSynthesisUtterance(chunk);
             ttsUtterance.rate = 1.0;
             ttsUtterance.pitch = 1.0;
 
@@ -8882,11 +9007,37 @@
             const preferred = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'));
             if (preferred) ttsUtterance.voice = preferred;
 
-            ttsUtterance.onend = () => dismissTTSIndicator();
-            ttsUtterance.onerror = () => dismissTTSIndicator();
+            ttsUtterance.onend = () => {
+                ttsChunkIndex++;
+                speakNextChunk();
+            };
+            ttsUtterance.onerror = (e) => {
+                console.warn('TTS chunk error:', e.error, 'at chunk', ttsChunkIndex);
+                // Try to continue with next chunk on non-fatal errors
+                if (e.error !== 'canceled') {
+                    ttsChunkIndex++;
+                    speakNextChunk();
+                } else {
+                    ttsChunks = [];
+                    ttsChunkIndex = 0;
+                    clearInterval(ttsKeepAliveTimer);
+                    ttsKeepAliveTimer = null;
+                    dismissTTSIndicator();
+                }
+            };
 
             window.speechSynthesis.speak(ttsUtterance);
-            showTTSIndicator();
+
+            // Chrome Android workaround: Chrome pauses speech after ~15s
+            // Periodically call pause/resume to keep it alive
+            if (!ttsKeepAliveTimer) {
+                ttsKeepAliveTimer = setInterval(() => {
+                    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                        window.speechSynthesis.pause();
+                        window.speechSynthesis.resume();
+                    }
+                }, 10000);
+            }
         }
 
         function showTTSIndicator() {
@@ -8910,6 +9061,12 @@
         function stopReadAloud() {
             if (window.speechSynthesis) {
                 window.speechSynthesis.cancel();
+            }
+            ttsChunks = [];
+            ttsChunkIndex = 0;
+            if (ttsKeepAliveTimer) {
+                clearInterval(ttsKeepAliveTimer);
+                ttsKeepAliveTimer = null;
             }
             dismissTTSIndicator();
         }
@@ -9073,7 +9230,20 @@
             conversationHistory.forEach(msg => {
                 const role = msg.role === 'user' ? 'You' : 'Command Center';
                 const icon = msg.role === 'user' ? '**You:**' : '**Command Center:**';
-                md += `${icon}\n\n${msg.content}\n\n---\n\n`;
+                
+                // Clean content: replace base64 image data with placeholder
+                let content = msg.content || '';
+                // Replace markdown image syntax with base64 data URLs
+                content = content.replace(/!\[([^\]]*)\]\(data:[^)]+\)/g, '[Image: $1]');
+                // Replace any remaining raw base64 data URLs
+                content = content.replace(/data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=]{50,}/g, '[Image data]');
+                
+                // Note if user attached an image
+                if (msg.image) {
+                    md += `${icon}\n\n${content}\n\n*[Attached image]*\n\n---\n\n`;
+                } else {
+                    md += `${icon}\n\n${content}\n\n---\n\n`;
+                }
             });
 
             md += `\n*Exported from OffGrid Command Center | offgridtoolkit.ai*\n`;
