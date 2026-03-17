@@ -8943,10 +8943,14 @@
         }
 
         // ---- Text-to-Speech: Read Aloud ----
-        let ttsUtterance = null;
+        // Chrome Android aggressively kills SpeechSynthesis utterances after a few seconds.
+        // Strategy: Use very short chunks (~60 chars), cancel before each new chunk to force
+        // a fresh audio context, and use a watchdog timer to detect silent failures.
         let ttsChunks = [];
         let ttsChunkIndex = 0;
-        let ttsKeepAliveTimer = null;
+        let ttsActive = false;
+        let ttsWatchdog = null;
+        let ttsSelectedVoice = null;
 
         function toggleReadAloud(text) {
             if (!window.speechSynthesis) {
@@ -8954,8 +8958,8 @@
                 return;
             }
 
-            // If already speaking, stop
-            if (window.speechSynthesis.speaking || ttsChunks.length > 0) {
+            // If already active, stop
+            if (ttsActive) {
                 stopReadAloud();
                 return;
             }
@@ -8976,10 +8980,16 @@
                 return;
             }
 
-            // Split into chunks at sentence boundaries (max ~180 chars per chunk)
-            // This avoids the Web Speech API character limit on mobile browsers
+            // Pre-select voice once
+            const voices = window.speechSynthesis.getVoices();
+            ttsSelectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
+                || voices.find(v => v.lang.startsWith('en'))
+                || null;
+
+            // Split into very short chunks for Chrome Android reliability
             ttsChunks = splitTextForTTS(cleanText);
             ttsChunkIndex = 0;
+            ttsActive = true;
 
             console.log('TTS: Starting read aloud,', ttsChunks.length, 'chunks, total length:', cleanText.length);
             showTTSIndicator();
@@ -8987,10 +8997,11 @@
         }
 
         function splitTextForTTS(text) {
-            const MAX_CHUNK = 100;
+            // Very short chunks (~60 chars) to stay well within Chrome Android's kill window
+            const MAX_CHUNK = 60;
             const chunks = [];
             
-            // First split on sentence boundaries
+            // Split on sentence boundaries first
             const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
             let current = '';
             
@@ -8999,9 +9010,9 @@
                     chunks.push(current.trim());
                     current = '';
                 }
-                // If a single sentence is longer than MAX_CHUNK, split on commas/semicolons
                 if (sentence.length > MAX_CHUNK) {
-                    const parts = sentence.match(/[^,;]+[,;]?[\s]*/g) || [sentence];
+                    // Split long sentences on commas, semicolons, colons, or "and"/"or"
+                    const parts = sentence.match(/[^,;:]+[,;:]?[\s]*/g) || [sentence];
                     for (const part of parts) {
                         if ((current + part).length > MAX_CHUNK && current.length > 0) {
                             chunks.push(current.trim());
@@ -9019,58 +9030,68 @@
         }
 
         function speakNextChunk() {
-            if (ttsChunkIndex >= ttsChunks.length) {
-                // All chunks done
+            // Clear any previous watchdog
+            if (ttsWatchdog) { clearTimeout(ttsWatchdog); ttsWatchdog = null; }
+
+            if (!ttsActive || ttsChunkIndex >= ttsChunks.length) {
+                // All done
+                ttsActive = false;
                 ttsChunks = [];
                 ttsChunkIndex = 0;
-                clearInterval(ttsKeepAliveTimer);
-                ttsKeepAliveTimer = null;
                 dismissTTSIndicator();
                 return;
             }
 
+            // CRITICAL: Cancel any previous utterance to force Chrome to create fresh audio context
+            window.speechSynthesis.cancel();
+
             const chunk = ttsChunks[ttsChunkIndex];
-            ttsUtterance = new SpeechSynthesisUtterance(chunk);
-            ttsUtterance.rate = 1.0;
-            ttsUtterance.pitch = 1.0;
+            const utterance = new SpeechSynthesisUtterance(chunk);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+            if (ttsSelectedVoice) utterance.voice = ttsSelectedVoice;
 
-            // Try to pick a good voice
-            const voices = window.speechSynthesis.getVoices();
-            const preferred = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'));
-            if (preferred) ttsUtterance.voice = preferred;
+            let chunkHandled = false;
 
-            ttsUtterance.onend = () => {
+            utterance.onend = () => {
+                if (chunkHandled) return;
+                chunkHandled = true;
+                if (ttsWatchdog) { clearTimeout(ttsWatchdog); ttsWatchdog = null; }
                 ttsChunkIndex++;
-                // Small delay between chunks to prevent Chrome from auto-canceling rapid queuing
-                setTimeout(() => speakNextChunk(), 150);
+                // Delay before next chunk gives Chrome time to clean up audio context
+                setTimeout(() => speakNextChunk(), 250);
             };
-            ttsUtterance.onerror = (e) => {
+
+            utterance.onerror = (e) => {
+                if (chunkHandled) return;
+                chunkHandled = true;
+                if (ttsWatchdog) { clearTimeout(ttsWatchdog); ttsWatchdog = null; }
                 console.warn('TTS chunk error:', e.error, 'at chunk', ttsChunkIndex);
-                // Try to continue with next chunk on non-fatal errors
-                if (e.error !== 'canceled') {
+                if (e.error !== 'canceled' && ttsActive) {
                     ttsChunkIndex++;
-                    speakNextChunk();
+                    setTimeout(() => speakNextChunk(), 250);
                 } else {
-                    ttsChunks = [];
-                    ttsChunkIndex = 0;
-                    clearInterval(ttsKeepAliveTimer);
-                    ttsKeepAliveTimer = null;
-                    dismissTTSIndicator();
+                    stopReadAloud();
                 }
             };
 
-            window.speechSynthesis.speak(ttsUtterance);
+            // Small delay after cancel to let Chrome fully reset
+            setTimeout(() => {
+                if (!ttsActive) return;
+                window.speechSynthesis.speak(utterance);
 
-            // Chrome Android workaround: Chrome kills speech after ~10-15s
-            // Periodically call pause/resume to keep it alive (every 5s)
-            if (!ttsKeepAliveTimer) {
-                ttsKeepAliveTimer = setInterval(() => {
-                    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
-                        window.speechSynthesis.pause();
-                        setTimeout(() => window.speechSynthesis.resume(), 50);
+                // Watchdog: if neither onend nor onerror fires within 8 seconds,
+                // Chrome silently killed the utterance. Force advance to next chunk.
+                ttsWatchdog = setTimeout(() => {
+                    if (!chunkHandled && ttsActive) {
+                        console.warn('TTS watchdog: chunk', ttsChunkIndex, 'appears stuck, forcing next');
+                        chunkHandled = true;
+                        window.speechSynthesis.cancel();
+                        ttsChunkIndex++;
+                        setTimeout(() => speakNextChunk(), 250);
                     }
-                }, 5000);
-            }
+                }, 8000);
+            }, 100);
         }
 
         function showTTSIndicator() {
@@ -9092,14 +9113,15 @@
         }
 
         function stopReadAloud() {
+            ttsActive = false;
             if (window.speechSynthesis) {
                 window.speechSynthesis.cancel();
             }
             ttsChunks = [];
             ttsChunkIndex = 0;
-            if (ttsKeepAliveTimer) {
-                clearInterval(ttsKeepAliveTimer);
-                ttsKeepAliveTimer = null;
+            if (ttsWatchdog) {
+                clearTimeout(ttsWatchdog);
+                ttsWatchdog = null;
             }
             dismissTTSIndicator();
         }
