@@ -4570,18 +4570,18 @@
                                 <div class="mobile-action-desc">Expert prompts for your library</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" onclick="triggerImageUpload()">
-                            <div class="mobile-action-icon">📸</div>
+                        <div class="mobile-action-card" onclick="triggerCameraOrGallery()">
+                            <div class="mobile-action-icon">📷</div>
                             <div class="mobile-action-text">
-                                <div class="mobile-action-title">Take Picture</div>
-                                <div class="mobile-action-desc">Camera capture</div>
+                                <div class="mobile-action-title">Photo / Upload</div>
+                                <div class="mobile-action-desc">Camera or gallery</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" onclick="triggerGalleryUpload()">
-                            <div class="mobile-action-icon">🖼️</div>
+                        <div class="mobile-action-card" onclick="openImageStudio()">
+                            <div class="mobile-action-icon">🎨</div>
                             <div class="mobile-action-text">
-                                <div class="mobile-action-title">Upload Image</div>
-                                <div class="mobile-action-desc">From gallery</div>
+                                <div class="mobile-action-title">Generate Visual</div>
+                                <div class="mobile-action-desc">AI-powered Image Studio</div>
                             </div>
                         </div>
                     </div>
@@ -5982,6 +5982,15 @@
             input.click();
         }
 
+        function triggerCameraOrGallery() {
+            // Uses galleryInput (no capture attribute) which on mobile presents
+            // the native "Camera or Gallery" chooser dialog
+            const input = document.getElementById('galleryInput');
+            input.value = '';
+            input.onchange = handleImageSelect;
+            input.click();
+        }
+
         function handleImageSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -6352,18 +6361,18 @@
                                 <div class="mobile-action-desc">Expert prompts for your library</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" onclick="triggerImageUpload()">
-                            <div class="mobile-action-icon">📸</div>
+                        <div class="mobile-action-card" onclick="triggerCameraOrGallery()">
+                            <div class="mobile-action-icon">📷</div>
                             <div class="mobile-action-text">
-                                <div class="mobile-action-title">Take Picture</div>
-                                <div class="mobile-action-desc">Camera capture</div>
+                                <div class="mobile-action-title">Photo / Upload</div>
+                                <div class="mobile-action-desc">Camera or gallery</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" onclick="triggerGalleryUpload()">
-                            <div class="mobile-action-icon">🖼️</div>
+                        <div class="mobile-action-card" onclick="openImageStudio()">
+                            <div class="mobile-action-icon">🎨</div>
                             <div class="mobile-action-text">
-                                <div class="mobile-action-title">Upload Image</div>
-                                <div class="mobile-action-desc">From gallery</div>
+                                <div class="mobile-action-title">Generate Visual</div>
+                                <div class="mobile-action-desc">AI-powered Image Studio</div>
                             </div>
                         </div>
                     </div>
@@ -7707,8 +7716,24 @@
                 </div>
             `;
             document.body.appendChild(overlay);
+            // Fix: Only close on tap, not on scroll. Track touch start to distinguish.
+            let overlayTouchStart = null;
+            overlay.addEventListener('touchstart', function(e) {
+                if (e.target === overlay) overlayTouchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                else overlayTouchStart = null;
+            }, { passive: true });
+            overlay.addEventListener('touchend', function(e) {
+                if (e.target === overlay && overlayTouchStart) {
+                    const dx = Math.abs(e.changedTouches[0].clientX - overlayTouchStart.x);
+                    const dy = Math.abs(e.changedTouches[0].clientY - overlayTouchStart.y);
+                    // Only close if it was a tap (not a scroll gesture)
+                    if (dx < 10 && dy < 10) closeImageStudio();
+                }
+                overlayTouchStart = null;
+            });
+            // Desktop: click still works normally
             overlay.addEventListener('click', function(e) {
-                if (e.target === overlay) closeImageStudio();
+                if (e.target === overlay && !('ontouchstart' in window)) closeImageStudio();
             });
 
             // Only render example cards if not in direct mode
@@ -8121,8 +8146,9 @@
                         <div class="studio-result">
                             <img src="${imageSrc}" alt="Generated image: ${escapeHtml(prompt)}">
                             <div class="studio-result-actions">
-                                <button class="studio-download-btn" onclick="downloadGeneratedImage(window._lastGeneratedImage)">\ud83d\udcbe Download Image</button>
-                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat(window._lastGeneratedImage, window._lastGeneratedPrompt)">\ud83d\udcac Send to Chat</button>
+                                <button class="studio-download-btn" onclick="downloadGeneratedImage(window._lastGeneratedImage)">💾 Download</button>
+                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #b8860b 0%, #daa520 100%);" onclick="insertImageToChat(window._lastGeneratedImage, window._lastGeneratedPrompt)">💬 Chat</button>
+                                <button class="studio-download-btn" style="background: linear-gradient(135deg, #1da1f2 0%, #0d8ecf 100%);" onclick="shareGeneratedImage(window._lastGeneratedImage, window._lastGeneratedPrompt)">📤 Share</button>
                             </div>
                             ${data.textResponse ? `<div style="font-size: 12px; color: #6b7280; margin-top: 10px; text-align: left;">${escapeHtml(data.textResponse)}</div>` : ''}
                         </div>
@@ -8180,16 +8206,102 @@
             }
         }
 
-        function downloadGeneratedImage(imageSrc) {
+        function addWatermark(imageSrc) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Watermark bar at the bottom
+                    const barHeight = Math.max(28, Math.round(img.height * 0.035));
+                    const fontSize = Math.max(11, Math.round(barHeight * 0.45));
+                    
+                    // Semi-transparent dark bar
+                    ctx.fillStyle = 'rgba(15, 20, 25, 0.75)';
+                    ctx.fillRect(0, img.height - barHeight, img.width, barHeight);
+                    
+                    // Watermark text
+                    ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+                    ctx.fillStyle = 'rgba(218, 165, 32, 0.9)';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('Created with OffGrid AI Image Studio \u2022 offgridtoolkit.ai', img.width / 2, img.height - barHeight / 2);
+                    
+                    resolve(canvas.toDataURL('image/png'));
+                };
+                img.onerror = () => resolve(imageSrc); // fallback to original
+                img.src = imageSrc;
+            });
+        }
+
+        async function downloadGeneratedImage(imageSrc) {
+            // Add watermark before downloading
+            const watermarked = await addWatermark(imageSrc);
             const a = document.createElement('a');
-            a.href = imageSrc;
-            // Generate descriptive filename from the prompt or conversation context
+            a.href = watermarked;
             const slug = getTopicSlug();
             const ts = getTimestamp();
             a.download = `offgrid-image-${slug}-${ts}.png`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+        }
+
+        async function shareGeneratedImage(imageSrc, promptText) {
+            try {
+                // Add watermark before sharing
+                const watermarked = await addWatermark(imageSrc);
+                
+                // Convert data URL to blob for sharing
+                const response = await fetch(watermarked);
+                const blob = await response.blob();
+                const slug = getTopicSlug();
+                const ts = getTimestamp();
+                const fileName = `offgrid-image-${slug}-${ts}.png`;
+                const file = new File([blob], fileName, { type: 'image/png' });
+                
+                const shareText = 'Created with OffGrid AI Image Studio';
+                const shareHashtags = '#OffGridAI #AIArt #ImageStudio';
+                const shareUrl = 'https://offgridtoolkit.ai';
+                
+                // Try Web Share API first (works great on mobile)
+                if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'OffGrid AI Image Studio Creation',
+                        text: `${shareText} ${shareHashtags}`,
+                        url: shareUrl,
+                        files: [file]
+                    });
+                    return;
+                }
+                
+                // Fallback: show share options modal
+                const shareModal = document.createElement('div');
+                shareModal.className = 'image-studio-overlay';
+                shareModal.style.zIndex = '10001';
+                shareModal.innerHTML = `
+                    <div style="background: var(--bg-surface); border: 1px solid var(--border-emphasis); border-radius: 12px; padding: 24px; max-width: 340px; width: 90%; text-align: center;">
+                        <h4 style="color: var(--text-primary); margin: 0 0 16px 0; font-size: 16px;">Share Your Creation</h4>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button onclick="window.open('https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + ' ' + shareHashtags + ' ' + shareUrl)}', '_blank'); this.closest('.image-studio-overlay').remove()" style="padding: 12px; border: none; border-radius: 8px; background: #1da1f2; color: white; font-weight: 600; font-size: 14px; cursor: pointer;">Post on X (Twitter)</button>
+                            <button onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}', '_blank'); this.closest('.image-studio-overlay').remove()" style="padding: 12px; border: none; border-radius: 8px; background: #1877f2; color: white; font-weight: 600; font-size: 14px; cursor: pointer;">Share on Facebook</button>
+                            <button onclick="navigator.clipboard.writeText('${shareText} ${shareHashtags} ${shareUrl}').then(() => { this.textContent = 'Copied!'; setTimeout(() => this.closest('.image-studio-overlay').remove(), 1000); })" style="padding: 12px; border: none; border-radius: 8px; background: var(--bg-elevated); color: var(--text-primary); font-weight: 600; font-size: 14px; cursor: pointer; border: 1px solid var(--border-subtle);">Copy Share Text</button>
+                            <button onclick="this.closest('.image-studio-overlay').remove()" style="padding: 10px; border: none; background: none; color: var(--text-secondary); font-size: 13px; cursor: pointer;">Cancel</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(shareModal);
+                shareModal.addEventListener('click', (e) => { if (e.target === shareModal) shareModal.remove(); });
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    console.error('Share failed:', err);
+                    alert('Sharing failed. Try downloading the image and sharing manually.');
+                }
+            }
         }
 
         async function insertImageToChat(imageSrc, promptText) {
@@ -8831,13 +8943,16 @@
             // Image-specific options
             if (imgSrc) {
                 items.push({ icon: '🖼️', label: 'Open Image', action: () => window.open(imgSrc, '_blank') });
-                items.push({ icon: '💾', label: 'Download Image', action: () => {
+                items.push({ icon: '💾', label: 'Download Image', action: async () => {
+                    const watermarked = await addWatermark(imgSrc);
                     const a = document.createElement('a');
-                    a.href = imgSrc;
+                    a.href = watermarked;
                     const slug = getTopicSlug();
                     const ts = getTimestamp();
                     a.download = `offgrid-image-${slug}-${ts}.png`;
+                    document.body.appendChild(a);
                     a.click();
+                    document.body.removeChild(a);
                 }});
                 items.push({ divider: true });
             }
@@ -9475,10 +9590,10 @@
         function enhanceImagePromptForMobile(prompt) {
             if (!isMobile()) return prompt;
             // Only add if user hasn't specified orientation
-            const orientationWords = ['landscape', 'portrait', 'horizontal', 'vertical', 'wide', 'tall', '16:9', '9:16', '4:3', '3:4'];
+            const orientationWords = ['landscape', 'portrait', 'horizontal', 'vertical', 'wide', 'tall', '16:9', '9:16', '4:3', '3:4', 'wallpaper', 'banner'];
             const hasOrientation = orientationWords.some(w => prompt.toLowerCase().includes(w));
             if (!hasOrientation) {
-                return prompt + ', vertical portrait orientation suitable for mobile phone wallpaper';
+                return prompt + '. Create this in vertical portrait orientation (9:16 aspect ratio), optimized for mobile phone viewing';
             }
             return prompt;
         }
