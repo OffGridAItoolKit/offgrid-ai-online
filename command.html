@@ -8118,7 +8118,10 @@
 
             try {
                 // Enhance prompt for mobile-friendly output
-                const finalPrompt = (typeof enhanceImagePromptForMobile === 'function') ? enhanceImagePromptForMobile(prompt) : prompt;
+                let finalPrompt = (typeof enhanceImagePromptForMobile === 'function') ? enhanceImagePromptForMobile(prompt) : prompt;
+                
+                // Add watermark/branding instruction to the prompt
+                finalPrompt += '. Include a small, subtle watermark or credit line at the bottom of the image that reads "OffGrid AI Image Studio - offgridaitoolkit.com" in a clean, professional font that complements the image style';
 
                 const response = await fetch(`${API_BASE}/api/command/generate-image`, {
                     method: 'POST',
@@ -8229,7 +8232,7 @@
                     ctx.fillStyle = 'rgba(218, 165, 32, 0.9)';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('Created with OffGrid AI Image Studio \u2022 offgridtoolkit.ai', img.width / 2, img.height - barHeight / 2);
+                    ctx.fillText('Created with OffGrid AI Image Studio \u2022 offgridaitoolkit.com', img.width / 2, img.height - barHeight / 2);
                     
                     resolve(canvas.toDataURL('image/png'));
                 };
@@ -8266,7 +8269,7 @@
                 
                 const shareText = 'Created with OffGrid AI Image Studio';
                 const shareHashtags = '#OffGridAI #AIArt #ImageStudio';
-                const shareUrl = 'https://offgridtoolkit.ai';
+                const shareUrl = 'https://offgridaitoolkit.com';
                 
                 // Try Web Share API first (works great on mobile)
                 if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -8827,7 +8830,7 @@
             // Clean markdown for sharing
             const cleanText = text.replace(/[#*_`~]/g, '').replace(/\n{3,}/g, '\n\n').trim();
             // Share full text with branded footer, no URL (the URL requires a license key so it's useless to recipients)
-            const shareText = cleanText + '\n\n---\nPowered by OffGrid Command Center | offgridtoolkit.ai';
+            const shareText = cleanText + '\n\n---\nPowered by OffGrid Command Center | offgridaitoolkit.com';
             const shareData = {
                 title: 'OffGrid Command Center',
                 text: shareText
@@ -9416,7 +9419,7 @@
                 }
             });
 
-            md += `\n*Exported from OffGrid Command Center | offgridtoolkit.ai*\n`;
+            md += `\n*Exported from OffGrid Command Center | offgridaitoolkit.com*\n`;
             md += `*Privacy first. No conversations stored.*\n`;
 
             // Create and download file
