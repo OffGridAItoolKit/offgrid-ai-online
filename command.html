@@ -1609,6 +1609,96 @@
             color: var(--text-secondary);
         }
 
+        /* Photo chooser bottom sheet */
+        .photo-chooser-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0);
+            z-index: 10000;
+            transition: background 0.3s ease;
+        }
+        .photo-chooser-overlay.active {
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .photo-chooser-panel {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--bg-secondary, #1e293b);
+            border-radius: 20px 20px 0 0;
+            padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+            z-index: 10001;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+        }
+        .photo-chooser-panel.active {
+            transform: translateY(0);
+        }
+        .photo-chooser-handle {
+            width: 36px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+        .photo-chooser-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary, #f1f5f9);
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .photo-chooser-option {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 16px;
+            background: var(--bg-tertiary, #0f172a);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .photo-chooser-option:active {
+            transform: scale(0.98);
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--accent-gold, #d4af37);
+        }
+        .photo-chooser-icon {
+            font-size: 28px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+        .photo-chooser-label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary, #f1f5f9);
+        }
+        .photo-chooser-desc {
+            font-size: 12px;
+            color: var(--text-secondary, #94a3b8);
+            margin-top: 2px;
+        }
+        .photo-chooser-cancel {
+            text-align: center;
+            padding: 14px;
+            margin-top: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary, #94a3b8);
+            cursor: pointer;
+            border-radius: 14px;
+            transition: background 0.2s;
+        }
+        .photo-chooser-cancel:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
         /* Voice recording indicator */
         .command-theme .voice-recording {
             display: none;
@@ -5983,12 +6073,71 @@
         }
 
         function triggerCameraOrGallery() {
-            // Uses galleryInput (no capture attribute) which on mobile presents
-            // the native "Camera or Gallery" chooser dialog
-            const input = document.getElementById('galleryInput');
-            input.value = '';
-            input.onchange = handleImageSelect;
-            input.click();
+            // Show a custom bottom sheet chooser for Camera vs Gallery
+            // Samsung One UI bypasses the native chooser, so we need our own
+            const existing = document.getElementById('photoChooserSheet');
+            if (existing) existing.remove();
+
+            const sheet = document.createElement('div');
+            sheet.id = 'photoChooserSheet';
+            sheet.innerHTML = `
+                <div class="photo-chooser-overlay" onclick="closePhotoChooser()"></div>
+                <div class="photo-chooser-panel">
+                    <div class="photo-chooser-handle"></div>
+                    <div class="photo-chooser-title">Add Image</div>
+                    <div class="photo-chooser-option" onclick="chooseCamera()">
+                        <span class="photo-chooser-icon">📷</span>
+                        <div>
+                            <div class="photo-chooser-label">Take Photo</div>
+                            <div class="photo-chooser-desc">Use your camera</div>
+                        </div>
+                    </div>
+                    <div class="photo-chooser-option" onclick="chooseGallery()">
+                        <span class="photo-chooser-icon">🖼️</span>
+                        <div>
+                            <div class="photo-chooser-label">Choose from Gallery</div>
+                            <div class="photo-chooser-desc">Pick an existing photo</div>
+                        </div>
+                    </div>
+                    <div class="photo-chooser-cancel" onclick="closePhotoChooser()">Cancel</div>
+                </div>
+            `;
+            document.body.appendChild(sheet);
+            // Animate in
+            requestAnimationFrame(() => {
+                sheet.querySelector('.photo-chooser-overlay').classList.add('active');
+                sheet.querySelector('.photo-chooser-panel').classList.add('active');
+            });
+        }
+
+        function closePhotoChooser() {
+            const sheet = document.getElementById('photoChooserSheet');
+            if (!sheet) return;
+            const overlay = sheet.querySelector('.photo-chooser-overlay');
+            const panel = sheet.querySelector('.photo-chooser-panel');
+            if (overlay) overlay.classList.remove('active');
+            if (panel) panel.classList.remove('active');
+            setTimeout(() => sheet.remove(), 300);
+        }
+
+        function chooseCamera() {
+            closePhotoChooser();
+            setTimeout(() => {
+                const input = document.getElementById('imageInput');
+                input.value = '';
+                input.onchange = handleImageSelect;
+                input.click();
+            }, 100);
+        }
+
+        function chooseGallery() {
+            closePhotoChooser();
+            setTimeout(() => {
+                const input = document.getElementById('galleryInput');
+                input.value = '';
+                input.onchange = handleImageSelect;
+                input.click();
+            }, 100);
         }
 
         function handleImageSelect(event) {
@@ -6711,6 +6860,65 @@
             });
 
             return frontmatter + content;
+        }
+
+        // PWA Install Prompt
+        let deferredInstallPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+        });
+
+        function promptAddToHomeScreen() {
+            // Check if already installed as PWA
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                showToast('Already installed! OffGrid Command Center is on your home screen.', 'success');
+                return;
+            }
+
+            // Android Chrome: use the deferred prompt
+            if (deferredInstallPrompt) {
+                deferredInstallPrompt.prompt();
+                deferredInstallPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('Command Center added to your home screen!', 'success');
+                    }
+                    deferredInstallPrompt = null;
+                });
+                return;
+            }
+
+            // iOS Safari: show instructions
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isIOS) {
+                const modal = document.createElement('div');
+                modal.id = 'pwaInstallGuide';
+                modal.innerHTML = `
+                    <div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px" onclick="this.parentElement.remove()">
+                        <div style="background:var(--bg-secondary,#1e293b);border-radius:16px;padding:24px;max-width:320px;width:100%;text-align:center" onclick="event.stopPropagation()">
+                            <div style="font-size:40px;margin-bottom:12px">🧭</div>
+                            <div style="font-size:18px;font-weight:700;color:var(--text-primary,#f1f5f9);margin-bottom:8px">Add to Home Screen</div>
+                            <div style="font-size:14px;color:var(--text-secondary,#94a3b8);line-height:1.6;margin-bottom:16px">
+                                <div style="margin-bottom:12px">To install OffGrid Command Center:</div>
+                                <div style="text-align:left;padding:0 8px">
+                                    <div style="margin-bottom:8px"><strong>1.</strong> Tap the <strong>Share</strong> button <span style="font-size:18px">⬆️</span> at the bottom of Safari</div>
+                                    <div style="margin-bottom:8px"><strong>2.</strong> Scroll down and tap <strong>"Add to Home Screen"</strong></div>
+                                    <div><strong>3.</strong> Tap <strong>"Add"</strong> to confirm</div>
+                                </div>
+                            </div>
+                            <div style="padding:12px;background:rgba(212,175,55,0.1);border-radius:10px;border:1px solid rgba(212,175,55,0.2);font-size:12px;color:var(--accent-gold,#d4af37);margin-bottom:16px">
+                                ⭐ Opens as a full-screen app with its own icon!
+                            </div>
+                            <button onclick="this.closest('#pwaInstallGuide').remove()" style="background:var(--accent-gold,#d4af37);color:#000;border:none;padding:12px 32px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">Got it!</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                return;
+            }
+
+            // Fallback for other browsers
+            showToast('Open your browser menu and look for "Add to Home Screen" or "Install App"', 'info', 5000);
         }
 
         // Generate a short descriptive slug from the first user message in the conversation
@@ -8929,8 +9137,8 @@
                 copyToClipboardReliable(msgText);
             }});
 
-            items.push({ icon: '📝', label: 'Copy as Markdown', action: () => {
-                copyToClipboardReliable(rawMarkdown);
+            items.push({ icon: '🧭', label: 'Add to Home Screen', action: () => {
+                promptAddToHomeScreen();
             }});
 
             items.push({ icon: '📤', label: 'Share', action: () => shareResponse(msgText) });
