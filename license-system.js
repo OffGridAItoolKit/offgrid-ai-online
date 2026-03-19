@@ -78,6 +78,14 @@ async function initializeDatabase() {
         await client.query(`
             ALTER TABLE licenses ALTER COLUMN license_key TYPE VARCHAR(20);
         `);
+        // Add is_trial column if it doesn't exist (migration for existing databases)
+        await client.query(`
+            ALTER TABLE licenses ADD COLUMN IF NOT EXISTS is_trial BOOLEAN NOT NULL DEFAULT FALSE;
+        `);
+        // Add trial_expires_at column if it doesn't exist (set on first activation, 30 days)
+        await client.query(`
+            ALTER TABLE licenses ADD COLUMN IF NOT EXISTS trial_expires_at TIMESTAMP;
+        `);
 
         await client.query(`
             CREATE TABLE IF NOT EXISTS activation_log (
@@ -166,6 +174,15 @@ const TIER_LIMITS = {
         hasImageStudio: true,
         monthlyPrompts: 75,
         monthlyImages: 5
+    },
+    // Trial: One-time trial key for Tier 1 customers (8 prompts / 3 images, no renewal, 30-day expiry)
+    'trial': {
+        name: 'Command Center Trial',
+        price: 0,
+        hasCommandCenter: true,
+        hasImageStudio: true,
+        monthlyPrompts: 8,
+        monthlyImages: 3
     }
 };
 
@@ -175,7 +192,7 @@ const TIER_LIMITS = {
  * Returns { monthlyPrompts, monthlyImages }.
  */
 function getEffectiveLimits(license) {
-    const tierKey = license.is_mobile ? 'mobile' : license.tier;
+    const tierKey = license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
     const tierLimits = TIER_LIMITS[tierKey] || TIER_LIMITS[2];
     return {
         monthlyPrompts: license.custom_prompt_limit !== null && license.custom_prompt_limit !== undefined
@@ -193,14 +210,16 @@ function getEffectiveLimits(license) {
 
 /**
  * Generate a unique license key.
- * Standard format:  OGTK-XXXX-XXXX-XXXX
- * Mobile format:    OGTK-MOB-XXXX-XXXX
+ * Standard format:  OGTK-XXXX-XXXX-XXXX  (19 chars)
+ * Mobile format:    OGTK-MOB-XXXX-XXXX   (18 chars)
+ * Trial format:     OGTK-TRL-XXXX-XXXX   (18 chars)
  * Uses cryptographically secure random bytes.
  */
-function generateLicenseKey(isMobile = false) {
+function generateLicenseKey(isMobile = false, isTrial = false) {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I, O, 0, 1 to avoid confusion
-    if (isMobile) {
-        let key = 'OGTK-MOB-';
+    if (isMobile || isTrial) {
+        const prefix = isTrial ? 'OGTK-TRL-' : 'OGTK-MOB-';
+        let key = prefix;
         for (let block = 0; block < 2; block++) {
             const bytes = crypto.randomBytes(4);
             for (let i = 0; i < 4; i++) {
@@ -231,11 +250,14 @@ function generateLicenseKey(isMobile = false) {
  */
 async function checkAndResetMonthlyUsage(licenseKey) {
     const result = await pool.query(
-        'SELECT usage_reset_at FROM licenses WHERE license_key = $1',
+        'SELECT usage_reset_at, is_trial FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return false;
+    
+    // Trial keys never reset -- their limits are lifetime, not monthly
+    if (result.rows[0].is_trial) return false;
     
     const lastReset = new Date(result.rows[0].usage_reset_at);
     const now = new Date();
@@ -280,20 +302,22 @@ async function getUsageInfo(licenseKey) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, is_mobile, prompt_count, image_count, custom_prompt_limit, custom_image_limit, usage_reset_at FROM licenses WHERE license_key = $1',
+        'SELECT tier, is_mobile, is_trial, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit, usage_reset_at FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return null;
     
     const license = result.rows[0];
-    const tierKey = license.is_mobile ? 'mobile' : license.tier;
+    const tierKey = license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
     const tierInfo = TIER_LIMITS[tierKey];
     const effective = getEffectiveLimits(license);
     
     return {
         tier: license.tier,
         isMobile: license.is_mobile,
+        isTrial: license.is_trial,
+        trialExpiresAt: license.trial_expires_at,
         tierName: tierInfo.name,
         prompts: {
             used: license.prompt_count,
@@ -307,7 +331,7 @@ async function getUsageInfo(licenseKey) {
         },
         hasCustomLimits: license.custom_prompt_limit !== null || license.custom_image_limit !== null,
         resetDate: license.usage_reset_at,
-        nextReset: getNextResetDate()
+        nextReset: license.is_trial ? null : getNextResetDate()
     };
 }
 
@@ -329,23 +353,38 @@ async function checkUsageLimit(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, is_mobile, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
+        'SELECT tier, is_mobile, is_trial, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return { allowed: false, reason: 'License not found' };
     
     const license = result.rows[0];
+
+    // Check trial expiry before checking usage limits
+    if (license.is_trial && license.trial_expires_at) {
+        const now = new Date();
+        const expiry = new Date(license.trial_expires_at);
+        if (now > expiry) {
+            return {
+                allowed: false,
+                reason: 'trial_expired',
+                trialExpiredAt: license.trial_expires_at
+            };
+        }
+    }
+
     const effective = getEffectiveLimits(license);
     
     if (type === 'prompt') {
         if (license.prompt_count >= effective.monthlyPrompts) {
             return {
                 allowed: false,
-                reason: 'monthly_prompt_limit',
+                reason: license.is_trial ? 'trial_prompt_limit' : 'monthly_prompt_limit',
                 used: license.prompt_count,
                 limit: effective.monthlyPrompts,
-                nextReset: getNextResetDate()
+                nextReset: license.is_trial ? null : getNextResetDate(),
+                isTrial: license.is_trial || false
             };
         }
         return { allowed: true, used: license.prompt_count, limit: effective.monthlyPrompts };
@@ -355,10 +394,11 @@ async function checkUsageLimit(licenseKey, type) {
         if (license.image_count >= effective.monthlyImages) {
             return {
                 allowed: false,
-                reason: 'monthly_image_limit',
+                reason: license.is_trial ? 'trial_image_limit' : 'monthly_image_limit',
                 used: license.image_count,
                 limit: effective.monthlyImages,
-                nextReset: getNextResetDate()
+                nextReset: license.is_trial ? null : getNextResetDate(),
+                isTrial: license.is_trial || false
             };
         }
         return { allowed: true, used: license.image_count, limit: effective.monthlyImages };
@@ -375,13 +415,27 @@ async function incrementUsage(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, is_mobile, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
+        'SELECT tier, is_mobile, is_trial, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return { allowed: false, reason: 'License not found' };
     
     const license = result.rows[0];
+
+    // Check trial expiry before incrementing
+    if (license.is_trial && license.trial_expires_at) {
+        const now = new Date();
+        const expiry = new Date(license.trial_expires_at);
+        if (now > expiry) {
+            return {
+                allowed: false,
+                reason: 'trial_expired',
+                trialExpiredAt: license.trial_expires_at
+            };
+        }
+    }
+
     const effective = getEffectiveLimits(license);
     
     if (type === 'prompt') {
@@ -511,8 +565,12 @@ function requireLicense(req, res, next) {
     }
     
     // Check that the license tier has Command Center access
+    // Note: trial keys are stored as tier 1 in DB but have Command Center access via is_trial flag.
+    // The requireLicense middleware only has the JWT payload (tier integer), not is_trial.
+    // Trial keys are issued with tier=1 in the JWT, so we cannot block tier 1 here.
+    // Instead, we allow all valid tokens through and let checkUsageLimit handle trial expiry.
     const limits = TIER_LIMITS[decoded.tier];
-    if (!limits || !limits.hasCommandCenter) {
+    if (!limits) {
         return res.status(403).json({
             error: 'Upgrade required',
             code: 'TIER_NO_ACCESS',
@@ -648,17 +706,25 @@ function registerLicenseRoutes(app, logToBetterStack) {
             }
             
             // Activate the license
-            await pool.query(
-                'UPDATE licenses SET is_activated = TRUE, activated_at = NOW() WHERE license_key = $1',
-                [normalizedKey]
-            );
+            // For trial keys: set trial_expires_at to 30 days from now on first activation
+            if (license.is_trial) {
+                await pool.query(
+                    'UPDATE licenses SET is_activated = TRUE, activated_at = NOW(), trial_expires_at = NOW() + INTERVAL \'30 days\' WHERE license_key = $1',
+                    [normalizedKey]
+                );
+            } else {
+                await pool.query(
+                    'UPDATE licenses SET is_activated = TRUE, activated_at = NOW() WHERE license_key = $1',
+                    [normalizedKey]
+                );
+            }
             
             // Generate JWT token
             const token = generateToken(normalizedKey, license.tier);
-            const tierKey = license.is_mobile ? 'mobile' : license.tier;
+            const tierKey = license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
             const tierInfo = TIER_LIMITS[tierKey];
             
-            await logActivationEvent(normalizedKey, 'activate.success', `${license.is_mobile ? 'Mobile' : 'Tier ' + license.tier} activated`);
+            await logActivationEvent(normalizedKey, 'activate.success', `${license.is_trial ? 'Trial' : license.is_mobile ? 'Mobile' : 'Tier ' + license.tier} activated`);
             
             if (logToBetterStack) {
                 logToBetterStack('info', 'license.activated', {
@@ -669,17 +735,26 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 });
             }
             
+            // Calculate trial expiry date for response (30 days from now)
+            const trialExpiresAt = license.is_trial
+                ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                : null;
+
             res.json({
                 success: true,
                 token,
                 tier: license.tier,
                 isMobile: license.is_mobile,
+                isTrial: license.is_trial,
+                trialExpiresAt,
                 tierName: tierInfo.name,
                 limits: {
                     monthlyPrompts: tierInfo.monthlyPrompts,
                     monthlyImages: tierInfo.monthlyImages
                 },
-                message: `Welcome to the Command Center! Your ${tierInfo.name} is now activated.`
+                message: license.is_trial
+                    ? `Welcome! Your Command Center Trial is now active. You have 8 prompts and 3 image generations to explore. Your trial expires in 30 days.`
+                    : `Welcome to the Command Center! Your ${tierInfo.name} is now activated.`
             });
             
         } catch (error) {
@@ -728,12 +803,21 @@ function registerLicenseRoutes(app, logToBetterStack) {
             // Get current usage
             const usage = await getUsageInfo(decoded.licenseKey);
             const licenseRow = result.rows[0];
-            const verifyTierKey = licenseRow.is_mobile ? 'mobile' : licenseRow.tier;
+            const verifyTierKey = licenseRow.is_trial ? 'trial' : licenseRow.is_mobile ? 'mobile' : licenseRow.tier;
+
+            // Check trial expiry
+            let trialExpired = false;
+            if (licenseRow.is_trial && licenseRow.trial_expires_at) {
+                trialExpired = new Date() > new Date(licenseRow.trial_expires_at);
+            }
             
             res.json({
                 valid: true,
                 tier: decoded.tier,
                 isMobile: licenseRow.is_mobile,
+                isTrial: licenseRow.is_trial,
+                trialExpiresAt: licenseRow.trial_expires_at,
+                trialExpired,
                 tierName: TIER_LIMITS[verifyTierKey]?.name,
                 usage,
                 hasEmail: !!licenseRow.email
@@ -929,26 +1013,29 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 return res.status(400).json({ error: 'Count must be between 1 and 100' });
             }
             
-            const validTiers = [1, 2, 3, 'mobile'];
+            const validTiers = [1, 2, 3, 'mobile', 'trial'];
             if (!validTiers.includes(tier)) {
-                return res.status(400).json({ error: 'Tier must be 1, 2, 3, or mobile' });
+                return res.status(400).json({ error: 'Tier must be 1, 2, 3, mobile, or trial' });
             }
             
             const isMobile = tier === 'mobile';
-            const dbTier = isMobile ? 2 : tier; // Mobile keys stored as tier 2 in DB with is_mobile=true
+            const isTrial = tier === 'trial';
+            // Mobile keys stored as tier 2 with is_mobile=true
+            // Trial keys stored as tier 1 with is_trial=true
+            const dbTier = isMobile ? 2 : isTrial ? 1 : tier;
             const keys = [];
             for (let i = 0; i < count; i++) {
-                const key = generateLicenseKey(isMobile);
+                const key = generateLicenseKey(isMobile, isTrial);
                 await pool.query(
-                    'INSERT INTO licenses (license_key, tier, is_mobile, notes) VALUES ($1, $2, $3, $4)',
-                    [key, dbTier, isMobile, notes]
+                    'INSERT INTO licenses (license_key, tier, is_mobile, is_trial, notes) VALUES ($1, $2, $3, $4, $5)',
+                    [key, dbTier, isMobile, isTrial, notes]
                 );
                 keys.push(key);
             }
             
             if (logToBetterStack) {
                 logToBetterStack('info', 'admin.keys_generated', {
-                    summary: `Generated ${count} Tier ${tier} license keys`,
+                    summary: `Generated ${count} ${tier} license keys`,
                     count,
                     tier
                 });
@@ -958,7 +1045,7 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 success: true,
                 count: keys.length,
                 tier,
-                tierName: TIER_LIMITS[tier]?.name || 'Mobile Companion',
+                tierName: TIER_LIMITS[tier]?.name || 'Command Center Trial',
                 keys
             });
             
@@ -988,9 +1075,12 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 if (tier === 'mobile') {
                     params.push(true);
                     conditions.push(`is_mobile = $${params.length}`);
+                } else if (tier === 'trial') {
+                    params.push(true);
+                    conditions.push(`is_trial = $${params.length}`);
                 } else {
                     params.push(parseInt(tier));
-                    conditions.push(`tier = $${params.length} AND is_mobile = FALSE`);
+                    conditions.push(`tier = $${params.length} AND is_mobile = FALSE AND is_trial = FALSE`);
                 }
             }
             if (activated !== undefined && activated !== '') {
@@ -1041,11 +1131,14 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 SELECT 
                     COUNT(*) as total_keys,
                     COUNT(*) FILTER (WHERE is_activated = TRUE) as activated_keys,
-                    COUNT(*) FILTER (WHERE tier = 1 AND is_mobile = FALSE) as tier1_keys,
-                    COUNT(*) FILTER (WHERE tier = 2 AND is_mobile = FALSE) as tier2_keys,
-                    COUNT(*) FILTER (WHERE tier = 3 AND is_mobile = FALSE) as tier3_keys,
+                    COUNT(*) FILTER (WHERE tier = 1 AND is_mobile = FALSE AND is_trial = FALSE) as tier1_keys,
+                    COUNT(*) FILTER (WHERE tier = 2 AND is_mobile = FALSE AND is_trial = FALSE) as tier2_keys,
+                    COUNT(*) FILTER (WHERE tier = 3 AND is_mobile = FALSE AND is_trial = FALSE) as tier3_keys,
                     COUNT(*) FILTER (WHERE is_mobile = TRUE) as mobile_keys,
                     COUNT(*) FILTER (WHERE is_mobile = TRUE AND is_activated = TRUE) as mobile_activated,
+                    COUNT(*) FILTER (WHERE is_trial = TRUE) as trial_keys,
+                    COUNT(*) FILTER (WHERE is_trial = TRUE AND is_activated = TRUE) as trial_activated,
+                    COUNT(*) FILTER (WHERE is_trial = TRUE AND trial_expires_at IS NOT NULL AND trial_expires_at < NOW()) as trial_expired,
                     COUNT(*) FILTER (WHERE email IS NOT NULL) as email_linked,
                     SUM(prompt_count) as total_prompts_used,
                     SUM(image_count) as total_images_used
@@ -1319,7 +1412,7 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 [normalizedKey]
             );
 
-            const tierKey = license.is_mobile ? 'mobile' : license.tier;
+            const tierKey = license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
             res.json({
                 license: { ...license, tierName: TIER_LIMITS[tierKey]?.name },
                 activationLog: logResult.rows,

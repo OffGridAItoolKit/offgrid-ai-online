@@ -5054,6 +5054,14 @@
                             parts.push(afterMob.slice(i, i + 4));
                         }
                         formatted = parts.join('-');
+                    } else if (rest.startsWith('TRL')) {
+                        // Trial key: OGTK-TRL-XXXX-XXXX
+                        const afterTrl = rest.slice(3);
+                        let parts = ['OGTK', 'TRL'];
+                        for (let i = 0; i < afterTrl.length && parts.length < 4; i += 4) {
+                            parts.push(afterTrl.slice(i, i + 4));
+                        }
+                        formatted = parts.join('-');
                     } else {
                         // Standard key: OGTK-XXXX-XXXX-XXXX
                         let parts = ['OGTK'];
@@ -5604,7 +5612,11 @@
 
             } catch (error) {
                 console.error('Stream error:', error);
-                streamingContent.innerHTML = `<span style="color: #ef4444;">Error: ${error.message}</span>`;
+                if (error.message && (error.message.includes('trial') || error.message.includes('Trial') || error.message.includes('expired') || error.message.includes('30-day'))) {
+                    streamingContent.innerHTML = buildTrialExpiredMessage();
+                } else {
+                    streamingContent.innerHTML = `<span style="color: #ef4444;">Error: ${error.message}</span>`;
+                }
             } finally {
                 streamingContent.removeAttribute('id');
                 isTyping = false;
@@ -5985,7 +5997,11 @@
                 if (document.getElementById('councilProgress')) {
                     document.getElementById('councilProgress').remove();
                 }
-                addMessage('Error: ' + error.message, 'assistant', true);
+                if (error.message && (error.message.includes('trial') || error.message.includes('Trial') || error.message.includes('expired') || error.message.includes('30-day'))) {
+                    addMessage(buildTrialExpiredMessage(), 'assistant', false);
+                } else {
+                    addMessage('Error: ' + error.message, 'assistant', true);
+                }
             } finally {
                 isTyping = false;
                 document.getElementById('sendButton').disabled = false;
@@ -5996,6 +6012,19 @@
         // ============================================
         // MESSAGE DISPLAY
         // ============================================
+
+        function buildTrialExpiredMessage() {
+            return `<div style="background: linear-gradient(135deg, rgba(212,160,23,0.12), rgba(212,160,23,0.04)); border: 1px solid rgba(212,160,23,0.35); border-left: 3px solid #d4a017; border-radius: 8px; padding: 16px 18px; line-height: 1.65;">
+                <div style="font-size: 15px; font-weight: 600; color: #d4a017; margin-bottom: 8px;">&#8987; Your Command Center Trial Has Ended</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">We hope you got a feel for what the OffGrid AI Command Center can do. Your trial key has reached its limit or 30-day window.</div>
+                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 14px;">As an OffGrid AI ToolKit owner, you can upgrade to the full Command Center and keep everything you already have &mdash; your USB drive, your offline models, and now the full online layer on top.</div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="https://offgridtoolkit.ai" target="_blank" style="display: inline-block; background: #d4a017; color: #1a1a1a; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 6px; text-decoration: none;">Upgrade to Full Access</a>
+                    <a href="mailto:support@offgridaitoolkit.com" style="display: inline-block; background: transparent; color: #d4a017; font-weight: 600; font-size: 13px; padding: 8px 16px; border-radius: 6px; text-decoration: none; border: 1px solid rgba(212,160,23,0.4);">Email Support for More Time</a>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 12px;">Need more time to decide? Email <a href="mailto:support@offgridaitoolkit.com" style="color: #d4a017;">support@offgridaitoolkit.com</a> and we will reset your trial key &mdash; no questions asked.</div>
+            </div>`;
+        }
 
         function addMessage(text, sender, isError = false) {
             const messagesDiv = document.getElementById('messages');

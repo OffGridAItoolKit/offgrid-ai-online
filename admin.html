@@ -1195,6 +1195,11 @@
                         <div class="stat-value" id="ds-mobile" style="color:#6c8ebf;">--</div>
                         <div class="stat-sub" id="ds-mobile-sub">Companion keys issued</div>
                     </div>
+                    <div class="stat-card" style="border-color:#d4a017;">
+                        <div class="stat-label">Trial Keys</div>
+                        <div class="stat-value" id="ds-trial" style="color:#d4a017;">--</div>
+                        <div class="stat-sub" id="ds-trial-sub">Issued to Tier 1 customers</div>
+                    </div>
                     <div class="stat-card">
                         <div class="stat-label">Prompts Used</div>
                         <div class="stat-value" id="ds-prompts">--</div>
@@ -1299,6 +1304,7 @@
                                 <option value="3">Tier 3 - Command Center Pro ($469)</option>
                                 <option value="1">Tier 1 - ToolKit Only ($129)</option>
                                 <option value="mobile">Mobile Companion - Bonus Key (75 prompts / 5 images)</option>
+                                <option value="trial">Command Center Trial - Tier 1 Customers (8 prompts / 3 images, 30-day expiry)</option>
                             </select>
                         </div>
                     </div>
@@ -1368,6 +1374,14 @@
                                     <td>75</td>
                                     <td>5</td>
                                     <td style="color:var(--success)">Yes</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge" style="background:#d4a017;color:#fff;">Trial</span></td>
+                                    <td>Command Center Trial (Tier 1 bonus)</td>
+                                    <td>Free</td>
+                                    <td>8</td>
+                                    <td>3</td>
+                                    <td style="color:var(--success)">Yes — 30-day expiry, no renewal</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1470,8 +1484,9 @@
                             <option value="1">Tier 1</option>
                             <option value="2">Tier 2</option>
                             <option value="3">Tier 3</option>
-                            <option value="mobile">Mobile</option>
-                        </select>
+                             <option value="mobile">Mobile</option>
+                             <option value="trial">Trial</option>
+                         </select>
                     </div>
                     <div class="form-group">
                         <label>Status</label>
@@ -2153,6 +2168,11 @@ async function loadStats() {
         const mobileActivated = parseInt(data.mobile_activated || 0);
         document.getElementById('ds-mobile').textContent = mobileKeys;
         document.getElementById('ds-mobile-sub').textContent = `${mobileActivated} activated`;
+        const trialKeys = parseInt(data.trial_keys || 0);
+        const trialActivated = parseInt(data.trial_activated || 0);
+        const trialExpired = parseInt(data.trial_expired || 0);
+        document.getElementById('ds-trial').textContent = trialKeys;
+        document.getElementById('ds-trial-sub').textContent = `${trialActivated} activated${trialExpired > 0 ? ', ' + trialExpired + ' expired' : ''}`;
         document.getElementById('ds-prompts').textContent = data.total_prompts_used;
         document.getElementById('ds-images').textContent = data.total_images_used;
         document.getElementById('ds-email').textContent = data.email_linked;
@@ -2317,6 +2337,8 @@ async function generateKeys() {
         const body = { count };
         if (tierRaw === 'mobile') {
             body.tier = 'mobile'; // send the string 'mobile' so backend sets is_mobile=true and OGTK-MOB prefix
+        } else if (tierRaw === 'trial') {
+            body.tier = 'trial'; // send the string 'trial' so backend sets is_trial=true and OGTK-TRL prefix
         } else {
             body.tier = parseInt(tierRaw);
         }
@@ -2376,12 +2398,13 @@ async function lookupKey() {
 
 function renderLookupResult(l) {
     const grid = document.getElementById('lookup-grid');
-    const isMobile = l.is_mobile || false;
-    const tierLimit = isMobile ? { p: 75, i: 5 } : l.tier === 2 ? { p: 150, i: 10 } : l.tier === 3 ? { p: 400, i: 30 } : { p: 0, i: 0 };
-    const effectivePrompts = l.custom_prompt_limit !== null ? l.custom_prompt_limit : tierLimit.p;
-    const effectiveImages = l.custom_image_limit !== null ? l.custom_image_limit : tierLimit.i;
-    const tierDisplay = isMobile ? 'mobile' : l.tier;
-    const tierNameDisplay = isMobile ? 'Mobile Companion' : (l.tierName || '');
+        const isMobile = l.is_mobile || false;
+        const isTrial = l.is_trial || false;
+        const tierLimit = isTrial ? { p: 8, i: 3 } : isMobile ? { p: 75, i: 5 } : l.tier === 2 ? { p: 150, i: 10 } : l.tier === 3 ? { p: 400, i: 30 } : { p: 0, i: 0 };
+        const effectivePrompts = l.custom_prompt_limit !== null ? l.custom_prompt_limit : tierLimit.p;
+        const effectiveImages = l.custom_image_limit !== null ? l.custom_image_limit : tierLimit.i;
+        const tierDisplay = isTrial ? 'trial' : isMobile ? 'mobile' : l.tier;
+        const tierNameDisplay = isTrial ? 'Command Center Trial' : isMobile ? 'Mobile Companion' : (l.tierName || '');
 
     grid.innerHTML = `
         <div class="lookup-field">
@@ -2417,8 +2440,8 @@ function renderLookupResult(l) {
             <span class="lf-value">${formatDate(l.created_at)}</span>
         </div>
         <div class="lookup-field">
-            <span class="lf-label">Usage Reset At</span>
-            <span class="lf-value">${formatDate(l.usage_reset_at)}</span>
+            <span class="lf-label">${isTrial ? 'Trial Expires' : 'Usage Reset At'}</span>
+            <span class="lf-value">${isTrial ? (l.trial_expires_at ? formatDate(l.trial_expires_at) + (new Date() > new Date(l.trial_expires_at) ? ' <span style="color:var(--error); font-size:0.78rem;">(EXPIRED)</span>' : ' <span style="color:var(--success); font-size:0.78rem;">(Active)</span>') : 'Not yet activated') : formatDate(l.usage_reset_at)}</span>
         </div>
         <div class="lookup-field" style="grid-column: 1 / -1;">
             <span class="lf-label">Notes</span>
@@ -2546,7 +2569,7 @@ async function loadLicenses(page) {
                 const prompts = `${l.prompt_count}${l.custom_prompt_limit !== null ? '<span style="color:var(--gold-muted);font-size:0.72rem;">/' + l.custom_prompt_limit + '</span>' : ''}`;
                 const images  = `${l.image_count}${l.custom_image_limit !== null ? '<span style="color:var(--gold-muted);font-size:0.72rem;">/' + l.custom_image_limit + '</span>' : ''}`;
                 const keyEsc = l.license_key.replace(/'/g, "\\'");
-                const tierDisplay = l.is_mobile ? 'mobile' : l.tier;
+                const tierDisplay = l.is_trial ? 'trial' : l.is_mobile ? 'mobile' : l.tier;
                 return `
                 <tr>
                     <td class="key-cell" onclick="copyText('${keyEsc}')" style="cursor:pointer;" title="Click to copy">${l.license_key}</td>
@@ -2923,7 +2946,8 @@ function formatDate(dateStr) {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function tierBadge(tier) {
+function tierBadge(tier, isTrial) {
+    if (isTrial || tier === 'trial') return '<span class="badge" style="background:#d4a017;color:#fff;">Trial</span>';
     if (tier === 1) return '<span class="badge badge-t1">Tier 1</span>';
     if (tier === 2) return '<span class="badge badge-t2">Tier 2</span>';
     if (tier === 3) return '<span class="badge badge-t3">Tier 3</span>';
@@ -2946,6 +2970,13 @@ function setupKeyAutoFormat() {
                     let parts = ['OGTK', 'MOB'];
                     for (let i = 0; i < afterMob.length && parts.length < 4; i += 4) {
                         parts.push(afterMob.slice(i, i + 4));
+                    }
+                    this.value = parts.join('-');
+                } else if (rest.startsWith('TRL')) {
+                    const afterTrl = rest.slice(3); // everything after 'TRL'
+                    let parts = ['OGTK', 'TRL'];
+                    for (let i = 0; i < afterTrl.length && parts.length < 4; i += 4) {
+                        parts.push(afterTrl.slice(i, i + 4));
                     }
                     this.value = parts.join('-');
                 } else {
