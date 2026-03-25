@@ -1079,6 +1079,16 @@
         </div>
         <button class="login-btn" id="login-btn">Access Dashboard</button>
         <div class="login-error" id="login-error">Incorrect admin key. Please try again.</div>
+        <div style="margin-top: 18px; text-align: center;">
+            <a href="#" id="backup-key-toggle" style="font-size: 0.78rem; color: var(--text-muted); text-decoration: none; opacity: 0.6;" onclick="toggleBackupKey(event)">Forgot your key? Use backup access</a>
+        </div>
+        <div id="backup-key-section" style="display:none; margin-top: 12px;">
+            <div style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 8px; text-align: center;">Enter your backup admin key below</div>
+            <div class="login-input-wrap">
+                <input type="password" id="backup-key-input" placeholder="Enter backup key" autocomplete="off" />
+            </div>
+            <button class="login-btn" id="backup-login-btn" style="background: var(--bg-input); color: var(--gold-primary); border: 1px solid var(--gold-primary);">Access with Backup Key</button>
+        </div>
     </div>
 </div>
 
@@ -2073,6 +2083,56 @@ async function attemptLogin() {
         errEl.style.display = 'block';
         btn.disabled = false;
         btn.innerHTML = 'Access Dashboard';
+    }
+}
+
+function toggleBackupKey(e) {
+    e.preventDefault();
+    const section = document.getElementById('backup-key-section');
+    const isVisible = section.style.display !== 'none';
+    section.style.display = isVisible ? 'none' : 'block';
+    if (!isVisible) {
+        document.getElementById('backup-key-input').focus();
+        const backupBtn = document.getElementById('backup-login-btn');
+        backupBtn.addEventListener('click', attemptBackupLogin);
+        document.getElementById('backup-key-input').addEventListener('keydown', e => {
+            if (e.key === 'Enter') attemptBackupLogin();
+        });
+    }
+}
+
+async function attemptBackupLogin() {
+    const key = document.getElementById('backup-key-input').value.trim();
+    if (!key) return;
+
+    const btn = document.getElementById('backup-login-btn');
+    const errEl = document.getElementById('login-error');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    errEl.style.display = 'none';
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/admin/stats`, {
+            headers: { 'x-admin-key': key }
+        });
+
+        if (res.ok) {
+            ADMIN_KEY = key;
+            sessionStorage.setItem('og-admin-key', key);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            initApp();
+        } else {
+            errEl.textContent = 'Incorrect backup key. Please try again.';
+            errEl.style.display = 'block';
+            btn.disabled = false;
+            btn.innerHTML = 'Access with Backup Key';
+        }
+    } catch (e) {
+        errEl.textContent = 'Connection error. Please try again.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = 'Access with Backup Key';
     }
 }
 

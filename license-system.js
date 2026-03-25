@@ -992,10 +992,13 @@ function registerLicenseRoutes(app, logToBetterStack) {
     // =========================================================================
 
     const ADMIN_SECRET = process.env.ADMIN_SECRET || 'change-me-in-production';
+    const ADMIN_SECRET_BACKUP = process.env.ADMIN_SECRET_BACKUP || null;
 
     function requireAdmin(req, res, next) {
         const adminKey = req.headers['x-admin-key'];
-        if (!adminKey || adminKey !== ADMIN_SECRET) {
+        const isPrimary = adminKey && adminKey === ADMIN_SECRET;
+        const isBackup = adminKey && ADMIN_SECRET_BACKUP && adminKey === ADMIN_SECRET_BACKUP;
+        if (!isPrimary && !isBackup) {
             return res.status(403).json({ error: 'Unauthorized' });
         }
         next();
@@ -1454,17 +1457,21 @@ function registerLicenseRoutes(app, logToBetterStack) {
                     ROUND(AVG(prompt_count) FILTER (WHERE is_activated = TRUE), 1) AS avg_prompts_activated,
                     COUNT(*) FILTER (WHERE is_activated = TRUE AND prompt_count::float / NULLIF(
                         CASE WHEN custom_prompt_limit IS NOT NULL THEN custom_prompt_limit
-                             ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 WHEN 'mobile' THEN 75 ELSE 0 END)
+                             WHEN is_trial = TRUE THEN 8
+                             WHEN is_mobile = TRUE THEN 75
+                             ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 ELSE 0 END)
                         END, 0) >= 0.75) AS keys_at_75pct_or_more
                 FROM licenses
             `);
 
             // Top 10 heaviest users this month
             const topUsers = await pool.query(`
-                SELECT license_key, tier, prompt_count, image_count, notes,
+                SELECT license_key, tier, is_mobile, is_trial, prompt_count, image_count, notes,
                     custom_prompt_limit,
                     CASE WHEN custom_prompt_limit IS NOT NULL THEN custom_prompt_limit
-                         ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 WHEN 'mobile' THEN 75 ELSE 0 END)
+                         WHEN is_trial = TRUE THEN 8
+                         WHEN is_mobile = TRUE THEN 75
+                         ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 ELSE 0 END)
                     END AS prompt_limit
                 FROM licenses
                 WHERE is_activated = TRUE
@@ -1488,7 +1495,9 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 FROM (
                     SELECT prompt_count,
                         CASE WHEN custom_prompt_limit IS NOT NULL THEN custom_prompt_limit
-                             ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 WHEN 'mobile' THEN 75 ELSE 0 END)
+                             WHEN is_trial = TRUE THEN 8
+                             WHEN is_mobile = TRUE THEN 75
+                             ELSE (CASE tier WHEN 2 THEN 150 WHEN 3 THEN 400 ELSE 0 END)
                         END AS prompt_limit
                     FROM licenses
                     WHERE is_activated = TRUE
@@ -1500,7 +1509,12 @@ function registerLicenseRoutes(app, logToBetterStack) {
             res.json({
                 monthlyTotals: monthlyTotals.rows,
                 currentMonth: currentStats.rows[0],
-                topUsers: topUsers.rows.map(r => ({ ...r, tierName: TIER_LIMITS[r.tier]?.name })),
+                topUsers: topUsers.rows.map(r => ({
+                    ...r,
+                    tierName: r.is_trial ? 'Command Center Trial'
+                             : r.is_mobile ? 'Mobile Companion'
+                             : (TIER_LIMITS[r.tier]?.name || `Tier ${r.tier}`)
+                })),
                 distribution: distribution.rows
             });
 
