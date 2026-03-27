@@ -6881,7 +6881,7 @@
             const modelName = selectedModel === 'command' ? 'AI-Council' : (MODEL_CONFIG[selectedModel]?.name || selectedModel);
             const chairmanInfo = (selectedModel === 'command' && chairmanName) ? chairmanName : '';
 
-            // Build YAML frontmatter
+            // Build YAML frontmatter (metadata for the .md file, stripped from PDF)
             let frontmatter = '---\n';
             frontmatter += `title: "${title.replace(/"/g, '\\"')}"\n`;
             frontmatter += `date: ${isoDate}\n`;
@@ -6905,39 +6905,30 @@
             }
             frontmatter += '---\n\n';
 
-            // Build conversation content
+            // Build clean, professional article content.
+            // No chat UI elements (user prompts, avatar labels, role headings).
+            // Only assistant responses are included, producing a publish-ready document.
             let content = `# ${title}\n\n`;
-            content += `*Saved from OffGrid Command Center on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
-            if (selectedModel === 'command' && chairmanName) {
-                content += `**Model:** AI Council (Chairman: ${chairmanEmoji} ${chairmanName})  \n`;
-            } else {
-                content += `**Model:** ${MODEL_CONFIG[selectedModel]?.name || selectedModel}  \n`;
-            }
-            content += `**Category:** ${category}\n\n`;
-            content += '---\n\n';
 
             // Track image replacement index (matches order from extractBase64Images)
             let imageIndex = 0;
+            let assistantBlockCount = 0;
 
-            conversationHistory.forEach((msg, index) => {
+            conversationHistory.forEach((msg) => {
                 if (msg.role === 'user') {
-                    // Skip Image Studio prompt messages from KB save — they are internal plumbing
-                    const isImageStudioPrompt = msg.content && msg.content.startsWith('[Image Studio]');
-                    if (!isImageStudioPrompt) {
-                        content += `## \ud83d\udc64 User\n\n`;
-                        content += `${msg.content}\n\n`;
-                        if (msg.image) {
-                            // Replace base64 user image with relative file path
-                            if (imageFilenames && imageIndex < imageFilenames.length) {
-                                content += `![Uploaded Image](./${imageFilenames[imageIndex]})\n\n`;
-                                imageIndex++;
-                            } else {
-                                content += `![Uploaded Image](${msg.image})\n\n`;
-                            }
+                    // User-uploaded images are still included (they are part of the content)
+                    if (msg.image) {
+                        if (imageFilenames && imageIndex < imageFilenames.length) {
+                            content += `![Uploaded Image](./${imageFilenames[imageIndex]})\n\n`;
+                            imageIndex++;
                         }
                     }
+                    // User prompt text is intentionally excluded for a clean document
                 } else if (msg.role === 'assistant') {
-                    content += `## \ud83e\udd16 OffGrid AI\n\n`;
+                    // Add a subtle separator between multiple assistant responses
+                    if (assistantBlockCount > 0) {
+                        content += '---\n\n';
+                    }
                     // Replace inline base64 images with relative file paths
                     let msgContent = msg.content;
                     if (imageFilenames && imageFilenames.length > 0) {
@@ -6951,9 +6942,7 @@
                         });
                     }
                     content += `${msgContent}\n\n`;
-                }
-                if (index < conversationHistory.length - 1) {
-                    content += '---\n\n';
+                    assistantBlockCount++;
                 }
             });
 
