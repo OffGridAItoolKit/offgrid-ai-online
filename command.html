@@ -3557,6 +3557,75 @@
             font-family: var(--font-mono);
         }
 
+        /* Deep Mode view toggle (Session / All-Time) */
+        .command-theme .deep-view-toggle {
+            display: flex;
+            background: var(--bg-deep);
+            border-radius: 6px;
+            padding: 2px;
+            margin: 12px 16px 4px;
+        }
+        .command-theme .deep-view-btn {
+            flex: 1;
+            padding: 6px 0;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            letter-spacing: 0.03em;
+            text-align: center;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .command-theme .deep-view-btn.active {
+            background: var(--bg-surface);
+            color: var(--gold-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .command-theme .deep-view-btn:hover:not(.active) {
+            color: var(--text-secondary);
+        }
+        .command-theme .deep-since-label {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 4px 16px 8px;
+            font-family: var(--font-mono);
+            font-style: italic;
+        }
+        .command-theme .deep-actions {
+            display: flex;
+            gap: 6px;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border-subtle);
+        }
+        .command-theme .deep-action-btn {
+            flex: 1;
+            padding: 7px 0;
+            font-size: 10px;
+            font-weight: 600;
+            font-family: var(--font-mono);
+            letter-spacing: 0.03em;
+            text-align: center;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+        .command-theme .deep-action-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+        .command-theme .deep-action-btn.danger:hover {
+            border-color: #ef4444;
+            color: #ef4444;
+        }
+
         /* Mobile: hide panel */
         @media (max-width: 768px) {
             .command-theme .deep-analytics-panel {
@@ -7413,12 +7482,14 @@
 
         // ============================================
         // DEEP MODE ANALYTICS (Ctrl+Shift+.)
+        // Two-tier system: Session (sessionStorage) + Lifetime (localStorage)
         // ============================================
 
         let deepModeActive = localStorage.getItem('offgrid-deep-mode') === 'true';
+        let deepModeView = 'session'; // 'session' or 'alltime'
         let deliberationViewCount = parseInt(localStorage.getItem('offgrid-delib-views') || '0');
 
-        // Session-scoped analytics data (persisted in sessionStorage for navigation survival, clears on tab close)
+        // ---- Session-scoped data (clears on tab close) ----
         const DEEP_MODE_STORAGE_KEY = 'offgrid-deep-mode-data';
         function createEmptyDeepModeData() {
             return {
@@ -7440,7 +7511,6 @@
                 const saved = sessionStorage.getItem(DEEP_MODE_STORAGE_KEY);
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // Restore Infinity for closestElection.margin if it was serialized as null
                     if (parsed.closestElection && parsed.closestElection.margin === null) {
                         parsed.closestElection.margin = Infinity;
                     }
@@ -7451,11 +7521,152 @@
         }
         function saveDeepModeData() {
             try {
-                // JSON.stringify converts Infinity to null, which we handle on load
                 sessionStorage.setItem(DEEP_MODE_STORAGE_KEY, JSON.stringify(deepModeData));
             } catch (e) { /* ignore storage errors */ }
         }
         const deepModeData = loadDeepModeData();
+
+        // ---- Lifetime persistent data (survives across sessions) ----
+        const LIFETIME_STORAGE_KEY = 'offgrid-deep-mode-lifetime';
+        function createEmptyLifetimeData() {
+            return {
+                totalQueries: 0,
+                totalResponseTime: 0,
+                trackingSince: new Date().toISOString(),
+                lastQueryAt: null,
+                longestStreak: { model: null, count: 0 },
+                closestElection: { margin: Infinity },
+                models: {
+                    scout:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                    medic:     { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                    navigator: { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} },
+                    ranger:    { wins: 0, totalAccuracy: 0, totalInsight: 0, totalBorda: 0, categoryWins: {} }
+                }
+            };
+        }
+        function loadLifetimeData() {
+            try {
+                const saved = localStorage.getItem(LIFETIME_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed.closestElection && parsed.closestElection.margin === null) {
+                        parsed.closestElection.margin = Infinity;
+                    }
+                    // Migration: absorb old offgrid-win-history if lifetime is empty but old data exists
+                    if (parsed.totalQueries === 0) {
+                        const oldHistory = getOldWinHistory();
+                        if (oldHistory.total > 0) {
+                            parsed.totalQueries = oldHistory.total;
+                            for (const key of ['scout', 'medic', 'navigator', 'ranger']) {
+                                if (oldHistory[key]) parsed.models[key].wins = oldHistory[key];
+                            }
+                            parsed.trackingSince = new Date().toISOString();
+                            localStorage.setItem(LIFETIME_STORAGE_KEY, JSON.stringify(parsed));
+                        }
+                    }
+                    return parsed;
+                }
+            } catch (e) { /* ignore parse errors */ }
+            // First-time init: migrate from old win history if it exists
+            const fresh = createEmptyLifetimeData();
+            const oldHistory = getOldWinHistory();
+            if (oldHistory.total > 0) {
+                fresh.totalQueries = oldHistory.total;
+                for (const key of ['scout', 'medic', 'navigator', 'ranger']) {
+                    if (oldHistory[key]) fresh.models[key].wins = oldHistory[key];
+                }
+            }
+            return fresh;
+        }
+        function saveLifetimeData() {
+            try {
+                localStorage.setItem(LIFETIME_STORAGE_KEY, JSON.stringify(lifetimeData));
+            } catch (e) { /* ignore storage errors */ }
+        }
+        function getOldWinHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('offgrid-win-history') || '{"scout":0,"medic":0,"navigator":0,"ranger":0,"total":0}');
+            } catch { return { scout: 0, medic: 0, navigator: 0, ranger: 0, total: 0 }; }
+        }
+        function resetLifetimeData() {
+            if (!confirm('Reset all-time Deep Mode analytics? This cannot be undone.')) return;
+            const fresh = createEmptyLifetimeData();
+            Object.assign(lifetimeData, fresh);
+            saveLifetimeData();
+            // Also clear old win history
+            localStorage.removeItem('offgrid-win-history');
+            renderDeepModePanel();
+        }
+        function exportDeepModeStats() {
+            const exportData = {
+                exportedAt: new Date().toISOString(),
+                session: deepModeData,
+                lifetime: lifetimeData
+            };
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `offgrid-deep-mode-stats-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        function updateLifetimeStats(data) {
+            lifetimeData.totalQueries++;
+            lifetimeData.totalResponseTime += data.responseTime || 0;
+            lifetimeData.lastQueryAt = new Date().toISOString();
+
+            // Process scores for each model
+            const scoreEntries = Array.isArray(data.scores) ? data.scores : Object.values(data.scores || {});
+            for (const s of scoreEntries) {
+                const modelKey = s.key || s.model;
+                if (modelKey && lifetimeData.models[modelKey]) {
+                    const acc = s.accPoints || s.accuracy || 0;
+                    const ins = s.insightPoints || s.insight || 0;
+                    const borda = s.councilScore || s.score || (acc * 2 + ins);
+                    lifetimeData.models[modelKey].totalAccuracy += acc;
+                    lifetimeData.models[modelKey].totalInsight += ins;
+                    lifetimeData.models[modelKey].totalBorda += borda;
+                }
+            }
+
+            // Record chairman win
+            const category = classifyQuery(data.userMessage || '');
+            if (lifetimeData.models[data.chairmanKey]) {
+                lifetimeData.models[data.chairmanKey].wins++;
+                if (!lifetimeData.models[data.chairmanKey].categoryWins[category]) {
+                    lifetimeData.models[data.chairmanKey].categoryWins[category] = 0;
+                }
+                lifetimeData.models[data.chairmanKey].categoryWins[category]++;
+            }
+
+            // Track longest streak (check session streak against lifetime record)
+            if (deepModeData.currentStreak.count > lifetimeData.longestStreak.count) {
+                lifetimeData.longestStreak.model = deepModeData.currentStreak.model;
+                lifetimeData.longestStreak.count = deepModeData.currentStreak.count;
+            }
+
+            // Track closest election
+            const scoreEntries2 = Array.isArray(data.scores) ? data.scores : Object.values(data.scores || {});
+            const bordaValues = scoreEntries2.map(s => s.councilScore || s.score || ((s.accPoints || 0) * 2 + (s.insightPoints || 0))).sort((a, b) => b - a);
+            if (bordaValues.length >= 2) {
+                const margin = bordaValues[0] - bordaValues[1];
+                if (margin < lifetimeData.closestElection.margin) {
+                    lifetimeData.closestElection.margin = margin;
+                }
+            }
+
+            saveLifetimeData();
+
+            // Also update old win history for backward compatibility with deliberation modal
+            const oldHistory = getOldWinHistory();
+            if (oldHistory[data.chairmanKey] !== undefined) oldHistory[data.chairmanKey]++;
+            oldHistory.total++;
+            localStorage.setItem('offgrid-win-history', JSON.stringify(oldHistory));
+        }
+        const lifetimeData = loadLifetimeData();
+        // Save immediately to persist migration if it happened
+        saveLifetimeData();
 
         const DEEP_MODE_MODELS = [
             { key: 'scout', name: 'Scout', fullName: 'GPT 5.2', emoji: '\ud83d\udd2d', color: 'scout' },
@@ -7556,6 +7767,9 @@
             // Persist to sessionStorage so data survives page navigation
             saveDeepModeData();
 
+            // Update lifetime persistent stats
+            updateLifetimeStats(data);
+
             // Re-render panel if visible
             renderDeepModePanel();
         }
@@ -7582,9 +7796,14 @@
                     </div>
                     <button class="deep-panel-close" onclick="toggleDeepMode()" title="Close">&times;</button>
                 </div>
+                <div class="deep-view-toggle">
+                    <button class="deep-view-btn active" id="deepViewSession" onclick="switchDeepView('session')">Session</button>
+                    <button class="deep-view-btn" id="deepViewAlltime" onclick="switchDeepView('alltime')">All-Time</button>
+                </div>
+                <div class="deep-since-label" id="deepSinceLabel"></div>
                 <div class="deep-panel-body" id="deepPanelBody">
                     <div class="deep-empty">
-                        <div class="deep-empty-icon">\ud83d\udcca</div>
+                        <div class="deep-empty-icon">📊</div>
                         <div>No council queries yet</div>
                         <div class="deep-empty-hint">Use Command Council mode to start tracking analytics</div>
                     </div>
@@ -7650,15 +7869,43 @@
             }, 3000);
         }
 
+        function switchDeepView(view) {
+            deepModeView = view;
+            const sessionBtn = document.getElementById('deepViewSession');
+            const alltimeBtn = document.getElementById('deepViewAlltime');
+            if (sessionBtn) sessionBtn.classList.toggle('active', view === 'session');
+            if (alltimeBtn) alltimeBtn.classList.toggle('active', view === 'alltime');
+            renderDeepModePanel();
+        }
+
         function renderDeepModePanel() {
             const body = document.getElementById('deepPanelBody');
             if (!body) return;
 
+            // Update the "Since" label
+            const sinceLabel = document.getElementById('deepSinceLabel');
+            if (sinceLabel) {
+                if (deepModeView === 'alltime' && lifetimeData.trackingSince) {
+                    const since = new Date(lifetimeData.trackingSince);
+                    sinceLabel.textContent = `Tracking since ${since.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                } else {
+                    sinceLabel.textContent = '';
+                }
+            }
+
+            if (deepModeView === 'alltime') {
+                renderAllTimeView(body);
+            } else {
+                renderSessionView(body);
+            }
+        }
+
+        function renderSessionView(body) {
             if (deepModeData.totalQueries === 0) {
                 body.innerHTML = `
                     <div class="deep-empty">
                         <div class="deep-empty-icon">\ud83d\udcca</div>
-                        <div>No council queries yet</div>
+                        <div>No council queries this session</div>
                         <div class="deep-empty-hint">Use Command Council mode to start tracking analytics</div>
                     </div>
                 `;
@@ -7667,12 +7914,10 @@
 
             const avgTime = (deepModeData.totalResponseTime / deepModeData.totalQueries).toFixed(1);
             const streakModel = DEEP_MODE_MODELS.find(m => m.key === deepModeData.currentStreak.model);
-            const streakText = streakModel ? `${streakModel.emoji} ${streakModel.name}` : 'N/A';
 
             // Closest election info
             let closestText = 'N/A';
             if (deepModeData.closestElection.queryIndex >= 0) {
-                const cq = deepModeData.queries[deepModeData.closestElection.queryIndex];
                 closestText = `${deepModeData.closestElection.margin}pts`;
             }
 
@@ -7715,77 +7960,21 @@
             html += '</div>';
 
             // Chairman Leaderboard
-            const sorted = [...DEEP_MODE_MODELS].sort((a, b) => deepModeData.models[b.key].wins - deepModeData.models[a.key].wins);
-            const maxWins = Math.max(...sorted.map(m => deepModeData.models[m.key].wins), 1);
+            html += buildLeaderboardHtml(deepModeData.models, deepModeData.totalQueries);
 
-            html += '<div class="deep-section"><div class="deep-section-title">Chairman Leaderboard</div>';
-            sorted.forEach((m, i) => {
-                const wins = deepModeData.models[m.key].wins;
-                const pct = deepModeData.totalQueries > 0 ? Math.round((wins / deepModeData.totalQueries) * 100) : 0;
-                const barWidth = maxWins > 0 ? Math.round((wins / maxWins) * 100) : 0;
-                html += `
-                    <div class="deep-leaderboard-row">
-                        <span class="deep-lb-rank">${i + 1}</span>
-                        <span class="deep-lb-name" style="color: var(--${m.key}-color)">${m.emoji} ${m.name}</span>
-                        <div class="deep-lb-bar-bg">
-                            <div class="deep-lb-bar ${m.key}" style="width: ${barWidth}%"></div>
-                        </div>
-                        <span class="deep-lb-stats">${wins}W ${pct}%</span>
-                    </div>
-                `;
-            });
-            html += '</div>';
-
-            // Category Strength Map
+            // Category Strength Map (from session queries)
             const categoriesUsed = {};
             for (const q of deepModeData.queries) {
                 if (!categoriesUsed[q.category]) categoriesUsed[q.category] = {};
                 if (!categoriesUsed[q.category][q.chairman]) categoriesUsed[q.category][q.chairman] = 0;
                 categoriesUsed[q.category][q.chairman]++;
             }
-
-            if (Object.keys(categoriesUsed).length > 0) {
-                html += '<div class="deep-section"><div class="deep-section-title">Category Strength</div>';
-                for (const [catId, winners] of Object.entries(categoriesUsed)) {
-                    const topModel = Object.entries(winners).sort((a, b) => b[1] - a[1])[0];
-                    const modelInfo = DEEP_MODE_MODELS.find(m => m.key === topModel[0]);
-                    if (modelInfo) {
-                        const totalInCat = Object.values(winners).reduce((a, b) => a + b, 0);
-                        html += `
-                            <div class="deep-category-row">
-                                <span class="deep-cat-name">${getCategoryLabel(catId)}</span>
-                                <span class="deep-cat-leader" style="color: var(--${modelInfo.key}-color)">${modelInfo.emoji} ${modelInfo.name}</span>
-                                <span class="deep-cat-count">${topModel[1]}/${totalInCat}</span>
-                            </div>
-                        `;
-                    }
-                }
-                html += '</div>';
-            }
+            html += buildCategoryHtml(categoriesUsed);
 
             // Score Averages
-            html += '<div class="deep-section"><div class="deep-section-title">Avg Borda Scores</div>';
-            const sortedByAvg = [...DEEP_MODE_MODELS].sort((a, b) => {
-                const avgA = deepModeData.totalQueries > 0 ? deepModeData.models[a.key].totalBorda / deepModeData.totalQueries : 0;
-                const avgB = deepModeData.totalQueries > 0 ? deepModeData.models[b.key].totalBorda / deepModeData.totalQueries : 0;
-                return avgB - avgA;
-            });
-            for (const m of sortedByAvg) {
-                const md = deepModeData.models[m.key];
-                const avgBorda = deepModeData.totalQueries > 0 ? (md.totalBorda / deepModeData.totalQueries).toFixed(1) : '0';
-                const avgAcc = deepModeData.totalQueries > 0 ? (md.totalAccuracy / deepModeData.totalQueries).toFixed(1) : '0';
-                const avgIns = deepModeData.totalQueries > 0 ? (md.totalInsight / deepModeData.totalQueries).toFixed(1) : '0';
-                html += `
-                    <div class="deep-avg-row">
-                        <span class="deep-avg-name" style="color: var(--${m.key}-color)">${m.emoji} ${m.name}</span>
-                        <span class="deep-avg-scores">A:${avgAcc} I:${avgIns}</span>
-                        <span class="deep-avg-total">${avgBorda}</span>
-                    </div>
-                `;
-            }
-            html += '</div>';
+            html += buildBordaHtml(deepModeData.models, deepModeData.totalQueries);
 
-            // Recent Queries Log
+            // Recent Queries Log (session only)
             if (deepModeData.queries.length > 0) {
                 html += '<div class="deep-section"><div class="deep-section-title">Query Log</div>';
                 const recentQueries = deepModeData.queries.slice(-10).reverse();
@@ -7810,23 +7999,190 @@
             body.innerHTML = html;
         }
 
+        function renderAllTimeView(body) {
+            if (lifetimeData.totalQueries === 0) {
+                body.innerHTML = `
+                    <div class="deep-empty">
+                        <div class="deep-empty-icon">\ud83c\udfc6</div>
+                        <div>No all-time data yet</div>
+                        <div class="deep-empty-hint">Run council queries to build your lifetime analytics</div>
+                    </div>
+                `;
+                return;
+            }
+
+            const avgTime = (lifetimeData.totalResponseTime / lifetimeData.totalQueries).toFixed(1);
+            const longestStreakModel = DEEP_MODE_MODELS.find(m => m.key === lifetimeData.longestStreak.model);
+            const longestStreakText = longestStreakModel ? lifetimeData.longestStreak.count : 0;
+
+            // Closest election
+            let closestText = 'N/A';
+            if (lifetimeData.closestElection.margin !== Infinity && lifetimeData.closestElection.margin !== null) {
+                closestText = `${lifetimeData.closestElection.margin}pts`;
+            }
+
+            // All-Time Summary
+            let html = `
+                <div class="deep-section">
+                    <div class="deep-section-title">All-Time Summary</div>
+                    <div class="deep-stat-grid">
+                        <div class="deep-stat-card highlight">
+                            <div class="deep-stat-value">${lifetimeData.totalQueries}</div>
+                            <div class="deep-stat-label">Total Queries</div>
+                        </div>
+                        <div class="deep-stat-card">
+                            <div class="deep-stat-value">${avgTime}s</div>
+                            <div class="deep-stat-label">Avg Response</div>
+                        </div>
+                        <div class="deep-stat-card">
+                            <div class="deep-stat-value">${longestStreakText}</div>
+                            <div class="deep-stat-label">Best Streak</div>
+                        </div>
+                        <div class="deep-stat-card">
+                            <div class="deep-stat-value">${closestText}</div>
+                            <div class="deep-stat-label">Closest Race</div>
+                        </div>
+                    </div>
+            `;
+
+            // Best streak callout
+            if (lifetimeData.longestStreak.count >= 2 && longestStreakModel) {
+                html += `
+                    <div class="deep-streak">
+                        <span class="deep-streak-fire">\ud83c\udfc6</span>
+                        <span class="deep-streak-text">
+                            Record streak: <span class="deep-streak-model" style="color: var(--${longestStreakModel.key}-color)">${longestStreakModel.name}</span>
+                            won ${lifetimeData.longestStreak.count} in a row
+                        </span>
+                    </div>
+                `;
+            }
+            html += '</div>';
+
+            // Chairman Leaderboard (lifetime)
+            html += buildLeaderboardHtml(lifetimeData.models, lifetimeData.totalQueries);
+
+            // Category Strength Map (from lifetime categoryWins)
+            const categoriesUsed = {};
+            for (const modelKey of ['scout', 'medic', 'navigator', 'ranger']) {
+                const catWins = lifetimeData.models[modelKey].categoryWins || {};
+                for (const [catId, count] of Object.entries(catWins)) {
+                    if (!categoriesUsed[catId]) categoriesUsed[catId] = {};
+                    categoriesUsed[catId][modelKey] = count;
+                }
+            }
+            html += buildCategoryHtml(categoriesUsed);
+
+            // Score Averages (lifetime)
+            html += buildBordaHtml(lifetimeData.models, lifetimeData.totalQueries);
+
+            // Actions: Export + Reset
+            html += `
+                <div class="deep-actions">
+                    <button class="deep-action-btn" onclick="exportDeepModeStats()" title="Download stats as JSON">Export JSON</button>
+                    <button class="deep-action-btn danger" onclick="resetLifetimeData()" title="Reset all-time stats">Reset All</button>
+                </div>
+            `;
+
+            body.innerHTML = html;
+        }
+
+        // ---- Shared rendering helpers ----
+
+        function buildLeaderboardHtml(models, totalQueries) {
+            const sorted = [...DEEP_MODE_MODELS].sort((a, b) => models[b.key].wins - models[a.key].wins);
+            const maxWins = Math.max(...sorted.map(m => models[m.key].wins), 1);
+
+            let html = '<div class="deep-section"><div class="deep-section-title">Chairman Leaderboard</div>';
+            sorted.forEach((m, i) => {
+                const wins = models[m.key].wins;
+                const pct = totalQueries > 0 ? Math.round((wins / totalQueries) * 100) : 0;
+                const barWidth = maxWins > 0 ? Math.round((wins / maxWins) * 100) : 0;
+                html += `
+                    <div class="deep-leaderboard-row">
+                        <span class="deep-lb-rank">${i + 1}</span>
+                        <span class="deep-lb-name" style="color: var(--${m.key}-color)">${m.emoji} ${m.name}</span>
+                        <div class="deep-lb-bar-bg">
+                            <div class="deep-lb-bar ${m.key}" style="width: ${barWidth}%"></div>
+                        </div>
+                        <span class="deep-lb-stats">${wins}W ${pct}%</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function buildCategoryHtml(categoriesUsed) {
+            if (Object.keys(categoriesUsed).length === 0) return '';
+            let html = '<div class="deep-section"><div class="deep-section-title">Category Strength</div>';
+            for (const [catId, winners] of Object.entries(categoriesUsed)) {
+                const topModel = Object.entries(winners).sort((a, b) => b[1] - a[1])[0];
+                const modelInfo = DEEP_MODE_MODELS.find(m => m.key === topModel[0]);
+                if (modelInfo) {
+                    const totalInCat = Object.values(winners).reduce((a, b) => a + b, 0);
+                    html += `
+                        <div class="deep-category-row">
+                            <span class="deep-cat-name">${getCategoryLabel(catId)}</span>
+                            <span class="deep-cat-leader" style="color: var(--${modelInfo.key}-color)">${modelInfo.emoji} ${modelInfo.name}</span>
+                            <span class="deep-cat-count">${topModel[1]}/${totalInCat}</span>
+                        </div>
+                    `;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function buildBordaHtml(models, totalQueries) {
+            let html = '<div class="deep-section"><div class="deep-section-title">Avg Borda Scores</div>';
+            const sortedByAvg = [...DEEP_MODE_MODELS].sort((a, b) => {
+                const avgA = totalQueries > 0 ? models[a.key].totalBorda / totalQueries : 0;
+                const avgB = totalQueries > 0 ? models[b.key].totalBorda / totalQueries : 0;
+                return avgB - avgA;
+            });
+            for (const m of sortedByAvg) {
+                const md = models[m.key];
+                const avgBorda = totalQueries > 0 ? (md.totalBorda / totalQueries).toFixed(1) : '0';
+                const avgAcc = totalQueries > 0 ? (md.totalAccuracy / totalQueries).toFixed(1) : '0';
+                const avgIns = totalQueries > 0 ? (md.totalInsight / totalQueries).toFixed(1) : '0';
+                html += `
+                    <div class="deep-avg-row">
+                        <span class="deep-avg-name" style="color: var(--${m.key}-color)">${m.emoji} ${m.name}</span>
+                        <span class="deep-avg-scores">A:${avgAcc} I:${avgIns}</span>
+                        <span class="deep-avg-total">${avgBorda}</span>
+                    </div>
+                `;
+            }
+            html += '</div>';
+            return html;
+        }
+
         // ============================================
         // HISTORICAL WIN RATE TRACKING
+        // Now powered by lifetime data as single source of truth.
+        // Old offgrid-win-history kept in sync for backward compatibility.
         // ============================================
 
         function getWinHistory() {
+            // Prefer lifetime data; fall back to old key for pre-migration browsers
+            if (lifetimeData && lifetimeData.totalQueries > 0) {
+                return {
+                    scout: lifetimeData.models.scout.wins,
+                    medic: lifetimeData.models.medic.wins,
+                    navigator: lifetimeData.models.navigator.wins,
+                    ranger: lifetimeData.models.ranger.wins,
+                    total: lifetimeData.totalQueries
+                };
+            }
             try {
                 return JSON.parse(localStorage.getItem('offgrid-win-history') || '{"scout":0,"medic":0,"navigator":0,"ranger":0,"total":0}');
             } catch { return { scout: 0, medic: 0, navigator: 0, ranger: 0, total: 0 }; }
         }
 
         function recordWin(modelKey) {
-            const history = getWinHistory();
-            if (history[modelKey] !== undefined) {
-                history[modelKey]++;
-            }
-            history.total++;
-            localStorage.setItem('offgrid-win-history', JSON.stringify(history));
+            // Now a no-op for the old system — lifetime stats are updated via updateLifetimeStats.
+            // Kept for backward compatibility in case any other code calls it.
         }
 
         function buildWinRateHtml() {
