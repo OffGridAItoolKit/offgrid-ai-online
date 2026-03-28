@@ -1999,6 +1999,10 @@ app.get('/try-command', (req, res) => {
     res.redirect(301, 'https://cmdcouncil.offgridtoolkit.ai?ref=try-command');
 });
 
+app.get('/terms', (req, res) => {
+    res.redirect(301, 'https://offgridaitoolkit.com/pages/terms-and-conditions');
+});
+
 // =============================================================================
 // LICENSE SYSTEM ROUTES (must be before catch-all)
 // =============================================================================
