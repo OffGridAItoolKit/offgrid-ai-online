@@ -808,6 +808,34 @@
         }
 
         /* ---- TEMPLATES PANEL ---- */
+        .template-section-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 24px 0 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .template-section-heading:first-child { margin-top: 0; }
+        .template-section-heading h3 {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+        .template-section-heading .section-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.04em;
+        }
+        .section-badge.gold { background: var(--gold-glow); color: var(--gold-primary); border: 1px solid var(--gold-muted); }
+        .section-badge.green { background: rgba(52,211,153,0.1); color: var(--success); border: 1px solid rgba(52,211,153,0.3); }
+        .section-badge.blue { background: rgba(56,189,248,0.1); color: var(--info); border: 1px solid rgba(56,189,248,0.3); }
+        .section-badge.muted { background: var(--bg-elevated); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+
         .template-list {
             display: flex;
             flex-direction: column;
@@ -1684,10 +1712,252 @@
             <div class="panel" id="panel-templates">
                 <div class="panel-header">
                     <h2>Customer Response Templates</h2>
-                    <p>Copy and adapt these templates for common customer support scenarios</p>
+                    <p>Order confirmations, follow-ups, and support responses. Copy, fill in the bracketed fields, and send.</p>
                 </div>
 
                 <div class="template-list">
+
+                    <!-- ===== SECTION: ORDER CONFIRMATIONS ===== -->
+                    <div class="template-section-heading">
+                        <h3>Order Confirmations</h3>
+                        <span class="section-badge gold">Send after label is printed</span>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Tier 1 Order Confirmation (OffGrid AI ToolKit + Trial Key)</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Subject: Your OffGrid AI ToolKit Is Packed and Heading Your Way
+
+Hi [Name],
+
+Thank you for your order! Your OffGrid AI ToolKit is packed and on its way to you. You will receive a separate shipping confirmation with your tracking number.
+
+Your license key is below. You will need it the first time you open the ToolKit on your drive.
+
+ToolKit License Key: [OGTK-XXXX-XXXX-XXXX]
+
+While you wait for your drive to arrive, here is a quick start video that walks you through everything:
+https://youtu.be/WvuFr461mkI
+
+And a few resources worth bookmarking:
+- How It Works: https://intel.offgridaitoolkit.com/guides/how-it-works.html
+- What to Expect: https://intel.offgridaitoolkit.com/guides/what-to-expect.html
+- Model Benchmarks: https://intel.offgridaitoolkit.com/testing/model-benchmarks.html
+- Full Resource Hub: https://intel.offgridaitoolkit.com/
+
+---
+Bonus: Try the Command Center Free
+
+As a ToolKit owner, you have free access to try the OffGrid AI Command Center. It is our online layer that adds four frontier AI models, an AI Council feature, and an Image Studio.
+
+Your trial key is below. It gives you 8 AI prompts and 3 image generations, valid for 30 days from the moment you activate it.
+
+Trial Key: [OGTK-TRL-XXXX-XXXX]
+
+To activate: go to offgridtoolkit.ai/command, enter your trial key, and accept the terms.
+
+If you like what you see, just reply to this email. As an early adopter, we will send you a $100 discount code toward the full Command Center as a thank you. No strings attached.
+
+---
+Questions or need help? Reply to this email or reach out at support@offgridaitoolkit.com. We are happy to help.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Tier 2 Order Confirmation (ToolKit + Command Center)</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Subject: Your OffGrid AI ToolKit + Command Center Is Packed and Heading Your Way
+
+Hi [Name],
+
+Thank you for your order! Your OffGrid AI ToolKit is packed and on its way to you. You will receive a separate shipping confirmation with your tracking number.
+
+Your license key is below. It activates both your ToolKit and your Command Center.
+
+License Key: [OGTK-XXXX-XXXX-XXXX]
+
+To activate the ToolKit: plug in your USB drive and enter your key when prompted.
+To activate the Command Center: go to offgridtoolkit.ai/command and enter the same key.
+
+Your Command Center plan includes 150 AI prompts and 10 image generations per month, renewing on the 1st of each month.
+
+---
+Get started with these resources:
+
+Quick Start Guide (ToolKit): https://youtu.be/WvuFr461mkI
+Exploring the Command Center: https://youtu.be/tLpOwz5IUvk
+Exploring the Image Studio: https://youtu.be/sm-yv413CTc
+Real Use Cases (Playlist): https://www.youtube.com/playlist?list=PLc0_CVA_M-Fsevt9T-t6s7LX_JOsl-3UK
+
+More resources:
+- How It Works: https://intel.offgridaitoolkit.com/guides/how-it-works.html
+- What to Expect: https://intel.offgridaitoolkit.com/guides/what-to-expect.html
+- Model Benchmarks: https://intel.offgridaitoolkit.com/testing/model-benchmarks.html
+- Full Resource Hub: https://intel.offgridaitoolkit.com/
+
+---
+Mobile Access
+
+The Command Center works best on a laptop or desktop, but mobile access is available. If you would like a Mobile Companion key for your phone, just reply to this email and we will send one right away.
+
+---
+Questions or need help? Reply to this email or reach out at support@offgridaitoolkit.com.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Tier 3 Order Confirmation (ToolKit + Command Center Pro)</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Subject: Your OffGrid AI ToolKit + Command Center Pro Is Packed and Heading Your Way
+
+Hi [Name],
+
+Thank you for your order! Your OffGrid AI ToolKit is packed and on its way to you. You will receive a separate shipping confirmation with your tracking number.
+
+Your license key is below. It activates both your ToolKit and your Command Center Pro.
+
+License Key: [OGTK-XXXX-XXXX-XXXX]
+
+To activate the ToolKit: plug in your USB drive and enter your key when prompted.
+To activate the Command Center Pro: go to offgridtoolkit.ai/command and enter the same key.
+
+Your Command Center Pro plan includes 400 AI prompts and 30 image generations per month, renewing on the 1st of each month.
+
+---
+Get started with these resources:
+
+Quick Start Guide (ToolKit): https://youtu.be/WvuFr461mkI
+Exploring the Command Center: https://youtu.be/tLpOwz5IUvk
+Exploring the Image Studio: https://youtu.be/sm-yv413CTc
+Real Use Cases (Playlist): https://www.youtube.com/playlist?list=PLc0_CVA_M-Fsevt9T-t6s7LX_JOsl-3UK
+
+More resources:
+- How It Works: https://intel.offgridaitoolkit.com/guides/how-it-works.html
+- What to Expect: https://intel.offgridaitoolkit.com/guides/what-to-expect.html
+- Model Benchmarks: https://intel.offgridaitoolkit.com/testing/model-benchmarks.html
+- Full Resource Hub: https://intel.offgridaitoolkit.com/
+
+---
+Mobile Access
+
+The Command Center works best on a laptop or desktop, but mobile access is available. If you would like a Mobile Companion key for your phone, just reply to this email and we will send one right away.
+
+---
+Questions or need help? Reply to this email or reach out at support@offgridaitoolkit.com.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <!-- ===== SECTION: MOBILE COMPANION ===== -->
+                    <div class="template-section-heading">
+                        <h3>Mobile Companion Key</h3>
+                        <span class="section-badge blue">Tier 2 and Tier 3 only</span>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Mobile Companion Key Delivery</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Subject: Your OffGrid AI Mobile Companion Key
+
+Hi [Name],
+
+Here is your Mobile Companion key:
+
+Mobile Key: [OGTK-MOB-XXXX-XXXX]
+
+To activate: open offgridtoolkit.ai/command on your phone, enter this key when prompted, and accept the terms.
+
+This key gives you 75 prompts and 5 image generations per month on mobile. Your primary license key for desktop remains unchanged.
+
+Let us know if you have any questions.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <!-- ===== SECTION: POST-DELIVERY FOLLOW-UPS ===== -->
+                    <div class="template-section-heading">
+                        <h3>Post-Delivery Follow-Ups</h3>
+                        <span class="section-badge green">Send 7-10 days after delivery</span>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Tier 1 Follow-Up (Check In + Upgrade Offer)</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Subject: How Is Your OffGrid AI ToolKit Treating You?
+
+Hi [Name],
+
+Just checking in to see how things are going with your OffGrid AI ToolKit. Hopefully it has been up and running without any issues.
+
+If you have had a chance to try the Command Center trial, we would love to hear what you think. And if you have not activated it yet, your trial key is still waiting for you.
+
+As an early adopter, your feedback genuinely matters to us. If you have had a chance to try the product and want to share your thoughts, or if you are interested in upgrading to the full Command Center, just reply to this email. We will send you a $100 discount code as a thank you.
+
+If anything is not working the way you expected, please let us know. We will sort it out.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Tier 2 / Tier 3 Follow-Up (Check In + Feedback Ask)</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Subject: How Is Your OffGrid AI Command Center Treating You?
+
+Hi [Name],
+
+Just checking in to see how things are going with your OffGrid AI ToolKit and Command Center. Hopefully everything has been running smoothly.
+
+If you have had a chance to explore the AI Council, Image Studio, or any of the model options, we would love to hear what you think. Your feedback as an early customer genuinely shapes where we take this product next.
+
+If you are enjoying it, we would really appreciate a quick review or a post on social media. And if something is not working the way you expected, please reply and let us know. We will take care of it.
+
+A few resources in case you have not explored them yet:
+- Command Center walkthrough: https://youtu.be/tLpOwz5IUvk
+- Image Studio walkthrough: https://youtu.be/sm-yv413CTc
+- Real use cases playlist: https://www.youtube.com/playlist?list=PLc0_CVA_M-Fsevt9T-t6s7LX_JOsl-3UK
+
+Thank you for being part of this.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <!-- ===== SECTION: CUSTOMER SUPPORT ===== -->
+                    <div class="template-section-heading">
+                        <h3>Customer Support</h3>
+                        <span class="section-badge muted">Inbound requests</span>
+                    </div>
 
                     <div class="template-card">
                         <div class="template-header" onclick="toggleTemplate(this)">
@@ -1699,11 +1969,13 @@
 
 Thanks for reaching out! It looks like your license key was already activated, and your browser data was cleared, which removed the saved session.
 
-I've reset your key so you can activate it again. Please visit offgridtoolkit.ai/command and enter your key as before. It should work right away.
+I have reset your key so you can activate it again. Please visit offgridtoolkit.ai/command and enter your key as before. It should work right away.
 
-Tip: Avoid clearing your browser data for offgridtoolkit.ai to keep your session active. If you ever need to clear your browser data, just know you can always reach out and we'll reset your key.
+Tip: Avoid clearing your browser data for offgridtoolkit.ai to keep your session active. If you ever need to clear your browser data, just know you can always reach out and we will reset your key.
 
-Let me know if you run into any issues!</div>
+Let me know if you run into any issues!
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
@@ -1716,11 +1988,13 @@ Let me know if you run into any issues!</div>
                         <div class="template-body">
                             <div class="template-text">Hi [Name],
 
-Thanks for reaching out! Your license key can currently be active on one device at a time. Since you'd like to use it on your new [computer/phone], I've reset your key so you can activate it there.
+Thanks for reaching out! Your license key can currently be active on one device at a time. Since you would like to use it on your new [computer/phone], I have reset your key so you can activate it there.
 
 Please visit offgridtoolkit.ai/command on your new device and enter your key. Note that your previous device will no longer have access.
 
-We're working on a multi-device login feature that will make this easier in the future. For now, just let us know whenever you need to switch devices and we'll take care of it right away.</div>
+We are working on a multi-device login feature that will make this easier in the future. For now, just let us know whenever you need to switch devices and we will take care of it right away.
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
@@ -1733,14 +2007,35 @@ We're working on a multi-device login feature that will make this easier in the 
                         <div class="template-body">
                             <div class="template-text">Hi [Name],
 
-You've used all [150/10] of your monthly [prompts/images] - which means you're getting great use out of the Command Center!
+You have used all [150/10] of your monthly [prompts/images] - which means you are getting great use out of the Command Center!
 
 Your usage resets automatically on [date]. In the meantime, here are your options:
 
 1. Wait for the reset - your full allocation will be available again on [date]
-2. Upgrade to Command Center Pro - get 400 monthly prompts and 30 images for $469 at [link]
+2. Upgrade to Command Center Pro - get 400 monthly prompts and 30 images for $469 at offgridaitoolkit.com
 
-If you experienced any errors or failed generations that used up credits unfairly, let me know and I'll credit those back for you.</div>
+If you experienced any errors or failed generations that used up credits unfairly, let me know and I will credit those back for you.
+
+The OffGrid AI Team</div>
+                            <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
+                        </div>
+                    </div>
+
+                    <div class="template-card">
+                        <div class="template-header" onclick="toggleTemplate(this)">
+                            <h4>Trial Key Expired</h4>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="template-body">
+                            <div class="template-text">Hi [Name],
+
+Your 30-day Command Center trial has ended. I hope you had a chance to put it through its paces!
+
+If you would like to continue, you can upgrade to the full Command Center at offgridaitoolkit.com. As a ToolKit owner, reply to this email and we will send you a discount code.
+
+If you need a little more time to decide, just say the word and we will reset your trial. No pressure at all.
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
@@ -1753,11 +2048,13 @@ If you experienced any errors or failed generations that used up credits unfairl
                         <div class="template-body">
                             <div class="template-text">Hi [Name],
 
-I wasn't able to find that license key in our system. This usually happens when there's a small typo - the keys can be tricky to read.
+I was not able to find that license key in our system. This usually happens when there is a small typo - the keys can be tricky to read.
 
-Could you double-check the key on your card? It should be in the format OGTK-XXXX-XXXX-XXXX. If you can send me a photo of the card, I'll look it up for you.
+Could you double-check the key on your card? It should be in the format OGTK-XXXX-XXXX-XXXX (or OGTK-TRL-XXXX-XXXX for a trial key). If you can send me a photo of the card, I will look it up for you.
 
-If you purchased the $129 OffGrid AI ToolKit (without Command Center), that version doesn't include a Command Center license key. You can upgrade to the Command Center version at [link].</div>
+If you purchased the $129 OffGrid AI ToolKit without Command Center, that version does not include a Command Center license key. You can upgrade at offgridaitoolkit.com.
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
@@ -1770,34 +2067,41 @@ If you purchased the $129 OffGrid AI ToolKit (without Command Center), that vers
                         <div class="template-body">
                             <div class="template-text">Hi [Name],
 
-No worries - I can help you recover your license key. To verify your identity, could you provide one of the following?
+No worries - I can help you recover your license key. To verify your purchase, could you provide one of the following?
 
 - Your order confirmation email
 - Your Shopify order number
 - The email address you used to purchase
 
-Once I verify your purchase, I'll send you your key right away.</div>
+Once I verify your purchase, I will send you your key right away.
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
 
                     <div class="template-card">
                         <div class="template-header" onclick="toggleTemplate(this)">
-                            <h4>Upgrade Coupon (via /try-command)</h4>
+                            <h4>Upgrade Offer (Tier 1 to Command Center)</h4>
                             <span class="toggle-icon">&#9660;</span>
                         </div>
                         <div class="template-body">
                             <div class="template-text">Hi [Name],
 
-Welcome to the Command Center! Since you already own the OffGrid AI ToolKit, your upgrade price is just $99 with coupon code 99$cmdUpgrade.
+Great news - as a ToolKit owner, you qualify for a discount on the Command Center upgrade. Here is your code:
 
-Here's how to upgrade:
-1. Visit [Shopify Command Center product page]
-2. Add the Command Center to your cart
-3. Enter coupon code 99$cmdUpgrade at checkout
-4. Your new license key will be included with your order
+Discount Code: [CODE]
 
-You get to keep your current ToolKit drive, and you'll have full access to all four AI models, Command Mode, and Image Studio.</div>
+Here is how to use it:
+1. Visit offgridaitoolkit.com and add the Command Center to your cart
+2. Enter the discount code at checkout
+3. Your new license key will arrive by email
+
+You keep your current ToolKit drive, and you will have full access to all four AI models, the AI Council, Command Mode, and Image Studio.
+
+Let me know if you have any questions.
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
@@ -1810,11 +2114,13 @@ You get to keep your current ToolKit drive, and you'll have full access to all f
                         <div class="template-body">
                             <div class="template-text">Hi [Name],
 
-I'm sorry to hear the Command Center didn't meet your expectations. I've processed your refund through Shopify - you should see it back on your payment method within 5-10 business days.
+I am sorry to hear the Command Center did not meet your expectations. I have processed your refund through Shopify - you should see it back on your payment method within 5-10 business days.
 
-Your license key has been deactivated. If you change your mind in the future, we'd love to have you back.
+Your license key has been deactivated. If you change your mind in the future, we would love to have you back.
 
-Is there anything specific about the experience that didn't work for you? Your feedback helps us improve.</div>
+Is there anything specific about the experience that did not work for you? Your feedback helps us improve.
+
+The OffGrid AI Team</div>
                             <button class="btn btn-outline btn-sm" onclick="copyTemplate(this)">Copy Template</button>
                         </div>
                     </div>
