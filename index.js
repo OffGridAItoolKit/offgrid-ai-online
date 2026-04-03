@@ -81,8 +81,15 @@ function logToBetterStack(level, event, data = {}) {
 
 console.log(`[Better Stack] ${BETTERSTACK_SOURCE_TOKEN ? '✓ Logging enabled' : '✗ No token — logging disabled'}`);
 
-// Original Gemma 3 Models (Free Demo)
+// Gemma Models (Free Demo) - Gemma 3 + Gemma 4
 const GEMMA_MODELS = {
+    'gemma-4-31b': {
+        id: 'google/gemma-4-31b-it',
+        name: 'Gemma 4 31B',
+        description: 'NEW! Most capable Gemma model - 256K context, reasoning, function calling',
+        multimodal: true,
+        responseTime: '~2-5 seconds'
+    },
     'gemma-3-27b': {
         id: 'google/gemma-3-27b-it',
         name: 'Gemma 3 27B',
@@ -2037,7 +2044,8 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`║  Local:   http://localhost:${PORT}                          ║`);
     console.log(`║  Network: http://0.0.0.0:${PORT}                            ║`);
     console.log('╠═══════════════════════════════════════════════════════════╣');
-    console.log('║  Free Demo Models (Gemma 3):                              ║');
+    console.log('║  Free Demo Models (Gemma 3 + Gemma 4):                      ║');
+    console.log('║    • Gemma 4 31B (gemma-4-31b)  ★ NEW                     ║');
     console.log('║    • Gemma 3 27B (gemma-3-27b)                            ║');
     console.log('║    • Gemma 3 12B (gemma-3-12b)                            ║');
     console.log('║    • Gemma 3 4B  (gemma-3-4b)                             ║');

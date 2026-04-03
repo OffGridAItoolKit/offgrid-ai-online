@@ -1034,6 +1034,10 @@
                                     </button>
                                     <div class="welcome-model-dropdown" id="welcomeModelDropdown">
                                         <div class="welcome-model-list">
+                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-4-31b', 'Gemma 4 31B', '🆕 NEW')">
+                                                <div class="welcome-model-item-name">🆕 Gemma 4 31B</div>
+                                                <div class="welcome-model-item-desc">✨ NEW • Most capable • ~2-5 seconds</div>
+                                            </div>
                                             <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-4b', 'Gemma 3 4B', '⚡ Fastest')">
                                                 <div class="welcome-model-item-name">Gemma 3 4B</div>
                                                 <div class="welcome-model-item-desc">⚡ Fastest • ~1-2 seconds</div>
@@ -1179,6 +1183,7 @@
         
         // Model display names and speed badges
         const MODEL_DISPLAY = {
+            'gemma-4-31b': { name: 'Gemma 4 31B', speed: '🆕 NEW' },
             'gemma-3-4b': { name: 'Gemma 3 4B', speed: '⚡ Fastest' },
             'gemma-3-12b': { name: 'Gemma 3 12B', speed: '⚡ Fast' },
             'gemma-3-27b': { name: 'Gemma 3 27B', speed: '🧠 Smartest' }
@@ -1584,6 +1589,10 @@
                             </button>
                             <div class="model-dropdown" id="modelDropdown">
                                 <div class="model-list">
+                                    <div class="model-item${selectedModel === 'gemma-4-31b' ? ' selected' : ''}" onclick="selectModel('gemma-4-31b')">
+                                        <div class="model-item-name">🆕 Gemma 4 31B</div>
+                                        <div class="model-item-desc">✨ NEW • Most capable • ~2-5 seconds</div>
+                                    </div>
                                     <div class="model-item${selectedModel === 'gemma-3-4b' ? ' selected' : ''}" onclick="selectModel('gemma-3-4b')">
                                         <div class="model-item-name">Gemma 3 4B</div>
                                         <div class="model-item-desc">⚡ Fastest • ~1-2 seconds</div>
