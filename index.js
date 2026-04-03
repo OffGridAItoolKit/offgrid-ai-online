@@ -157,6 +157,46 @@ const COMMAND_MODELS = {
 };
 
 // =============================================================================
+// ARENA MODEL CONFIGURATION
+// Gemma 4 31B replaces Ranger (Grok) for the promotional arena event
+// =============================================================================
+
+const ARENA_MODELS = {
+    'scout': {
+        id: 'openai/gpt-5.2',
+        name: 'Scout (GPT 5.2)',
+        shortName: 'Scout',
+        emoji: '\ud83d\udd2d',
+        description: 'Vision Specialist',
+        multimodal: true
+    },
+    'medic': {
+        id: 'anthropic/claude-sonnet-4.6',
+        name: 'Medic (Claude Sonnet 4.6)',
+        shortName: 'Medic',
+        emoji: '\ud83c\udfe5',
+        description: 'Safety & Analysis',
+        multimodal: true
+    },
+    'navigator': {
+        id: 'google/gemini-3.1-pro-preview',
+        name: 'Navigator (Gemini 3.1 Pro)',
+        shortName: 'Navigator',
+        emoji: '\ud83e\udded',
+        description: 'Research & Planning',
+        multimodal: true
+    },
+    'ranger': {
+        id: 'google/gemma-4-31b-it',
+        name: 'Ranger (Gemma 4 31B)',
+        shortName: 'Ranger',
+        emoji: '\ud83c\udfc6',
+        description: 'Open-Source Champion',
+        multimodal: true
+    }
+};
+
+// =============================================================================
 // MIDDLEWARE
 // =============================================================================
 
@@ -506,7 +546,7 @@ Now provide your rankings and explanations as described.`;
  *    rawReviews: [ ... ] // optional debugging info
  *  }
  */
-async function runCouncilReview(userQuery, labeledResults) {
+async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAND_MODELS) {
     const labels = labeledResults.map(r => r.label);
     const answersByLabel = {};
     for (const r of labeledResults) {
@@ -529,7 +569,7 @@ async function runCouncilReview(userQuery, labeledResults) {
     const REVIEW_TIMEOUT_MS = 30000;
 
     const reviewPromises = modelKeys.map(async (reviewKey) => {
-        const reviewModel = COMMAND_MODELS[reviewKey];
+        const reviewModel = activeModels[reviewKey];
         // Randomize label order per reviewer to reduce positional bias
         const shuffledLabels = shuffleArray(labels);
         const reviewMessages = buildReviewerMessages(userQuery, answersByLabel, shuffledLabels);
@@ -798,6 +838,20 @@ app.get('/api/command/models', (req, res) => {
 });
 
 /**
+ * GET /api/arena/models
+ * Returns available Arena models (Gemma 4 replaces Grok)
+ */
+app.get('/api/arena/models', (req, res) => {
+    res.json({
+        models: Object.entries(ARENA_MODELS).map(([key, model]) => ({
+            key,
+            ...model
+        })),
+        defaultModel: 'command'
+    });
+});
+
+/**
  * POST /api/command/stream
  * Streaming endpoint for single Command Center models
  */
@@ -810,9 +864,11 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
             return res.status(500).json({ error: 'Server configuration error' });
         }
         
-        const modelConfig = COMMAND_MODELS[model];
+        const isArenaRequest = req.licenseData?.isArena || false;
+        const activeModels = isArenaRequest ? ARENA_MODELS : COMMAND_MODELS;
+        const modelConfig = activeModels[model];
         if (!modelConfig) {
-            return res.status(400).json({ error: 'Invalid Command Center model selected' });
+            return res.status(400).json({ error: 'Invalid model selected' });
         }
         
         const openRouterMessages = buildOpenRouterMessages(messages, modelConfig.multimodal);
@@ -881,6 +937,11 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             return res.status(400).json({ error: 'Messages are required' });
         }
         
+        // Determine which model set to use: Arena or Command Center
+        // Arena requests are identified by the isArena flag in the JWT token
+        const isArenaRequest = req.licenseData?.isArena || false;
+        const activeModels = isArenaRequest ? ARENA_MODELS : COMMAND_MODELS;
+        
         // Set up SSE
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
@@ -890,7 +951,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         const lastUserMessage = messages.filter(m => m.role === 'user').pop();
         const userQuery = lastUserMessage?.content || '';
         
-        console.log(`[Council] Starting parallel calls for: "${userQuery.substring(0, 80)}..."`);
+        console.log(`[${isArenaRequest ? 'Arena' : 'Council'}] Starting parallel calls for: "${userQuery.substring(0, 80)}..."`);
         
         // Step 1: Make parallel calls to all 4 models
         const modelKeys = ['scout', 'medic', 'navigator', 'ranger'];
@@ -900,7 +961,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         const MODEL_TIMEOUT_MS = 45000;
 
         const promises = modelKeys.map(async (key) => {
-            const model = COMMAND_MODELS[key];
+            const model = activeModels[key];
             try {
                 const modelMessages = buildOpenRouterMessages(messages, model.multimodal);
                 const response = await withTimeout(
@@ -959,7 +1020,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             message: '🤝 Running anonymous peer review (accuracy + insight)...' 
         })}\n\n`);
 
-        const reviewOutcome = await runCouncilReview(userQuery, labeledResults);
+        const reviewOutcome = await runCouncilReview(userQuery, labeledResults, activeModels);
         const { chairmanLabel, chairmanResult, scores } = reviewOutcome;
 
         // Build a scores summary for the frontend
@@ -1944,6 +2005,14 @@ app.get('/command', (req, res) => {
 
 app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// =============================================================================
+// ROUTE: /arena - AI Arena promotional experience
+// =============================================================================
+
+app.get('/arena', (req, res) => {
+    res.sendFile(path.join(__dirname, 'arena.html'));
 });
 
 // =============================================================================

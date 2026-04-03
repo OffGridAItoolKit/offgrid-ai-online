@@ -86,6 +86,18 @@ async function initializeDatabase() {
         await client.query(`
             ALTER TABLE licenses ADD COLUMN IF NOT EXISTS trial_expires_at TIMESTAMP;
         `);
+        // Add is_arena column if it doesn't exist (migration for Arena promo)
+        await client.query(`
+            ALTER TABLE licenses ADD COLUMN IF NOT EXISTS is_arena BOOLEAN NOT NULL DEFAULT FALSE;
+        `);
+        // Add arena_email column for Arena registrations
+        await client.query(`
+            ALTER TABLE licenses ADD COLUMN IF NOT EXISTS arena_email VARCHAR(255);
+        `);
+        // Add arena_opt_in column for email opt-in
+        await client.query(`
+            ALTER TABLE licenses ADD COLUMN IF NOT EXISTS arena_opt_in BOOLEAN NOT NULL DEFAULT FALSE;
+        `);
 
         await client.query(`
             CREATE TABLE IF NOT EXISTS activation_log (
@@ -183,6 +195,15 @@ const TIER_LIMITS = {
         hasImageStudio: true,
         monthlyPrompts: 8,
         monthlyImages: 3
+    },
+    // Arena: Free 30-day promotional keys (30 prompts, no images, 30-day expiry)
+    'arena': {
+        name: 'AI Arena',
+        price: 0,
+        hasCommandCenter: true,
+        hasImageStudio: false,
+        monthlyPrompts: 30,
+        monthlyImages: 0
     }
 };
 
@@ -192,7 +213,7 @@ const TIER_LIMITS = {
  * Returns { monthlyPrompts, monthlyImages }.
  */
 function getEffectiveLimits(license) {
-    const tierKey = license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
+    const tierKey = license.is_arena ? 'arena' : license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
     const tierLimits = TIER_LIMITS[tierKey] || TIER_LIMITS[2];
     return {
         monthlyPrompts: license.custom_prompt_limit !== null && license.custom_prompt_limit !== undefined
@@ -213,12 +234,13 @@ function getEffectiveLimits(license) {
  * Standard format:  OGTK-XXXX-XXXX-XXXX  (19 chars)
  * Mobile format:    OGTK-MOB-XXXX-XXXX   (18 chars)
  * Trial format:     OGTK-TRL-XXXX-XXXX   (18 chars)
+ * Arena format:     OGTK-ARN-XXXX-XXXX   (18 chars)
  * Uses cryptographically secure random bytes.
  */
-function generateLicenseKey(isMobile = false, isTrial = false) {
+function generateLicenseKey(isMobile = false, isTrial = false, isArena = false) {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No I, O, 0, 1 to avoid confusion
-    if (isMobile || isTrial) {
-        const prefix = isTrial ? 'OGTK-TRL-' : 'OGTK-MOB-';
+    if (isMobile || isTrial || isArena) {
+        const prefix = isArena ? 'OGTK-ARN-' : isTrial ? 'OGTK-TRL-' : 'OGTK-MOB-';
         let key = prefix;
         for (let block = 0; block < 2; block++) {
             const bytes = crypto.randomBytes(4);
@@ -250,14 +272,14 @@ function generateLicenseKey(isMobile = false, isTrial = false) {
  */
 async function checkAndResetMonthlyUsage(licenseKey) {
     const result = await pool.query(
-        'SELECT usage_reset_at, is_trial FROM licenses WHERE license_key = $1',
+        'SELECT usage_reset_at, is_trial, is_arena FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return false;
     
-    // Trial keys never reset -- their limits are lifetime, not monthly
-    if (result.rows[0].is_trial) return false;
+    // Trial and Arena keys never reset -- their limits are lifetime, not monthly
+    if (result.rows[0].is_trial || result.rows[0].is_arena) return false;
     
     const lastReset = new Date(result.rows[0].usage_reset_at);
     const now = new Date();
@@ -302,14 +324,14 @@ async function getUsageInfo(licenseKey) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, is_mobile, is_trial, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit, usage_reset_at FROM licenses WHERE license_key = $1',
+        'SELECT tier, is_mobile, is_trial, is_arena, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit, usage_reset_at FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
     if (result.rows.length === 0) return null;
     
     const license = result.rows[0];
-    const tierKey = license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
+    const tierKey = license.is_arena ? 'arena' : license.is_trial ? 'trial' : license.is_mobile ? 'mobile' : license.tier;
     const tierInfo = TIER_LIMITS[tierKey];
     const effective = getEffectiveLimits(license);
     
@@ -317,6 +339,7 @@ async function getUsageInfo(licenseKey) {
         tier: license.tier,
         isMobile: license.is_mobile,
         isTrial: license.is_trial,
+        isArena: license.is_arena,
         trialExpiresAt: license.trial_expires_at,
         tierName: tierInfo.name,
         prompts: {
@@ -331,7 +354,7 @@ async function getUsageInfo(licenseKey) {
         },
         hasCustomLimits: license.custom_prompt_limit !== null || license.custom_image_limit !== null,
         resetDate: license.usage_reset_at,
-        nextReset: license.is_trial ? null : getNextResetDate()
+        nextReset: (license.is_trial || license.is_arena) ? null : getNextResetDate()
     };
 }
 
@@ -353,7 +376,7 @@ async function checkUsageLimit(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, is_mobile, is_trial, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
+        'SELECT tier, is_mobile, is_trial, is_arena, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
@@ -383,7 +406,7 @@ async function checkUsageLimit(licenseKey, type) {
                 reason: license.is_trial ? 'trial_prompt_limit' : 'monthly_prompt_limit',
                 used: license.prompt_count,
                 limit: effective.monthlyPrompts,
-                nextReset: license.is_trial ? null : getNextResetDate(),
+                nextReset: (license.is_trial || license.is_arena) ? null : getNextResetDate(),
                 isTrial: license.is_trial || false
             };
         }
@@ -397,7 +420,7 @@ async function checkUsageLimit(licenseKey, type) {
                 reason: license.is_trial ? 'trial_image_limit' : 'monthly_image_limit',
                 used: license.image_count,
                 limit: effective.monthlyImages,
-                nextReset: license.is_trial ? null : getNextResetDate(),
+                nextReset: (license.is_trial || license.is_arena) ? null : getNextResetDate(),
                 isTrial: license.is_trial || false
             };
         }
@@ -415,7 +438,7 @@ async function incrementUsage(licenseKey, type) {
     await checkAndResetMonthlyUsage(licenseKey);
     
     const result = await pool.query(
-        'SELECT tier, is_mobile, is_trial, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
+        'SELECT tier, is_mobile, is_trial, is_arena, trial_expires_at, prompt_count, image_count, custom_prompt_limit, custom_image_limit FROM licenses WHERE license_key = $1',
         [licenseKey]
     );
     
@@ -581,9 +604,11 @@ function requireLicense(req, res, next) {
     
     // Attach license info to the request for downstream handlers
     req.license = {
-        licenseKey: decoded.licenseKey,
+        licenseKey: decoded.licenseKey || decoded.key,
         tier: decoded.tier
     };
+    // Also attach the full decoded token data for arena detection
+    req.licenseData = decoded;
     
     next();
 }
@@ -1626,9 +1651,141 @@ function registerLicenseRoutes(app, logToBetterStack) {
         }
     });
 
+      // =========================================================================
+    // ARENA REGISTRATION
+    // =========================================================================
+
+    // -------------------------------------------------------------------------
+    // POST /api/arena/register
+    // Email-based registration for the AI Arena promotional event.
+    // Creates an arena license key, binds it to the email, and returns a JWT.
+    // If the email already has an arena key, returns the existing token.
+    // -------------------------------------------------------------------------
+    app.post('/api/arena/register', async (req, res) => {
+        try {
+            const { email, optIn } = req.body;
+
+            if (!email || typeof email !== 'string' || !email.includes('@') || !email.includes('.')) {
+                return res.status(400).json({ error: 'A valid email address is required.', code: 'INVALID_EMAIL' });
+            }
+
+            const normalizedEmail = email.trim().toLowerCase();
+
+            // Rate limit: max 5 registrations per IP per hour
+            // (Simple in-memory rate limiter; resets on server restart)
+            const clientIP = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip;
+            if (!global._arenaRateLimit) global._arenaRateLimit = {};
+            const now = Date.now();
+            const ipEntry = global._arenaRateLimit[clientIP] || { count: 0, resetAt: now + 3600000 };
+            if (now > ipEntry.resetAt) {
+                ipEntry.count = 0;
+                ipEntry.resetAt = now + 3600000;
+            }
+            ipEntry.count++;
+            global._arenaRateLimit[clientIP] = ipEntry;
+            if (ipEntry.count > 5) {
+                return res.status(429).json({ error: 'Too many registrations. Please try again later.', code: 'RATE_LIMIT' });
+            }
+
+            // Check if this email already has an arena key
+            const existing = await pool.query(
+                'SELECT * FROM licenses WHERE arena_email = $1 AND is_arena = TRUE',
+                [normalizedEmail]
+            );
+
+            if (existing.rows.length > 0) {
+                const license = existing.rows[0];
+                const effective = getEffectiveLimits(license);
+
+                // Check if expired (30 days from activation)
+                if (license.trial_expires_at && new Date(license.trial_expires_at) < new Date()) {
+                    return res.status(403).json({
+                        error: 'Your Arena access has expired. Thanks for participating!',
+                        code: 'ARENA_EXPIRED'
+                    });
+                }
+
+                // Generate a fresh token for returning user
+                const token = jwt.sign(
+                    { key: license.license_key, tier: license.tier, isArena: true },
+                    JWT_SECRET,
+                    { expiresIn: JWT_EXPIRY }
+                );
+
+                await logActivationEvent(license.license_key, 'arena.return', `Returning arena user: ${normalizedEmail}`);
+
+                return res.json({
+                    token,
+                    tier: 'arena',
+                    tierName: 'AI Arena',
+                    returning: true,
+                    limits: {
+                        monthlyPrompts: effective.monthlyPrompts,
+                        monthlyImages: effective.monthlyImages,
+                        promptsUsed: license.prompt_count
+                    }
+                });
+            }
+
+            // Create a new arena key
+            let arenaKey;
+            let attempts = 0;
+            while (attempts < 10) {
+                arenaKey = generateLicenseKey(false, false, true);
+                const dup = await pool.query('SELECT 1 FROM licenses WHERE license_key = $1', [arenaKey]);
+                if (dup.rows.length === 0) break;
+                attempts++;
+            }
+
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + 30);
+
+            await pool.query(
+                `INSERT INTO licenses (license_key, tier, is_activated, activated_at, is_arena, arena_email, arena_opt_in, trial_expires_at, email)
+                 VALUES ($1, 2, TRUE, NOW(), TRUE, $2, $3, $4, $2)`,
+                [arenaKey, normalizedEmail, optIn || false, expiresAt.toISOString()]
+            );
+
+            const token = jwt.sign(
+                { key: arenaKey, tier: 2, isArena: true },
+                JWT_SECRET,
+                { expiresIn: JWT_EXPIRY }
+            );
+
+            await logActivationEvent(arenaKey, 'arena.register', `New arena registration: ${normalizedEmail}, opt-in: ${optIn || false}`);
+
+            if (logToBetterStack) {
+                logToBetterStack('arena_registration', {
+                    key: arenaKey,
+                    email: normalizedEmail,
+                    optIn: optIn || false
+                });
+            }
+
+            const effective = getEffectiveLimits({ tier: 2, is_arena: true, custom_prompt_limit: null, custom_image_limit: null });
+
+            res.json({
+                token,
+                tier: 'arena',
+                tierName: 'AI Arena',
+                returning: false,
+                key: arenaKey,
+                limits: {
+                    monthlyPrompts: effective.monthlyPrompts,
+                    monthlyImages: effective.monthlyImages,
+                    promptsUsed: 0
+                }
+            });
+
+        } catch (error) {
+            console.error('[Arena] Registration error:', error);
+            res.status(500).json({ error: 'Registration failed. Please try again.' });
+        }
+    });
+
     // -------------------------------------------------------------------------
     // GET /api/admin/backup
-    // Export full database snapshot as JSON for manual backup
+    // Full database backup (JSON download)for manual backup
     // -------------------------------------------------------------------------
     app.get('/api/admin/backup', requireAdmin, async (req, res) => {
         try {
