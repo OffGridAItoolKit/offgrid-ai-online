@@ -1133,7 +1133,7 @@
                                     oninput="autoResizeWelcome(this)"
                                 ></textarea>
                                 <div style="position: relative;">
-                                    <div class="video-upload-tooltip" id="welcomeVideoTooltip">New! Analyze videos (60s max)</div>
+                                    <div class="video-upload-tooltip" id="welcomeVideoTooltip">New! Analyze videos (20s max)</div>
                                     <svg class="video-upload-btn" onclick="triggerVideoUpload(); dismissVideoTooltip();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
                                         <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                                         <line x1="7" y1="2" x2="7" y2="22"></line>
@@ -1730,7 +1730,7 @@
                         </div>
                         <textarea id="messageInput" class="message-input" placeholder="Ask OffGrid AI anything..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
                         <div style="position: relative;">
-                            <div class="video-upload-tooltip" id="videoUploadTooltip">New! Analyze videos (60s max)</div>
+                            <div class="video-upload-tooltip" id="videoUploadTooltip">New! Analyze videos (20s max)</div>
                             <svg class="video-upload-btn" onclick="triggerVideoUpload(); dismissVideoTooltip();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
                                 <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                                 <line x1="7" y1="2" x2="7" y2="22"></line>
@@ -2339,8 +2339,8 @@
             videoEl.onloadedmetadata = function() {
                 window.URL.revokeObjectURL(videoEl.src);
                 
-                if (videoEl.duration > 60) {
-                    alert('Video is too long (' + Math.round(videoEl.duration) + ' seconds). Maximum duration is 60 seconds for AI analysis.');
+                if (videoEl.duration > 20) {
+                    alert('Video is too long (' + Math.round(videoEl.duration) + ' seconds). Maximum duration is 20 seconds for AI analysis.');
                     return;
                 }
                 
