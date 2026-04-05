@@ -2812,3 +2812,104 @@ body.command-theme {
         margin-top: 6px !important;
     }
 }
+
+/* ============================================ */
+/* Mobile Welcome Screen Reorder & Cleanup      */
+/* ============================================ */
+@media (max-width: 768px) {
+    /* Use flexbox on welcome content to reorder elements */
+    .welcome-content {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 0 8px !important;
+    }
+    
+    /* Hide compass on mobile */
+    .welcome-icon {
+        display: none !important;
+    }
+    
+    /* Title stays at top */
+    .welcome h2 {
+        order: 1 !important;
+        font-size: 18px !important;
+        margin-bottom: 2px !important;
+    }
+    
+    .welcome-online-badge {
+        order: 2 !important;
+        margin-bottom: 4px !important;
+    }
+    
+    /* Hide subtitle and feature badges on mobile to save space */
+    .welcome-subtitle {
+        order: 3 !important;
+        display: none !important;
+    }
+    
+    .feature-badges {
+        order: 4 !important;
+        display: none !important;
+    }
+    
+    /* Hide the description paragraph on mobile */
+    .welcome-content > p {
+        order: 5 !important;
+        display: none !important;
+    }
+    
+    /* Chat input box - MOVED TO TOP (right after title) */
+    .welcome-input-area {
+        order: 6 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 6px 0 8px 0 !important;
+    }
+    
+    .welcome-input-container {
+        padding: 8px 10px !important;
+        border-radius: 12px !important;
+    }
+    
+    /* Desktop quick actions hidden on mobile */
+    .desktop-quick-actions {
+        display: none !important;
+    }
+    
+    /* Mobile quick actions - after chat box */
+    .mobile-quick-actions {
+        order: 7 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Full-width action buttons */
+    .mobile-action-grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 6px !important;
+    }
+    
+    .mobile-action-btn {
+        padding: 10px 14px !important;
+    }
+    
+    /* Purchase CTA at bottom */
+    .welcome-content > .prospect-only:last-child {
+        order: 8 !important;
+    }
+    
+    /* Reduce overall padding on welcome */
+    .welcome {
+        padding: 5px 4px 10px 4px !important;
+    }
+    
+    /* Reduce side padding on messages container */
+    .messages {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+}

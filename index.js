@@ -335,8 +335,20 @@ function buildOpenRouterMessages(messages, multimodal = true) {
             const content = [
                 { type: 'text', text: msg.content || 'Analyze these video frames and describe what is happening.' }
             ];
-            // Add each frame as an image_url
-            for (const frame of msg.videoFrames) {
+            // Add frames as image_url (limit to 5 evenly-spaced frames to reduce payload)
+            const allFrames = msg.videoFrames;
+            const maxFrames = 5;
+            let framesToSend;
+            if (allFrames.length <= maxFrames) {
+                framesToSend = allFrames;
+            } else {
+                framesToSend = [];
+                for (let i = 0; i < maxFrames; i++) {
+                    const idx = Math.floor(i * (allFrames.length - 1) / (maxFrames - 1));
+                    framesToSend.push(allFrames[idx]);
+                }
+            }
+            for (const frame of framesToSend) {
                 content.push({
                     type: 'image_url',
                     image_url: {
@@ -435,7 +447,9 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temper
 
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        res.write(`data: ${JSON.stringify({ error: errorData.error?.message || 'Stream error' })}\n\n`);
+        const errMsg = errorData.error?.message || errorData.error || 'Provider returned error';
+        console.error('OpenRouter stream error:', JSON.stringify(errorData));
+        res.write(`data: ${JSON.stringify({ error: typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg) })}\n\n`);
         res.end();
         return;
     }

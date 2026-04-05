@@ -2301,7 +2301,33 @@
         // VIDEO HANDLING
         // ============================================
         
+        function autoSelectVideoModel() {
+            // Auto-select Gemma 4 26B A4B for video analysis
+            const currentModel = selectedModel;
+            if (currentModel !== 'gemma-4-26b') {
+                selectedModel = 'gemma-4-26b';
+                sessionStorage.setItem('offgrid_selected_model', 'gemma-4-26b');
+                // Update welcome dropdown if visible
+                const welcomeBtn = document.getElementById('welcomeModelButton');
+                if (welcomeBtn) {
+                    const nameEl = welcomeBtn.querySelector('.model-name');
+                    const badgeEl = welcomeBtn.querySelector('.model-speed-badge');
+                    if (nameEl) nameEl.textContent = 'Gemma 4 26B A4B';
+                    if (badgeEl) badgeEl.textContent = '🧪 TESTING';
+                }
+                // Update chat dropdown if visible
+                const chatBtn = document.getElementById('modelSelectorButton');
+                if (chatBtn) {
+                    const nameEl = chatBtn.querySelector('.model-name');
+                    const badgeEl = chatBtn.querySelector('.model-speed-badge');
+                    if (nameEl) nameEl.textContent = 'Gemma 4 26B A4B';
+                    if (badgeEl) badgeEl.textContent = '🧪 TESTING';
+                }
+            }
+        }
+        
         function triggerVideoUpload() {
+            autoSelectVideoModel();
             // Ensure we're in chat mode
             let input = document.getElementById('videoInput');
             if (!input) {
@@ -2325,6 +2351,7 @@
         }
 
         function triggerVideoRecord() {
+            autoSelectVideoModel();
             // Create a temporary video input with capture attribute for recording
             let input = document.getElementById('videoRecordInput');
             if (!input) {
