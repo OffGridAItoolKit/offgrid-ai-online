@@ -86,9 +86,16 @@ const GEMMA_MODELS = {
     'gemma-4-31b': {
         id: 'google/gemma-4-31b-it',
         name: 'Gemma 4 31B',
-        description: 'NEW! Most capable Gemma model - 256K context, reasoning, function calling',
+        description: 'TESTING - Dense 31B, 256K context, reasoning, multimodal (text+image)',
         multimodal: true,
         responseTime: '~2-5 seconds'
+    },
+    'gemma-4-26b': {
+        id: 'google/gemma-4-26b-a4b-it',
+        name: 'Gemma 4 26B A4B',
+        description: 'TESTING - MoE (only 4B active), 256K context, multimodal (text+image+video)',
+        multimodal: true,
+        responseTime: '~1-3 seconds'
     },
     'gemma-3-27b': {
         id: 'google/gemma-3-27b-it',
@@ -2114,7 +2121,8 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`║  Network: http://0.0.0.0:${PORT}                            ║`);
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Free Demo Models (Gemma 3 + Gemma 4):                      ║');
-    console.log('║    • Gemma 4 31B (gemma-4-31b)  ★ NEW                     ║');
+    console.log('║    • Gemma 4 31B  (gemma-4-31b)  TESTING                  ║');
+    console.log('║    • Gemma 4 26B  (gemma-4-26b)  TESTING                  ║');
     console.log('║    • Gemma 3 27B (gemma-3-27b)                            ║');
     console.log('║    • Gemma 3 12B (gemma-3-12b)                            ║');
     console.log('║    • Gemma 3 4B  (gemma-3-4b)                             ║');
