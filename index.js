@@ -88,6 +88,7 @@ const GEMMA_MODELS = {
         name: 'Gemma 4 31B',
         description: 'TESTING - Dense 31B, 256K context, reasoning, multimodal (text+image)',
         multimodal: true,
+        videoSupport: false,
         responseTime: '~2-5 seconds'
     },
     'gemma-4-26b': {
@@ -95,6 +96,7 @@ const GEMMA_MODELS = {
         name: 'Gemma 4 26B A4B',
         description: 'TESTING - MoE (only 4B active), 256K context, multimodal (text+image+video)',
         multimodal: true,
+        videoSupport: true,
         responseTime: '~1-3 seconds'
     },
     'gemma-3-27b': {
@@ -214,7 +216,7 @@ app.use(cors({
 }));
 
 // JSON body parser with size limit for images
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
 
 // Trust proxy for rate limiting behind reverse proxies
 app.set('trust proxy', 1);
@@ -328,6 +330,23 @@ app.use((req, res, next) => {
  */
 function buildOpenRouterMessages(messages, multimodal = true) {
     return messages.map(msg => {
+        if (msg.video && multimodal) {
+            // Video content - use video_url type per OpenRouter docs
+            return {
+                role: msg.role,
+                content: [
+                    { type: 'text', text: msg.content || 'Describe what is happening in this video.' },
+                    { 
+                        type: 'video_url', 
+                        video_url: { 
+                            url: msg.video.startsWith('data:') 
+                                ? msg.video 
+                                : `data:video/mp4;base64,${msg.video}`
+                        }
+                    }
+                ]
+            };
+        }
         if (msg.image && multimodal) {
             return {
                 role: msg.role,
