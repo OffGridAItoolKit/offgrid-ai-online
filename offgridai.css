@@ -1071,52 +1071,82 @@ body {
     }
     
     .mobile-quick-actions {
-        display: flex !important;
-        flex-direction: column;
-        gap: 12px;
-        width: 90%;
+        display: block !important;
+        width: 100%;
         max-width: 400px;
-        margin: -10px auto 0 auto;
+        margin: 0 auto;
+        padding: 0 4px;
     }
-     .mobile-quick-actions .quick-action {
+    
+    /* App-like action grid: 4 buttons in a 2x2 grid */
+    .mobile-action-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .mobile-action-btn {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 16px;
-        padding: 16px;
+        justify-content: center;
+        gap: 6px;
+        padding: 14px 8px;
         background: white;
         border: 1px solid rgba(184, 134, 11, 0.25);
         border-radius: 12px;
         cursor: pointer;
         transition: all 0.2s;
-        text-align: left;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
-    .mobile-quick-actions .quick-action:hover {
-        background: white;
-        border-color: rgba(218, 165, 32, 0.5);
-        box-shadow: 0 2px 8px rgba(184, 134, 11, 0.12);
+    .mobile-action-btn:active {
+        background: rgba(184, 134, 11, 0.08);
+        transform: scale(0.97);
     }
     
-    .mobile-quick-actions .quick-action-icon {
-        font-size: 24px;
-        flex-shrink: 0;
+    .mobile-action-icon {
+        font-size: 28px;
     }
     
-    .mobile-quick-actions .quick-action-content {
-        flex: 1;
-    }
-    
-    .mobile-quick-actions .quick-action-title {
-        font-size: 15px;
+    .mobile-action-label {
+        font-size: 12px;
         font-weight: 600;
         color: #2c1810;
-        margin-bottom: 2px;
+        text-align: center;
     }
     
-    .mobile-quick-actions .quick-action-desc {
+    /* Secondary row: 2 buttons side by side */
+    .mobile-secondary-row {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .mobile-secondary-btn {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 10px 8px;
+        background: rgba(44, 24, 16, 0.04);
+        border: 1px solid rgba(184, 134, 11, 0.2);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
         font-size: 12px;
-        color: #111827;
+        font-weight: 500;
+        color: #6b4423;
+    }
+    
+    .mobile-secondary-btn:active {
+        background: rgba(184, 134, 11, 0.1);
+        transform: scale(0.97);
+    }
+    
+    .mobile-secondary-btn span {
+        font-size: 14px;
     }
 }
 
@@ -1344,17 +1374,42 @@ body {
     }
     
     .welcome {
-        padding: 20px;
-        padding-top: 30px;
-        padding-bottom: 40px;
+        padding: 12px 8px;
+        padding-top: 10px;
+        padding-bottom: 20px;
+    }
+    
+    .welcome-icon {
+        display: none !important;
     }
     
     .welcome h2 {
-        font-size: 20px;
+        font-size: 18px;
+        margin-bottom: 4px;
+    }
+    
+    .welcome-online-badge {
+        margin-bottom: 4px !important;
+    }
+    
+    .welcome-subtitle {
+        font-size: 11px !important;
+        margin-bottom: 6px !important;
     }
     
     .welcome p {
-        font-size: 14px;
+        font-size: 13px;
+        margin-top: 6px;
+        margin-bottom: 12px;
+    }
+    
+    .feature-badges {
+        margin-bottom: 6px !important;
+    }
+    
+    .feature-badge {
+        font-size: 9px !important;
+        padding: 2px 6px !important;
     }
     
     .quick-actions {
@@ -1992,12 +2047,12 @@ body {
 /* Mobile responsive for welcome input */
 @media (max-width: 768px) {
     .welcome-input-area {
-        max-width: 95%;
-        margin: 16px auto 20px auto;
+        max-width: 100%;
+        margin: 8px auto 10px auto;
     }
     
     .welcome-input-container {
-        padding: 12px;
+        padding: 8px 10px;
     }
     
     .welcome-message-input {
@@ -2729,4 +2784,31 @@ body.command-theme {
 
 .command-theme .model-helper::after {
     border-top-color: #21262d;
+}
+
+
+/* ============================================ */
+/* Mobile App-Like Redesign                     */
+/* ============================================ */
+@media (max-width: 768px) {
+    /* Hide purchase CTA on mobile welcome - already in sidebar */
+    .welcome .purchase-cta {
+        display: none !important;
+    }
+    
+    /* Tighter welcome model button */
+    .welcome-model-button {
+        height: 34px !important;
+        font-size: 12px !important;
+    }
+    
+    .welcome-send-button {
+        height: 34px !important;
+        font-size: 13px !important;
+        padding: 0 16px !important;
+    }
+    
+    .welcome-button-row {
+        margin-top: 6px !important;
+    }
 }

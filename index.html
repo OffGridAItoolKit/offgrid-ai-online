@@ -1229,50 +1229,60 @@
                     
                     <!-- Mobile quick actions (Prospect) -->
                     <div class="mobile-quick-actions prospect-only">
-                        <div class="quick-action" onclick="triggerGalleryUpload()">
-                            <div class="quick-action-icon">🖼️</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Upload Image</div>
-                                <div class="quick-action-desc">From gallery</div>
+                        <div class="mobile-action-grid">
+                            <div class="mobile-action-btn" onclick="triggerCameraCapture()">
+                                <div class="mobile-action-icon">📷</div>
+                                <div class="mobile-action-label">Take Picture</div>
+                            </div>
+                            <div class="mobile-action-btn" onclick="triggerGalleryUpload()">
+                                <div class="mobile-action-icon">🖼️</div>
+                                <div class="mobile-action-label">Upload Image</div>
+                            </div>
+                            <div class="mobile-action-btn" onclick="triggerVideoRecord()">
+                                <div class="mobile-action-icon">🎬</div>
+                                <div class="mobile-action-label">Record Video</div>
+                            </div>
+                            <div class="mobile-action-btn" onclick="triggerVideoUpload()">
+                                <div class="mobile-action-icon">📁</div>
+                                <div class="mobile-action-label">Upload Video</div>
                             </div>
                         </div>
-                        <div class="quick-action" onclick="setupTranslator()">
-                            <div class="quick-action-icon">🌐</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Translator</div>
-                                <div class="quick-action-desc">Quick translate</div>
+                        <div class="mobile-secondary-row">
+                            <div class="mobile-secondary-btn" onclick="window.location.href='/online/ready-made-prompts'">
+                                <span>💡</span> Ready-Made Prompts
+                            </div>
+                            <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
+                                <span>⭐</span> Command Center
                             </div>
                         </div>
                     </div>
 
                     <!-- Mobile quick actions (Customer) -->
                     <div class="mobile-quick-actions customer-only">
-                        <div class="quick-action" onclick="triggerCameraCapture()">
-                            <div class="quick-action-icon">📸</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Take Picture</div>
-                                <div class="quick-action-desc">Camera capture</div>
+                        <div class="mobile-action-grid">
+                            <div class="mobile-action-btn" onclick="triggerCameraCapture()">
+                                <div class="mobile-action-icon">📷</div>
+                                <div class="mobile-action-label">Take Picture</div>
+                            </div>
+                            <div class="mobile-action-btn" onclick="triggerGalleryUpload()">
+                                <div class="mobile-action-icon">🖼️</div>
+                                <div class="mobile-action-label">Upload Image</div>
+                            </div>
+                            <div class="mobile-action-btn" onclick="triggerVideoRecord()">
+                                <div class="mobile-action-icon">🎬</div>
+                                <div class="mobile-action-label">Record Video</div>
+                            </div>
+                            <div class="mobile-action-btn" onclick="triggerVideoUpload()">
+                                <div class="mobile-action-icon">📁</div>
+                                <div class="mobile-action-label">Upload Video</div>
                             </div>
                         </div>
-                        <div class="quick-action" onclick="triggerGalleryUpload()">
-                            <div class="quick-action-icon">🖼️</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Upload Image</div>
-                                <div class="quick-action-desc">From gallery</div>
+                        <div class="mobile-secondary-row">
+                            <div class="mobile-secondary-btn" onclick="window.location.href='/online/ready-made-prompts'">
+                                <span>💡</span> Ready-Made Prompts
                             </div>
-                        </div>
-                        <div class="quick-action" id="voiceInputCard" onclick="startVoiceInput()">
-                            <div class="quick-action-icon">🎙️</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Voice Input</div>
-                                <div class="quick-action-desc">Speak your prompt</div>
-                            </div>
-                        </div>
-                        <div class="quick-action" onclick="window.location.href='/online/ready-made-prompts'">
-                            <div class="quick-action-icon">💡</div>
-                            <div class="quick-action-content">
-                                <div class="quick-action-title">Ready-Made Prompts</div>
-                                <div class="quick-action-desc">Expert prompts for your library</div>
+                            <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
+                                <span>⭐</span> Command Center
                             </div>
                         </div>
                     </div>
@@ -1687,6 +1697,7 @@
                     <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
                     <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
                     <input type="file" id="videoInput" class="image-upload-input" accept="video/mp4,video/webm,video/mov,video/mpeg" onchange="handleVideoSelect(event)">
+                    <input type="file" id="videoRecordInput" class="image-upload-input" accept="video/mp4,video/webm,video/mov,video/mpeg" capture="environment" onchange="handleVideoSelect(event)">
                     <div class="video-preview" id="videoPreview">
                         <video class="video-preview-thumb" id="videoPreviewThumb" muted></video>
                         <div class="video-preview-info">
@@ -2314,7 +2325,39 @@
             }
             if (input) input.click();
         }
-        
+
+        function triggerVideoRecord() {
+            // Create a temporary video input with capture attribute for recording
+            let input = document.getElementById('videoRecordInput');
+            if (!input) {
+                const welcomeInput = document.getElementById('welcomeMessageInput');
+                const savedText = welcomeInput ? welcomeInput.value : '';
+                
+                transitionToChat();
+                const welcome = document.getElementById('welcome');
+                if (welcome) welcome.remove();
+                
+                // Create a temporary input for camera video recording
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'videoRecordInput';
+                input.accept = 'video/mp4,video/webm,video/mov,video/mpeg';
+                input.capture = 'environment';
+                input.style.display = 'none';
+                input.onchange = handleVideoSelect;
+                document.body.appendChild(input);
+                
+                if (savedText) {
+                    const newInput = document.getElementById('messageInput');
+                    if (newInput) {
+                        newInput.value = savedText;
+                        autoResize(newInput);
+                    }
+                }
+            }
+            if (input) input.click();
+        }
+
         function handleVideoSelect(event) {
             const file = event.target.files[0];
             if (!file) return;
