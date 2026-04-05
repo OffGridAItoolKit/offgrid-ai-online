@@ -1178,7 +1178,7 @@
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
         
-        let selectedModel = 'gemma-3-12b';
+        let selectedModel = sessionStorage.getItem('offgrid-selected-model') || 'gemma-3-12b';
         let isTyping = false;
         let selectedImage = null;
         let conversationHistory = [];
@@ -1436,6 +1436,7 @@
         
         function selectModel(model) {
             selectedModel = model;
+            sessionStorage.setItem('offgrid-selected-model', model);
             const display = MODEL_DISPLAY[model] || { name: model, speed: '' };
             
             document.getElementById('selectedModelName').textContent = display.name;
@@ -1491,6 +1492,7 @@
         
         function selectWelcomeModel(modelId, displayName, speedBadge) {
             selectedModel = modelId;
+            sessionStorage.setItem('offgrid-selected-model', modelId);
             document.getElementById('welcomeSelectedModelName').textContent = displayName;
             const badge = document.getElementById('welcomeSpeedBadge');
             if (badge) badge.textContent = speedBadge;
@@ -1783,7 +1785,7 @@
                     image: msg.image
                 }));
                 
-                const response = await fetch(`${API_BASE}/api/chat`, {
+                const response = await fetch(`${API_BASE}/api/stream`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1797,26 +1799,80 @@
                     throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
                 }
                 
-                const data = await response.json();
+                // Remove typing indicator and create the message bubble for streaming
                 typingDiv.remove();
+                const messagesDiv = document.getElementById('messages');
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message assistant';
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                messageDiv.innerHTML = `
+                    <div class="message-avatar">AI</div>
+                    <div class="message-content">
+                        <div class="message-text markdown-content" id="streamingText"></div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+                messagesDiv.appendChild(messageDiv);
+                
+                // Stream the response with typing effect
+                const streamingTextEl = document.getElementById('streamingText');
+                let fullResponse = '';
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+                            try {
+                                const parsed = JSON.parse(data);
+                                if (parsed.content) {
+                                    fullResponse += parsed.content;
+                                    if (typeof marked !== 'undefined') {
+                                        streamingTextEl.innerHTML = marked.parse(fullResponse);
+                                        // Make links open in new tab
+                                        streamingTextEl.querySelectorAll('a').forEach(a => {
+                                            a.setAttribute('target', '_blank');
+                                            a.setAttribute('rel', 'noopener noreferrer');
+                                        });
+                                    } else {
+                                        streamingTextEl.textContent = fullResponse;
+                                    }
+                                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                                }
+                                if (parsed.error) {
+                                    throw new Error(parsed.error);
+                                }
+                            } catch (e) {
+                                if (e.message && !e.message.includes('JSON')) throw e;
+                            }
+                        }
+                    }
+                }
+                
+                // Remove the streaming ID to avoid conflicts
+                streamingTextEl.removeAttribute('id');
                 
                 // Calculate and display response time
                 const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
-                
-                // Show response time indicator
-                const messagesDiv = document.getElementById('messages');
+                const displayName = MODEL_DISPLAY[selectedModel]?.name || selectedModel;
                 const timeIndicator = document.createElement('div');
                 timeIndicator.className = 'response-time';
-                timeIndicator.innerHTML = `⚡ ${data.model || selectedModel} • ${responseTime}s response time`;
+                timeIndicator.innerHTML = `⚡ ${displayName} • ${responseTime}s response time`;
                 messagesDiv.appendChild(timeIndicator);
-                
-                // Add assistant response
-                addMessage(data.response, 'assistant');
                 
                 // Add to conversation history
                 conversationHistory.push({
                     role: 'assistant',
-                    content: data.response
+                    content: fullResponse
                 });
                 
                 // Enable Save to KB button
@@ -1917,10 +1973,23 @@
         function triggerImageUpload() {
             let input = document.getElementById('imageInput');
             if (!input) {
+                // Save any existing text from welcome input before transitioning
+                const welcomeInput = document.getElementById('welcomeMessageInput');
+                const savedText = welcomeInput ? welcomeInput.value : '';
+                
                 transitionToChat();
                 const welcome = document.getElementById('welcome');
                 if (welcome) welcome.remove();
                 input = document.getElementById('imageInput');
+                
+                // Restore the saved text to the new input
+                if (savedText) {
+                    const newInput = document.getElementById('messageInput');
+                    if (newInput) {
+                        newInput.value = savedText;
+                        autoResize(newInput);
+                    }
+                }
             }
             if (input) input.click();
         }
@@ -1928,10 +1997,23 @@
         function triggerCameraCapture() {
             let input = document.getElementById('imageInput');
             if (!input) {
+                // Save any existing text from welcome input before transitioning
+                const welcomeInput = document.getElementById('welcomeMessageInput');
+                const savedText = welcomeInput ? welcomeInput.value : '';
+                
                 transitionToChat();
                 const welcome = document.getElementById('welcome');
                 if (welcome) welcome.remove();
                 input = document.getElementById('imageInput');
+                
+                // Restore the saved text to the new input
+                if (savedText) {
+                    const newInput = document.getElementById('messageInput');
+                    if (newInput) {
+                        newInput.value = savedText;
+                        autoResize(newInput);
+                    }
+                }
             }
             if (input) input.click();
         }
@@ -1939,10 +2021,23 @@
         function triggerGalleryUpload() {
             let input = document.getElementById('galleryInput');
             if (!input) {
+                // Save any existing text from welcome input before transitioning
+                const welcomeInput = document.getElementById('welcomeMessageInput');
+                const savedText = welcomeInput ? welcomeInput.value : '';
+                
                 transitionToChat();
                 const welcome = document.getElementById('welcome');
                 if (welcome) welcome.remove();
                 input = document.getElementById('galleryInput');
+                
+                // Restore the saved text to the new input
+                if (savedText) {
+                    const newInput = document.getElementById('messageInput');
+                    if (newInput) {
+                        newInput.value = savedText;
+                        autoResize(newInput);
+                    }
+                }
             }
             if (input) input.click();
         }
@@ -2060,7 +2155,7 @@
         function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.overflow = 'hidden';
-            const maxHeight = window.innerWidth <= 768 ? 80 : 120;
+            const maxHeight = window.innerWidth <= 768 ? 150 : 200;
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = newHeight + 'px';
             if (textarea.scrollHeight > maxHeight) {
@@ -2835,6 +2930,25 @@
                         };
                     }
                 }
+            }
+
+            // Restore persisted model selection
+            const savedModel = sessionStorage.getItem('offgrid-selected-model');
+            if (savedModel && MODEL_DISPLAY[savedModel]) {
+                selectedModel = savedModel;
+                const display = MODEL_DISPLAY[savedModel];
+                // Update welcome screen model button
+                const welcomeModelName = document.getElementById('welcomeSelectedModelName');
+                const welcomeSpeedBadge = document.getElementById('welcomeSpeedBadge');
+                if (welcomeModelName) welcomeModelName.textContent = display.name;
+                if (welcomeSpeedBadge) welcomeSpeedBadge.textContent = display.speed;
+                // Update welcome dropdown selected state
+                document.querySelectorAll('.welcome-model-item').forEach(item => {
+                    item.classList.remove('selected');
+                    if (item.getAttribute('onclick')?.includes(savedModel)) {
+                        item.classList.add('selected');
+                    }
+                });
             }
 
             // Check for ready-made prompt from prompts page
