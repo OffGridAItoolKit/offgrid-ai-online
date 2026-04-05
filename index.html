@@ -1707,9 +1707,7 @@
                         </div>
                         <button class="remove-video" onclick="removeVideo()">Remove</button>
                     </div>
-                    <div class="video-model-warning" id="videoModelWarning">
-                        ⚠️ Video analysis requires <strong>Gemma 4 26B A4B</strong>. Please switch models to analyze video.
-                    </div>
+                    <!-- Video model warning removed - frame extraction works with all multimodal models -->
                     <div class="input-wrapper">
                         <div class="plus-menu-wrapper">
                             <svg class="image-upload-btn" onclick="togglePlusMenu('bottom')" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Quick Actions">
@@ -1945,7 +1943,7 @@
                 content: userMessage
             };
             if (selectedVideo) {
-                historyEntry.video = selectedVideo.dataUrl;
+                historyEntry.videoFrames = selectedVideo.frames;
             } else if (selectedImage) {
                 historyEntry.image = selectedImage.dataUrl;
             }
@@ -1971,7 +1969,7 @@
                     role: msg.role,
                     content: msg.content,
                     image: msg.image,
-                    video: msg.video
+                    videoFrames: msg.videoFrames
                 }));
                 
                 const response = await fetch(`${API_BASE}/api/stream`, {
@@ -2375,76 +2373,117 @@
                 return;
             }
             
-            // Check duration
+            // Show processing indicator
+            const uploadIndicator = document.createElement('div');
+            uploadIndicator.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(44,24,16,0.92);color:white;padding:20px 30px;border-radius:14px;z-index:2000;text-align:center;border:1px solid rgba(184,134,11,0.5);box-shadow:0 8px 30px rgba(0,0,0,0.3);';
+            uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">🎬</div>Processing video frames...<br><small>Extracting frames for AI analysis</small></div>';
+            document.body.appendChild(uploadIndicator);
+            
+            // Check duration and extract frames
             const videoEl = document.createElement('video');
-            videoEl.preload = 'metadata';
+            videoEl.preload = 'auto';
+            videoEl.muted = true;
             
             videoEl.onloadedmetadata = function() {
-                window.URL.revokeObjectURL(videoEl.src);
-                
                 if (videoEl.duration > 20) {
+                    uploadIndicator.remove();
                     alert('Video is too long (' + Math.round(videoEl.duration) + ' seconds). Maximum duration is 20 seconds for AI analysis.');
                     return;
                 }
                 
-                // Check if current model supports video
-                const videoWarning = document.getElementById('videoModelWarning');
-                if (selectedModel !== 'gemma-4-26b') {
-                    if (videoWarning) videoWarning.classList.add('active');
-                } else {
-                    if (videoWarning) videoWarning.classList.remove('active');
-                }
+                // Extract frames at 1fps using canvas
+                const duration = videoEl.duration;
+                const frameCount = Math.min(Math.ceil(duration), 20); // Max 20 frames
+                const frames = [];
+                let currentFrame = 0;
                 
-                // Read file as base64
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const dataUrl = e.target.result;
-                    
-                    // Generate thumbnail
-                    const thumbVideo = document.createElement('video');
-                    thumbVideo.src = dataUrl;
-                    thumbVideo.currentTime = 1; // Seek to 1 second for thumbnail
-                    thumbVideo.muted = true;
-                    
-                    thumbVideo.onseeked = function() {
-                        const canvas = document.createElement('canvas');
-                        canvas.width = 160;
-                        canvas.height = 120;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(thumbVideo, 0, 0, 160, 120);
-                        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.7);
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;  // Good balance of quality vs size
+                canvas.height = 384;
+                const ctx = canvas.getContext('2d');
+                
+                function extractNextFrame() {
+                    if (currentFrame >= frameCount) {
+                        // All frames extracted - generate thumbnail from first frame
+                        const thumbCanvas = document.createElement('canvas');
+                        thumbCanvas.width = 160;
+                        thumbCanvas.height = 120;
+                        const thumbCtx = thumbCanvas.getContext('2d');
                         
-                        selectedVideo = {
-                            dataUrl: dataUrl,
-                            name: file.name,
-                            size: file.size,
-                            duration: videoEl.duration,
-                            thumbnailUrl: thumbnailUrl,
-                            mimeType: file.type || 'video/mp4'
-                        };
-                        
-                        // Remove any selected image
-                        removeImage();
-                        showVideoPreview();
-                    };
-                    
-                    // Fallback if onseeked doesn't fire
-                    setTimeout(() => {
-                        if (!selectedVideo || selectedVideo.dataUrl !== dataUrl) {
+                        // Use the video element at time 1s for thumbnail
+                        videoEl.currentTime = Math.min(1, duration / 2);
+                        videoEl.onseeked = function() {
+                            thumbCtx.drawImage(videoEl, 0, 0, 160, 120);
+                            const thumbnailUrl = thumbCanvas.toDataURL('image/jpeg', 0.7);
+                            
                             selectedVideo = {
-                                dataUrl: dataUrl,
+                                frames: frames,
                                 name: file.name,
                                 size: file.size,
-                                duration: videoEl.duration,
-                                thumbnailUrl: '',
+                                duration: duration,
+                                thumbnailUrl: thumbnailUrl,
+                                frameCount: frames.length,
                                 mimeType: file.type || 'video/mp4'
                             };
+                            
+                            uploadIndicator.remove();
                             removeImage();
                             showVideoPreview();
+                        };
+                        // Fallback
+                        setTimeout(() => {
+                            if (!selectedVideo || selectedVideo.frameCount !== frames.length) {
+                                selectedVideo = {
+                                    frames: frames,
+                                    name: file.name,
+                                    size: file.size,
+                                    duration: duration,
+                                    thumbnailUrl: frames[0] || '',
+                                    frameCount: frames.length,
+                                    mimeType: file.type || 'video/mp4'
+                                };
+                                uploadIndicator.remove();
+                                removeImage();
+                                showVideoPreview();
+                            }
+                        }, 3000);
+                        return;
+                    }
+                    
+                    // Seek to the next frame time
+                    const seekTime = (currentFrame / frameCount) * duration;
+                    videoEl.currentTime = seekTime;
+                    
+                    videoEl.onseeked = function() {
+                        // Draw the current frame to canvas
+                        const vw = videoEl.videoWidth;
+                        const vh = videoEl.videoHeight;
+                        const aspect = vw / vh;
+                        let dw = canvas.width;
+                        let dh = canvas.height;
+                        if (aspect > dw / dh) {
+                            dh = dw / aspect;
+                        } else {
+                            dw = dh * aspect;
                         }
-                    }, 3000);
-                };
-                reader.readAsDataURL(file);
+                        ctx.fillStyle = '#000';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.drawImage(videoEl, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+                        
+                        // Convert to JPEG data URL
+                        const frameDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                        frames.push(frameDataUrl);
+                        
+                        currentFrame++;
+                        // Update indicator
+                        uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">🎬</div>Extracting frames... ' + currentFrame + '/' + frameCount + '<br><small>Preparing video for AI analysis</small></div>';
+                        
+                        // Small delay to prevent UI freeze
+                        setTimeout(extractNextFrame, 50);
+                    };
+                }
+                
+                extractNextFrame();
             };
             
             videoEl.src = URL.createObjectURL(file);
@@ -2465,6 +2504,7 @@
                 if (nameEl) nameEl.textContent = selectedVideo.name;
                 if (metaEl) {
                     const sizeMB = (selectedVideo.size / (1024 * 1024)).toFixed(1);
+                    const frameInfo = selectedVideo.frameCount ? ' (' + selectedVideo.frameCount + ' frames)' : '';
                     const duration = Math.round(selectedVideo.duration);
                     metaEl.textContent = duration + 's • ' + sizeMB + 'MB';
                 }

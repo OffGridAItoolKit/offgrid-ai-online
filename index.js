@@ -330,21 +330,23 @@ app.use((req, res, next) => {
  */
 function buildOpenRouterMessages(messages, multimodal = true) {
     return messages.map(msg => {
-        if (msg.video && multimodal) {
-            // Video content - use video_url type per OpenRouter docs
+        if (msg.videoFrames && multimodal) {
+            // Video frames - extracted client-side at 1fps, sent as images
+            const content = [
+                { type: 'text', text: msg.content || 'Analyze these video frames and describe what is happening.' }
+            ];
+            // Add each frame as an image_url
+            for (const frame of msg.videoFrames) {
+                content.push({
+                    type: 'image_url',
+                    image_url: {
+                        url: frame.startsWith('data:') ? frame : `data:image/jpeg;base64,${frame}`
+                    }
+                });
+            }
             return {
                 role: msg.role,
-                content: [
-                    { type: 'text', text: msg.content || 'Describe what is happening in this video.' },
-                    { 
-                        type: 'video_url', 
-                        video_url: { 
-                            url: msg.video.startsWith('data:') 
-                                ? msg.video 
-                                : `data:video/mp4;base64,${msg.video}`
-                        }
-                    }
-                ]
+                content: content
             };
         }
         if (msg.image && multimodal) {

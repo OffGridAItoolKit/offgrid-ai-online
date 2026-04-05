@@ -1078,21 +1078,21 @@ body {
         padding: 0 4px;
     }
     
-    /* App-like action grid: 4 buttons in a 2x2 grid */
+    /* App-like action grid: full-width buttons */
     .mobile-action-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        grid-template-columns: 1fr;
+        gap: 6px;
         margin-bottom: 8px;
     }
     
     .mobile-action-btn {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        justify-content: center;
-        gap: 6px;
-        padding: 14px 8px;
+        justify-content: flex-start;
+        gap: 12px;
+        padding: 12px 16px;
         background: white;
         border: 1px solid rgba(184, 134, 11, 0.25);
         border-radius: 12px;
@@ -1107,14 +1107,17 @@ body {
     }
     
     .mobile-action-icon {
-        font-size: 28px;
+        font-size: 24px;
+        width: 32px;
+        text-align: center;
+        flex-shrink: 0;
     }
     
     .mobile-action-label {
-        font-size: 12px;
+        font-size: 14px;
         font-weight: 600;
         color: #2c1810;
-        text-align: center;
+        text-align: left;
     }
     
     /* Secondary row: 2 buttons side by side */
@@ -1374,9 +1377,9 @@ body {
     }
     
     .welcome {
-        padding: 12px 8px;
-        padding-top: 10px;
-        padding-bottom: 20px;
+        padding: 8px 8px;
+        padding-top: 5px;
+        padding-bottom: 15px;
     }
     
     .welcome-icon {
@@ -1398,18 +1401,15 @@ body {
     }
     
     .welcome p {
-        font-size: 13px;
-        margin-top: 6px;
-        margin-bottom: 12px;
+        display: none;
     }
     
     .feature-badges {
-        margin-bottom: 6px !important;
+        display: none !important;
     }
     
     .feature-badge {
-        font-size: 9px !important;
-        padding: 2px 6px !important;
+        display: none !important;
     }
     
     .quick-actions {
