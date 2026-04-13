@@ -1059,7 +1059,14 @@
 
         <!-- Toggle Sidebar Button (Mobile) -->
         <button class="toggle-sidebar" onclick="toggleSidebar()">
-            ☰
+            <svg class="sidebar-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="28" height="28">
+                <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
+                <path d="M50 95 L45 55 L50 50 L55 55 Z" fill="#daa520"/>
+                <path d="M95 50 L55 55 L50 50 L55 45 Z" fill="#cd853f"/>
+                <path d="M5 50 L45 45 L50 50 L45 55 Z" fill="#d2691e"/>
+                <circle cx="50" cy="50" r="35" fill="none" stroke="#8b4513" stroke-width="1" opacity="0.5"/>
+                <circle cx="50" cy="50" r="6" fill="#8b4513"/>
+            </svg>
         </button>
 
         <!-- Chat Container -->
@@ -1090,7 +1097,7 @@
                         <div class="feature-badge">⚡ Fast</div>
                         <div class="feature-badge">🔒 Private Sessions</div>
                     </div>
-                    <p>Experience the same Gemma 3 AI models from the USB version, now with cloud speed!</p>
+                    <p>Experience the same AI models from the USB version, now with cloud speed and Gemma 4!</p>
                     
                     <!-- Centered Input Box (Welcome Screen) -->
                     <div class="welcome-input-area" id="welcomeInputArea">
@@ -1157,8 +1164,8 @@
                             <div class="welcome-button-row">
                                 <div class="welcome-model-selector">
                                     <button class="welcome-model-button" id="welcomeModelButton" onclick="toggleWelcomeModelDropdown()">
-                                        <span class="model-name" id="welcomeSelectedModelName">Gemma 3 12B</span>
-                                        <span class="model-speed-badge" id="welcomeSpeedBadge">⚡ Fast</span>
+                                        <span class="model-name" id="welcomeSelectedModelName">Gemma 4 26B A4B</span>
+                                        <span class="model-speed-badge" id="welcomeSpeedBadge">⚡ Smart</span>
                                         <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px;">
                                             <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
                                         </svg>
@@ -1169,22 +1176,19 @@
                                                 <div class="welcome-model-item-name">🧪 Gemma 4 31B</div>
                                                 <div class="welcome-model-item-desc">🧪 TESTING • Dense 31B • Multimodal • ~2-5s</div>
                                             </div>
-                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-4-26b', 'Gemma 4 26B A4B', '🧪 TESTING')">
-                                                <div class="welcome-model-item-name">🧪 Gemma 4 26B A4B</div>
-                                                <div class="welcome-model-item-desc">🧪 TESTING • MoE (4B active) • Text+Image+Video • ~1-3s</div>
+                                            <div class="welcome-model-item selected" onclick="selectWelcomeModel('gemma-4-26b', 'Gemma 4 26B A4B', '⚡ Smart')">
+                                                <div class="welcome-model-item-name">Gemma 4 26B A4B</div>
+                                                <div class="welcome-model-item-desc">⚡ Smart • MoE (4B active) • Text+Image+Video • ~1-3s</div>
                                             </div>
                                             <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-4b', 'Gemma 3 4B', '⚡ Fastest')">
                                                 <div class="welcome-model-item-name">Gemma 3 4B</div>
                                                 <div class="welcome-model-item-desc">⚡ Fastest • ~1-2 seconds</div>
                                             </div>
-                                            <div class="welcome-model-item selected" onclick="selectWelcomeModel('gemma-3-12b', 'Gemma 3 12B', '⚡ Fast')">
+                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-12b', 'Gemma 3 12B', '⚡ Fast')">
                                                 <div class="welcome-model-item-name">Gemma 3 12B</div>
                                                 <div class="welcome-model-item-desc">⚡ Fast • ~1-3 seconds</div>
                                             </div>
-                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-27b', 'Gemma 3 27B', '🧠 Smartest')">
-                                                <div class="welcome-model-item-name">Gemma 3 27B</div>
-                                                <div class="welcome-model-item-desc">🧠 Smartest • ~2-5 seconds</div>
-                                            </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -1319,7 +1323,7 @@
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
         
-        let selectedModel = sessionStorage.getItem('offgrid-selected-model') || 'gemma-3-12b';
+        let selectedModel = sessionStorage.getItem('offgrid-selected-model') || 'gemma-4-26b';
         let isTyping = false;
         let selectedImage = null;
         let selectedVideo = null;
@@ -1330,10 +1334,9 @@
         // Model display names and speed badges
         const MODEL_DISPLAY = {
             'gemma-4-31b': { name: 'Gemma 4 31B', speed: '🧪 TESTING' },
-            'gemma-4-26b': { name: 'Gemma 4 26B A4B', speed: '🧪 TESTING' },
+            'gemma-4-26b': { name: 'Gemma 4 26B A4B', speed: '⚡ Smart' },
             'gemma-3-4b': { name: 'Gemma 3 4B', speed: '⚡ Fastest' },
             'gemma-3-12b': { name: 'Gemma 3 12B', speed: '⚡ Fast' },
-            'gemma-3-27b': { name: 'Gemma 3 27B', speed: '🧠 Smartest' }
         };
         
         // ============================================
@@ -1772,8 +1775,8 @@
                                         <div class="model-item-desc">🧪 TESTING • Dense 31B • Multimodal • ~2-5s</div>
                                     </div>
                                     <div class="model-item${selectedModel === 'gemma-4-26b' ? ' selected' : ''}" onclick="selectModel('gemma-4-26b')">
-                                        <div class="model-item-name">🧪 Gemma 4 26B A4B</div>
-                                        <div class="model-item-desc">🧪 TESTING • MoE (4B active) • Text+Image+Video • ~1-3s</div>
+                                        <div class="model-item-name">Gemma 4 26B A4B</div>
+                                        <div class="model-item-desc">⚡ Smart • MoE (4B active) • Text+Image+Video • ~1-3s</div>
                                     </div>
                                     <div class="model-item${selectedModel === 'gemma-3-4b' ? ' selected' : ''}" onclick="selectModel('gemma-3-4b')">
                                         <div class="model-item-name">Gemma 3 4B</div>
@@ -1783,11 +1786,6 @@
                                         <div class="model-item-name">Gemma 3 12B</div>
                                         <div class="model-item-desc">⚡ Fast • ~1-3 seconds</div>
                                     </div>
-                                    <div class="model-item${selectedModel === 'gemma-3-27b' ? ' selected' : ''}" onclick="selectModel('gemma-3-27b')">
-                                        <div class="model-item-name">Gemma 3 27B</div>
-                                        <div class="model-item-desc">🧠 Smartest • ~2-5 seconds</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
@@ -2313,7 +2311,7 @@
                     const nameEl = welcomeBtn.querySelector('.model-name');
                     const badgeEl = welcomeBtn.querySelector('.model-speed-badge');
                     if (nameEl) nameEl.textContent = 'Gemma 4 26B A4B';
-                    if (badgeEl) badgeEl.textContent = '🧪 TESTING';
+                    if (badgeEl) badgeEl.textContent = '⚡ Smart';
                 }
                 // Update chat dropdown if visible
                 const chatBtn = document.getElementById('modelSelectorButton');

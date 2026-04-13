@@ -1383,7 +1383,10 @@ body {
     }
     
     body:not(.command-theme) .welcome-icon {
-        display: none !important;
+        display: block !important;
+        width: 60px !important;
+        height: 60px !important;
+        margin-bottom: 4px !important;
     }
     
     body:not(.command-theme) .welcome h2 {
@@ -2827,7 +2830,10 @@ body.command-theme {
     
     /* Hide compass on mobile (free ToolKit only, Command Center keeps it) */
     body:not(.command-theme) .welcome-icon {
-        display: none !important;
+        display: block !important;
+        width: 60px !important;
+        height: 60px !important;
+        margin-bottom: 4px !important;
     }
     
     /* Title stays at top */
@@ -2912,4 +2918,38 @@ body.command-theme {
         padding-left: 8px !important;
         padding-right: 8px !important;
     }
+}
+
+
+/* Compass icon in sidebar toggle (replaces hamburger for demo/prospect) */
+.toggle-sidebar .sidebar-compass-icon {
+    width: 28px;
+    height: 28px;
+    display: block;
+}
+
+/* Make chat input box larger and more prominent on mobile */
+@media (max-width: 768px) {
+    body:not(.command-theme) .welcome-input-wrapper textarea {
+        font-size: 16px !important;
+        min-height: 48px !important;
+        padding: 14px 12px !important;
+    }
+    
+    body:not(.command-theme) .welcome-input-container {
+        border: 2px solid #b8860b !important;
+        border-radius: 16px !important;
+        box-shadow: 0 2px 8px rgba(184, 134, 11, 0.15) !important;
+    }
+}
+
+/* Make chat input box slightly larger on desktop too */
+.welcome-input-wrapper textarea {
+    font-size: 16px !important;
+    min-height: 44px !important;
+}
+
+.welcome-input-container {
+    border: 2px solid #b8860b !important;
+    border-radius: 16px !important;
 }
