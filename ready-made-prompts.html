@@ -645,7 +645,7 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>All prompts have been field-tested across multiple Gemma 3 models.</p>
+        <p>All prompts have been field-tested with Gemma 4.</p>
         <p><a href="/online">← Return to OffGrid AI Online</a> · <a href="https://offgridaitoolkit.com" target="_blank">Get the USB Version</a></p>
     </div>
 
@@ -1518,7 +1518,7 @@
                         catPromptCount++;
                         
                         const badgeClass = p.badge === 'all' ? 'all-models' : p.badge === 'vision' ? 'vision' : 'advanced';
-                        const badgeText = p.badge === 'all' ? 'All Models' : p.badge === 'vision' ? '📷 Vision' : (isCommandContext ? 'Advanced' : '12B+');
+                        const badgeText = p.badge === 'all' ? 'Gemma 4' : p.badge === 'vision' ? '📷 Vision' : (isCommandContext ? 'Advanced' : 'Gemma 4');
                         const kbHtml = p.kb ? `<div class="kb-tag">📚 ${p.kb}</div>` : '';
                         
                         promptsHtml += `

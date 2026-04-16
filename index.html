@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OffGrid AI ToolKit Online - Cloud-Powered Gemma 3</title>
-    <meta name="description" content="Experience the power of Gemma 3 AI models online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <title>OffGrid AI ToolKit Online - Cloud-Powered Gemma 4</title>
+    <meta name="description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     
     <!-- Open Graph / Social Sharing Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://offgridtoolkit.ai/">
-    <meta property="og:title" content="OffGrid AI ToolKit Online - Cloud-Powered Gemma 3">
-    <meta property="og:description" content="Experience the power of Gemma 3 AI models online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <meta property="og:title" content="OffGrid AI ToolKit Online - Cloud-Powered Gemma 4">
+    <meta property="og:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta property="og:image" content="https://offgridtoolkit.ai/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="1200">
@@ -18,8 +18,8 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://offgridtoolkit.ai/">
-    <meta name="twitter:title" content="OffGrid AI ToolKit Online - Cloud-Powered Gemma 3">
-    <meta name="twitter:description" content="Experience the power of Gemma 3 AI models online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <meta name="twitter:title" content="OffGrid AI ToolKit Online - Cloud-Powered Gemma 4">
+    <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" href="compasstilted.png">
     <link rel="stylesheet" href="offgridai.css?v=5.2">
@@ -844,10 +844,10 @@
     <div id="firstRunBanner" class="first-run-banner" style="display: none;">
         <div class="first-run-content">
             <div class="first-run-logo">OffGrid AI ToolKit</div>
-            <div class="first-run-tagline">Cloud-Powered Gemma 3 • Private Sessions • No Data Stored</div>
+            <div class="first-run-tagline">Cloud-Powered Gemma 4 • Private Sessions • No Data Stored</div>
             <div class="first-run-message">
                 <p><strong>Welcome to OffGrid AI Online!</strong> This is the cloud-powered version of the OffGrid AI ToolKit.</p>
-                <p>This uses the same Gemma 3 AI models as the USB version, running on secure cloud infrastructure.</p>
+                <p>This uses the same Gemma AI models as the USB version, now powered by Gemma 4 on secure cloud infrastructure.</p>
                 <p>Your conversations are <strong>not stored</strong>. Each session is ephemeral and private.</p>
                 <p>AI may occasionally generate inaccurate or incomplete information. Please verify important details.</p>
             </div>
@@ -1163,33 +1163,9 @@
                             </div>
                             <div class="welcome-button-row">
                                 <div class="welcome-model-selector">
-                                    <button class="welcome-model-button" id="welcomeModelButton" onclick="toggleWelcomeModelDropdown()">
+                                    <div class="welcome-model-button" id="welcomeModelButton" style="cursor: default;">
                                         <span class="model-name" id="welcomeSelectedModelName">Gemma 4 26B A4B</span>
                                         <span class="model-speed-badge" id="welcomeSpeedBadge">⚡ Smart</span>
-                                        <svg viewBox="0 0 16 16" fill="currentColor" style="width: 14px; height: 14px;">
-                                            <path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/>
-                                        </svg>
-                                    </button>
-                                    <div class="welcome-model-dropdown" id="welcomeModelDropdown">
-                                        <div class="welcome-model-list">
-                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-4-31b', 'Gemma 4 31B', '🧪 TESTING')">
-                                                <div class="welcome-model-item-name">🧪 Gemma 4 31B</div>
-                                                <div class="welcome-model-item-desc">🧪 TESTING • Dense 31B • Multimodal • ~2-5s</div>
-                                            </div>
-                                            <div class="welcome-model-item selected" onclick="selectWelcomeModel('gemma-4-26b', 'Gemma 4 26B A4B', '⚡ Smart')">
-                                                <div class="welcome-model-item-name">Gemma 4 26B A4B</div>
-                                                <div class="welcome-model-item-desc">⚡ Smart • MoE (4B active) • Text+Image+Video • ~1-3s</div>
-                                            </div>
-                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-4b', 'Gemma 3 4B', '⚡ Fastest')">
-                                                <div class="welcome-model-item-name">Gemma 3 4B</div>
-                                                <div class="welcome-model-item-desc">⚡ Fastest • ~1-2 seconds</div>
-                                            </div>
-                                            <div class="welcome-model-item" onclick="selectWelcomeModel('gemma-3-12b', 'Gemma 3 12B', '⚡ Fast')">
-                                                <div class="welcome-model-item-name">Gemma 3 12B</div>
-                                                <div class="welcome-model-item-desc">⚡ Fast • ~1-3 seconds</div>
-                                            </div>
-
-                                        </div>
                                     </div>
                                 </div>
                                 <button class="welcome-send-button" onclick="sendWelcomeMessage()">
@@ -1211,7 +1187,7 @@
                         </div>
                         <div class="quick-action" onclick="showInfoContent('benchmarks')">
                             <div class="quick-action-title">📊 Benchmarks</div>
-                            <div class="quick-action-desc">Why Gemma 3</div>
+                            <div class="quick-action-desc">Why Gemma 4</div>
                         </div>
                         <div class="quick-action" onclick="showInfoContent('modelSelection')">
                             <div class="quick-action-title">🧠 Models</div>
@@ -1323,7 +1299,9 @@
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
         
-        let selectedModel = sessionStorage.getItem('offgrid-selected-model') || 'gemma-4-26b';
+        // Single model architecture - always use Gemma 4 26B A4B
+        let selectedModel = 'gemma-4-26b';
+        sessionStorage.setItem('offgrid-selected-model', 'gemma-4-26b');
         let isTyping = false;
         let selectedImage = null;
         let selectedVideo = null;
@@ -1331,12 +1309,9 @@
         let voiceRecognition = null;
         const API_BASE = '';  // Same origin - Express proxy
         
-        // Model display names and speed badges
+        // Model display name (single model architecture)
         const MODEL_DISPLAY = {
-            'gemma-4-31b': { name: 'Gemma 4 31B', speed: '🧪 TESTING' },
             'gemma-4-26b': { name: 'Gemma 4 26B A4B', speed: '⚡ Smart' },
-            'gemma-3-4b': { name: 'Gemma 3 4B', speed: '⚡ Fastest' },
-            'gemma-3-12b': { name: 'Gemma 3 12B', speed: '⚡ Fast' },
         };
         
         // ============================================
@@ -1351,13 +1326,13 @@
                         <h3>⚙️ The Technology Behind OffGrid AI</h3>
                         <p>OffGrid AI ToolKit is a <strong>complete AI system on a USB drive</strong>. No internet, no cloud, no subscriptions. Plug it in, and you have a powerful AI assistant that runs entirely on your computer's hardware.</p>
                         
-                        <h3>🧠 Gemma 3: Google's Latest Open-Source AI</h3>
-                        <p>We chose <strong>Google's Gemma 3 models</strong> after extensive testing against 15+ model families. Gemma 3 offers the best combination of intelligence, speed, and multimodal capabilities for offline use. These are the same models powering this online demo.</p>
+                        <h3>🧠 Gemma 4: Google's Latest Open-Source AI</h3>
+                        <p>We chose <strong>Google's Gemma models</strong> after extensive testing against 15+ model families. Now powered by Gemma 4, the system offers the best combination of intelligence, speed, and multimodal capabilities for offline use. This online version runs the same Gemma 4 model.</p>
                         
                         <div class="highlight-box">
                             <strong>Technical Stack:</strong>
                             <ul>
-                                <li><strong>AI Models:</strong> Gemma 3 (4B, 12B, 27B) + MedGemma - 31GB of optimized AI</li>
+                                <li><strong>AI Models:</strong> Gemma 4 26B A4B + additional models - optimized AI</li>
                                 <li><strong>Inference Engine:</strong> Ollama - local AI processing with zero cloud dependency</li>
                                 <li><strong>Interface:</strong> Electron app with dynamic path resolution for any USB drive letter</li>
                                 <li><strong>Web Server:</strong> Caddy - zero-config server enabling mobile access</li>
@@ -1365,7 +1340,7 @@
                         </div>
                         
                         <h3>👁️ Multimodal Vision Capabilities</h3>
-                        <p>Unlike text-only AI, Gemma 3 can <strong>analyze images</strong> - identify plants and animals, diagnose vehicle issues from dashboard photos, read technical diagrams, and assess medical conditions.</p>
+                        <p>Unlike text-only AI, Gemma 4 can <strong>analyze images and video</strong> - identify plants and animals, diagnose vehicle issues from dashboard photos, read technical diagrams, and assess medical conditions from multiple angles.</p>
                         
                         <h3>🔒 Zero-Installation Privacy</h3>
                         <p>The entire system uses <strong>dynamic environment configuration</strong> - no registry entries, no system files, no traces left behind. When you unplug the USB, it's like the AI was never there.</p>
@@ -1448,8 +1423,8 @@
                 title: "Testing & Benchmarks",
                 content: `
                     <div class="info-content">
-                        <h3>📊 Why We Chose Gemma 3</h3>
-                        <p>We tested <strong>15+ model families with 300+ survival-focused prompts</strong>. Standard AI benchmarks don't measure what matters for real-world survival situations. So we built our own testing methodology.</p>
+                        <h3>📊 Why We Chose Gemma</h3>
+                        <p>We tested <strong>15+ model families with 300+ survival-focused prompts</strong>. Standard AI benchmarks don't measure what matters for real-world survival situations. So we built our own testing methodology. Gemma 4 builds on these results with even stronger baseline performance.</p>
                         
                         <h3>🏆 Survival AI Testing Results</h3>
                         <table class="benchmark-table">
@@ -1464,7 +1439,7 @@
                         <div class="highlight-box">
                             <strong>Key Findings:</strong>
                             <ul>
-                                <li>Gemma 3 27B matched or exceeded GPT-4 level performance on survival-specific tasks</li>
+                                <li>Gemma models matched or exceeded GPT-4 level performance on survival-specific tasks</li>
                                 <li>Vision capabilities were a deciding factor - many powerful models are text-only</li>
                                 <li>Even the 4B model scored above 9.4, making it viable for resource-constrained devices</li>
                             </ul>
@@ -1472,7 +1447,7 @@
                         
                         <div class="cta-box prospect-only">
                             <h4>🛒 Experience These Models Offline</h4>
-                            <p>Get all three Gemma 3 models on a USB drive - no internet required.</p>
+                            <p>Get the full Gemma-powered OffGrid AI on a USB drive - no internet required.</p>
                             <a href="https://offgridaitoolkit.com" target="_blank" class="cta-button">Get the USB Version →</a>
                         </div>
                         
@@ -1482,34 +1457,36 @@
                 `
             },
             modelSelection: {
-                title: "Choose the Right Model",
+                title: "About Gemma 4",
                 content: `
                     <div class="info-content">
-                        <h3>🧠 Model Selection Guide</h3>
-                        <p>Each Gemma 3 model offers different trade-offs between speed and intelligence. Here's how to choose:</p>
+                        <h3>🧠 Gemma 4 26B A4B</h3>
+                        <p>OffGrid AI Online is powered by <strong>Google's Gemma 4 26B A4B</strong>, a Mixture-of-Experts model that activates only 4B parameters per token. This means you get the intelligence of a 26B model at the speed of a much smaller one.</p>
                         
                         <div class="use-case-item">
-                            <h4>⚡ Gemma 3 4B — Fastest</h4>
-                            <p><strong>Best for:</strong> Quick questions, simple lookups, basic image identification</p>
-                            <p><strong>Response time:</strong> ~1-2 seconds online</p>
-                            <p>Great for rapid-fire questions where speed matters more than depth.</p>
+                            <h4>⚡ Fast & Intelligent</h4>
+                            <p><strong>Response time:</strong> ~1-3 seconds</p>
+                            <p><strong>Context window:</strong> 256K tokens</p>
+                            <p>Handles complex reasoning, detailed analysis, and multi-step problem solving with speed.</p>
                         </div>
                         
                         <div class="use-case-item">
-                            <h4>⚡ Gemma 3 12B — Balanced</h4>
-                            <p><strong>Best for:</strong> Most tasks, detailed explanations, image analysis, creative writing</p>
-                            <p><strong>Response time:</strong> ~1-3 seconds online</p>
-                            <p>The sweet spot for most users. Excellent reasoning with fast responses.</p>
+                            <h4>👁️ Multimodal: Text + Image + Video</h4>
+                            <p>Analyze images of plants, injuries, vehicle problems, and terrain. Upload a short video for multi-angle identification of berries, tracks, or equipment issues.</p>
                         </div>
                         
                         <div class="use-case-item">
-                            <h4>🧠 Gemma 3 27B — Smartest</h4>
-                            <p><strong>Best for:</strong> Complex reasoning, detailed analysis, medical questions, technical problems</p>
-                            <p><strong>Response time:</strong> ~2-5 seconds online</p>
-                            <p>Maximum intelligence. Use when accuracy and depth are critical.</p>
+                            <h4>🏆 Decision Intelligence</h4>
+                            <p>OffGrid AI doesn't just list options. It recommends the best course of action, explains why, and tells you what to do first. Most AI gives answers. OffGrid AI helps you make the right decision.</p>
                         </div>
                         
-                        <p class="continue-prompt">Try switching between models to see the difference!</p>
+                        <div class="cta-box prospect-only">
+                            <h4>🛒 Experience This Offline</h4>
+                            <p>Get the full Gemma-powered OffGrid AI on a USB drive. No internet, no subscriptions, no surveillance.</p>
+                            <a href="https://offgridaitoolkit.com" target="_blank" class="cta-button">Get the USB Version →</a>
+                        </div>
+                        
+                        <p class="continue-prompt">Try it now - ask a complex survival or medical question!</p>
                         <button class="clear-chat-info-btn" onclick="clearChat()">📋 Clear Chat / Return Home</button>
                     </div>
                 `
@@ -1763,29 +1740,9 @@
                     <div class="button-row">
                         <div class="model-selector">
                             <div class="model-helper" id="modelHelper"></div>
-                            <button class="model-button" id="modelButton" onclick="toggleModelDropdown()">
+                            <div class="model-button" id="modelButton" style="cursor: default;">
                                 <span class="model-name" id="selectedModelName">${display.name}</span>
                                 <span class="model-speed-badge">${display.speed}</span>
-                                <svg viewBox="0 0 16 16" fill="currentColor" style="width: 16px; height: 16px;"><path d="M4.427 7.427l3.396 3.396a.25.25 0 00.354 0l3.396-3.396A.25.25 0 0011.396 7H4.604a.25.25 0 00-.177.427z"/></svg>
-                            </button>
-                            <div class="model-dropdown" id="modelDropdown">
-                                <div class="model-list">
-                                    <div class="model-item${selectedModel === 'gemma-4-31b' ? ' selected' : ''}" onclick="selectModel('gemma-4-31b')">
-                                        <div class="model-item-name">🧪 Gemma 4 31B</div>
-                                        <div class="model-item-desc">🧪 TESTING • Dense 31B • Multimodal • ~2-5s</div>
-                                    </div>
-                                    <div class="model-item${selectedModel === 'gemma-4-26b' ? ' selected' : ''}" onclick="selectModel('gemma-4-26b')">
-                                        <div class="model-item-name">Gemma 4 26B A4B</div>
-                                        <div class="model-item-desc">⚡ Smart • MoE (4B active) • Text+Image+Video • ~1-3s</div>
-                                    </div>
-                                    <div class="model-item${selectedModel === 'gemma-3-4b' ? ' selected' : ''}" onclick="selectModel('gemma-3-4b')">
-                                        <div class="model-item-name">Gemma 3 4B</div>
-                                        <div class="model-item-desc">⚡ Fastest • ~1-2 seconds</div>
-                                    </div>
-                                    <div class="model-item${selectedModel === 'gemma-3-12b' ? ' selected' : ''}" onclick="selectModel('gemma-3-12b')">
-                                        <div class="model-item-name">Gemma 3 12B</div>
-                                        <div class="model-item-desc">⚡ Fast • ~1-3 seconds</div>
-                                    </div>
                             </div>
                         </div>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
@@ -2300,28 +2257,8 @@
         // ============================================
         
         function autoSelectVideoModel() {
-            // Auto-select Gemma 4 26B A4B for video analysis
-            const currentModel = selectedModel;
-            if (currentModel !== 'gemma-4-26b') {
-                selectedModel = 'gemma-4-26b';
-                sessionStorage.setItem('offgrid_selected_model', 'gemma-4-26b');
-                // Update welcome dropdown if visible
-                const welcomeBtn = document.getElementById('welcomeModelButton');
-                if (welcomeBtn) {
-                    const nameEl = welcomeBtn.querySelector('.model-name');
-                    const badgeEl = welcomeBtn.querySelector('.model-speed-badge');
-                    if (nameEl) nameEl.textContent = 'Gemma 4 26B A4B';
-                    if (badgeEl) badgeEl.textContent = '⚡ Smart';
-                }
-                // Update chat dropdown if visible
-                const chatBtn = document.getElementById('modelSelectorButton');
-                if (chatBtn) {
-                    const nameEl = chatBtn.querySelector('.model-name');
-                    const badgeEl = chatBtn.querySelector('.model-speed-badge');
-                    if (nameEl) nameEl.textContent = 'Gemma 4 26B A4B';
-                    if (badgeEl) badgeEl.textContent = '🧪 TESTING';
-                }
-            }
+            // Single model architecture - no switching needed
+            // Kept for compatibility with existing calls
         }
         
         function triggerVideoUpload() {
@@ -3415,24 +3352,9 @@
                 }
             }
 
-            // Restore persisted model selection
-            const savedModel = sessionStorage.getItem('offgrid-selected-model');
-            if (savedModel && MODEL_DISPLAY[savedModel]) {
-                selectedModel = savedModel;
-                const display = MODEL_DISPLAY[savedModel];
-                // Update welcome screen model button
-                const welcomeModelName = document.getElementById('welcomeSelectedModelName');
-                const welcomeSpeedBadge = document.getElementById('welcomeSpeedBadge');
-                if (welcomeModelName) welcomeModelName.textContent = display.name;
-                if (welcomeSpeedBadge) welcomeSpeedBadge.textContent = display.speed;
-                // Update welcome dropdown selected state
-                document.querySelectorAll('.welcome-model-item').forEach(item => {
-                    item.classList.remove('selected');
-                    if (item.getAttribute('onclick')?.includes(savedModel)) {
-                        item.classList.add('selected');
-                    }
-                });
-            }
+            // Single model architecture - ensure model is always set correctly
+            selectedModel = 'gemma-4-26b';
+            sessionStorage.setItem('offgrid-selected-model', 'gemma-4-26b');
 
             // Check for ready-made prompt from prompts page
             const readyPrompt = sessionStorage.getItem('offgrid-ready-prompt');

@@ -5,7 +5,7 @@
  * keeping the API key secure on the server side.
  * 
  * Includes:
- * - Original Gemma 3 model routing (free demo)
+ * - Gemma 4 26B A4B routing with system prompt (free tier)
  * - Command Center multi-model routing (Scout, Medic, Navigator, Ranger)
  * - Command Council mode (parallel calls + competitive ranking + synthesis)
  * - Response streaming for all endpoints
@@ -81,16 +81,8 @@ function logToBetterStack(level, event, data = {}) {
 
 console.log(`[Better Stack] ${BETTERSTACK_SOURCE_TOKEN ? '✓ Logging enabled' : '✗ No token — logging disabled'}`);
 
-// Gemma Models (Free Demo) - Gemma 3 + Gemma 4
+// Gemma 4 Model (Free Tier) - Single model architecture
 const GEMMA_MODELS = {
-    'gemma-4-31b': {
-        id: 'google/gemma-4-31b-it',
-        name: 'Gemma 4 31B',
-        description: 'TESTING - Dense 31B, 256K context, reasoning, multimodal (text+image)',
-        multimodal: true,
-        videoSupport: false,
-        responseTime: '~2-5 seconds'
-    },
     'gemma-4-26b': {
         id: 'google/gemma-4-26b-a4b-it',
         name: 'Gemma 4 26B A4B',
@@ -98,29 +90,34 @@ const GEMMA_MODELS = {
         multimodal: true,
         videoSupport: true,
         responseTime: '~1-3 seconds'
-    },
-    'gemma-3-12b': {
-        id: 'google/gemma-3-12b-it',
-        name: 'Gemma 3 12B',
-        description: 'Balanced performance and speed',
-        multimodal: true,
-        responseTime: '~1-3 seconds'
-    },
-    'gemma-3-4b': {
-        id: 'google/gemma-3-4b-it',
-        name: 'Gemma 3 4B',
-        description: 'Lightweight, fastest response',
-        multimodal: true,
-        responseTime: '~1-2 seconds'
-    },
-    'medgemma-3-4b': {
-        id: 'google/medgemma-4b-it',
-        name: 'MedGemma 3 4B',
-        description: 'Specialized for medical/healthcare questions',
-        multimodal: true,
-        responseTime: '~1-2 seconds'
     }
 };
+
+// =============================================================================
+// OFFGRID AI SYSTEM PROMPT
+// Pre-inference behavioral conditioning layer for improved response quality.
+// Provides decision-oriented, practical, safety-aware guidance.
+// =============================================================================
+
+const OFFGRID_SYSTEM_PROMPT = `You are OffGrid AI, a seasoned field expert and practical problem solver for real-world, off-grid, and high-stakes environments.
+
+Core behavior:
+- Provide clear, concise, and actionable guidance. Lead with what to do, not background theory.
+- When multiple options exist, recommend the best one first and explain why. Help the user make a decision, not just list choices.
+- Use numbered steps, priorities, or clear sections when the situation calls for it.
+- Focus on practical solutions using minimal, improvised, or commonly available resources.
+- If information is uncertain, state that clearly. Do not guess or fabricate details.
+- Fact-check your reasoning before responding. Prioritize accuracy over completeness.
+
+Safety and risk:
+- For medical, survival, or dangerous topics, provide direct, practical guidance with clear safety warnings.
+- Never provide a dangerous recommendation without a warning, but never let a warning replace useful guidance.
+- Note when professional help should be sought.
+
+Tone:
+- Calm, confident, and resourceful. Think experienced wilderness guide, not corporate chatbot.
+- Be direct and efficient with words. No filler, no hype, no unnecessary pleasantries.
+- Treat the user as a capable adult who needs expert guidance, not hand-holding.`;
 
 // Command Center Models (Premium)
 const COMMAND_MODELS = {
@@ -319,14 +316,21 @@ app.use((req, res, next) => {
 // =============================================================================
 
 /**
- * Build OpenRouter-compatible messages array from request messages
+ * Build OpenRouter-compatible messages array from request messages.
+ * Does NOT inject the system prompt (that is handled at the endpoint level).
  */
 function buildOpenRouterMessages(messages, multimodal = true) {
     return messages.map(msg => {
         if (msg.videoFrames && multimodal) {
-            // Video frames - extracted client-side at 1fps, sent as images
+            // Video frames - extracted client-side at 1fps, sent as sequential images
+            const userText = msg.content && msg.content.trim()
+                ? msg.content
+                : 'Analyze what you see across these images.';
+            const frameInstruction = 'These images are sequential frames extracted from a short video clip recorded by the user. '
+                + 'Analyze each frame and describe what you observe across all of them, noting any changes or details between frames. '
+                + 'Treat them as a cohesive visual sequence, not separate unrelated images.';
             const content = [
-                { type: 'text', text: msg.content || 'Analyze these video frames and describe what is happening.' }
+                { type: 'text', text: `${frameInstruction}\n\nUser request: ${userText}` }
             ];
             // Add frames as image_url (limit to 5 evenly-spaced frames to reduce payload)
             const allFrames = msg.videoFrames;
@@ -714,12 +718,12 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
 }
 
 // =============================================================================
-/** ORIGINAL API ROUTES (Free Demo - Gemma 3) */
+/** FREE TIER API ROUTES (Gemma 4 26B A4B) */
 // =============================================================================
 
 /**
  * GET /api/models
- * Returns available Gemma 3 models and their capabilities
+ * Returns available Gemma model(s) and their capabilities
  */
 app.get('/api/models', (req, res) => {
     res.json({
@@ -727,7 +731,7 @@ app.get('/api/models', (req, res) => {
             key,
             ...model
         })),
-        defaultModel: 'gemma-3-4b'
+        defaultModel: 'gemma-4-26b'
     });
 });
 
@@ -770,7 +774,10 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ error: 'Messages are required' });
         }
         
-        const openRouterMessages = buildOpenRouterMessages(messages, modelConfig.multimodal);
+        const openRouterMessages = [
+            { role: 'system', content: OFFGRID_SYSTEM_PROMPT },
+            ...buildOpenRouterMessages(messages, modelConfig.multimodal)
+        ];
         const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages);
         const responseTime = Date.now() - startTime;
         
@@ -805,7 +812,7 @@ app.post('/api/chat', async (req, res) => {
 
 /**
  * POST /api/stream
- * Streaming chat endpoint for Gemma models
+ * Streaming chat endpoint for Gemma 4 (free tier) with system prompt
  */
 app.post('/api/stream', async (req, res) => {
     const streamStart = Date.now();
@@ -821,7 +828,10 @@ app.post('/api/stream', async (req, res) => {
             return res.status(400).json({ error: 'Invalid model selected' });
         }
         
-        const openRouterMessages = buildOpenRouterMessages(messages, modelConfig.multimodal);
+        const openRouterMessages = [
+            { role: 'system', content: OFFGRID_SYSTEM_PROMPT },
+            ...buildOpenRouterMessages(messages, modelConfig.multimodal)
+        ];
         
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
@@ -2148,13 +2158,8 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`║  Local:   http://localhost:${PORT}                          ║`);
     console.log(`║  Network: http://0.0.0.0:${PORT}                            ║`);
     console.log('╠═══════════════════════════════════════════════════════════╣');
-    console.log('║  Free Demo Models (Gemma 3 + Gemma 4):                      ║');
-    console.log('║    • Gemma 4 31B  (gemma-4-31b)  TESTING                  ║');
-    console.log('║    • Gemma 4 26B  (gemma-4-26b)  DEFAULT                  ║');
-    console.log('║    • Gemma 3 27B (gemma-3-27b)  REMOVED                   ║');
-    console.log('║    • Gemma 3 12B (gemma-3-12b)                            ║');
-    console.log('║    • Gemma 3 4B  (gemma-3-4b)                             ║');
-    console.log('║    • MedGemma 3 4B (medgemma-3-4b)                        ║');
+    console.log('║  Free Tier Model:                                         ║');
+    console.log('║    • Gemma 4 26B A4B (gemma-4-26b) + System Prompt        ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Command Center Models:                                   ║');
     console.log('║    🔭 Scout    (GPT 5.2)          - Vision Specialist      ║');

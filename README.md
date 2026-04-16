@@ -18,7 +18,7 @@ The platform is built on a simple and robust technical stack, prioritizing maint
 3.  **Business Logic**: Implements application-specific features such as the AI Council, PDF export, and health checks.
 
 **External Services**:
-*   **OpenRouter**: Provides a unified API to access a wide range of large language models (LLMs), including Google's Gemma 3, OpenAI's GPT models, Anthropic's Claude, and more.
+*   **OpenRouter**: Provides a unified API to access a wide range of large language models (LLMs), including Google's Gemma 4, OpenAI's GPT models, Anthropic's Claude, and more.
 *   **Better Stack**: Used for privacy-safe operational logging and monitoring. Captures application events for troubleshooting without storing any user data or prompts.
 
 ## 2. Core Features
@@ -27,9 +27,9 @@ The platform is divided into two main products: the free Online ToolKit and the 
 
 ### 2.1. Online ToolKit (Free)
 
-The free toolkit provides a demonstration of the core OffGrid AI experience using the same Gemma 3 models found in the offline USB product.
+The free toolkit provides a demonstration of the core OffGrid AI experience using the same Gemma 4 model found in the offline USB product.
 
-*   **Gemma 3 Models**: Access to `gemma-3-4b`, `gemma-3-12b`, and `gemma-3-27b`.
+*   **Gemma 4 26B A4B**: Single model architecture with system prompt for decision-oriented responses.
 *   **Multimodal Input**: Supports image uploads for visual analysis.
 *   **Ephemeral Conversations**: All chat sessions are processed in memory and are not stored, ensuring user privacy.
 *   **Save to Knowledge Base**: Users can save conversations as local Markdown (`.md`) files.
@@ -57,7 +57,7 @@ The backend exposes a set of API endpoints for the frontend to consume. All endp
 | Endpoint | Method | Description |
 |---|---|---|
 | `/api/health` | GET | General health check for the server. |
-| `/api/models` | GET | Returns the list of available Gemma 3 models for the free toolkit. |
+| `/api/models` | GET | Returns the available Gemma 4 model for the free toolkit. |
 | `/api/chat` | POST | Main chat endpoint for the free toolkit. |
 | `/api/stream` | POST | Streaming chat endpoint for the free toolkit. |
 | `/api/export-pdf` | POST | Converts a Markdown conversation to a PDF. |

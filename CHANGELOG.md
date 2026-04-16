@@ -1,8 +1,25 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-02-20
+**Last Updated:** 2026-04-16
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
+
+---
+
+### April 2026
+
+**2026-04-16**
+*   **Gemma 4 Migration & System Prompt (v5.2.0)**
+    *   Migrated free tier from multi-model Gemma 3 architecture to single-model **Gemma 4 26B A4B**.
+    *   Implemented **OffGrid AI system prompt** — a pre-inference behavioral conditioning layer that provides decision-oriented, practical, safety-aware guidance. The AI now identifies as "OffGrid AI" with a calm, authoritative field-expert persona.
+    *   Removed all deprecated models: Gemma 3 4B, Gemma 3 12B, Gemma 4 31B (testing), and MedGemma 3 4B.
+    *   Replaced model dropdown (welcome screen and chat view) with a static model label.
+    *   Updated the "Model Selection" info panel to "About Gemma 4" with Decision Intelligence messaging.
+    *   Fixed video analysis prompt — frames are now described as sequential video frames instead of unrelated images.
+    *   Updated all meta tags, Open Graph tags, info panels, and marketing copy from Gemma 3 to Gemma 4.
+    *   Updated ready-made prompts page badges from "All Models" / "12B+" to "Gemma 4".
+    *   Updated Homepage_Redesign_v2.html, README.md, and package.json.
+    *   Cleaned up session persistence and model restore logic for single-model architecture.
 
 ---
 
