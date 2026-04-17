@@ -719,16 +719,17 @@
             transition: all 0.2s ease;
         }
         .voice-btn .voice-icon {
-            font-size: 14px;
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
         }
         .voice-btn.voice-active {
             background: #ef4444 !important;
             border-color: #ef4444 !important;
             color: white !important;
-            animation: voicePulse 1.5s ease-in-out infinite;
         }
         .voice-btn.voice-active .voice-icon {
-            filter: brightness(10);
+            stroke: white;
         }
         @keyframes voicePulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
@@ -783,8 +784,8 @@
         /* Customer-only elements hidden when prospect */
         body.is-prospect .customer-only { display: none !important; }
         
-        /* Hide hamburger menu on mobile for customers */
-        body.is-customer .toggle-sidebar { display: none !important; }
+        /* Hide hamburger menu on mobile for all experiences */
+        .toggle-sidebar { display: none !important; }
         
         /* Mobile: hide status text, keep dot only */
         @media (max-width: 768px) {
@@ -1178,6 +1179,7 @@ if ('serviceWorker' in navigator) {
         <div class="chat-container">
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
+                  <div class="welcome-content">
                     <svg class="welcome-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <!-- Main compass points (N,S,E,W) -->
                         <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
@@ -1270,7 +1272,7 @@ if ('serviceWorker' in navigator) {
                                     <span class="action-btn-icon">💡</span> Prompts
                                 </button>
                                 <button class="action-btn voice-btn" id="welcomeVoiceBtn" onclick="toggleVoiceInput('welcome')" title="Voice Input">
-                                    <span class="voice-icon">🎤</span>
+                                    <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                 </button>
                                 <button class="welcome-send-button" onclick="sendWelcomeMessage()">
                                     Send
@@ -1378,6 +1380,7 @@ if ('serviceWorker' in navigator) {
                             🛒 Get the USB Version — 100% Offline
                         </a>
                     </div>
+                  </div>
                 </div>
             </div>
 
@@ -1840,9 +1843,9 @@ if ('serviceWorker' in navigator) {
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
                             Save
                         </button>
-                        <button class="action-btn voice-btn" id="chatVoiceBtn" onclick="toggleVoiceInput('chat')" title="Voice Input">
-                            <span class="voice-icon">🎤</span>
-                        </button>
+<button class="action-btn voice-btn" id="chatVoiceBtn" onclick="toggleVoiceInput('chat')" title="Voice Input">
+                             <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                         </button>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
                     <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No data stored</div>

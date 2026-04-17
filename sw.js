@@ -8,7 +8,7 @@
  * - Fetch fresh version in background (stays up to date)
  */
 
-const CACHE_VERSION = 'offgrid-v5.4.0';
+const CACHE_VERSION = 'offgrid-v5.4.1';
 const STATIC_ASSETS = [
     '/',
     '/online',

@@ -9,6 +9,14 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-17**
+*   **Mobile Layout Hotfix (v5.4.1)**
+    *   Fixed mobile layout: added `welcome-content` wrapper div so CSS flex ordering works correctly.
+    *   Fixed duplicated quick action buttons (Take Picture, Upload Image, etc. appearing twice).
+    *   Fixed compass icon overlapping header/ONLINE badge — reduced size and added proper margins.
+    *   Replaced emoji microphone (🎤) with SVG icon for consistent rendering across all Android devices.
+    *   Hidden hamburger/sidebar toggle button on all experiences (was only hidden for customers).
+    *   Updated service worker cache version to force fresh cache on deploy.
+
 *   **Weak Signal Optimization, Voice Input & UX Polish (v5.4.0)**
     *   Added tagline: "Built for weak signals and hard decisions." below compass on welcome screen.
     *   Implemented **gzip compression** for static assets (HTML, CSS, JS) — 60-70% smaller page loads. SSE streams and API responses are explicitly excluded.
