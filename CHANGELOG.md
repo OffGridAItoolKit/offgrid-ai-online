@@ -1,12 +1,24 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-04-17
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
 
 ---
 
 ### April 2026
+
+**2026-04-17**
+*   **Mobile UI Overhaul & Branding Cleanup (v5.3.0)**
+    *   Enlarged compass icon on mobile using viewport-relative units (25vw) for proportional scaling across all phone sizes.
+    *   Replaced model label in bottom bar with contextual action buttons: **Ready-Made Prompts** on welcome screen, **Clear** and **Save** in chat view.
+    *   Improved textarea auto-expansion — input box now grows up to ~6 lines on mobile before scrolling (matching ChatGPT/Claude behavior).
+    *   Reduced textarea line-height from 1.5 to 1.4 for tighter, more readable text.
+    *   Removed "New!" tooltips from video and image upload buttons for cleaner UI.
+    *   Removed model name and response time footer from AI messages (no longer needed with single model).
+    *   Shortened privacy microcopy to "Ephemeral · No data stored" for mobile space efficiency.
+    *   Added privacy microcopy to welcome screen input area.
+    *   Removed Gemma model branding from chat interface — OffGrid AI is now the primary identity.
 
 **2026-04-16**
 *   **Gemma 4 Migration & System Prompt (v5.2.0)**

@@ -790,8 +790,8 @@ body {
     outline: none;
     background: transparent;
     font-family: inherit;
-    line-height: 1.5;
-    max-height: 200px;
+    line-height: 1.4;
+    max-height: 220px;
     overflow-y: auto;
     color: #2c1810;
 }
@@ -1307,9 +1307,10 @@ body {
     .message-input {
         width: 100% !important;
         min-height: 40px !important;
-        max-height: 150px !important;
+        max-height: 160px !important;
         padding: 8px 4px !important;
         font-size: 16px !important;
+        line-height: 1.4 !important;
         border-radius: 0 !important;
         border: none !important;
     }
@@ -1352,6 +1353,11 @@ body {
         width: 100%;
     }
     
+    .button-row .action-btn {
+        padding: 7px 12px;
+        font-size: 12px;
+    }
+    
     .model-selector {
         flex: 1 !important;
         min-width: 0 !important;
@@ -1384,9 +1390,11 @@ body {
     
     body:not(.command-theme) .welcome-icon {
         display: block !important;
-        width: 60px !important;
-        height: 60px !important;
-        margin-bottom: 4px !important;
+        width: 25vw !important;
+        height: 25vw !important;
+        max-width: 180px !important;
+        max-height: 180px !important;
+        margin-bottom: 12px !important;
     }
     
     body:not(.command-theme) .welcome h2 {
@@ -1824,11 +1832,13 @@ body {
         padding-bottom: 20px !important;
     }
     
-    /* Smaller compass on mobile to save vertical space */
+    /* Compass scales with viewport on mobile */
     .welcome-icon {
-        width: 80px !important;
-        height: 80px !important;
-        margin-bottom: 8px !important;
+        width: 22vw !important;
+        height: 22vw !important;
+        max-width: 160px !important;
+        max-height: 160px !important;
+        margin-bottom: 10px !important;
     }
 }
 /* Hide Verified Drive badge on mobile and tablet portrait */
@@ -1884,11 +1894,11 @@ body {
     font-size: 15px;
     font-family: inherit;
     resize: none;
-    line-height: 1.5;
+    line-height: 1.4;
     padding: 8px 4px;
     background: transparent;
     color: #2c1810;
-    max-height: 100px;
+    max-height: 140px;
     overflow-y: hidden;
 }
 
@@ -1915,6 +1925,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
     margin-top: 10px;
     padding-top: 10px;
     border-top: 1px solid #f0e6d6;
@@ -2814,6 +2825,11 @@ body.command-theme {
     .welcome-button-row {
         margin-top: 6px !important;
     }
+    
+    .welcome-button-row .action-btn {
+        padding: 7px 14px !important;
+        font-size: 12px !important;
+    }
 }
 
 /* ============================================ */
@@ -2831,9 +2847,11 @@ body.command-theme {
     /* Hide compass on mobile (free ToolKit only, Command Center keeps it) */
     body:not(.command-theme) .welcome-icon {
         display: block !important;
-        width: 60px !important;
-        height: 60px !important;
-        margin-bottom: 4px !important;
+        width: 25vw !important;
+        height: 25vw !important;
+        max-width: 180px !important;
+        max-height: 180px !important;
+        margin-bottom: 12px !important;
     }
     
     /* Title stays at top */

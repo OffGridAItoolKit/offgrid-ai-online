@@ -118,12 +118,66 @@
             margin-bottom: 8px;
         }
         
-        /* Response time display */
+        /* Response time display - hidden in single-model UI */
         .response-time {
-            font-size: 11px;
+            display: none;
+        }
+        
+        /* Action buttons (Clear, Save, Prompts) */
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            background: rgba(44, 24, 16, 0.6);
+            color: #deb887;
+        }
+        .action-btn:hover {
+            background: rgba(184, 134, 11, 0.15);
+            border-color: rgba(184, 134, 11, 0.5);
+            color: #daa520;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+        .action-btn-icon {
+            font-size: 14px;
+        }
+        .clear-btn {
+            color: #ef9a7a;
+            border-color: rgba(239, 154, 122, 0.3);
+            background: rgba(239, 68, 68, 0.08);
+        }
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 154, 122, 0.5);
+            color: #ef4444;
+        }
+        .save-btn {
             color: #10b981;
-            margin-left: 44px;
-            margin-bottom: 4px;
+            border-color: rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.08);
+        }
+        .save-btn:hover {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #059669;
+        }
+        .prompts-btn {
+            color: #daa520;
+            border-color: rgba(218, 165, 32, 0.3);
+            background: rgba(218, 165, 32, 0.08);
+        }
+        .prompts-btn:hover {
+            background: rgba(218, 165, 32, 0.15);
+            border-color: rgba(218, 165, 32, 0.5);
+            color: #f0c040;
         }
         
         /* Loading overlay */
@@ -644,10 +698,11 @@
         
         /* Privacy micro-copy */
         .privacy-microcopy {
-            font-size: 11px;
+            font-size: 10px;
             color: #9ca3af;
             text-align: center;
-            padding: 4px 0 0 0;
+            padding: 3px 0 0 0;
+            letter-spacing: 0.3px;
         }
         .privacy-microcopy .lock-icon {
             color: #10b981;
@@ -1140,8 +1195,7 @@
                                     oninput="autoResizeWelcome(this)"
                                 ></textarea>
                                 <div style="position: relative;">
-                                    <div class="video-upload-tooltip" id="welcomeVideoTooltip">New! Analyze videos (20s max)</div>
-                                    <svg class="video-upload-btn" onclick="triggerVideoUpload(); dismissVideoTooltip();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
+                                    <svg class="video-upload-btn" onclick="triggerVideoUpload();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
                                         <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                                         <line x1="7" y1="2" x2="7" y2="22"></line>
                                         <line x1="17" y1="2" x2="17" y2="22"></line>
@@ -1153,8 +1207,7 @@
                                     </svg>
                                 </div>
                                 <div style="position: relative;">
-                                    <div class="image-upload-tooltip" id="imageUploadTooltip">Try uploading an image!</div>
-                                    <svg class="welcome-gallery-btn" onclick="triggerGalleryUpload(); dismissImageTooltip();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload from Gallery">
+                                    <svg class="welcome-gallery-btn" onclick="triggerGalleryUpload();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload from Gallery">
                                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                         <polyline points="21 15 16 10 5 21"></polyline>
@@ -1162,16 +1215,14 @@
                                 </div>
                             </div>
                             <div class="welcome-button-row">
-                                <div class="welcome-model-selector">
-                                    <div class="welcome-model-button" id="welcomeModelButton" style="cursor: default;">
-                                        <span class="model-name" id="welcomeSelectedModelName">Gemma 4 26B A4B</span>
-                                        <span class="model-speed-badge" id="welcomeSpeedBadge">⚡ Smart</span>
-                                    </div>
-                                </div>
+                                <button class="action-btn prompts-btn" onclick="window.location.href='/online/ready-made-prompts'">
+                                    <span class="action-btn-icon">💡</span> Prompts
+                                </button>
                                 <button class="welcome-send-button" onclick="sendWelcomeMessage()">
                                     Send
                                 </button>
                             </div>
+                            <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No data stored</div>
                         </div>
                     </div>
 
@@ -1599,7 +1650,8 @@
         function autoResizeWelcome(textarea) {
             textarea.style.height = 'auto';
             textarea.style.overflow = 'hidden';
-            const maxHeight = 100;
+            // Welcome textarea expands up to ~4 lines then scrolls
+            const maxHeight = window.innerWidth <= 768 ? 120 : 140;
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = newHeight + 'px';
             if (textarea.scrollHeight > maxHeight) {
@@ -1648,24 +1700,13 @@
             // Transfer message to the main input (now in DOM)
             document.getElementById('messageInput').value = message;
             
-            // Sync model selection to bottom bar
-            const bottomModelName = document.getElementById('selectedModelName');
-            if (bottomModelName) {
-                const display = MODEL_DISPLAY[selectedModel] || { name: selectedModel, speed: '' };
-                bottomModelName.textContent = display.name;
-            }
-            const bottomSpeedBadge = document.querySelector('#modelButton .model-speed-badge');
-            if (bottomSpeedBadge) {
-                const display = MODEL_DISPLAY[selectedModel] || { name: selectedModel, speed: '' };
-                bottomSpeedBadge.textContent = display.speed;
-            }
+            // Model sync removed - single model, no model label in bottom bar
             
             // Send the message
             sendMessage();
         }
         
         function getBottomInputBarHTML() {
-            const display = MODEL_DISPLAY[selectedModel] || { name: selectedModel, speed: '' };
             return `
             <div class="input-area slide-in" id="bottomInputArea">
                 <div class="input-container">
@@ -1719,8 +1760,7 @@
                         </div>
                         <textarea id="messageInput" class="message-input" placeholder="Ask OffGrid AI anything..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
                         <div style="position: relative;">
-                            <div class="video-upload-tooltip" id="videoUploadTooltip">New! Analyze videos (20s max)</div>
-                            <svg class="video-upload-btn" onclick="triggerVideoUpload(); dismissVideoTooltip();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
+                            <svg class="video-upload-btn" onclick="triggerVideoUpload();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
                                 <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
                                 <line x1="7" y1="2" x2="7" y2="22"></line>
                                 <line x1="17" y1="2" x2="17" y2="22"></line>
@@ -1738,16 +1778,15 @@
                         </svg>
                     </div>
                     <div class="button-row">
-                        <div class="model-selector">
-                            <div class="model-helper" id="modelHelper"></div>
-                            <div class="model-button" id="modelButton" style="cursor: default;">
-                                <span class="model-name" id="selectedModelName">${display.name}</span>
-                                <span class="model-speed-badge">${display.speed}</span>
-                            </div>
-                        </div>
+                        <button class="action-btn clear-btn" onclick="clearChat()">
+                            Clear
+                        </button>
+                        <button class="action-btn save-btn" onclick="handleSaveToKB()">
+                            Save
+                        </button>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
-                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> This conversation is ephemeral and exists only in your browser.</div>
+                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No data stored</div>
                 </div>
             </div>`;
         }
@@ -2003,13 +2042,9 @@
                 // Remove the streaming ID to avoid conflicts
                 streamingTextEl.removeAttribute('id');
                 
-                // Calculate and display response time
+                // Response time logged to console only (removed from UI for cleaner experience)
                 const responseTime = ((Date.now() - requestStartTime) / 1000).toFixed(1);
-                const displayName = MODEL_DISPLAY[selectedModel]?.name || selectedModel;
-                const timeIndicator = document.createElement('div');
-                timeIndicator.className = 'response-time';
-                timeIndicator.innerHTML = `⚡ ${displayName} • ${responseTime}s response time`;
-                messagesDiv.appendChild(timeIndicator);
+                console.log(`Response time: ${responseTime}s`);
                 
                 // Add to conversation history
                 conversationHistory.push({
@@ -2566,7 +2601,8 @@
         function autoResize(textarea) {
             textarea.style.height = 'auto';
             textarea.style.overflow = 'hidden';
-            const maxHeight = window.innerWidth <= 768 ? 150 : 200;
+            // Max ~6 lines on mobile, ~8 lines on desktop before scrolling
+            const maxHeight = window.innerWidth <= 768 ? 160 : 220;
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = newHeight + 'px';
             if (textarea.scrollHeight > maxHeight) {
@@ -3281,24 +3317,7 @@
                 togglePromptCategory('survival');
             }, 300);
             
-            // Hide image upload tooltip if already dismissed, or auto-dismiss after 8 seconds
-            if (localStorage.getItem('offgrid-image-tooltip-dismissed')) {
-                const tooltip = document.getElementById('imageUploadTooltip');
-                if (tooltip) tooltip.remove();
-            } else {
-                setTimeout(() => {
-                    dismissImageTooltip();
-                }, 8000);
-            }
-            
-            // Hide video upload tooltip if already dismissed, or auto-dismiss after 10 seconds
-            if (localStorage.getItem('offgrid-video-tooltip-dismissed')) {
-                document.querySelectorAll('.video-upload-tooltip').forEach(t => t.remove());
-            } else {
-                setTimeout(() => {
-                    dismissVideoTooltip();
-                }, 10000);
-            }
+            // Tooltips removed from UI in v5.3.0 for cleaner experience
             
             // Pull-to-refresh for mobile
             if (window.innerWidth <= 768) {
