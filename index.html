@@ -696,6 +696,45 @@
             margin-top: 4px;
         }
         
+        /* Welcome tagline */
+        .welcome-tagline {
+            font-size: 14px;
+            color: #8b7355;
+            font-style: italic;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .welcome-tagline {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+        }
+        
+        /* Voice input button */
+        .voice-btn {
+            padding: 7px 14px !important;
+            transition: all 0.2s ease;
+        }
+        .voice-btn .voice-icon {
+            font-size: 14px;
+        }
+        .voice-btn.voice-active {
+            background: #ef4444 !important;
+            border-color: #ef4444 !important;
+            color: white !important;
+            animation: voicePulse 1.5s ease-in-out infinite;
+        }
+        .voice-btn.voice-active .voice-icon {
+            filter: brightness(10);
+        }
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+        
         /* Privacy micro-copy */
         .privacy-microcopy {
             font-size: 10px;
@@ -893,8 +932,19 @@
             background: rgba(184, 134, 11, 0.3);
         }
     </style>
+    <link rel="manifest" href="/offgrid-manifest.json">
 </head>
 <body>
+<script>
+// Register service worker for offline caching (static assets only, never API)
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('[SW] Registered:', reg.scope))
+            .catch(err => console.log('[SW] Registration failed:', err));
+    });
+}
+</script>
     <!-- First Run Banner (Online Version - No PIN required) -->
     <div id="firstRunBanner" class="first-run-banner" style="display: none;">
         <div class="first-run-content">
@@ -1144,6 +1194,7 @@
                         <!-- Center circle -->
                         <circle cx="50" cy="50" r="6" fill="#8b4513"/>
                     </svg>
+                    <div class="welcome-tagline">Built for weak signals and hard decisions.</div>
                     <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
                     <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</div>
@@ -1217,6 +1268,9 @@
                             <div class="welcome-button-row">
                                 <button class="action-btn prompts-btn" onclick="window.location.href='/online/ready-made-prompts'">
                                     <span class="action-btn-icon">💡</span> Prompts
+                                </button>
+                                <button class="action-btn voice-btn" id="welcomeVoiceBtn" onclick="toggleVoiceInput('welcome')" title="Voice Input">
+                                    <span class="voice-icon">🎤</span>
                                 </button>
                                 <button class="welcome-send-button" onclick="sendWelcomeMessage()">
                                     Send
@@ -1650,12 +1704,14 @@
         function autoResizeWelcome(textarea) {
             textarea.style.height = 'auto';
             textarea.style.overflow = 'hidden';
-            // Welcome textarea expands up to ~4 lines then scrolls
-            const maxHeight = window.innerWidth <= 768 ? 120 : 140;
+            // Welcome textarea expands up to ~5 lines on mobile, ~6 on desktop, then scrolls
+            const maxHeight = window.innerWidth <= 768 ? 140 : 160;
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = newHeight + 'px';
             if (textarea.scrollHeight > maxHeight) {
                 textarea.style.overflowY = 'auto';
+            } else {
+                textarea.style.overflowY = 'hidden';
             }
         }
         
@@ -1783,6 +1839,9 @@
                         </button>
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
                             Save
+                        </button>
+                        <button class="action-btn voice-btn" id="chatVoiceBtn" onclick="toggleVoiceInput('chat')" title="Voice Input">
+                            <span class="voice-icon">🎤</span>
                         </button>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
@@ -1943,8 +2002,9 @@
             }
             conversationHistory.push(historyEntry);
             
-            // Clear input
+            // Clear input and dismiss mobile keyboard
             input.value = '';
+            input.blur();
             autoResize(input);
             const imageToSend = selectedImage;
             const videoToSend = selectedVideo;
@@ -2554,6 +2614,89 @@
                 setTimeout(() => tooltip.remove(), 300);
             });
             localStorage.setItem('offgrid-video-tooltip-dismissed', 'true');
+        }
+        
+        // ============================================
+        // VOICE INPUT (Web Speech API)
+        // ============================================
+        
+        let voiceRecognition = null;
+        let isListening = false;
+        
+        function toggleVoiceInput(context) {
+            // Check browser support
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Try Chrome or Edge.');
+                return;
+            }
+            
+            if (isListening) {
+                stopVoiceInput();
+                return;
+            }
+            
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.continuous = false;
+            voiceRecognition.interimResults = true;
+            voiceRecognition.lang = 'en-US';
+            voiceRecognition.maxAlternatives = 1;
+            
+            const targetInput = context === 'welcome' 
+                ? document.getElementById('welcomeMessageInput') 
+                : document.getElementById('messageInput');
+            const voiceBtn = context === 'welcome'
+                ? document.getElementById('welcomeVoiceBtn')
+                : document.getElementById('chatVoiceBtn');
+            
+            if (!targetInput) return;
+            
+            isListening = true;
+            if (voiceBtn) voiceBtn.classList.add('voice-active');
+            
+            let finalTranscript = targetInput.value;
+            
+            voiceRecognition.onresult = function(event) {
+                let interimTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += (finalTranscript ? ' ' : '') + event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                targetInput.value = finalTranscript + (interimTranscript ? ' ' + interimTranscript : '');
+                // Trigger auto-resize
+                if (context === 'welcome') {
+                    autoResizeWelcome(targetInput);
+                } else {
+                    autoResize(targetInput);
+                }
+            };
+            
+            voiceRecognition.onend = function() {
+                stopVoiceInput();
+            };
+            
+            voiceRecognition.onerror = function(event) {
+                console.log('[Voice] Error:', event.error);
+                if (event.error === 'not-allowed') {
+                    alert('Microphone access denied. Please allow microphone access in your browser settings.');
+                }
+                stopVoiceInput();
+            };
+            
+            voiceRecognition.start();
+        }
+        
+        function stopVoiceInput() {
+            isListening = false;
+            if (voiceRecognition) {
+                try { voiceRecognition.stop(); } catch(e) {}
+                voiceRecognition = null;
+            }
+            // Remove active state from all voice buttons
+            document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.remove('voice-active'));
         }
         
         // ============================================

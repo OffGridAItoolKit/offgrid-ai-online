@@ -9,6 +9,18 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-17**
+*   **Weak Signal Optimization, Voice Input & UX Polish (v5.4.0)**
+    *   Added tagline: "Built for weak signals and hard decisions." below compass on welcome screen.
+    *   Implemented **gzip compression** for static assets (HTML, CSS, JS) — 60-70% smaller page loads. SSE streams and API responses are explicitly excluded.
+    *   Added **keep-alive headers** with 120s timeout to reduce TCP handshake overhead on slow connections.
+    *   Added **service worker** (stale-while-revalidate) for offline caching of static assets. Repeat visits load instantly even on poor connections. API calls are never cached.
+    *   Created web app manifest (`offgrid-manifest.json`) for PWA-like behavior.
+    *   Added **Voice Input** button (Web Speech API) on both welcome screen and chat view. Pulses red when actively listening. Appends to existing text.
+    *   Keyboard now **auto-dismisses after sending** a message (blur on send) — matches ChatGPT/Claude behavior.
+    *   Improved welcome textarea auto-resize with proper overflow handling.
+    *   Reduced compass icon gap from top of screen for better vertical centering.
+    *   Added cache-control headers: 1 hour for HTML/CSS/JS, 7 days for images and fonts.
+
 *   **Mobile UI Overhaul & Branding Cleanup (v5.3.0)**
     *   Enlarged compass icon on mobile using viewport-relative units (25vw) for proportional scaling across all phone sizes.
     *   Replaced model label in bottom bar with contextual action buttons: **Ready-Made Prompts** on welcome screen, **Clear** and **Save** in chat view.
