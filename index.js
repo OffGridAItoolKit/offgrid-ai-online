@@ -14,7 +14,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
@@ -200,18 +199,6 @@ const ARENA_MODELS = {
 // MIDDLEWARE
 // =============================================================================
 
-// Gzip/Brotli compression for static assets (HTML, CSS, JS)
-// Skips streaming responses (SSE) automatically — no impact on AI chat
-app.use(compression({
-    filter: (req, res) => {
-        // Don't compress SSE streams or API responses
-        if (req.headers.accept === 'text/event-stream') return false;
-        if (req.path.startsWith('/api/stream')) return false;
-        return compression.filter(req, res);
-    },
-    level: 6 // balanced speed vs compression ratio
-}));
-
 // CORS Configuration
 app.use(cors({
     origin: true,
@@ -313,21 +300,8 @@ app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'cmdcouncil.html'));
 });
 
-// Serve static files with caching and keep-alive headers
-app.use(express.static(__dirname, {
-    maxAge: '1h',           // Cache static assets for 1 hour
-    etag: true,             // Enable ETag for conditional requests
-    lastModified: true,     // Enable Last-Modified headers
-    setHeaders: (res, filePath) => {
-        // Keep-alive to reduce TCP handshake overhead on slow connections
-        res.setHeader('Connection', 'keep-alive');
-        res.setHeader('Keep-Alive', 'timeout=120');
-        // Longer cache for truly static assets (images, fonts)
-        if (filePath.match(/\.(png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/)) {
-            res.setHeader('Cache-Control', 'public, max-age=604800'); // 7 days
-        }
-    }
-}));
+// Serve static files from the same directory as index.js (flat structure)
+app.use(express.static(__dirname));
 
 // Request logging (minimal for privacy)
 app.use((req, res, next) => {
