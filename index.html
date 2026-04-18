@@ -1695,8 +1695,8 @@
         function autoResizeWelcome(textarea) {
             textarea.style.height = 'auto';
             textarea.style.overflow = 'hidden';
-            // Welcome textarea expands up to ~4 lines then scrolls
-            const maxHeight = window.innerWidth <= 768 ? 120 : 140;
+            // Welcome textarea expands up to ~6 lines then scrolls
+            const maxHeight = window.innerWidth <= 768 ? 160 : 180;
             const newHeight = Math.min(textarea.scrollHeight, maxHeight);
             textarea.style.height = newHeight + 'px';
             if (textarea.scrollHeight > maxHeight) {
@@ -2112,7 +2112,11 @@
             } finally {
                 isTyping = false;
                 document.getElementById('sendButton').disabled = false;
-                document.getElementById('messageInput').focus();
+                // Don't refocus input on mobile - keep keyboard dismissed so user can read the response
+                // User taps the input when they're ready to type again
+                if (window.innerWidth > 768) {
+                    document.getElementById('messageInput').focus();
+                }
             }
         }
         
@@ -2694,7 +2698,7 @@
             // Activate all voice buttons visually
             document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.add('voice-active'));
 
-            const input = document.getElementById('messageInput') || document.getElementById('welcomeInput');
+            const input = document.getElementById('messageInput') || document.getElementById('welcomeMessageInput');
 
             voiceRecognition.onresult = function(event) {
                 let transcript = '';
@@ -2703,7 +2707,7 @@
                 }
                 if (input) {
                     input.value = transcript;
-                    if (input.id === 'welcomeInput') {
+                    if (input.id === 'welcomeMessageInput') {
                         autoResizeWelcome(input);
                     } else {
                         autoResize(input);
@@ -3493,9 +3497,11 @@
                     const chatInput = document.getElementById('messageInput');
                     if (welcomeInput && document.getElementById('welcome') && document.getElementById('welcome').style.display !== 'none') {
                         welcomeInput.value = readyPrompt;
+                        autoResizeWelcome(welcomeInput);
                         welcomeInput.focus();
                     } else if (chatInput) {
                         chatInput.value = readyPrompt;
+                        autoResize(chatInput);
                         chatInput.focus();
                     }
                 }, 500);

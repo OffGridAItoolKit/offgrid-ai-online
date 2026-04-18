@@ -790,7 +790,7 @@ body {
     outline: none;
     background: transparent;
     font-family: inherit;
-    line-height: 1.4;
+    line-height: 1.35;
     max-height: 220px;
     overflow-y: auto;
     color: #2c1810;
@@ -1390,10 +1390,10 @@ body {
     
     body:not(.command-theme) .welcome-icon {
         display: block !important;
-        width: 18vw !important;
-        height: 18vw !important;
-        max-width: 120px !important;
-        max-height: 120px !important;
+        width: 22vw !important;
+        height: 22vw !important;
+        max-width: 150px !important;
+        max-height: 150px !important;
         margin-bottom: 4px !important;
     }
     
@@ -1834,10 +1834,10 @@ body {
     
     /* Compass scales with viewport on mobile */
     .welcome-icon {
-        width: 18vw !important;
-        height: 18vw !important;
-        max-width: 120px !important;
-        max-height: 120px !important;
+        width: 22vw !important;
+        height: 22vw !important;
+        max-width: 150px !important;
+        max-height: 150px !important;
         margin-bottom: 4px !important;
     }
 }
@@ -1894,7 +1894,7 @@ body {
     font-size: 15px;
     font-family: inherit;
     resize: none;
-    line-height: 1.4;
+    line-height: 1.35;
     padding: 8px 4px;
     background: transparent;
     color: #2c1810;
@@ -2847,18 +2847,20 @@ body.command-theme {
     /* Compass sizing on mobile (free ToolKit only) */
     body:not(.command-theme) .welcome-icon {
         display: block !important;
-        width: 18vw !important;
-        height: 18vw !important;
-        max-width: 120px !important;
-        max-height: 120px !important;
+        width: 22vw !important;
+        height: 22vw !important;
+        max-width: 150px !important;
+        max-height: 150px !important;
         margin-bottom: 4px !important;
         margin-top: 0 !important;
     }
     
-    /* Tagline below compass */
+    /* Tagline below compass - MUST be visible on mobile */
     body:not(.command-theme) .welcome-tagline {
         order: 1 !important;
+        display: block !important;
         margin-bottom: 4px !important;
+        font-size: 12px !important;
     }
     
     /* Title after tagline */

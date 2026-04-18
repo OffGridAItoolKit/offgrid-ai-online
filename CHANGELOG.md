@@ -9,6 +9,14 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-18**
+*   **Mobile UX Fixes (v5.4.1)**
+    *   **Fixed tagline visibility on mobile** — added explicit `display: block !important` to override the paragraph-hide rule. "Built for weak signals and hard decisions." now shows on all screen sizes.
+    *   **Enlarged compass** back to 22vw / 150px max for better visual presence on mobile.
+    *   **Fixed voice input text transfer** — was looking for wrong textarea ID (`welcomeInput` instead of `welcomeMessageInput`). Voice transcription now correctly populates the input field.
+    *   **Fixed textarea auto-resize for ready-made prompts** — `autoResizeWelcome()` now called after prompt text is injected. Increased max-height to 160px on mobile (~6 lines) before scrollbar appears.
+    *   **Keyboard stays dismissed after AI response** — removed auto-focus on mobile after stream completes. Desktop still auto-focuses. User taps input when ready to type again.
+    *   Reduced line-height to 1.35 on both welcome and chat textareas for tighter text display.
+
 *   **Welcome Screen Polish, Voice Input & Keyboard UX (v5.4.0)**
     *   Added tagline "Built for weak signals and hard decisions." below compass icon on welcome screen.
     *   Added **Voice Input** button (SVG microphone icon) to both welcome screen and chat view button rows. Uses Web Speech API for native browser speech-to-text. Button pulses red when actively listening.
