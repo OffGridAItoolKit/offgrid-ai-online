@@ -8,6 +8,17 @@ This document provides a reverse-chronological summary of recent development pro
 
 ### April 2026
 
+**2026-04-18**
+*   **Welcome Screen Polish, Voice Input & Keyboard UX (v5.4.0)**
+    *   Added tagline "Built for weak signals and hard decisions." below compass icon on welcome screen.
+    *   Added **Voice Input** button (SVG microphone icon) to both welcome screen and chat view button rows. Uses Web Speech API for native browser speech-to-text. Button pulses red when actively listening.
+    *   Added `welcome-content` wrapper div for proper CSS flex ordering on mobile — fixes duplicate quick action buttons issue.
+    *   **Keyboard dismiss on send:** Input field now blurs after sending a message, automatically dismissing the mobile keyboard so users can see the AI response streaming in (matching ChatGPT/Claude behavior).
+    *   Reduced compass icon to 18vw (from 25vw) with 120px max to prevent header overlap on mobile.
+    *   Hidden hamburger menu on all experiences (was only hidden for customers).
+    *   Updated CSS ordering to accommodate tagline in the mobile welcome screen flow.
+    *   Protected tagline from the mobile "hide description paragraphs" rule.
+
 **2026-04-17**
 *   **Mobile UI Overhaul & Branding Cleanup (v5.3.0)**
     *   Enlarged compass icon on mobile using viewport-relative units (25vw) for proportional scaling across all phone sizes.

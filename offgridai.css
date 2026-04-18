@@ -1390,11 +1390,11 @@ body {
     
     body:not(.command-theme) .welcome-icon {
         display: block !important;
-        width: 25vw !important;
-        height: 25vw !important;
-        max-width: 180px !important;
-        max-height: 180px !important;
-        margin-bottom: 12px !important;
+        width: 18vw !important;
+        height: 18vw !important;
+        max-width: 120px !important;
+        max-height: 120px !important;
+        margin-bottom: 4px !important;
     }
     
     body:not(.command-theme) .welcome h2 {
@@ -1834,11 +1834,11 @@ body {
     
     /* Compass scales with viewport on mobile */
     .welcome-icon {
-        width: 22vw !important;
-        height: 22vw !important;
-        max-width: 160px !important;
-        max-height: 160px !important;
-        margin-bottom: 10px !important;
+        width: 18vw !important;
+        height: 18vw !important;
+        max-width: 120px !important;
+        max-height: 120px !important;
+        margin-bottom: 4px !important;
     }
 }
 /* Hide Verified Drive badge on mobile and tablet portrait */
@@ -2844,48 +2844,55 @@ body.command-theme {
         padding: 0 8px !important;
     }
     
-    /* Hide compass on mobile (free ToolKit only, Command Center keeps it) */
+    /* Compass sizing on mobile (free ToolKit only) */
     body:not(.command-theme) .welcome-icon {
         display: block !important;
-        width: 25vw !important;
-        height: 25vw !important;
-        max-width: 180px !important;
-        max-height: 180px !important;
-        margin-bottom: 12px !important;
+        width: 18vw !important;
+        height: 18vw !important;
+        max-width: 120px !important;
+        max-height: 120px !important;
+        margin-bottom: 4px !important;
+        margin-top: 0 !important;
     }
     
-    /* Title stays at top */
-    body:not(.command-theme) .welcome h2 {
+    /* Tagline below compass */
+    body:not(.command-theme) .welcome-tagline {
         order: 1 !important;
+        margin-bottom: 4px !important;
+    }
+    
+    /* Title after tagline */
+    body:not(.command-theme) .welcome h2 {
+        order: 2 !important;
         font-size: 18px !important;
         margin-bottom: 2px !important;
     }
     
     body:not(.command-theme) .welcome-online-badge {
-        order: 2 !important;
+        order: 3 !important;
         margin-bottom: 4px !important;
     }
     
     /* Hide subtitle and feature badges on mobile to save space */
     body:not(.command-theme) .welcome-subtitle {
-        order: 3 !important;
-        display: none !important;
-    }
-    
-    body:not(.command-theme) .feature-badges {
         order: 4 !important;
         display: none !important;
     }
     
-    /* Hide the description paragraph on mobile */
-    body:not(.command-theme) .welcome-content > p {
+    body:not(.command-theme) .feature-badges {
         order: 5 !important;
+        display: none !important;
+    }
+    
+    /* Hide the description paragraph on mobile (but NOT the tagline) */
+    body:not(.command-theme) .welcome-content > p:not(.welcome-tagline) {
+        order: 6 !important;
         display: none !important;
     }
     
     /* Chat input box - MOVED TO TOP (right after title) */
     body:not(.command-theme) .welcome-input-area {
-        order: 6 !important;
+        order: 7 !important;
         width: 100% !important;
         max-width: 100% !important;
         margin: 6px 0 8px 0 !important;
@@ -2903,7 +2910,7 @@ body.command-theme {
     
     /* Mobile quick actions - after chat box */
     .mobile-quick-actions {
-        order: 7 !important;
+        order: 8 !important;
         width: 100% !important;
         max-width: 100% !important;
         padding: 0 !important;
@@ -2923,7 +2930,7 @@ body.command-theme {
     
     /* Purchase CTA at bottom */
     .welcome-content > .prospect-only:last-child {
-        order: 8 !important;
+        order: 9 !important;
     }
     
     /* Reduce overall padding on welcome (free ToolKit only) */

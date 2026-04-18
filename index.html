@@ -180,6 +180,44 @@
             color: #f0c040;
         }
         
+        /* Voice input button */
+        .voice-btn {
+            padding: 7px 14px !important;
+            transition: all 0.2s ease;
+        }
+        .voice-btn.voice-active {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: rgba(239, 68, 68, 0.5) !important;
+            color: #ef4444 !important;
+            animation: voicePulse 1.5s ease-in-out infinite;
+        }
+        .voice-icon {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+        @keyframes voicePulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3); }
+            50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        }
+        
+        /* Welcome tagline */
+        .welcome-tagline {
+            font-size: 14px;
+            color: #8b7355;
+            font-style: italic;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            margin-bottom: 6px;
+            opacity: 0.9;
+        }
+        @media (max-width: 768px) {
+            .welcome-tagline {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+        }
+        
         /* Loading overlay */
         .loading-overlay {
             position: fixed;
@@ -744,8 +782,9 @@
         /* Customer-only elements hidden when prospect */
         body.is-prospect .customer-only { display: none !important; }
         
-        /* Hide hamburger menu on mobile for customers */
+        /* Hide hamburger menu on mobile for all experiences */
         body.is-customer .toggle-sidebar { display: none !important; }
+        body.is-prospect .toggle-sidebar { display: none !important; }
         
         /* Mobile: hide status text, keep dot only */
         @media (max-width: 768px) {
@@ -1128,6 +1167,7 @@
         <div class="chat-container">
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
+                <div class="welcome-content">
                     <svg class="welcome-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                         <!-- Main compass points (N,S,E,W) -->
                         <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
@@ -1144,6 +1184,7 @@
                         <!-- Center circle -->
                         <circle cx="50" cy="50" r="6" fill="#8b4513"/>
                     </svg>
+                    <p class="welcome-tagline"><em>Built for weak signals and hard decisions.</em></p>
                     <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
                     <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</div>
@@ -1217,6 +1258,9 @@
                             <div class="welcome-button-row">
                                 <button class="action-btn prompts-btn" onclick="window.location.href='/online/ready-made-prompts'">
                                     <span class="action-btn-icon">💡</span> Prompts
+                                </button>
+                                <button class="action-btn voice-btn" onclick="toggleVoiceInput()" title="Voice Input">
+                                    <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                                 </button>
                                 <button class="welcome-send-button" onclick="sendWelcomeMessage()">
                                     Send
@@ -1324,6 +1368,7 @@
                             🛒 Get the USB Version — 100% Offline
                         </a>
                     </div>
+                </div><!-- /.welcome-content -->
                 </div>
             </div>
 
@@ -1784,6 +1829,9 @@
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
                             Save
                         </button>
+                        <button class="action-btn voice-btn" onclick="toggleVoiceInput()" title="Voice Input">
+                            <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                        </button>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
                     <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No data stored</div>
@@ -1943,8 +1991,9 @@
             }
             conversationHistory.push(historyEntry);
             
-            // Clear input
+            // Clear input and dismiss mobile keyboard
             input.value = '';
+            input.blur();
             autoResize(input);
             const imageToSend = selectedImage;
             const videoToSend = selectedVideo;
@@ -2620,6 +2669,65 @@
         // ============================================
         // VOICE INPUT (Customer only)
         // ============================================
+        
+        function toggleVoiceInput() {
+            if (voiceRecognition) {
+                stopVoiceInput();
+                return;
+            }
+            // Use startVoiceInput for the actual logic
+            startVoiceInputWithButton();
+        }
+        
+        function startVoiceInputWithButton() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                alert('Voice input is not supported in this browser. Please use Chrome or Safari.');
+                return;
+            }
+
+            voiceRecognition = new SpeechRecognition();
+            voiceRecognition.continuous = false;
+            voiceRecognition.interimResults = true;
+            voiceRecognition.lang = 'en-US';
+
+            // Activate all voice buttons visually
+            document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.add('voice-active'));
+
+            const input = document.getElementById('messageInput') || document.getElementById('welcomeInput');
+
+            voiceRecognition.onresult = function(event) {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                if (input) {
+                    input.value = transcript;
+                    if (input.id === 'welcomeInput') {
+                        autoResizeWelcome(input);
+                    } else {
+                        autoResize(input);
+                    }
+                }
+            };
+
+            voiceRecognition.onend = function() {
+                document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.remove('voice-active'));
+                voiceRecognition = null;
+                if (input) input.focus();
+            };
+
+            voiceRecognition.onerror = function(event) {
+                console.error('Voice recognition error:', event.error);
+                document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.remove('voice-active'));
+                voiceRecognition = null;
+                if (event.error === 'not-allowed') {
+                    alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+                }
+            };
+
+            voiceRecognition.start();
+        }
         
         function startVoiceInput() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
