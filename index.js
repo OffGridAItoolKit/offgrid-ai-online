@@ -1839,12 +1839,12 @@ app.post('/api/export-pdf', async (req, res) => {
             padding: 40px 30px;
             color: #1a1a1a;
             line-height: 1.7;
-            font-size: 13px;
+            font-size: 15px;
         }
         
         h1 {
             color: #2c1810;
-            font-size: 22px;
+            font-size: 24px;
             border-bottom: 3px solid #b8860b;
             padding-bottom: 10px;
             margin-bottom: 20px;
@@ -1852,7 +1852,7 @@ app.post('/api/export-pdf', async (req, res) => {
         
         h2 {
             color: #4a2c1a;
-            font-size: 16px;
+            font-size: 18px;
             margin-top: 28px;
             margin-bottom: 10px;
             padding: 6px 12px;
@@ -1864,10 +1864,11 @@ app.post('/api/export-pdf', async (req, res) => {
         h3, h4 {
             color: #374151;
             margin-top: 16px;
+            font-size: 16px;
         }
         
         p {
-            margin: 8px 0;
+            margin: 10px 0;
         }
         
         em {
@@ -1890,14 +1891,14 @@ app.post('/api/export-pdf', async (req, res) => {
         }
         
         li {
-            margin: 4px 0;
+            margin: 6px 0;
         }
         
         code {
             background: #f3f4f6;
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 13px;
             font-family: 'Courier New', monospace;
         }
         
@@ -1907,7 +1908,7 @@ app.post('/api/export-pdf', async (req, res) => {
             padding: 16px;
             border-radius: 8px;
             overflow-x: auto;
-            font-size: 12px;
+            font-size: 13px;
             line-height: 1.5;
         }
         
@@ -1929,7 +1930,7 @@ app.post('/api/export-pdf', async (req, res) => {
             width: 100%;
             border-collapse: collapse;
             margin: 12px 0;
-            font-size: 12px;
+            font-size: 13px;
         }
         
         th, td {
@@ -1945,7 +1946,7 @@ app.post('/api/export-pdf', async (req, res) => {
         
         img {
             max-width: 100%;
-            max-height: 45vh;
+            max-height: 38vh;
             object-fit: contain;
             border-radius: 8px;
             margin: 8px 0;
@@ -1954,7 +1955,7 @@ app.post('/api/export-pdf', async (req, res) => {
         
         @media print {
             img {
-                max-height: 400px;
+                max-height: 340px;
                 page-break-inside: avoid;
             }
         }

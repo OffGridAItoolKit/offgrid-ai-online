@@ -9,6 +9,12 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-19**
+*   **PDF Typography & Readability Improvements (v5.5.2)**
+    *   **Body text enlarged** from 13px to 15px for better readability, especially on mobile-saved PDFs used as field references.
+    *   **Headings scaled up** across all levels: h1 from 22px to 24px, h2 from 16px to 18px, h3/h4 now explicit at 16px.
+    *   **Image sizing refined** from `max-height: 45vh` / 400px to `38vh` / 340px. Images remain clearly visible but leave more room for the AI response to begin on the same page.
+    *   **Supporting elements** (code, pre, tables) bumped from 12px to 13px. List item and paragraph spacing slightly increased.
+
 *   **Vision System Prompt, PDF Layout, Video Frames & Terms Modal (v5.5.1)**
     *   **Vision-specific system prompt** — Added "Image and video analysis" section to `OFFGRID_SYSTEM_PROMPT`. Instructs the AI to always provide its best assessment even when uncertain, offer a short list of possibilities with reasoning, keep disclaimers concise, and suggest additional images or video uploads for better identification.
     *   **PDF image layout fix** — Added `max-height: 45vh` and `page-break-inside: avoid` to images in the PDF export template. Prevents tall uploaded images from pushing to a new page and leaving a blank first page.
