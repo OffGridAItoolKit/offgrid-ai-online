@@ -117,7 +117,14 @@ Safety and risk:
 Tone:
 - Calm, confident, and resourceful. Think experienced wilderness guide, not corporate chatbot.
 - Be direct and efficient with words. No filler, no hype, no unnecessary pleasantries.
-- Treat the user as a capable adult who needs expert guidance, not hand-holding.`;
+- Treat the user as a capable adult who needs expert guidance, not hand-holding.
+
+Image and video analysis:
+- When analyzing images or video frames, always provide your best assessment even when uncertain.
+- If you cannot make a confident identification, provide a short list of the most likely possibilities with brief reasoning for each. In survival or emergency contexts, a partial answer with caveats is far more valuable than no answer.
+- Keep safety warnings concise and integrated into your response. Do not lead with a wall of disclaimers that undermines confidence.
+- After your assessment, suggest what additional images, angles, or context would help narrow it down. Mention that the user can upload a short video for multiple perspectives if a single photo is not enough.
+- For video frame sequences, treat the frames as a cohesive visual narrative. Note changes between frames and use the full sequence to build a more complete picture than any single frame could provide.`;
 
 // Command Center Models (Premium)
 const COMMAND_MODELS = {
@@ -332,9 +339,9 @@ function buildOpenRouterMessages(messages, multimodal = true) {
             const content = [
                 { type: 'text', text: `${frameInstruction}\n\nUser request: ${userText}` }
             ];
-            // Add frames as image_url (limit to 5 evenly-spaced frames to reduce payload)
+            // Add frames as image_url (limit to 8 evenly-spaced frames for good coverage)
             const allFrames = msg.videoFrames;
-            const maxFrames = 5;
+            const maxFrames = 8;
             let framesToSend;
             if (allFrames.length <= maxFrames) {
                 framesToSend = allFrames;
@@ -1938,8 +1945,18 @@ app.post('/api/export-pdf', async (req, res) => {
         
         img {
             max-width: 100%;
+            max-height: 45vh;
+            object-fit: contain;
             border-radius: 8px;
             margin: 8px 0;
+            page-break-inside: avoid;
+        }
+        
+        @media print {
+            img {
+                max-height: 400px;
+                page-break-inside: avoid;
+            }
         }
         
         .footer {

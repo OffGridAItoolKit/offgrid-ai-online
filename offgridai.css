@@ -1777,21 +1777,54 @@ body {
 
 /* Mobile Responsive */
 @media (max-width: 768px) {
+    .first-run-banner {
+        align-items: flex-start;
+        padding: 10px 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
     .first-run-content {
-        padding: 30px 20px;
-        width: 95%;
+        padding: 24px 18px;
+        width: 92%;
+        max-height: none;
+        margin: auto;
+        border-radius: 16px;
     }
     
     .first-run-logo {
-        font-size: 24px;
+        font-size: 22px;
+        margin-bottom: 6px;
+    }
+    
+    .first-run-tagline {
+        font-size: 12px;
+        margin-bottom: 16px;
     }
     
     .first-run-message {
-        padding: 15px;
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .first-run-message p {
+        margin: 6px 0;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+    
+    .first-run-terms {
+        margin-bottom: 16px;
     }
     
     .terms-checkbox {
         font-size: 13px;
+    }
+    
+    .first-run-button {
+        padding: 12px 24px;
+        font-size: 14px;
+        width: 100%;
     }
 }
 /* Online version: Show hamburger menu on mobile for sidebar access */

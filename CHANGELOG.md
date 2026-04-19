@@ -9,6 +9,12 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-19**
+*   **Vision System Prompt, PDF Layout, Video Frames & Terms Modal (v5.5.1)**
+    *   **Vision-specific system prompt** — Added "Image and video analysis" section to `OFFGRID_SYSTEM_PROMPT`. Instructs the AI to always provide its best assessment even when uncertain, offer a short list of possibilities with reasoning, keep disclaimers concise, and suggest additional images or video uploads for better identification.
+    *   **PDF image layout fix** — Added `max-height: 45vh` and `page-break-inside: avoid` to images in the PDF export template. Prevents tall uploaded images from pushing to a new page and leaving a blank first page.
+    *   **Video frame limit bump** — Increased server-side frame limit from 5 to 8 evenly-spaced frames sent to the AI. Longer videos now provide better visual coverage for analysis.
+    *   **Terms modal mobile fix** — Made the first-run terms/disclaimer modal scrollable on small mobile screens. The banner now uses `overflow-y: auto` with compact spacing so the accept button is always reachable regardless of screen size.
+
 *   **Mobile Save Redesign, PDF Naming & Image Upload UX (v5.5.0)**
     *   **PDF filename fix** — Added `<title>` tag to export-pdf HTML template. Browser now uses the conversation title for the PDF filename instead of "about_blank."
     *   **Keyboard dismiss after image/video upload** — On mobile, keyboard now automatically dismisses after selecting an image or video so users can see the upload preview confirmation.
