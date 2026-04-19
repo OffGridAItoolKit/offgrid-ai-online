@@ -1821,6 +1821,7 @@ app.post('/api/export-pdf', async (req, res) => {
 <html>
 <head>
     <meta charset="UTF-8">
+    <title>${(title || 'OffGrid AI Conversation').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         

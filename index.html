@@ -2288,6 +2288,11 @@
                         dataUrl: resizedDataUrl
                     };
                     showImagePreview();
+                    
+                    // Dismiss keyboard on mobile so user can see the image preview
+                    if (window.innerWidth <= 768) {
+                        document.activeElement.blur();
+                    }
                 });
             }
         }
@@ -2479,6 +2484,8 @@
                             uploadIndicator.remove();
                             removeImage();
                             showVideoPreview();
+                            // Dismiss keyboard on mobile so user can see the video preview
+                            if (window.innerWidth <= 768) document.activeElement.blur();
                         };
                         // Fallback
                         setTimeout(() => {
@@ -2495,6 +2502,8 @@
                                 uploadIndicator.remove();
                                 removeImage();
                                 showVideoPreview();
+                                // Dismiss keyboard on mobile so user can see the video preview
+                                if (window.innerWidth <= 768) document.activeElement.blur();
                             }
                         }, 3000);
                         return;
@@ -2949,19 +2958,46 @@
         }
         
         function showKBUpsellModal() {
+            // Auto-generate title from first user message (for mobile PDF save)
+            const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+            const autoTitle = firstUserMsg
+                ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
+                : 'Conversation';
+            const isMobile = window.innerWidth <= 768;
+            
             const overlay = document.createElement('div');
             overlay.className = 'kb-modal-overlay';
             overlay.id = 'kbUpsellModal';
-            overlay.innerHTML = `
-                <div class="kb-modal">
-                    <div class="kb-modal-icon">📚</div>
-                    <h3>Save to Your Knowledge Base</h3>
-                    <p>The Knowledge Base is a powerful feature of the <strong>OffGrid AI ToolKit USB drive</strong>. Save conversations, build a personal reference library, and access it all offline, anywhere, anytime.</p>
-                    <p style="font-size: 12px; color: #8b7355;">With the USB version, your saved knowledge stays on <em>your</em> drive. No cloud. No accounts. Just your data, under your control.</p>
-                    <a href="https://offgridaitoolkit.com" target="_blank" class="kb-modal-cta">🛒 Get the USB Version</a>
-                    <button class="kb-modal-close" onclick="closeKBUpsellModal()">Maybe later</button>
-                </div>
-            `;
+            
+            if (isMobile) {
+                // Mobile demo user: offer PDF save + upsell
+                overlay.innerHTML = `
+                    <div class="kb-modal">
+                        <h3>💾 Save Conversation</h3>
+                        <div style="font-size: 13px; color: #6b7280; margin-bottom: 12px;">Saved directly to your device — never to our servers.</div>
+                        <label for="saveTitle" style="font-size: 13px; font-weight: 600; color: #2c1810; display: block; margin-bottom: 4px;">Title</label>
+                        <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title..." style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; margin-bottom: 12px; box-sizing: border-box;">
+                        <button class="kb-modal-cta" onclick="closeKBUpsellModal(); exportAsPDF();" style="display: block; width: 100%; text-align: center; margin-bottom: 10px;">🖨️ Save as PDF</button>
+                        <div style="border-top: 1px solid #e5e7eb; padding-top: 10px; margin-top: 4px;">
+                            <p style="font-size: 11px; color: #8b7355; margin: 0 0 8px 0;">Want categories, tags & offline access? The <strong>USB version</strong> saves to your personal Knowledge Base.</p>
+                            <a href="https://offgridaitoolkit.com" target="_blank" style="font-size: 12px; color: #b8860b; text-decoration: underline;">Learn about the USB version</a>
+                        </div>
+                        <button class="kb-modal-close" onclick="closeKBUpsellModal()" style="margin-top: 8px;">Cancel</button>
+                    </div>
+                `;
+            } else {
+                // Desktop demo user: full upsell modal
+                overlay.innerHTML = `
+                    <div class="kb-modal">
+                        <div class="kb-modal-icon">📚</div>
+                        <h3>Save to Your Knowledge Base</h3>
+                        <p>The Knowledge Base is a powerful feature of the <strong>OffGrid AI ToolKit USB drive</strong>. Save conversations, build a personal reference library, and access it all offline, anywhere, anytime.</p>
+                        <p style="font-size: 12px; color: #8b7355;">With the USB version, your saved knowledge stays on <em>your</em> drive. No cloud. No accounts. Just your data, under your control.</p>
+                        <a href="https://offgridaitoolkit.com" target="_blank" class="kb-modal-cta">🛒 Get the USB Version</a>
+                        <button class="kb-modal-close" onclick="closeKBUpsellModal()">Maybe later</button>
+                    </div>
+                `;
+            }
             document.body.appendChild(overlay);
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) closeKBUpsellModal();
@@ -2983,37 +3019,57 @@
                 ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
                 : 'Conversation';
             
+            const isMobile = window.innerWidth <= 768;
             const overlay = document.createElement('div');
             overlay.className = 'save-modal-overlay';
             overlay.id = 'saveModal';
-            overlay.innerHTML = `
-                <div class="save-modal">
-                    <h3>💾 Save to Knowledge Base</h3>
-                    <div class="save-modal-subtitle">Saved directly to your computer — never to our servers.</div>
-                    <label for="saveTitle">Title</label>
-                    <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
-                    <label for="saveCategory">Category</label>
-                    <select id="saveCategory">
-                        <option value="Other">Other</option>
-                        <option value="Emergency Plans">Emergency Plans</option>
-                        <option value="Gear & Checklists">Gear & Checklists</option>
-                        <option value="Medical & First Aid">Medical & First Aid</option>
-                        <option value="Navigation & Orientation">Navigation & Orientation</option>
-                        <option value="OffGrid AI Documentation">OffGrid AI Documentation</option>
-                        <option value="Shelter & Fire">Shelter & Fire</option>
-                        <option value="Skills & Reference">Skills & Reference</option>
-                        <option value="Water & Food">Water & Food</option>
-                    </select>
-                    <div class="folder-hint">💡 <strong>OffGrid AI USB users:</strong> When the Save dialog opens, navigate to your OffGrid AI drive &gt; Saved Knowledge Base &gt; the matching category folder.</div>
-                    <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
-                    <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
-                    <div class="save-modal-actions">
-                        <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
-                        <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">🖨️ Print / Save PDF</button>
-                        <button class="save-modal-btn primary" onclick="executeSave()">💾 Save .md</button>
+            
+            if (isMobile) {
+                // Mobile: streamlined PDF-focused save experience
+                overlay.innerHTML = `
+                    <div class="save-modal">
+                        <h3>💾 Save Conversation</h3>
+                        <div class="save-modal-subtitle">Saved directly to your device — never to our servers.</div>
+                        <label for="saveTitle">Title</label>
+                        <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
+                        <div class="save-modal-actions" style="margin-top: 16px;">
+                            <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
+                            <button class="save-modal-btn primary" onclick="exportAsPDF()" style="flex: 2;">🖨️ Save as PDF</button>
+                        </div>
+                        <div style="text-align: center; margin-top: 12px; font-size: 11px; color: #9ca3af;">💡 USB drive owners: Use the desktop version for full Knowledge Base save with categories & tags.</div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                // Desktop: full Knowledge Base save experience
+                overlay.innerHTML = `
+                    <div class="save-modal">
+                        <h3>💾 Save to Knowledge Base</h3>
+                        <div class="save-modal-subtitle">Saved directly to your computer — never to our servers.</div>
+                        <label for="saveTitle">Title</label>
+                        <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
+                        <label for="saveCategory">Category</label>
+                        <select id="saveCategory">
+                            <option value="Other">Other</option>
+                            <option value="Emergency Plans">Emergency Plans</option>
+                            <option value="Gear & Checklists">Gear & Checklists</option>
+                            <option value="Medical & First Aid">Medical & First Aid</option>
+                            <option value="Navigation & Orientation">Navigation & Orientation</option>
+                            <option value="OffGrid AI Documentation">OffGrid AI Documentation</option>
+                            <option value="Shelter & Fire">Shelter & Fire</option>
+                            <option value="Skills & Reference">Skills & Reference</option>
+                            <option value="Water & Food">Water & Food</option>
+                        </select>
+                        <div class="folder-hint">💡 <strong>OffGrid AI USB users:</strong> When the Save dialog opens, navigate to your OffGrid AI drive &gt; Saved Knowledge Base &gt; the matching category folder.</div>
+                        <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
+                        <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
+                        <div class="save-modal-actions">
+                            <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
+                            <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">🖨️ Print / Save PDF</button>
+                            <button class="save-modal-btn primary" onclick="executeSave()">💾 Save .md</button>
+                        </div>
+                    </div>
+                `;
+            }
             document.body.appendChild(overlay);
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) closeSaveModal();
@@ -3301,12 +3357,14 @@
         
         async function exportAsPDF() {
             const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
-            const category = document.getElementById('saveCategory')?.value || 'General';
+            const category = document.getElementById('saveCategory')?.value || 'Other';
             const tags = document.getElementById('saveTags')?.value || '';
             
             const markdownContent = generateMarkdownContent(title, category, tags);
             
+            // Close whichever modal is open (save modal or upsell modal)
             closeSaveModal();
+            closeKBUpsellModal();
             showSaveToast('Generating PDF...', 'Please wait');
             
             try {

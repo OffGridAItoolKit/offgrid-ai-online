@@ -1,12 +1,20 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-04-17
+**Last Updated:** 2026-04-19
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
 
 ---
 
 ### April 2026
+
+**2026-04-19**
+*   **Mobile Save Redesign, PDF Naming & Image Upload UX (v5.5.0)**
+    *   **PDF filename fix** — Added `<title>` tag to export-pdf HTML template. Browser now uses the conversation title for the PDF filename instead of "about_blank."
+    *   **Keyboard dismiss after image/video upload** — On mobile, keyboard now automatically dismisses after selecting an image or video so users can see the upload preview confirmation.
+    *   **Mobile Save modal redesign** — Mobile users (both demo and customer) now see a streamlined "Save Conversation" modal with title field and a prominent "Save as PDF" button. Category, tags, and .md save remain available on desktop for USB drive users.
+    *   **Demo mobile Save** — Demo users on mobile now get PDF save functionality with a soft upsell to the USB version, instead of a full-screen upsell-only modal that blocked saving entirely.
+    *   Video upload also dismisses keyboard on mobile after frame extraction completes.
 
 **2026-04-18**
 *   **Mobile UX Fixes (v5.4.1)**
