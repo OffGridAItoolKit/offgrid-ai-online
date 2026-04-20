@@ -307,8 +307,23 @@ app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'cmdcouncil.html'));
 });
 
-// Serve static files from the same directory as index.js (flat structure)
-app.use(express.static(__dirname));
+// Serve static files with Cache-Control headers for edge caching & performance
+// Render's CDN uses these headers to determine how long to cache at the edge.
+// Cache is purged automatically on every redeploy, so aggressive TTLs are safe.
+app.use(express.static(__dirname, {
+    setHeaders: (res, filePath) => {
+        const ext = path.extname(filePath).toLowerCase();
+        // Long cache for immutable assets (CSS, JS, fonts, images)
+        if (['.css', '.js', '.woff', '.woff2', '.ttf', '.otf', '.eot'].includes(ext)) {
+            res.setHeader('Cache-Control', 'public, max-age=86400, s-maxage=86400');
+        } else if (['.png', '.jpg', '.jpeg', '.gif', '.webp', '.svg', '.ico'].includes(ext)) {
+            res.setHeader('Cache-Control', 'public, max-age=604800, s-maxage=604800');
+        } else if (['.html', '.htm'].includes(ext)) {
+            // HTML pages: cache briefly at edge, always revalidate in browser
+            res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, must-revalidate');
+        }
+    }
+}));
 
 // Request logging (minimal for privacy)
 app.use((req, res, next) => {

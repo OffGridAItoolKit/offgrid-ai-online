@@ -1,12 +1,18 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-04-19
+**Last Updated:** 2026-04-20
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
 
 ---
 
 ### April 2026
+
+**2026-04-20**
+*   **Weak-Signal Performance: Edge Caching & Cache-Control Headers (v5.6.0)**
+    *   **Render Edge Caching enabled** — Static assets (CSS, JS, images, fonts) are now served from Render's global CDN edge nodes. Users on weak or distant connections receive cached assets from the nearest edge location instead of hitting the origin server. Cache purges automatically on every redeploy.
+    *   **Cache-Control headers added** — CSS/JS/fonts cached for 24 hours (`max-age=86400`), images cached for 7 days (`max-age=604800`), HTML pages revalidate on every browser request but are cached at the edge for 1 hour (`s-maxage=3600`). These headers tell both the browser and Render's CDN how long to cache each asset type.
+    *   **No Express compression middleware needed** — Confirmed that Render's native runtime already applies automatic Brotli and gzip compression at the infrastructure layer. Adding Express `compression` would cause double-compression.
 
 **2026-04-19**
 *   **PDF Typography & Readability Improvements (v5.5.2)**
