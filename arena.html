@@ -1176,8 +1176,8 @@
         }
 
         .command-theme .prompts-toggle:hover {
-            background: var(--border-emphasis);
-            border-color: var(--gold-primary);
+            background: rgba(251, 146, 60, 0.08);
+            border-color: rgba(251, 146, 60, 0.4);
         }
 
         .command-theme .prompts-toggle-arrow {
@@ -1191,7 +1191,7 @@
 
         .command-theme .prompts-list {
             display: none;
-            max-height: 200px;
+            max-height: 280px;
             overflow-y: auto;
             padding: 4px 0;
             scrollbar-width: thin;
@@ -1212,22 +1212,40 @@
         }
 
         .command-theme .prompt-item {
-            padding: 8px 10px;
+            padding: 10px 12px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 6px;
-            margin-bottom: 4px;
+            border-radius: 8px;
+            margin-bottom: 5px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             color: var(--text-secondary);
             transition: all 0.2s;
-            line-height: 1.4;
+            line-height: 1.5;
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .command-theme .prompt-item::before {
+            content: '\25B6';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 8px;
+            color: #FB923C;
+            opacity: 0;
+            transition: opacity 0.2s;
         }
 
         .command-theme .prompt-item:hover {
-            background: var(--bg-elevated);
-            border-color: var(--gold-primary);
+            background: rgba(251, 146, 60, 0.06);
+            border-color: rgba(251, 146, 60, 0.4);
             color: var(--text-primary);
+        }
+
+        .command-theme .prompt-item:hover::before {
+            opacity: 1;
         }
 
         /* Sidebar model roster — updated descriptions */
@@ -2598,37 +2616,33 @@
         }
 
         /* ============================================ */
-        /* Save to Knowledge Base Styles               */
+        /* Survival Prompts Button Styles              */
         /* ============================================ */
 
-        .command-theme .save-kb-button {
+        .command-theme .survival-prompts-button {
+            display: block;
             width: 100%;
-            background: rgba(52, 211, 153, 0.08);
-            border: 1px solid rgba(52, 211, 153, 0.3);
+            background: rgba(251, 146, 60, 0.08);
+            border: 1px solid rgba(251, 146, 60, 0.3);
             border-radius: 6px;
             padding: 10px 12px;
             margin-bottom: 6px;
             cursor: pointer;
             transition: all 0.2s;
             font-size: 13px;
-            color: var(--success);
+            color: #FB923C;
             font-weight: 600;
             text-align: left;
             font-family: var(--font-sans);
+            text-decoration: none;
+            box-sizing: border-box;
         }
-        .command-theme .save-kb-button:hover {
-            background: rgba(52, 211, 153, 0.15);
-            border-color: var(--success);
-            box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
-        }
-        .command-theme .save-kb-button:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-        .command-theme .save-kb-button:disabled:hover {
-            background: rgba(52, 211, 153, 0.08);
-            border-color: rgba(52, 211, 153, 0.3);
-            box-shadow: none;
+        .command-theme .survival-prompts-button:hover {
+            background: rgba(251, 146, 60, 0.15);
+            border-color: #FB923C;
+            box-shadow: 0 2px 8px rgba(251, 146, 60, 0.2);
+            color: #FB923C;
+            text-decoration: none;
         }
 
         /* Inline Save to KB link (appears after image responses) */
@@ -4538,8 +4552,7 @@
                 New Chat
             </button>
 
-            <button class="save-kb-button" id="saveToKbBtn" onclick="showSaveModal()" disabled>💾 Save to Knowledge Base</button>
-            <!-- Image Studio and Ready-Made Prompts removed for Arena -->
+            <a href="https://offgridtoolkit.ai/command/ready-made-prompts?filter=survival" target="_blank" class="survival-prompts-button">🏕️ Survival Prompts</a>
 
             <div class="sidebar-section">
                 <div class="sidebar-title">Sample Prompts</div>
@@ -4548,28 +4561,20 @@
                     <span class="prompts-toggle-arrow">▼</span>
                 </button>
                 <div class="prompts-list" id="promptsList">
-                    <!-- Survival & Emergency (80%) -->
+                    <!-- Survival & Emergency -->
                     <div class="prompt-item" onclick="usePrompt(this)">I'm lost in the desert with 1 liter of water. What do I do first?</div>
                     <div class="prompt-item" onclick="usePrompt(this)">My child has a severe allergic reaction and we're 2 hours from a hospital. Walk me through it.</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">How do I build a shelter in heavy rain with no tools?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Our well water suddenly smells like sulfur. Is it safe to drink?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">What are the warning signs of hypothermia and how do I treat it in the field?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">How do I purify water in the wild without a filter?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">A grid-down event has just started with no clear restoration timeline. Walk me through the first 72 hours.</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">My vehicle has broken down in a remote area far from help. Do I stay or go?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">I found an unknown plant while hiking. Walk me through the safest decision process before considering whether it's edible.</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Design the most effective bug-out bag under a strict 30 lb weight limit and explain the tradeoffs.</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">How do I navigate using the stars if I have no compass?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">In a remote setting with no emergency services, how should I triage multiple injuries after an accident?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Build a medical kit optimized for long-term off-grid living.</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Compare the pros and cons of solar vs wind power for off-grid living.</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Someone in my group was bitten by a snake and I can't identify the species. What do I do right now?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Someone was bitten by an unidentified snake. What do I do right now?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">A wildfire is approaching and my vehicle won't start. What's my decision tree?</div>
                     <div class="prompt-item" onclick="usePrompt(this)">We're snowed in with no power and the temperature is dropping fast. Prioritize my next steps.</div>
-                    <!-- Practical General (20%) -->
-                    <div class="prompt-item" onclick="usePrompt(this)">What's the most efficient way to learn a new skill from scratch in 30 days?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Help me create a realistic monthly budget for a family of four.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">How do I purify water in the wild without a filter?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Walk me through the first 72 hours of a complete grid-down event.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">How do I navigate using the stars with no compass?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Build the ideal bug-out bag under 30 lbs and explain the tradeoffs.</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">What are the top 5 medicinal plants in North America and their dangerous look-alikes?</div>
+                    <!-- Practical General -->
+                    <div class="prompt-item" onclick="usePrompt(this)">How do I properly maintain a vehicle to avoid expensive repairs?</div>
                     <div class="prompt-item" onclick="usePrompt(this)">What are the most common mistakes people make when buying their first home?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">Explain how to properly maintain a vehicle to avoid expensive repairs.</div>
                 </div>
             </div>
 

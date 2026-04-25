@@ -1489,7 +1489,11 @@
         // RENDERING
         // ============================================
         
-        let activeFilter = 'all';
+        // Support URL parameter filtering (e.g., ?filter=survival)
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlFilter = urlParams.get('filter');
+        const validFilters = ['all', 'survival', 'kb', 'vision', 'challenging'];
+        let activeFilter = (urlFilter && validFilters.includes(urlFilter)) ? urlFilter : 'all';
         let totalPrompts = 0;
         
         function renderCategories() {
@@ -1635,6 +1639,12 @@
             });
         });
         
+        // If URL param set a filter, update the active button state
+        if (activeFilter !== 'all') {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`.filter-btn[data-filter="${activeFilter}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
         renderCategories();
     </script>
 </body>
