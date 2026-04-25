@@ -170,26 +170,26 @@ const COMMAND_MODELS = {
 const ARENA_MODELS = {
     'scout': {
         id: 'openai/gpt-5.2',
-        name: 'Scout (GPT 5.2)',
-        shortName: 'Scout',
+        name: 'ChatGPT',
+        shortName: 'ChatGPT',
         emoji: '\ud83d\udd2d',
-        description: 'Vision Specialist',
+        description: 'Content & Conversation',
         multimodal: true
     },
     'medic': {
         id: 'anthropic/claude-sonnet-4.6',
-        name: 'Medic (Claude Sonnet 4.6)',
-        shortName: 'Medic',
+        name: 'Claude',
+        shortName: 'Claude',
         emoji: '\ud83c\udfe5',
-        description: 'Safety & Analysis',
+        description: 'Code & Analysis',
         multimodal: true
     },
     'navigator': {
         id: 'google/gemini-3.1-pro-preview',
-        name: 'Navigator (Gemini 3.1 Pro)',
-        shortName: 'Navigator',
+        name: 'Gemini',
+        shortName: 'Gemini',
         emoji: '\ud83e\udded',
-        description: 'Research & Planning',
+        description: 'Research & Reasoning',
         multimodal: true
     },
     'ranger': {

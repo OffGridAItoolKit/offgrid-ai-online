@@ -4577,16 +4577,16 @@
                 <div class="sidebar-title">Model Roster</div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
                     <div class="roster-item scout">
-                        <div class="roster-item-name">🔭 ChatGPT (GPT 5.2)</div>
-                        <div class="roster-item-desc">Vision specialist. Best for image analysis, visual tasks, and multimodal queries.</div>
+                        <div class="roster-item-name">🔭 ChatGPT</div>
+                        <div class="roster-item-desc">General-purpose AI. Strong at content creation, conversation, and creative writing.</div>
                     </div>
                     <div class="roster-item medic">
-                        <div class="roster-item-name">🏥 Claude (Sonnet 4.6)</div>
-                        <div class="roster-item-desc">Safety and analysis. Thorough, careful reasoning with attention to nuance.</div>
+                        <div class="roster-item-name">🏥 Claude</div>
+                        <div class="roster-item-desc">Coding and analysis. Precise, careful reasoning with strong attention to detail.</div>
                     </div>
                     <div class="roster-item navigator">
-                        <div class="roster-item-name">🧭 Gemini (3.1 Pro)</div>
-                        <div class="roster-item-desc">Research and planning. Deep analysis, strategy, and long-context reasoning.</div>
+                        <div class="roster-item-name">🧭 Gemini</div>
+                        <div class="roster-item-desc">Research and reasoning. Excels at deep analysis, synthesis, and long-context tasks.</div>
                     </div>
                     <div class="roster-item ranger">
                         <div class="roster-item-name">🏕️ OffGrid AI</div>
@@ -4698,16 +4698,16 @@
                                         <div class="model-dropdown" id="modelDropdownWelcome">
                                             <div class="model-list">
                                                 <div class="model-item scout-item" onclick="selectModel('scout')">
-                                                    <div class="model-item-name">🔭 ChatGPT <span class="model-item-badge badge-scout">Vision</span></div>
-                                                    <div class="model-item-desc">Vision specialist, image analysis, visual tasks, and multimodal queries</div>
+                                                    <div class="model-item-name">🔭 ChatGPT <span class="model-item-badge badge-scout">GPT 5.2</span></div>
+                                                    <div class="model-item-desc">Content creation, conversation, creative writing, and general knowledge</div>
                                                 </div>
                                                 <div class="model-item medic-item" onclick="selectModel('medic')">
-                                                    <div class="model-item-name">🏥 Claude <span class="model-item-badge badge-medic">Safety</span></div>
-                                                    <div class="model-item-desc">Safety and analysis, thorough, careful reasoning with attention to nuance</div>
+                                                    <div class="model-item-name">🏥 Claude <span class="model-item-badge badge-medic">Sonnet 4.6</span></div>
+                                                    <div class="model-item-desc">Coding, analysis, precise reasoning, and strong attention to detail</div>
                                                 </div>
                                                 <div class="model-item navigator-item" onclick="selectModel('navigator')">
-                                                    <div class="model-item-name">🧭 Gemini <span class="model-item-badge badge-navigator">Research</span></div>
-                                                    <div class="model-item-desc">Research and planning, deep analysis, strategy, and long-context reasoning</div>
+                                                    <div class="model-item-name">🧭 Gemini <span class="model-item-badge badge-navigator">3.1 Pro</span></div>
+                                                    <div class="model-item-desc">Research, deep analysis, synthesis, and long-context reasoning</div>
                                                 </div>
                                                 <div class="model-item ranger-item" onclick="selectModel('ranger')">
                                                     <div class="model-item-name">🏕️ OffGrid AI <span class="model-item-badge badge-ranger">Survival</span></div>
@@ -4863,16 +4863,16 @@
                         <div class="model-dropdown" id="modelDropdown">
                             <div class="model-list">
                                 <div class="model-item scout-item" onclick="selectModel('scout')">
-                                    <div class="model-item-name">🔭 ChatGPT <span class="model-item-badge badge-scout">Vision</span></div>
-                                    <div class="model-item-desc">Vision specialist, image analysis, visual tasks, and multimodal queries</div>
+                                    <div class="model-item-name">🔭 ChatGPT <span class="model-item-badge badge-scout">GPT 5.2</span></div>
+                                    <div class="model-item-desc">Content creation, conversation, creative writing, and general knowledge</div>
                                 </div>
                                 <div class="model-item medic-item" onclick="selectModel('medic')">
-                                    <div class="model-item-name">🏥 Claude <span class="model-item-badge badge-medic">Safety</span></div>
-                                    <div class="model-item-desc">Safety and analysis, thorough, careful reasoning with attention to nuance</div>
+                                    <div class="model-item-name">🏥 Claude <span class="model-item-badge badge-medic">Sonnet 4.6</span></div>
+                                    <div class="model-item-desc">Coding, analysis, precise reasoning, and strong attention to detail</div>
                                 </div>
                                 <div class="model-item navigator-item" onclick="selectModel('navigator')">
-                                    <div class="model-item-name">🧭 Gemini <span class="model-item-badge badge-navigator">Research</span></div>
-                                    <div class="model-item-desc">Research and planning, deep analysis, strategy, and long-context reasoning</div>
+                                    <div class="model-item-name">🧭 Gemini <span class="model-item-badge badge-navigator">3.1 Pro</span></div>
+                                    <div class="model-item-desc">Research, deep analysis, synthesis, and long-context reasoning</div>
                                 </div>
                                 <div class="model-item ranger-item" onclick="selectModel('ranger')">
                                     <div class="model-item-name">🏕️ OffGrid AI <span class="model-item-badge badge-ranger">Survival</span></div>
@@ -5270,7 +5270,7 @@
 
         const MODEL_CONFIG = {
             scout: {
-                name: 'ChatGPT (GPT 5.2)',
+                name: 'ChatGPT',
                 shortName: 'ChatGPT',
                 badge: 'Vision',
                 badgeClass: 'badge-scout',
@@ -5278,7 +5278,7 @@
                 color: '#3b82f6'
             },
             medic: {
-                name: 'Claude (Sonnet 4.6)',
+                name: 'Claude',
                 shortName: 'Claude',
                 badge: 'Safety',
                 badgeClass: 'badge-medic',
@@ -5286,7 +5286,7 @@
                 color: '#ef4444'
             },
             navigator: {
-                name: 'Gemini (3.1 Pro)',
+                name: 'Gemini',
                 shortName: 'Gemini',
                 badge: 'Research',
                 badgeClass: 'badge-navigator',
@@ -6575,16 +6575,16 @@
                                         <div class="model-dropdown" id="modelDropdownWelcome">
                                             <div class="model-list">
                                                 <div class="model-item scout-item" onclick="selectModel('scout')">
-                                                    <div class="model-item-name">🔭 ChatGPT <span class="model-item-badge badge-scout">Vision</span></div>
-                                                    <div class="model-item-desc">Vision specialist, image analysis, visual tasks, and multimodal queries</div>
+                                                    <div class="model-item-name">🔭 ChatGPT <span class="model-item-badge badge-scout">GPT 5.2</span></div>
+                                                    <div class="model-item-desc">Content creation, conversation, creative writing, and general knowledge</div>
                                                 </div>
                                                 <div class="model-item medic-item" onclick="selectModel('medic')">
-                                                    <div class="model-item-name">🏥 Claude <span class="model-item-badge badge-medic">Safety</span></div>
-                                                    <div class="model-item-desc">Safety and analysis, thorough, careful reasoning with attention to nuance</div>
+                                                    <div class="model-item-name">🏥 Claude <span class="model-item-badge badge-medic">Sonnet 4.6</span></div>
+                                                    <div class="model-item-desc">Coding, analysis, precise reasoning, and strong attention to detail</div>
                                                 </div>
                                                 <div class="model-item navigator-item" onclick="selectModel('navigator')">
-                                                    <div class="model-item-name">🧭 Gemini <span class="model-item-badge badge-navigator">Research</span></div>
-                                                    <div class="model-item-desc">Research and planning, deep analysis, strategy, and long-context reasoning</div>
+                                                    <div class="model-item-name">🧭 Gemini <span class="model-item-badge badge-navigator">3.1 Pro</span></div>
+                                                    <div class="model-item-desc">Research, deep analysis, synthesis, and long-context reasoning</div>
                                                 </div>
                                                 <div class="model-item ranger-item" onclick="selectModel('ranger')">
                                                     <div class="model-item-name">🏕️ OffGrid AI <span class="model-item-badge badge-ranger">Survival</span></div>
@@ -7318,9 +7318,9 @@
             // Build the reviewer cards
             let reviewerCards = '';
             const REVIEWER_NAMES = {
-                scout: '\ud83d\udd2d ChatGPT (GPT 5.2)',
-                medic: '\ud83c\udfe5 Claude (Sonnet 4.6)',
-                navigator: '\ud83e\udded Gemini (3.1 Pro)',
+                scout: '\ud83d\udd2d ChatGPT',
+                medic: '\ud83c\udfe5 Claude',
+                navigator: '\ud83e\udded Gemini',
                 ranger: '\ud83c\udfd5\ufe0f OffGrid AI'
             };
 
@@ -7717,9 +7717,9 @@
         saveLifetimeData();
 
         const DEEP_MODE_MODELS = [
-            { key: 'scout', name: 'ChatGPT', fullName: 'ChatGPT (GPT 5.2)', emoji: '\ud83d\udd2d', color: 'scout' },
-            { key: 'medic', name: 'Claude', fullName: 'Claude (Sonnet 4.6)', emoji: '\ud83c\udfe5', color: 'medic' },
-            { key: 'navigator', name: 'Gemini', fullName: 'Gemini (3.1 Pro)', emoji: '\ud83e\udded', color: 'navigator' },
+            { key: 'scout', name: 'ChatGPT', fullName: 'ChatGPT', emoji: '\ud83d\udd2d', color: 'scout' },
+            { key: 'medic', name: 'Claude', fullName: 'Claude', emoji: '\ud83c\udfe5', color: 'medic' },
+            { key: 'navigator', name: 'Gemini', fullName: 'Gemini', emoji: '\ud83e\udded', color: 'navigator' },
             { key: 'ranger', name: 'OffGrid AI', fullName: 'OffGrid AI', emoji: '\ud83c\udfd5\ufe0f', color: 'ranger' }
         ];
 
@@ -8238,10 +8238,10 @@
             const history = getWinHistory();
             if (history.total === 0) return '';
             const models = [
-                { key: 'scout', name: '\ud83d\udd2d Scout', color: 'scout' },
-                { key: 'medic', name: '\ud83c\udfe5 Medic', color: 'medic' },
-                { key: 'navigator', name: '\ud83e\udded Navigator', color: 'navigator' },
-                { key: 'ranger', name: '\ud83c\udfd5\ufe0f Ranger', color: 'ranger' }
+                { key: 'scout', name: '\ud83d\udd2d ChatGPT', color: 'scout' },
+                { key: 'medic', name: '\ud83c\udfe5 Claude', color: 'medic' },
+                { key: 'navigator', name: '\ud83e\udded Gemini', color: 'navigator' },
+                { key: 'ranger', name: '\ud83c\udfd5\ufe0f OffGrid AI', color: 'ranger' }
             ];
             let rows = '';
             for (const m of models) {
@@ -9383,9 +9383,9 @@
             // Build model list
             const models = [
                 { key: 'command', name: 'Command Mode', desc: 'AI Council consensus, all 4 models', color: 'var(--gold-primary)', emoji: '🏆' },
-                { key: 'scout', name: 'ChatGPT (GPT 5.2)', desc: 'Vision specialist, image analysis', color: 'var(--scout-color)', emoji: '🔭' },
-                { key: 'medic', name: 'Claude (Sonnet 4.6)', desc: 'Safety and analysis', color: 'var(--medic-color)', emoji: '🏥' },
-                { key: 'navigator', name: 'Gemini (3.1 Pro)', desc: 'Research and planning', color: 'var(--navigator-color)', emoji: '🧭' },
+                { key: 'scout', name: 'ChatGPT', desc: 'Content creation, conversation, and creative writing', color: 'var(--scout-color)', emoji: '🔭' },
+                { key: 'medic', name: 'Claude', desc: 'Coding, analysis, and precise reasoning', color: 'var(--medic-color)', emoji: '🏥' },
+                { key: 'navigator', name: 'Gemini', desc: 'Research, reasoning, and long-context tasks', color: 'var(--navigator-color)', emoji: '🧭' },
                 { key: 'ranger', name: 'OffGrid AI', desc: 'Survival & field-tested expert', color: 'var(--ranger-color)', emoji: '🏕️' }
             ];
 
