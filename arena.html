@@ -3316,6 +3316,23 @@
             gap: 8px;
         }
 
+        .command-theme .deep-panel-reset-btn {
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 3px 5px;
+            line-height: 1;
+            transition: all 0.2s;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .command-theme .deep-panel-reset-btn:hover {
+            color: #ef4444;
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.08);
+        }
         .command-theme .deep-panel-close {
             background: none;
             border: none;
@@ -7602,6 +7619,20 @@
             localStorage.removeItem('offgrid-win-history');
             renderDeepModePanel();
         }
+        function resetAllStats() {
+            if (!confirm('Reset ALL Deep Mode stats (session + all-time)? This cannot be undone.')) return;
+            // Reset session data
+            const freshSession = createEmptyDeepModeData();
+            Object.assign(deepModeData, freshSession);
+            saveDeepModeData();
+            // Reset lifetime data
+            const freshLifetime = createEmptyLifetimeData();
+            Object.assign(lifetimeData, freshLifetime);
+            saveLifetimeData();
+            // Clear old win history
+            localStorage.removeItem('offgrid-win-history');
+            renderDeepModePanel();
+        }
         function exportDeepModeStats() {
             const exportData = {
                 exportedAt: new Date().toISOString(),
@@ -7641,7 +7672,7 @@
                 shareText += `${medal} ${m.name}: ${wins} wins (${pct}%)\n`;
             });
             shareText += `\nNo bias. No benchmarks. Real queries, real results.\n`;
-            shareText += `\nTry it free: https://arena.offgridtoolkit.ai`;
+            shareText += `\nTry it free: https://offgridtoolkit.ai/arena`;
 
             // Try native share API first (mobile), fall back to clipboard
             if (navigator.share) {
@@ -7847,7 +7878,10 @@
                         <div class="deep-mode-pulse"></div>
                         DEEP MODE ANALYTICS
                     </div>
-                    <button class="deep-panel-close" onclick="toggleDeepMode()" title="Close">&times;</button>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <button class="deep-panel-reset-btn" onclick="resetAllStats()" title="Reset all stats">↺</button>
+                        <button class="deep-panel-close" onclick="toggleDeepMode()" title="Close">&times;</button>
+                    </div>
                 </div>
                 <div class="deep-view-toggle">
                     <button class="deep-view-btn active" id="deepViewSession" onclick="switchDeepView('session')">Session</button>
