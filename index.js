@@ -164,7 +164,7 @@ const COMMAND_MODELS = {
 
 // =============================================================================
 // ARENA MODEL CONFIGURATION
-// Gemma 4 31B replaces Ranger (Grok) for the promotional arena event
+// OffGrid AI (Gemma 4 26B with proprietary system instructions) replaces Ranger for the arena
 // =============================================================================
 
 const ARENA_MODELS = {
@@ -193,14 +193,42 @@ const ARENA_MODELS = {
         multimodal: true
     },
     'ranger': {
-        id: 'google/gemma-4-31b-it',
-        name: 'Ranger (Gemma 4 31B)',
-        shortName: 'Ranger',
-        emoji: '\ud83c\udfc6',
-        description: 'Open-Source Champion',
+        id: 'google/gemma-4-26b-it',
+        name: 'OffGrid AI',
+        shortName: 'OffGrid AI',
+        emoji: '\ud83c\udfd5\ufe0f',
+        description: 'Survival & Field-Tested Expert',
         multimodal: true
     }
 };
+
+// OffGrid AI proprietary system instructions (injected ONLY for ranger/OffGrid AI in arena)
+const OFFGRID_AI_SYSTEM_PROMPT = `You are OffGrid AI, a seasoned field expert and practical problem solver for real-world, off-grid, and high-stakes environments.
+
+**Core behavior:**
+- Provide clear, concise, and actionable guidance. Lead with what to do, not background theory.
+- When multiple options exist, recommend the best one first and explain why. Help the user make a decision, not just list choices.
+- Use numbered steps, priorities, or clear sections when the situation calls for it.
+- Focus on practical solutions using minimal, improvised, or commonly available resources.
+- If information is uncertain, state that clearly. Do not guess or fabricate details.
+- Fact-check your reasoning before responding. Prioritize accuracy over completeness.
+
+**Safety and risk:**
+- For medical, survival, or dangerous topics, provide direct, practical guidance with clear safety warnings.
+- Never provide a dangerous recommendation without a warning, but never let a warning replace useful guidance.
+- Note when professional help should be sought.
+
+**Tone:**
+- Calm, confident, and resourceful. Think experienced wilderness guide, not corporate chatbot.
+- Be direct and efficient with words. No filler, no hype, no unnecessary pleasantries.
+- Treat the user as a capable adult who needs expert guidance, not hand-holding.
+
+**Image and video analysis:**
+- When analyzing images or video frames, always provide your best assessment even when uncertain.
+- If you cannot make a confident identification, provide a short list of the most likely possibilities with brief reasoning for each. In survival or emergency contexts, a partial answer with caveats is far more valuable than no answer.
+- Keep safety warnings concise and integrated into your response. Do not lead with a wall of disclaimers that undermines confidence.
+- After your assessment, suggest what additional images, angles, or context would help narrow it down. Mention that the user can upload a short video for multiple perspectives if a single photo is not enough.
+- For video frame sequences, treat the frames as a cohesive visual narrative. Note changes between frames and use the full sequence to build a more complete picture than any single frame could provide.`;
 
 // =============================================================================
 // MIDDLEWARE
@@ -539,12 +567,22 @@ function shuffleArray(arr) {
  * - Original user query
  * - Answer A, B, C, D (no model identities)
  */
-function buildReviewerMessages(userQuery, answersByLabel, labelOrder) {
+function buildReviewerMessages(userQuery, answersByLabel, labelOrder, activeModels = COMMAND_MODELS) {
     const orderedLabels = labelOrder || Object.keys(answersByLabel);
     let answersBlock = '';
     for (const label of orderedLabels) {
         answersBlock += `Answer ${label}:\n${answersByLabel[label]}\n\n`;
     }
+
+    // Use Actionability criteria for Arena, Insight for Command Center
+    const isArenaReview = activeModels === ARENA_MODELS;
+    const secondCriterion = isArenaReview ? 'Actionability' : 'Insight';
+    const secondDefinition = isArenaReview
+        ? 'Actionability: clear prioritized steps the user can immediately follow, decisive recommendations rather than open-ended lists, practical with commonly available or improvised resources, and appropriate urgency for the scenario. Penalize excessive hedging, filler, or corporate disclaimers that delay useful guidance.'
+        : 'Insight: depth of reasoning, helpful structure, non-obvious but valid ideas, and practical usefulness to the user.';
+    const evalContext = isArenaReview
+        ? 'You are evaluating for a human user who needs practical, field-ready answers they can act on immediately.'
+        : 'You are evaluating for a human user who cares about both correctness and creativity.';
 
     const systemPrompt = `
 You are part of an anonymous review panel evaluating multiple answers to the same user question.
@@ -553,16 +591,16 @@ Important rules:
 - You do NOT know which model wrote which answer.
 - Do NOT try to guess which model wrote what.
 - Focus only on the content quality.
-- You are evaluating for a human user who cares about both correctness and creativity.
+- ${evalContext}
 
 You must:
 1. Rank the answers by Accuracy (most accurate to least accurate).
-2. Rank the answers by Insight (most insightful / helpful to least).
+2. Rank the answers by ${secondCriterion} (most ${secondCriterion.toLowerCase()} to least).
 3. Give a brief explanation for your top choice in each category.
 
 Definitions:
 - Accuracy: factual correctness, lack of hallucinations, correct use of terminology, and appropriate caveats where the answer is uncertain.
-- Insight: depth of reasoning, helpful structure, non-obvious but valid ideas, and practical usefulness to the user.
+- ${secondDefinition}
 
 Do NOT write a new answer to the question. You are only judging the answers provided.
 
@@ -570,9 +608,9 @@ Respond ONLY with a valid JSON object in this exact structure:
 
 {
   "accuracy_ranking": ["A", "B", "C", "D"],
-  "insight_ranking": ["C", "B", "A", "D"],
+  "${secondCriterion.toLowerCase()}_ranking": ["C", "B", "A", "D"],
   "top_accuracy_explanation": "Short explanation of why the top-ranked answer is most accurate.",
-  "top_insight_explanation": "Short explanation of why the top-ranked answer is most insightful."
+  "top_${secondCriterion.toLowerCase()}_explanation": "Short explanation of why the top-ranked answer is most ${secondCriterion.toLowerCase()}."
 }
 `;
 
@@ -633,7 +671,7 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
         const reviewModel = activeModels[reviewKey];
         // Randomize label order per reviewer to reduce positional bias
         const shuffledLabels = shuffleArray(labels);
-        const reviewMessages = buildReviewerMessages(userQuery, answersByLabel, shuffledLabels);
+        const reviewMessages = buildReviewerMessages(userQuery, answersByLabel, shuffledLabels, activeModels);
 
         try {
             const reviewText = await withTimeout(
@@ -643,14 +681,19 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
             );
             const parsed = safeParseJSON(reviewText);
 
-            if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(parsed.insight_ranking)) {
+            // Dynamic second criterion: actionability for Arena, insight for Command Center
+            const isArenaReview = activeModels === ARENA_MODELS;
+            const secondKey = isArenaReview ? 'actionability_ranking' : 'insight_ranking';
+            const secondRanking = parsed[secondKey] || parsed.insight_ranking || parsed.actionability_ranking;
+
+            if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(secondRanking)) {
                 console.warn(`[Council Review] ${reviewModel.shortName} returned invalid review JSON.`);
                 return { reviewer: reviewKey, success: false, raw: reviewText };
             }
 
             // Borda scoring: best gets N-1 points, worst gets 0
             const ar = parsed.accuracy_ranking;
-            const ir = parsed.insight_ranking;
+            const ir = secondRanking;
 
             // Accuracy points
             ar.forEach((label, idx) => {
@@ -666,13 +709,14 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
                 }
             });
 
+            const secondExplKey = isArenaReview ? 'top_actionability_explanation' : 'top_insight_explanation';
             rawReviews.push({
                 reviewer: reviewKey,
                 modelName: reviewModel.name,
                 accuracy_ranking: ar,
                 insight_ranking: ir,
                 top_accuracy_explanation: parsed.top_accuracy_explanation,
-                top_insight_explanation: parsed.top_insight_explanation
+                top_insight_explanation: parsed[secondExplKey] || parsed.top_insight_explanation || parsed.top_actionability_explanation
             });
 
             return { reviewer: reviewKey, success: true };
@@ -938,7 +982,15 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
             return res.status(400).json({ error: 'Invalid model selected' });
         }
         
-        const openRouterMessages = buildOpenRouterMessages(messages, modelConfig.multimodal);
+        let openRouterMessages = buildOpenRouterMessages(messages, modelConfig.multimodal);
+        
+        // Inject OffGrid AI system instructions for ranger in Arena mode only
+        if (isArenaRequest && model === 'ranger') {
+            openRouterMessages = [
+                { role: 'system', content: OFFGRID_AI_SYSTEM_PROMPT },
+                ...openRouterMessages
+            ];
+        }
         
         res.setHeader('Content-Type', 'text/event-stream');
         res.setHeader('Cache-Control', 'no-cache');
@@ -1030,7 +1082,16 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         const promises = modelKeys.map(async (key) => {
             const model = activeModels[key];
             try {
-                const modelMessages = buildOpenRouterMessages(messages, model.multimodal);
+                let modelMessages = buildOpenRouterMessages(messages, model.multimodal);
+                
+                // Inject OffGrid AI system instructions for ranger in Arena mode only
+                if (isArenaRequest && key === 'ranger') {
+                    modelMessages = [
+                        { role: 'system', content: OFFGRID_AI_SYSTEM_PROMPT },
+                        ...modelMessages
+                    ];
+                }
+                
                 const response = await withTimeout(
                     callOpenRouter(model.id, modelMessages, 2048),
                     MODEL_TIMEOUT_MS,
@@ -1082,9 +1143,10 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         }));
 
         // Step 2: Run competitive peer review to select Chairman
+        const reviewCriteria = isArenaRequest ? 'accuracy + actionability' : 'accuracy + insight';
         res.write(`data: ${JSON.stringify({ 
             progress: 'review', 
-            message: '🤝 Running anonymous peer review (accuracy + insight)...' 
+            message: `🤝 Running anonymous peer review (${reviewCriteria})...` 
         })}\n\n`);
 
         const reviewOutcome = await runCouncilReview(userQuery, labeledResults, activeModels);
@@ -2194,6 +2256,8 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Free Tier Model:                                         ║');
     console.log('║    • Gemma 4 26B A4B (gemma-4-26b) + System Prompt        ║');
+    console.log('║  Arena:                                                    ║');
+    console.log('║    • OffGrid AI   (gemma-4-26b)  Arena                   ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Command Center Models:                                   ║');
     console.log('║    🔭 Scout    (GPT 5.2)          - Vision Specialist      ║');
