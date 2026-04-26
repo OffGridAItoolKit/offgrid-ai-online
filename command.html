@@ -2276,6 +2276,82 @@
                 height: 13px;
             }
 
+
+            /* ============================================
+               INLINE ACTION ROW — Share, Copy, Save, New Chat
+               ============================================ */
+            .inline-actions-row {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-top: 8px;
+                align-items: center;
+            }
+            .inline-action-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 5px 12px;
+                background: transparent;
+                border: 1px solid var(--border-subtle);
+                border-radius: 6px;
+                color: var(--text-secondary);
+                font-size: 11px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.15s;
+                -webkit-tap-highlight-color: transparent;
+                font-family: var(--font-sans);
+            }
+            .inline-action-btn:active {
+                border-color: var(--gold-primary);
+                color: var(--gold-primary);
+            }
+            .inline-action-btn svg {
+                width: 13px;
+                height: 13px;
+            }
+            /* Desktop save dropdown */
+            .save-dropdown-wrapper {
+                position: relative;
+                display: inline-flex;
+            }
+            .save-dropdown-menu {
+                position: absolute;
+                bottom: calc(100% + 6px);
+                left: 0;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-subtle);
+                border-radius: 8px;
+                padding: 4px 0;
+                min-width: 200px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+                z-index: 200;
+                display: none;
+            }
+            .save-dropdown-menu.open {
+                display: block;
+            }
+            .save-dropdown-item {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 14px;
+                font-size: 12px;
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: background 0.15s, color 0.15s;
+                font-family: var(--font-sans);
+                border: none;
+                background: none;
+                width: 100%;
+            }
+            .save-dropdown-item:hover,
+            .save-dropdown-item:active {
+                background: var(--gold-glow);
+                color: var(--gold-primary);
+            }
+
             /* ============================================
                LONG-PRESS CONTEXT MENU
                ============================================ */
@@ -5672,23 +5748,12 @@
                 singleVisualBtn.onclick = () => createVisualFromResponse(capturedSingleResponse, singleVisualBtn);
                 messageDiv.querySelector('.message-content').appendChild(singleVisualBtn);
 
-                // Add share button on mobile
-                if (typeof addShareButtonToMessage === 'function') {
-                    addShareButtonToMessage(messageDiv);
-                }
                 // Apply paper mode if active
                 if (typeof applyPaperModeToMessage === 'function') {
                     applyPaperModeToMessage(messageDiv);
                 }
-
-                // Add inline Save to KB link when image was part of the conversation
-                if (imageToSend) {
-                    const saveLink = document.createElement('button');
-                    saveLink.className = 'save-kb-inline';
-                    saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
-                    saveLink.onclick = () => showSaveModal();
-                    messageDiv.querySelector('.message-content').appendChild(saveLink);
-                }
+                // Add inline action row (Share, Copy, Save, New Chat)
+                addInlineActionsToMessage(messageDiv);
 
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
@@ -5707,7 +5772,17 @@
                 streamingContent.removeAttribute('id');
                 isTyping = false;
                 document.getElementById('sendButton').disabled = false;
-                document.getElementById('messageInput').focus();
+                // On mobile, blur input to dismiss keyboard after response
+                // On desktop, keep focus for quick follow-up typing
+                if (typeof isMobile === 'function' && isMobile()) {
+                    document.getElementById('messageInput').blur();
+                    setTimeout(() => {
+                        const msgs = document.getElementById('messages');
+                        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+                    }, 100);
+                } else {
+                    document.getElementById('messageInput').focus();
+                }
             }
         }
 
@@ -6044,23 +6119,12 @@
                 visualBtn.onclick = () => createVisualFromResponse(capturedResponse, visualBtn);
                 messageDiv.querySelector('.message-content').appendChild(visualBtn);
 
-                // Add share button on mobile
-                if (typeof addShareButtonToMessage === 'function') {
-                    addShareButtonToMessage(messageDiv);
-                }
                 // Apply paper mode if active
                 if (typeof applyPaperModeToMessage === 'function') {
                     applyPaperModeToMessage(messageDiv);
                 }
-
-                // Add inline Save to KB link when image was part of the conversation
-                if (imageToSend) {
-                    const saveLink = document.createElement('button');
-                    saveLink.className = 'save-kb-inline';
-                    saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
-                    saveLink.onclick = () => showSaveModal();
-                    messageDiv.querySelector('.message-content').appendChild(saveLink);
-                }
+                // Add inline action row (Share, Copy, Save, New Chat)
+                addInlineActionsToMessage(messageDiv);
 
                 conversationHistory.push({ role: 'assistant', content: fullResponse });
 
@@ -6091,7 +6155,17 @@
             } finally {
                 isTyping = false;
                 document.getElementById('sendButton').disabled = false;
-                document.getElementById('messageInput').focus();
+                // On mobile, blur input to dismiss keyboard after response
+                // On desktop, keep focus for quick follow-up typing
+                if (typeof isMobile === 'function' && isMobile()) {
+                    document.getElementById('messageInput').blur();
+                    setTimeout(() => {
+                        const msgs = document.getElementById('messages');
+                        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+                    }, 100);
+                } else {
+                    document.getElementById('messageInput').focus();
+                }
             }
         }
 
@@ -8967,12 +9041,8 @@
                 `;
                 messagesDiv.appendChild(messageDiv);
 
-                // Add inline Save to KB link after Image Studio images
-                const saveLink = document.createElement('button');
-                saveLink.className = 'save-kb-inline';
-                saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
-                saveLink.onclick = () => showSaveModal();
-                messageDiv.querySelector('.message-content').appendChild(saveLink);
+                // Add inline action row (Share, Save, New Chat)
+                addImageStudioActions(messageDiv);
 
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
@@ -9035,12 +9105,8 @@
                     if (container) container.remove();
                 }
 
-                // Add inline Save to KB link after Image Studio images
-                const saveLink = document.createElement('button');
-                saveLink.className = 'save-kb-inline';
-                saveLink.innerHTML = '\ud83d\udcbe Save to Knowledge Base';
-                saveLink.onclick = () => showSaveModal();
-                messageDiv.querySelector('.message-content').appendChild(saveLink);
+                // Add inline action row (Share, Save, New Chat)
+                addImageStudioActions(messageDiv);
 
                 // Add to conversationHistory with summary for KB save
                 conversationHistory.push({ role: 'user', content: `[Image Studio] ${imagePromptText}` });
@@ -9691,82 +9757,108 @@
                 showSaveToast('Not supported', 'Your browser does not support text-to-speech');
                 return;
             }
-
             // If already active, stop
             if (ttsActive) {
                 stopReadAloud();
                 return;
             }
-
-            // Clean text for speech (remove markdown artifacts)
+            // Enhanced text cleaning for natural speech
             const cleanText = text
-                .replace(/```[\s\S]*?```/g, ' code block ')
+                // Remove code blocks entirely (they don't read well)
+                .replace(/```[\s\S]*?```/g, ' code block omitted ')
+                // Remove inline code backticks
                 .replace(/`([^`]+)`/g, '$1')
-                .replace(/[#*_~>|]/g, '')
+                // Convert markdown headers to pauses
+                .replace(/^#{1,6}\s+(.+)$/gm, '$1. ')
+                // Remove bold/italic markers
+                .replace(/\*\*([^*]+)\*\*/g, '$1')
+                .replace(/\*([^*]+)\*/g, '$1')
+                .replace(/__([^_]+)__/g, '$1')
+                .replace(/_([^_]+)_/g, '$1')
+                .replace(/~~([^~]+)~~/g, '$1')
+                // Convert markdown links to just the text
                 .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                // Handle numbered lists
+                .replace(/^\d+\.\s+/gm, '')
+                // Handle bullet points
+                .replace(/^[\-\*]\s+/gm, '')
+                // Remove blockquote markers
+                .replace(/^>\s*/gm, '')
+                // Remove horizontal rules
+                .replace(/^---+$/gm, '')
+                // Remove pipe table formatting
+                .replace(/\|/g, ', ')
+                .replace(/^[\s\-:]+$/gm, '')
+                // Clean up remaining markdown artifacts
+                .replace(/[#~>]/g, '')
+                // Normalize whitespace
                 .replace(/\n{2,}/g, '. ')
                 .replace(/\n/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
-
             if (!cleanText) {
                 showSaveToast('Nothing to read', 'No text content found');
                 return;
             }
-
             // Pre-select voice once
             const voices = window.speechSynthesis.getVoices();
             ttsSelectedVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
                 || voices.find(v => v.lang.startsWith('en'))
                 || null;
-
-            // Split into very short chunks for Chrome Android reliability
+            // Split into adaptive chunks
             ttsChunks = splitTextForTTS(cleanText);
             ttsChunkIndex = 0;
             ttsActive = true;
-
             console.log('TTS: Starting read aloud,', ttsChunks.length, 'chunks, total length:', cleanText.length);
             showTTSIndicator();
             speakNextChunk();
         }
-
         function splitTextForTTS(text) {
-            // Very short chunks (~60 chars) to stay well within Chrome Android's kill window
-            const MAX_CHUNK = 60;
+            // Adaptive chunk size: shorter for Chrome Android, longer for others
+            const isAndroidChrome = /android/i.test(navigator.userAgent) && /chrome/i.test(navigator.userAgent);
+            const MAX_CHUNK = isAndroidChrome ? 80 : 200;
             const chunks = [];
-            
-            // Split on sentence boundaries first
-            const sentences = text.match(/[^.!?]+[.!?]+[\s]*/g) || [text];
+            // Better sentence splitting: handle abbreviations, numbers, etc.
+            const sentences = text.match(/[^.!?]+(?:[.!?]+(?:\s|$))?/g) || [text];
             let current = '';
-            
             for (const sentence of sentences) {
-                if ((current + sentence).length > MAX_CHUNK && current.length > 0) {
+                const trimmed = sentence.trim();
+                if (!trimmed) continue;
+                if ((current + ' ' + trimmed).length > MAX_CHUNK && current.length > 0) {
                     chunks.push(current.trim());
                     current = '';
                 }
-                if (sentence.length > MAX_CHUNK) {
-                    // Split long sentences on commas, semicolons, colons, or "and"/"or"
-                    const parts = sentence.match(/[^,;:]+[,;:]?[\s]*/g) || [sentence];
-                    for (const part of parts) {
-                        if ((current + part).length > MAX_CHUNK && current.length > 0) {
+                if (trimmed.length > MAX_CHUNK) {
+                    // Split long sentences on clause boundaries
+                    const clauses = trimmed.match(/[^,;:\u2014\u2013]+[,;:\u2014\u2013]?\s*/g) || [trimmed];
+                    for (const clause of clauses) {
+                        if ((current + clause).length > MAX_CHUNK && current.length > 0) {
                             chunks.push(current.trim());
                             current = '';
                         }
-                        current += part;
+                        if (clause.length > MAX_CHUNK) {
+                            const words = clause.split(/\s+/);
+                            for (const word of words) {
+                                if ((current + ' ' + word).length > MAX_CHUNK && current.length > 0) {
+                                    chunks.push(current.trim());
+                                    current = '';
+                                }
+                                current += (current ? ' ' : '') + word;
+                            }
+                        } else {
+                            current += clause;
+                        }
                     }
                 } else {
-                    current += sentence;
+                    current += (current ? ' ' : '') + trimmed;
                 }
             }
             if (current.trim()) chunks.push(current.trim());
-            
             return chunks.length > 0 ? chunks : [text.substring(0, MAX_CHUNK)];
         }
-
         function speakNextChunk() {
             // Clear any previous watchdog
             if (ttsWatchdog) { clearTimeout(ttsWatchdog); ttsWatchdog = null; }
-
             if (!ttsActive || ttsChunkIndex >= ttsChunks.length) {
                 // All done
                 ttsActive = false;
@@ -9775,27 +9867,31 @@
                 dismissTTSIndicator();
                 return;
             }
-
             // CRITICAL: Cancel any previous utterance to force Chrome to create fresh audio context
             window.speechSynthesis.cancel();
-
             const chunk = ttsChunks[ttsChunkIndex];
             const utterance = new SpeechSynthesisUtterance(chunk);
             utterance.rate = 1.0;
             utterance.pitch = 1.0;
             if (ttsSelectedVoice) utterance.voice = ttsSelectedVoice;
-
             let chunkHandled = false;
-
+            // Determine pause duration based on how this chunk ends
+            function getInterChunkDelay() {
+                const trimmed = chunk.trimEnd();
+                const lastChar = trimmed[trimmed.length - 1];
+                if ('.!?'.includes(lastChar)) return 450;   // Sentence boundary
+                if (',;'.includes(lastChar)) return 220;     // Clause boundary
+                if (':'.includes(lastChar)) return 300;      // Colon
+                return 100;                                   // Mid-sentence
+            }
             utterance.onend = () => {
                 if (chunkHandled) return;
                 chunkHandled = true;
                 if (ttsWatchdog) { clearTimeout(ttsWatchdog); ttsWatchdog = null; }
                 ttsChunkIndex++;
-                // Delay before next chunk gives Chrome time to clean up audio context
-                setTimeout(() => speakNextChunk(), 250);
+                const delay = getInterChunkDelay();
+                setTimeout(() => speakNextChunk(), delay);
             };
-
             utterance.onerror = (e) => {
                 if (chunkHandled) return;
                 chunkHandled = true;
@@ -9808,14 +9904,13 @@
                     stopReadAloud();
                 }
             };
-
             // Small delay after cancel to let Chrome fully reset
             setTimeout(() => {
                 if (!ttsActive) return;
                 window.speechSynthesis.speak(utterance);
-
-                // Watchdog: if neither onend nor onerror fires within 8 seconds,
-                // Chrome silently killed the utterance. Force advance to next chunk.
+                // Watchdog: adaptive timeout based on platform
+                const isAndroidChrome = /android/i.test(navigator.userAgent) && /chrome/i.test(navigator.userAgent);
+                const watchdogTimeout = isAndroidChrome ? 8000 : 15000;
                 ttsWatchdog = setTimeout(() => {
                     if (!chunkHandled && ttsActive) {
                         console.warn('TTS watchdog: chunk', ttsChunkIndex, 'appears stuck, forcing next');
@@ -9824,10 +9919,9 @@
                         ttsChunkIndex++;
                         setTimeout(() => speakNextChunk(), 250);
                     }
-                }, 8000);
+                }, watchdogTimeout);
             }, 100);
         }
-
         function showTTSIndicator() {
             dismissTTSIndicator();
             const indicator = document.createElement('div');
@@ -9840,12 +9934,10 @@
             `;
             document.body.appendChild(indicator);
         }
-
         function dismissTTSIndicator() {
             const el = document.getElementById('ttsIndicator');
             if (el) el.remove();
         }
-
         function stopReadAloud() {
             ttsActive = false;
             if (window.speechSynthesis) {
@@ -10187,6 +10279,164 @@
                     openBottomSheet();
                 });
             });
+        }
+
+
+        // ---- Save Response as PDF ----
+        function saveResponseAsPDF() {
+            if (conversationHistory.length === 0) {
+                showSaveToast('Nothing to save', 'Start a conversation first');
+                return;
+            }
+            haptic('light');
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            let htmlContent = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>OffGrid Command Center</title><style>body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:700px;margin:0 auto;padding:20px;color:#1a1a1a;line-height:1.6}.header{text-align:center;border-bottom:2px solid #d4a017;padding-bottom:16px;margin-bottom:24px}.header h1{font-size:20px;color:#d4a017;margin:0 0 4px 0}.header .date{font-size:12px;color:#666}.msg{margin-bottom:20px;padding:12px 16px;border-radius:8px}.msg.user{background:#f0f4f8;border-left:3px solid #3b82f6}.msg.assistant{background:#fefce8;border-left:3px solid #d4a017}.msg .role{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}.msg.user .role{color:#3b82f6}.msg.assistant .role{color:#d4a017}.footer{text-align:center;font-size:11px;color:#999;margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb}img{max-width:100%;border-radius:8px}pre{background:#f3f4f6;padding:12px;border-radius:6px;overflow-x:auto;font-size:13px}code{background:#f3f4f6;padding:2px 4px;border-radius:3px;font-size:13px}</style></head><body>`;
+            htmlContent += `<div class="header"><h1>⭐ OffGrid Command Center</h1><div class="date">${dateStr} at ${timeStr}</div></div>`;
+            conversationHistory.forEach(msg => {
+                const role = msg.role === 'user' ? 'You' : 'Command Center';
+                const roleClass = msg.role;
+                let content = msg.content || '';
+                content = content.replace(/!\[([^\]]*)\]\(data:[^)]+\)/g, '<em>[Image: $1]</em>');
+                content = content.replace(/data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+\/=]{50,}/g, '[Image data]');
+                if (typeof marked !== 'undefined') { content = marked.parse(content); }
+                htmlContent += '<div class="msg ' + roleClass + '"><div class="role">' + role + '</div>' + content + '</div>';
+            });
+            htmlContent += '<div class="footer">Exported from OffGrid Command Center &bull; offgridaitoolkit.com<br>Privacy first. No conversations stored.</div></body></html>';
+            const printWindow = window.open('', '_blank');
+            if (printWindow) {
+                printWindow.document.write(htmlContent);
+                printWindow.document.close();
+                setTimeout(() => { printWindow.print(); setTimeout(() => printWindow.close(), 1000); }, 500);
+            } else {
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const chatSlug = getTopicSlug();
+                const exportTs = getTimestamp();
+                a.download = 'offgrid-chat-' + chatSlug + '-' + exportTs + '.html';
+                a.click();
+                URL.revokeObjectURL(url);
+                showSaveToast('Chat saved', 'Saved as HTML file');
+            }
+        }
+        // ---- Add inline action row to assistant messages ----
+        function addInlineActionsToMessage(msgEl) {
+            const content = msgEl.querySelector('.message-content');
+            if (!content) return;
+            const textEl = msgEl.querySelector('.message-text') || msgEl.querySelector('.markdown-content');
+            const rawText = textEl ? textEl.textContent : '';
+            if (!rawText.trim()) return;
+            const row = document.createElement('div');
+            row.className = 'inline-actions-row';
+            // --- Share button (mobile only, using Web Share API) ---
+            if (isMobile() && navigator.share) {
+                const shareBtn = document.createElement('button');
+                shareBtn.className = 'inline-action-btn';
+                shareBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share';
+                shareBtn.onclick = () => shareResponse(rawText);
+                row.appendChild(shareBtn);
+            }
+            // --- Copy button ---
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'inline-action-btn';
+            copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy';
+            copyBtn.onclick = () => { haptic('light'); copyToClipboardReliable(rawText); };
+            row.appendChild(copyBtn);
+            // --- Save button ---
+            if (isMobile()) {
+                // Mobile: Save as PDF directly
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'inline-action-btn';
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Save';
+                saveBtn.onclick = () => saveResponseAsPDF();
+                row.appendChild(saveBtn);
+            } else {
+                // Desktop: Save dropdown with KB + PDF options
+                const wrapper = document.createElement('div');
+                wrapper.className = 'save-dropdown-wrapper';
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'inline-action-btn';
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Save ▾';
+                const dropdown = document.createElement('div');
+                dropdown.className = 'save-dropdown-menu';
+                const kbItem = document.createElement('div');
+                kbItem.className = 'save-dropdown-item';
+                kbItem.textContent = '💾 Save to Knowledge Base';
+                kbItem.onclick = (e) => { e.stopPropagation(); dropdown.classList.remove('open'); showSaveModal(); };
+                const pdfItem = document.createElement('div');
+                pdfItem.className = 'save-dropdown-item';
+                pdfItem.textContent = '📄 Save as PDF';
+                pdfItem.onclick = (e) => { e.stopPropagation(); dropdown.classList.remove('open'); saveResponseAsPDF(); };
+                dropdown.appendChild(kbItem);
+                dropdown.appendChild(pdfItem);
+                saveBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('open');
+                    const closeHandler = () => { dropdown.classList.remove('open'); document.removeEventListener('click', closeHandler); };
+                    setTimeout(() => document.addEventListener('click', closeHandler), 10);
+                };
+                wrapper.appendChild(saveBtn);
+                wrapper.appendChild(dropdown);
+                row.appendChild(wrapper);
+            }
+            // --- New Chat button ---
+            const newChatBtn = document.createElement('button');
+            newChatBtn.className = 'inline-action-btn';
+            newChatBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> New Chat';
+            newChatBtn.onclick = () => {
+                haptic('light');
+                if (conversationHistory.length > 0) {
+                    if (confirm('Start a new chat? Your Deep Mode analytics will be preserved.')) { softResetChat(); }
+                } else { softResetChat(); }
+            };
+            row.appendChild(newChatBtn);
+            content.appendChild(row);
+        }
+        // ---- Add inline actions to Image Studio messages ----
+        function addImageStudioActions(msgEl) {
+            const content = msgEl.querySelector('.message-content');
+            if (!content) return;
+            const row = document.createElement('div');
+            row.className = 'inline-actions-row';
+            // Share (mobile only)
+            if (isMobile() && navigator.share) {
+                const shareBtn = document.createElement('button');
+                shareBtn.className = 'inline-action-btn';
+                shareBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Share';
+                shareBtn.onclick = () => {
+                    const textEl = msgEl.querySelector('.message-text') || msgEl.querySelector('.markdown-content');
+                    shareResponse(textEl ? textEl.textContent : 'Image from OffGrid Command Center');
+                };
+                row.appendChild(shareBtn);
+            }
+            // Save
+            if (isMobile()) {
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'inline-action-btn';
+                saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Save';
+                saveBtn.onclick = () => saveResponseAsPDF();
+                row.appendChild(saveBtn);
+            } else {
+                // Desktop: Save to KB
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'inline-action-btn';
+                saveBtn.textContent = '💾 Save to Knowledge Base';
+                saveBtn.onclick = () => showSaveModal();
+                row.appendChild(saveBtn);
+            }
+            // New Chat
+            const newChatBtn = document.createElement('button');
+            newChatBtn.className = 'inline-action-btn';
+            newChatBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg> New Chat';
+            newChatBtn.onclick = () => {
+                haptic('light');
+                if (confirm('Start a new chat? Your Deep Mode analytics will be preserved.')) { softResetChat(); }
+            };
+            row.appendChild(newChatBtn);
+            content.appendChild(row);
         }
 
         // ---- Add share button to messages ----
