@@ -9,6 +9,14 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-30**
+*   **Hybrid Video Frame Extraction — iOS rVFC + Android Seek (v5.6.2)**
+    *   **Complete rewrite of video frame extraction** using a platform-adaptive hybrid approach. iOS Safari's `currentTime` seeking is fundamentally unreliable — even with play/pause buffering and timeout fallbacks, it only captures frame 1.
+    *   **iOS/Safari (Method A):** Uses `requestVideoFrameCallback` (rVFC) to play the video at 4x speed and capture frames as the system actually renders them. Includes a progress bar, safety timeout, and graceful fallback. Requires iOS 15.4+ (supported on all modern iPhones).
+    *   **Android/Desktop (Method B):** Retains the proven seek-based approach (`currentTime` + `onseeked` event) which works reliably on non-iOS platforms.
+    *   **Shared utilities:** `drawFrameToCanvas()`, `isValidFrame()`, and `completeVideoSetup()` are now shared between both methods, reducing code duplication.
+    *   **Platform detection:** Uses UA sniffing + `maxTouchPoints` for iPad detection + feature detection (`'requestVideoFrameCallback' in HTMLVideoElement.prototype`) to choose the right method.
+    *   **Older iOS fallback:** Devices without rVFC support get a clear error message directing them to update or use desktop.
+
 *   **iOS Video Upload Fix & Command Center Token Overflow Fix (v5.6.1)**
     *   **iOS video frame extraction rewritten** — Fixed video upload getting stuck on iPhone/iOS Safari. Root cause: iOS requires `playsinline` attribute, `loadeddata` event (not `loadedmetadata`), and a play→pause buffer cycle before seeking works. Added 3-second timeout fallback per frame seek — if `onseeked` doesn't fire, attempts to draw anyway and skips blank frames. Also added pixel-check validation to avoid capturing duplicate/black frames.
     *   **Base64 token overflow prevention** — Fixed follow-up messages after image generation causing 555,000+ token errors. Generated images were stored as full base64 data URLs in conversation history and sent as text tokens on follow-up. Added `stripBase64FromContent()` utility that replaces base64 image data with placeholder text before API calls. Applied to both `command.html` and `arena.html` (stream and council endpoints).
