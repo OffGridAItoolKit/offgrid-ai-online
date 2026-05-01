@@ -9,6 +9,14 @@ This document provides a reverse-chronological summary of recent development pro
 ### April 2026
 
 **2026-04-30**
+*   **iOS Video Fix v2: DOM Attachment + timeupdate Fallback (v5.6.3)**
+    *   **Root cause identified:** `requestVideoFrameCallback` does not fire on iOS Safari when the video element is not attached to the DOM. The v5.6.2 video element was created via `document.createElement` but never appended to the page.
+    *   **Fix:** Video element is now appended to the DOM (hidden off-screen with `position:fixed; top:-9999px; opacity:0`) before playback begins. Removed from DOM after frame extraction completes.
+    *   **Reduced playback rate** from 4x to 2x for better iOS compatibility (iOS may silently cap or ignore high playback rates).
+    *   **Added `timeupdate` fallback:** If rVFC doesn't fire (detected via a flag), frames are captured using `timeupdate` events instead. This provides a secondary capture path on devices where rVFC is unreliable.
+    *   **Consolidated cleanup:** All video element cleanup (revoke blob URL + remove from DOM) now handled by a single `cleanupVideoEl()` helper used in all code paths.
+    *   **Conservative timeout:** Safety timeout increased to `duration + 8 seconds` (assumes 1x playback as worst case).
+
 *   **Hybrid Video Frame Extraction — iOS rVFC + Android Seek (v5.6.2)**
     *   **Complete rewrite of video frame extraction** using a platform-adaptive hybrid approach. iOS Safari's `currentTime` seeking is fundamentally unreliable — even with play/pause buffering and timeout fallbacks, it only captures frame 1.
     *   **iOS/Safari (Method A):** Uses `requestVideoFrameCallback` (rVFC) to play the video at 4x speed and capture frames as the system actually renders them. Includes a progress bar, safety timeout, and graceful fallback. Requires iOS 15.4+ (supported on all modern iPhones).
