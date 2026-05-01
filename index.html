@@ -2438,11 +2438,17 @@
             const videoEl = document.createElement('video');
             videoEl.preload = 'auto';
             videoEl.muted = true;
+            videoEl.playsInline = true;
+            videoEl.setAttribute('playsinline', '');
+            videoEl.setAttribute('webkit-playsinline', '');
             
-            videoEl.onloadedmetadata = function() {
+            // Use loadeddata (not loadedmetadata) for iOS compatibility
+            // iOS needs actual frame data loaded before seeking works
+            videoEl.onloadeddata = function() {
                 if (videoEl.duration > 20) {
                     uploadIndicator.remove();
                     alert('Video is too long (' + Math.round(videoEl.duration) + ' seconds). Maximum duration is 20 seconds for AI analysis.');
+                    URL.revokeObjectURL(videoEl.src);
                     return;
                 }
                 
@@ -2457,55 +2463,59 @@
                 canvas.height = 384;
                 const ctx = canvas.getContext('2d');
                 
+                function finishExtraction() {
+                    // All frames extracted - generate thumbnail from first frame
+                    const thumbCanvas = document.createElement('canvas');
+                    thumbCanvas.width = 160;
+                    thumbCanvas.height = 120;
+                    const thumbCtx = thumbCanvas.getContext('2d');
+                    
+                    // Use the video element at time 1s for thumbnail
+                    videoEl.currentTime = Math.min(1, duration / 2);
+                    let thumbDone = false;
+                    videoEl.onseeked = function() {
+                        if (thumbDone) return;
+                        thumbDone = true;
+                        thumbCtx.drawImage(videoEl, 0, 0, 160, 120);
+                        const thumbnailUrl = thumbCanvas.toDataURL('image/jpeg', 0.7);
+                        completeVideoSetup(thumbnailUrl);
+                    };
+                    // Fallback if thumbnail seek doesn't fire (iOS)
+                    setTimeout(() => {
+                        if (!thumbDone) {
+                            thumbDone = true;
+                            completeVideoSetup(frames[0] || '');
+                        }
+                    }, 2000);
+                }
+                
+                function completeVideoSetup(thumbnailUrl) {
+                    selectedVideo = {
+                        frames: frames,
+                        name: file.name,
+                        size: file.size,
+                        duration: duration,
+                        thumbnailUrl: thumbnailUrl,
+                        frameCount: frames.length,
+                        mimeType: file.type || 'video/mp4'
+                    };
+                    uploadIndicator.remove();
+                    removeImage();
+                    showVideoPreview();
+                    URL.revokeObjectURL(videoEl.src);
+                    if (window.innerWidth <= 768) document.activeElement.blur();
+                }
+                
                 function extractNextFrame() {
                     if (currentFrame >= frameCount) {
-                        // All frames extracted - generate thumbnail from first frame
-                        const thumbCanvas = document.createElement('canvas');
-                        thumbCanvas.width = 160;
-                        thumbCanvas.height = 120;
-                        const thumbCtx = thumbCanvas.getContext('2d');
-                        
-                        // Use the video element at time 1s for thumbnail
-                        videoEl.currentTime = Math.min(1, duration / 2);
-                        videoEl.onseeked = function() {
-                            thumbCtx.drawImage(videoEl, 0, 0, 160, 120);
-                            const thumbnailUrl = thumbCanvas.toDataURL('image/jpeg', 0.7);
-                            
-                            selectedVideo = {
-                                frames: frames,
-                                name: file.name,
-                                size: file.size,
-                                duration: duration,
-                                thumbnailUrl: thumbnailUrl,
-                                frameCount: frames.length,
-                                mimeType: file.type || 'video/mp4'
-                            };
-                            
+                        if (frames.length === 0) {
+                            // No frames extracted at all - show error
                             uploadIndicator.remove();
-                            removeImage();
-                            showVideoPreview();
-                            // Dismiss keyboard on mobile so user can see the video preview
-                            if (window.innerWidth <= 768) document.activeElement.blur();
-                        };
-                        // Fallback
-                        setTimeout(() => {
-                            if (!selectedVideo || selectedVideo.frameCount !== frames.length) {
-                                selectedVideo = {
-                                    frames: frames,
-                                    name: file.name,
-                                    size: file.size,
-                                    duration: duration,
-                                    thumbnailUrl: frames[0] || '',
-                                    frameCount: frames.length,
-                                    mimeType: file.type || 'video/mp4'
-                                };
-                                uploadIndicator.remove();
-                                removeImage();
-                                showVideoPreview();
-                                // Dismiss keyboard on mobile so user can see the video preview
-                                if (window.innerWidth <= 768) document.activeElement.blur();
-                            }
-                        }, 3000);
+                            alert('Could not extract video frames. Try a shorter video or a different format (MP4 recommended).');
+                            URL.revokeObjectURL(videoEl.src);
+                            return;
+                        }
+                        finishExtraction();
                         return;
                     }
                     
@@ -2513,7 +2523,42 @@
                     const seekTime = (currentFrame / frameCount) * duration;
                     videoEl.currentTime = seekTime;
                     
+                    // Timeout fallback for iOS: if onseeked doesn't fire, skip frame
+                    let seekFired = false;
+                    const seekTimeout = setTimeout(() => {
+                        if (!seekFired) {
+                            seekFired = true;
+                            // Try to draw anyway (iOS sometimes updates without firing seeked)
+                            try {
+                                const vw = videoEl.videoWidth;
+                                const vh = videoEl.videoHeight;
+                                if (vw > 0 && vh > 0) {
+                                    const aspect = vw / vh;
+                                    let dw = canvas.width;
+                                    let dh = canvas.height;
+                                    if (aspect > dw / dh) { dh = dw / aspect; } else { dw = dh * aspect; }
+                                    ctx.fillStyle = '#000';
+                                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                                    ctx.drawImage(videoEl, (canvas.width - dw) / 2, (canvas.height - dh) / 2, dw, dh);
+                                    const frameDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                                    // Only add if it's not a blank/duplicate frame
+                                    const pixelCheck = ctx.getImageData(canvas.width/2, canvas.height/2, 1, 1).data;
+                                    if (pixelCheck[0] !== 0 || pixelCheck[1] !== 0 || pixelCheck[2] !== 0) {
+                                        frames.push(frameDataUrl);
+                                    }
+                                }
+                            } catch(e) { /* skip frame */ }
+                            currentFrame++;
+                            uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">🎬</div>Extracting frames... ' + frames.length + ' captured<br><small>Processing video for AI analysis</small></div>';
+                            setTimeout(extractNextFrame, 100);
+                        }
+                    }, 3000);
+                    
                     videoEl.onseeked = function() {
+                        if (seekFired) return;
+                        seekFired = true;
+                        clearTimeout(seekTimeout);
+                        
                         // Draw the current frame to canvas
                         const vw = videoEl.videoWidth;
                         const vh = videoEl.videoHeight;
@@ -2534,7 +2579,6 @@
                         frames.push(frameDataUrl);
                         
                         currentFrame++;
-                        // Update indicator
                         uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">🎬</div>Extracting frames... ' + currentFrame + '/' + frameCount + '<br><small>Preparing video for AI analysis</small></div>';
                         
                         // Small delay to prevent UI freeze
@@ -2542,7 +2586,22 @@
                     };
                 }
                 
-                extractNextFrame();
+                // iOS fix: Force play→pause to trigger buffering before seeking
+                const playPromise = videoEl.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        videoEl.pause();
+                        // Start extraction after iOS has buffered
+                        setTimeout(extractNextFrame, 200);
+                    }).catch(() => {
+                        // play() rejected (autoplay policy) — try extraction anyway
+                        videoEl.pause();
+                        setTimeout(extractNextFrame, 200);
+                    });
+                } else {
+                    videoEl.pause();
+                    setTimeout(extractNextFrame, 200);
+                }
             };
             
             videoEl.src = URL.createObjectURL(file);

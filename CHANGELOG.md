@@ -1,12 +1,18 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-04-20
+**Last Updated:** 2026-04-30
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
 
 ---
 
 ### April 2026
+
+**2026-04-30**
+*   **iOS Video Upload Fix & Command Center Token Overflow Fix (v5.6.1)**
+    *   **iOS video frame extraction rewritten** — Fixed video upload getting stuck on iPhone/iOS Safari. Root cause: iOS requires `playsinline` attribute, `loadeddata` event (not `loadedmetadata`), and a play→pause buffer cycle before seeking works. Added 3-second timeout fallback per frame seek — if `onseeked` doesn't fire, attempts to draw anyway and skips blank frames. Also added pixel-check validation to avoid capturing duplicate/black frames.
+    *   **Base64 token overflow prevention** — Fixed follow-up messages after image generation causing 555,000+ token errors. Generated images were stored as full base64 data URLs in conversation history and sent as text tokens on follow-up. Added `stripBase64FromContent()` utility that replaces base64 image data with placeholder text before API calls. Applied to both `command.html` and `arena.html` (stream and council endpoints).
+    *   **Memory cleanup** — Added `URL.revokeObjectURL()` calls after video processing completes to prevent memory leaks on mobile devices.
 
 **2026-04-20**
 *   **Weak-Signal Performance: Edge Caching & Cache-Control Headers (v5.6.0)**

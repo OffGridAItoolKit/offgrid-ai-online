@@ -5688,7 +5688,7 @@
             try {
                 const messages = conversationHistory.map(msg => ({
                     role: msg.role,
-                    content: msg.content,
+                    content: stripBase64FromContent(msg.content),
                     image: msg.image
                 }));
 
@@ -5887,7 +5887,7 @@
             try {
                 const messages = conversationHistory.map(msg => ({
                     role: msg.role,
-                    content: msg.content,
+                    content: stripBase64FromContent(msg.content),
                     image: msg.image
                 }));
 
@@ -6601,6 +6601,20 @@
             if (voiceRecognition) {
                 voiceRecognition.stop();
             }
+        }
+
+        // ============================================
+        // UTILITY: Strip base64 from conversation content
+        // Prevents token overflow when generated images are in history
+        // ============================================
+
+        function stripBase64FromContent(content) {
+            if (!content || typeof content !== 'string') return content;
+            // Replace base64 data URLs in markdown image syntax: ![...](data:image/...;base64,...)
+            content = content.replace(/!\[([^\]]*)\]\(data:image\/[^)]+\)/g, '[$1 - image was generated here]');
+            // Replace any remaining standalone base64 data URLs
+            content = content.replace(/data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=]{100,}/g, '[base64 image removed from context]');
+            return content;
         }
 
         // ============================================
