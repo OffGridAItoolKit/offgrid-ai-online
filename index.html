@@ -2467,6 +2467,28 @@
                     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
                 const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
                 
+                // === DIAGNOSTIC LOG (temporary — remove after iOS debugging) ===
+                const diagLog = document.createElement('div');
+                diagLog.id = 'videoDiagLog';
+                diagLog.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:40vh;overflow-y:auto;background:rgba(0,0,0,0.92);color:#0f0;font-family:monospace;font-size:11px;padding:10px;z-index:9999;white-space:pre-wrap;line-height:1.4;';
+                document.body.appendChild(diagLog);
+                const diagEntries = [];
+                function diag(msg) {
+                    const ts = new Date().toLocaleTimeString('en-US', {hour12:false, hour:'2-digit', minute:'2-digit', second:'2-digit', fractionalSecondDigits:3});
+                    diagEntries.push(ts + ' ' + msg);
+                    diagLog.textContent = diagEntries.join('\n');
+                    diagLog.scrollTop = diagLog.scrollHeight;
+                }
+                diag('loadeddata fired. duration=' + duration.toFixed(2) + 's');
+                diag('videoWidth=' + videoEl.videoWidth + ' videoHeight=' + videoEl.videoHeight);
+                diag('isIOS=' + isIOS + ' hasRVFC=' + hasRVFC);
+                diag('targetFrames=' + targetFrames);
+                diag('UA=' + navigator.userAgent.substring(0, 80));
+                diag('video.readyState=' + videoEl.readyState + ' networkState=' + videoEl.networkState);
+                diag('video.paused=' + videoEl.paused + ' video.muted=' + videoEl.muted);
+                diag('video in DOM=' + !!videoEl.parentNode);
+                // === END DIAGNOSTIC SETUP ===
+                
                 function drawFrameToCanvas() {
                     const vw = videoEl.videoWidth;
                     const vh = videoEl.videoHeight;
@@ -2517,16 +2539,20 @@
                 // as they render via requestVideoFrameCallback
                 // =============================================
                 function extractFramesViaPlaythrough() {
+                    diag('--- extractFramesViaPlaythrough() START ---');
                     const frameInterval = duration / targetFrames;
                     let lastCaptureTime = -frameInterval;
                     let finished = false;
                     let rVFCFired = false;
+                    let timeupdateCount = 0;
+                    let rVFCCount = 0;
                     
                     uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">🎬</div>Processing video...<br><small>Playing through to capture frames</small><br><div style="margin-top:10px;background:rgba(255,255,255,0.1);border-radius:8px;height:6px;overflow:hidden"><div id="videoProgressBar" style="background:#d4a017;height:100%;width:0%;transition:width 0.3s"></div></div></div>';
                     
                     videoEl.currentTime = 0;
+                    diag('frameInterval=' + frameInterval.toFixed(2) + 's');
                     
-                    function captureCurrentFrame(currentTime) {
+                    function captureCurrentFrame(currentTime, source) {
                         if (finished) return;
                         // Update progress bar
                         const progress = Math.min((currentTime / duration) * 100, 100);
@@ -2536,7 +2562,9 @@
                         // Capture frame if enough time has passed
                         if (currentTime - lastCaptureTime >= frameInterval * 0.8) {
                             const frameData = drawFrameToCanvas();
-                            if (frameData && isValidFrame(frameData)) {
+                            const valid = frameData ? isValidFrame(frameData) : false;
+                            diag('[' + source + '] t=' + currentTime.toFixed(2) + ' draw=' + !!frameData + ' valid=' + valid + ' frames=' + frames.length);
+                            if (frameData && valid) {
                                 frames.push(frameData);
                                 lastCaptureTime = currentTime;
                             }
@@ -2546,8 +2574,10 @@
                     // PRIMARY: requestVideoFrameCallback
                     function onFrame(now, metadata) {
                         if (finished) return;
+                        rVFCCount++;
+                        if (rVFCCount <= 3) diag('rVFC callback #' + rVFCCount + ' mediaTime=' + metadata.mediaTime.toFixed(2));
                         rVFCFired = true;
-                        captureCurrentFrame(metadata.mediaTime);
+                        captureCurrentFrame(metadata.mediaTime, 'rVFC');
                         if (!videoEl.ended && !videoEl.paused && frames.length < targetFrames) {
                             videoEl.requestVideoFrameCallback(onFrame);
                         }
@@ -2555,56 +2585,81 @@
                     
                     // FALLBACK: timeupdate-based capture (fires if rVFC doesn't work)
                     videoEl.ontimeupdate = function() {
+                        timeupdateCount++;
+                        if (timeupdateCount <= 3) diag('timeupdate #' + timeupdateCount + ' t=' + videoEl.currentTime.toFixed(2) + ' rVFCFired=' + rVFCFired);
                         if (finished || rVFCFired) return; // rVFC is working, don't double-capture
-                        captureCurrentFrame(videoEl.currentTime);
+                        captureCurrentFrame(videoEl.currentTime, 'timeupdate');
                     };
                     
-                    function finishCapture() {
+                    function finishCapture(reason) {
                         if (finished) return;
                         finished = true;
                         videoEl.pause();
                         videoEl.ontimeupdate = null;
+                        diag('finishCapture reason=' + reason + ' frames=' + frames.length + ' rVFCCount=' + rVFCCount + ' timeupdateCount=' + timeupdateCount);
                         
                         if (frames.length === 0) {
+                            diag('ERROR: Zero frames captured!');
                             uploadIndicator.remove();
-                            alert('Could not extract video frames. Try a shorter video or MP4 format.');
+                            // Don't remove diag log so user can screenshot it
+                            alert('Could not extract video frames. Check the diagnostic log at the bottom of the screen and screenshot it.');
                             cleanupVideoEl();
                             return;
                         }
+                        diag('SUCCESS: ' + frames.length + ' frames captured. Completing setup...');
+                        // Remove diag log on success after brief delay
+                        setTimeout(() => { if (diagLog.parentNode) diagLog.remove(); }, 3000);
                         completeVideoSetup();
                     }
                     
-                    videoEl.onended = finishCapture;
+                    videoEl.onended = function() { diag('video.onended fired'); finishCapture('ended'); };
                     
                     // Safety timeout
                     const expectedTime = duration + 8; // duration at 1x + 8s buffer (conservative)
+                    diag('Safety timeout set: ' + expectedTime.toFixed(1) + 's');
                     const safetyTimeout = setTimeout(() => {
                         if (!finished) {
-                            finishCapture();
+                            diag('SAFETY TIMEOUT triggered after ' + expectedTime + 's');
+                            finishCapture('timeout');
                         }
                     }, expectedTime * 1000);
                     
+                    // Also log video events
+                    videoEl.onplaying = function() { diag('video.onplaying fired. playbackRate=' + videoEl.playbackRate); };
+                    videoEl.onwaiting = function() { diag('video.onwaiting fired (buffering)'); };
+                    videoEl.onstalled = function() { diag('video.onstalled fired'); };
+                    videoEl.onerror = function(e) { diag('video.onerror: ' + (videoEl.error ? videoEl.error.code + ' ' + videoEl.error.message : 'unknown')); };
+                    
                     // Start: try rVFC + play
+                    diag('Registering rVFC callback...');
                     videoEl.requestVideoFrameCallback(onFrame);
                     
                     // Try to play at 2x (4x can be unreliable on iOS)
+                    diag('Calling play() with playbackRate=2.0...');
                     videoEl.playbackRate = 2.0;
                     videoEl.play().then(() => {
+                        diag('play() RESOLVED. paused=' + videoEl.paused + ' playbackRate=' + videoEl.playbackRate);
                         // Check if playbackRate was actually applied
                         setTimeout(() => {
+                            diag('playbackRate check: ' + videoEl.playbackRate + ' paused=' + videoEl.paused + ' currentTime=' + videoEl.currentTime.toFixed(2));
                             if (videoEl.playbackRate < 1.5) {
-                                // iOS capped it, just play at 1x
+                                diag('iOS capped playbackRate. Falling back to 1x');
                                 videoEl.playbackRate = 1.0;
                             }
-                        }, 200);
-                    }).catch(() => {
+                        }, 500);
+                    }).catch((err) => {
+                        diag('play() REJECTED at 2x: ' + (err ? err.name + ': ' + err.message : 'unknown'));
                         // Try at 1x speed
                         videoEl.playbackRate = 1.0;
-                        videoEl.play().catch(() => {
+                        diag('Retrying play() at 1x...');
+                        videoEl.play().then(() => {
+                            diag('play() at 1x RESOLVED. paused=' + videoEl.paused);
+                        }).catch((err2) => {
+                            diag('play() at 1x ALSO REJECTED: ' + (err2 ? err2.name + ': ' + err2.message : 'unknown'));
                             finished = true;
                             clearTimeout(safetyTimeout);
                             uploadIndicator.remove();
-                            alert('Could not play video on this device. Try MP4 format or a desktop browser.');
+                            alert('Could not play video. Check diagnostic log at bottom of screen.');
                             cleanupVideoEl();
                         });
                     });
@@ -2682,16 +2737,17 @@
                 // =============================================
                 // Choose extraction method based on platform
                 // =============================================
+                diag('=== METHOD SELECTION ===');
                 if (isIOS && hasRVFC) {
-                    // iOS with rVFC support (iOS 15.4+) — use play-through
+                    diag('SELECTED: Method A (rVFC play-through) for iOS');
                     extractFramesViaPlaythrough();
                 } else if (isIOS && !hasRVFC) {
-                    // Older iOS without rVFC — show helpful error
+                    diag('SELECTED: NONE — older iOS without rVFC');
                     uploadIndicator.remove();
                     alert('Video upload requires iOS 15.4 or later. Please update your device or try from a desktop browser.');
                     cleanupVideoEl();
                 } else {
-                    // Android/Desktop — use reliable seek-based method
+                    diag('SELECTED: Method B (seek-based) for Android/Desktop');
                     extractFramesViaSeek();
                 }
             };
