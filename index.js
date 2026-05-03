@@ -193,7 +193,7 @@ const ARENA_MODELS = {
         multimodal: true
     },
     'ranger': {
-        id: 'google/gemma-4-26b-it',
+        id: 'google/gemma-4-26b-a4b-it',
         name: 'OffGrid AI',
         shortName: 'OffGrid AI',
         emoji: '\ud83c\udfd5\ufe0f',
@@ -2262,7 +2262,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('║  Free Tier Model:                                         ║');
     console.log('║    • Gemma 4 26B A4B (gemma-4-26b) + System Prompt        ║');
     console.log('║  Arena:                                                    ║');
-    console.log('║    • OffGrid AI   (gemma-4-26b)  Arena                   ║');
+    console.log('║    • OffGrid AI   (gemma-4-26b-a4b-it) Arena             ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log('║  Command Center Models:                                   ║');
     console.log('║    🔭 Scout    (GPT 5.2)          - Vision Specialist      ║');
