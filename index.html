@@ -2436,6 +2436,34 @@
             const objectUrl = URL.createObjectURL(file);
             let extractionStarted = false;
             let cleanedUp = false;
+            const videoDebugEnabled = new URLSearchParams(window.location.search).get('videoDebug') === '1'
+                || sessionStorage.getItem('offgrid-video-debug') === '1';
+            let videoDebugLog = null;
+
+            function debugVideo(stage, details) {
+                if (!videoDebugEnabled) return;
+                if (!videoDebugLog) {
+                    videoDebugLog = document.createElement('div');
+                    videoDebugLog.style.cssText = 'position:fixed;left:8px;right:8px;bottom:8px;max-height:35vh;overflow:auto;background:rgba(0,0,0,0.88);color:#9efc9e;font:11px/1.35 monospace;padding:10px;border-radius:8px;z-index:99999;text-align:left;white-space:pre-wrap;';
+                    document.body.appendChild(videoDebugLog);
+                }
+
+                const safeDetails = details || {};
+                const line = {
+                    t: new Date().toISOString().split('T')[1].replace('Z', ''),
+                    stage: stage,
+                    ...safeDetails
+                };
+                videoDebugLog.textContent += JSON.stringify(line) + '\n';
+                videoDebugLog.scrollTop = videoDebugLog.scrollHeight;
+            }
+
+            debugVideo('selected', {
+                type: file.type || inferVideoType(file.name),
+                sizeMB: Math.round((file.size / (1024 * 1024)) * 10) / 10,
+                isIOS: isIOS,
+                hasRVFC: hasRVFC
+            });
 
             const uploadIndicator = document.createElement('div');
             uploadIndicator.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(44,24,16,0.92);color:white;padding:20px 30px;border-radius:14px;z-index:2000;text-align:center;border:1px solid rgba(184,134,11,0.5);box-shadow:0 8px 30px rgba(0,0,0,0.3);';
@@ -2462,22 +2490,32 @@
 
             const loadTimeout = setTimeout(() => {
                 if (!extractionStarted) {
+                    debugVideo('load_timeout', {
+                        readyState: videoEl.readyState,
+                        networkState: videoEl.networkState
+                    });
                     failVideoSetup('The video could not be opened on this device. Please try a shorter MP4 or record a new clip.');
                 }
             }, 12000);
 
-            videoEl.addEventListener('loadedmetadata', startExtractionOnce);
-            videoEl.addEventListener('loadeddata', startExtractionOnce);
-            videoEl.addEventListener('canplay', startExtractionOnce);
+            videoEl.addEventListener('loadedmetadata', () => startExtractionOnce('loadedmetadata'));
+            videoEl.addEventListener('loadeddata', () => startExtractionOnce('loadeddata'));
+            videoEl.addEventListener('canplay', () => startExtractionOnce('canplay'));
             videoEl.addEventListener('error', () => {
+                debugVideo('video_error', {
+                    code: videoEl.error ? videoEl.error.code : null,
+                    readyState: videoEl.readyState,
+                    networkState: videoEl.networkState
+                });
                 failVideoSetup('This video format could not be opened here. Please try MP4 or record a new clip.');
             });
             sourceEl.addEventListener('error', () => {
+                debugVideo('source_error', { type: sourceEl.type });
                 failVideoSetup('This video format could not be opened here. Please try MP4 or record a new clip.');
             });
 
             videoEl.load();
-            if (videoEl.readyState >= 1) setTimeout(startExtractionOnce, 0);
+            if (videoEl.readyState >= 1) setTimeout(() => startExtractionOnce('readyState'), 0);
 
             function inferVideoType(name) {
                 if (/\.mov$/i.test(name)) return 'video/quicktime';
@@ -2489,6 +2527,7 @@
             function cleanupVideoEl() {
                 if (cleanedUp) return;
                 cleanedUp = true;
+                debugVideo('cleanup');
                 clearTimeout(loadTimeout);
                 videoEl.pause();
                 videoEl.removeAttribute('src');
@@ -2500,17 +2539,25 @@
 
             function failVideoSetup(message) {
                 if (cleanedUp) return;
+                debugVideo('fail', { message: message });
                 uploadIndicator.remove();
                 cleanupVideoEl();
                 alert(message);
             }
 
-            function startExtractionOnce() {
+            function startExtractionOnce(triggerEvent) {
                 if (extractionStarted) return;
                 if (!Number.isFinite(videoEl.duration) || videoEl.duration <= 0) return;
 
                 extractionStarted = true;
                 clearTimeout(loadTimeout);
+                debugVideo('metadata_ready', {
+                    trigger: triggerEvent,
+                    duration: Math.round(videoEl.duration * 100) / 100,
+                    width: videoEl.videoWidth,
+                    height: videoEl.videoHeight,
+                    readyState: videoEl.readyState
+                });
 
                 if (videoEl.duration > 20) {
                     uploadIndicator.remove();
@@ -2521,8 +2568,9 @@
 
                 const duration = videoEl.duration;
                 const frames = [];
+                const lastFrameTime = Math.max(0, duration - 0.05);
                 const frameTimes = Array.from({ length: targetFrames }, (_, index) => {
-                    return Math.min(duration - 0.05, Math.max(0, ((index + 0.5) / targetFrames) * duration));
+                    return Math.min(lastFrameTime, Math.max(0, ((index + 0.5) / targetFrames) * duration));
                 });
                 const canvas = document.createElement('canvas');
                 canvas.width = 512;
@@ -2584,6 +2632,7 @@
                         mimeType: file.type || inferVideoType(file.name)
                     };
 
+                    debugVideo('complete', { frames: frames.length, path: isIOS ? 'playthrough' : 'seek' });
                     uploadIndicator.remove();
                     removeImage();
                     showVideoPreview();
@@ -2596,6 +2645,7 @@
                     let finished = false;
                     let sawRVFC = false;
                     const tolerance = Math.max(0.05, duration / targetFrames / 2);
+                    debugVideo('capture_start', { path: 'playthrough', frameTargets: frameTimes.length });
 
                     uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">Video</div>Processing video...<br><small>Capturing frames for AI analysis</small><br><div style="margin-top:10px;background:rgba(255,255,255,0.1);border-radius:8px;height:6px;overflow:hidden"><div id="videoProgressBar" style="background:#d4a017;height:100%;width:0%;transition:width 0.2s"></div></div></div>';
 
@@ -2652,6 +2702,7 @@
                     const playPromise = videoEl.play();
                     if (playPromise && typeof playPromise.catch === 'function') {
                         playPromise.catch(() => {
+                            debugVideo('play_rejected_fallback_seek');
                             clearTimeout(safetyTimeout);
                             extractFramesViaSeek();
                         });
@@ -2660,6 +2711,7 @@
 
                 function extractFramesViaSeek() {
                     let currentFrame = 0;
+                    debugVideo('capture_start', { path: 'seek', frameTargets: frameTimes.length });
                     uploadIndicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">Video</div>Extracting frames...<br><small>Preparing video for AI analysis</small><br><div style="margin-top:10px;background:rgba(255,255,255,0.1);border-radius:8px;height:6px;overflow:hidden"><div id="videoProgressBar" style="background:#d4a017;height:100%;width:0%;transition:width 0.2s"></div></div></div>';
 
                     function extractNextFrame() {
@@ -2736,7 +2788,7 @@
                     const sizeMB = (selectedVideo.size / (1024 * 1024)).toFixed(1);
                     const frameInfo = selectedVideo.frameCount ? ' (' + selectedVideo.frameCount + ' frames)' : '';
                     const duration = Math.round(selectedVideo.duration);
-                    metaEl.textContent = duration + 's • ' + sizeMB + 'MB';
+                    metaEl.textContent = duration + 's • ' + sizeMB + 'MB' + frameInfo;
                 }
                 preview.classList.add('active');
             }

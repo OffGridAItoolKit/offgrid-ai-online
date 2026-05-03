@@ -371,8 +371,19 @@ app.use((req, res, next) => {
  */
 function buildOpenRouterMessages(messages, multimodal = true) {
     return messages.map(msg => {
-        if (msg.videoFrames && multimodal) {
-            // Video frames - extracted client-side at 1fps, sent as sequential images
+        if (Array.isArray(msg.videoFrames) && msg.videoFrames.length > 0 && multimodal) {
+            const validFrames = msg.videoFrames.filter(frame => {
+                return typeof frame === 'string'
+                    && (frame.startsWith('data:image/') || /^[A-Za-z0-9+/=]+$/.test(frame));
+            });
+            if (validFrames.length === 0) {
+                return {
+                    role: msg.role,
+                    content: msg.content || 'I tried to send video frames, but they could not be processed.'
+                };
+            }
+
+            // Video frames are extracted client-side and sent as sequential images.
             const userText = msg.content && msg.content.trim()
                 ? msg.content
                 : 'Analyze what you see across these images.';
@@ -383,7 +394,7 @@ function buildOpenRouterMessages(messages, multimodal = true) {
                 { type: 'text', text: `${frameInstruction}\n\nUser request: ${userText}` }
             ];
             // Add frames as image_url (limit to 8 evenly-spaced frames for good coverage)
-            const allFrames = msg.videoFrames;
+            const allFrames = validFrames;
             const maxFrames = 8;
             let framesToSend;
             if (allFrames.length <= maxFrames) {
