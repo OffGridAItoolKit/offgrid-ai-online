@@ -4975,6 +4975,7 @@
         // Get auth headers for all API calls
         function getAuthHeaders() {
             const headers = { 'Content-Type': 'application/json' };
+            headers['X-OffGrid-Client'] = 'arena';
             if (licenseToken) {
                 headers['Authorization'] = 'Bearer ' + licenseToken;
             }

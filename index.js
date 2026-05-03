@@ -202,6 +202,11 @@ const ARENA_MODELS = {
     }
 };
 
+function isArenaModeRequest(req) {
+    return req.licenseData?.isArena === true ||
+        req.headers['x-offgrid-client'] === 'arena';
+}
+
 // OffGrid AI proprietary system instructions (injected ONLY for ranger/OffGrid AI in arena)
 const OFFGRID_AI_SYSTEM_PROMPT = `You are OffGrid AI, a seasoned field expert and practical problem solver for real-world, off-grid, and high-stakes environments.
 
@@ -975,7 +980,7 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
             return res.status(500).json({ error: 'Server configuration error' });
         }
         
-        const isArenaRequest = req.licenseData?.isArena || false;
+        const isArenaRequest = isArenaModeRequest(req);
         const activeModels = isArenaRequest ? ARENA_MODELS : COMMAND_MODELS;
         const modelConfig = activeModels[model];
         if (!modelConfig) {
@@ -1057,8 +1062,8 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         }
         
         // Determine which model set to use: Arena or Command Center
-        // Arena requests are identified by the isArena flag in the JWT token
-        const isArenaRequest = req.licenseData?.isArena || false;
+        // Arena requests are identified by the JWT flag or the arena page marker.
+        const isArenaRequest = isArenaModeRequest(req);
         const activeModels = isArenaRequest ? ARENA_MODELS : COMMAND_MODELS;
         
         // Set up SSE
