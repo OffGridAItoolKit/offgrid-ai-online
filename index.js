@@ -202,9 +202,54 @@ const ARENA_MODELS = {
     }
 };
 
-function isArenaModeRequest(req) {
-    return req.licenseData?.isArena === true ||
-        req.headers['x-offgrid-client'] === 'arena';
+const OPEN_ARENA_MODELS = {
+    'scout': {
+        id: 'google/gemma-4-26b-a4b-it',
+        name: 'Gemma 4 26B',
+        shortName: 'Gemma 4',
+        emoji: '\ud83d\udc8e',
+        description: 'Base Gemma 4 26B',
+        multimodal: true
+    },
+    'medic': {
+        id: 'qwen/qwen3.6-35b-a3b',
+        name: 'Qwen3.6 35B',
+        shortName: 'Qwen',
+        emoji: '\ud83d\udd37',
+        description: 'Open-weight reasoning model',
+        multimodal: true
+    },
+    'navigator': {
+        id: 'mistralai/mistral-small-2603',
+        name: 'Mistral Small 4',
+        shortName: 'Mistral',
+        emoji: '\ud83c\udf2c\ufe0f',
+        description: 'Open-weight general model',
+        multimodal: true
+    },
+    'ranger': {
+        id: 'google/gemma-4-26b-a4b-it',
+        name: 'OffGrid AI',
+        shortName: 'OffGrid AI',
+        emoji: '\ud83c\udfd5\ufe0f',
+        description: 'Field-conditioned Gemma 4',
+        multimodal: true
+    }
+};
+
+function getCommandModelSet(req) {
+    const client = req.headers['x-offgrid-client'];
+    if (client === 'open-arena') {
+        return { isArenaRequest: true, arenaType: 'Open Arena', activeModels: OPEN_ARENA_MODELS };
+    }
+    if (req.licenseData?.isArena === true || client === 'arena') {
+        return { isArenaRequest: true, arenaType: 'Arena', activeModels: ARENA_MODELS };
+    }
+    return { isArenaRequest: false, arenaType: 'Council', activeModels: COMMAND_MODELS };
+}
+
+function isArenaModelSet(activeModels) {
+    return activeModels === ARENA_MODELS || activeModels === OPEN_ARENA_MODELS;
 }
 
 // OffGrid AI proprietary system instructions (injected ONLY for ranger/OffGrid AI in arena)
@@ -580,7 +625,7 @@ function buildReviewerMessages(userQuery, answersByLabel, labelOrder, activeMode
     }
 
     // Use Actionability criteria for Arena, Insight for Command Center
-    const isArenaReview = activeModels === ARENA_MODELS;
+    const isArenaReview = isArenaModelSet(activeModels);
     const secondCriterion = isArenaReview ? 'Actionability' : 'Insight';
     const secondDefinition = isArenaReview
         ? 'Actionability: clear prioritized steps the user can immediately follow, decisive recommendations rather than open-ended lists, practical with commonly available or improvised resources, and appropriate urgency for the scenario. Penalize excessive hedging, filler, or corporate disclaimers that delay useful guidance.'
@@ -687,7 +732,7 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
             const parsed = safeParseJSON(reviewText);
 
             // Dynamic second criterion: actionability for Arena, insight for Command Center
-            const isArenaReview = activeModels === ARENA_MODELS;
+            const isArenaReview = isArenaModelSet(activeModels);
             const secondKey = isArenaReview ? 'actionability_ranking' : 'insight_ranking';
             const secondRanking = parsed[secondKey] || parsed.insight_ranking || parsed.actionability_ranking;
 
@@ -967,6 +1012,16 @@ app.get('/api/arena/models', (req, res) => {
     });
 });
 
+app.get('/api/arena-open/models', (req, res) => {
+    res.json({
+        models: Object.entries(OPEN_ARENA_MODELS).map(([key, model]) => ({
+            key,
+            ...model
+        })),
+        defaultModel: 'command'
+    });
+});
+
 /**
  * POST /api/command/stream
  * Streaming endpoint for single Command Center models
@@ -980,8 +1035,7 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
             return res.status(500).json({ error: 'Server configuration error' });
         }
         
-        const isArenaRequest = isArenaModeRequest(req);
-        const activeModels = isArenaRequest ? ARENA_MODELS : COMMAND_MODELS;
+        const { isArenaRequest, activeModels } = getCommandModelSet(req);
         const modelConfig = activeModels[model];
         if (!modelConfig) {
             return res.status(400).json({ error: 'Invalid model selected' });
@@ -1061,10 +1115,8 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             return res.status(400).json({ error: 'Messages are required' });
         }
         
-        // Determine which model set to use: Arena or Command Center
-        // Arena requests are identified by the JWT flag or the arena page marker.
-        const isArenaRequest = isArenaModeRequest(req);
-        const activeModels = isArenaRequest ? ARENA_MODELS : COMMAND_MODELS;
+        // Determine which model set to use: Arena, Open Arena, or Command Center.
+        const { isArenaRequest, arenaType, activeModels } = getCommandModelSet(req);
         
         // Set up SSE
         res.setHeader('Content-Type', 'text/event-stream');
@@ -1075,7 +1127,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         const lastUserMessage = messages.filter(m => m.role === 'user').pop();
         const userQuery = lastUserMessage?.content || '';
         
-        console.log(`[${isArenaRequest ? 'Arena' : 'Council'}] Starting parallel calls for: "${userQuery.substring(0, 80)}..."`);
+        console.log(`[${arenaType}] Starting parallel calls for: "${userQuery.substring(0, 80)}..."`);
         
         // Step 1: Make parallel calls to all 4 models
         const modelKeys = ['scout', 'medic', 'navigator', 'ranger'];
@@ -2159,6 +2211,10 @@ app.get('/admin', (req, res) => {
 
 app.get('/arena', (req, res) => {
     res.sendFile(path.join(__dirname, 'arena.html'));
+});
+
+app.get('/arena-open', (req, res) => {
+    res.sendFile(path.join(__dirname, 'arena-open.html'));
 });
 
 // =============================================================================
