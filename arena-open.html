@@ -4533,6 +4533,7 @@
             </div>
             <h1 class="title">OffGrid <span class="desktop-only">Open Arena</span><span class="mobile-only">Arena</span></h1>
             <span class="online-badge" style="background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(251,146,60,0.25)); border: 1px solid rgba(251,146,60,0.4); color: #FB923C;">OPEN</span>
+            <span id="judgeModeBadge" class="online-badge desktop-only" style="display: none; background: rgba(59,130,246,0.14); border: 1px solid rgba(59,130,246,0.35); color: #93c5fd;">Judge: Borda Peer Review</span>
         </div>
         <div class="header-center-mobile" style="display: none;"><span class="online-badge" style="margin-left: 0; background: linear-gradient(135deg, rgba(201,168,76,0.25), rgba(251,146,60,0.25)); border: 1px solid rgba(251,146,60,0.4); color: #FB923C;">OPEN</span></div>
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -5263,6 +5264,26 @@
         let voiceRecognition = null;
         let lastCouncilDeliberation = null; // Stores full deliberation data for "See Deliberation"
         let lastCouncilLabelMap = null; // Maps labels (A,B,C,D) to model info
+        let judgeMode = localStorage.getItem('offgrid-open-judge-mode') || 'borda';
+
+        function getJudgeModeLabel() {
+            return judgeMode === 'gpt-5.2' ? 'GPT-5.2 Judge' : 'Borda Peer Review';
+        }
+
+        function updateJudgeModeBadge() {
+            const badge = document.getElementById('judgeModeBadge');
+            if (!badge) return;
+            badge.textContent = `Judge: ${getJudgeModeLabel()}`;
+            badge.style.display = judgeMode === 'gpt-5.2' ? 'inline-flex' : 'none';
+            badge.classList.toggle('active', judgeMode === 'gpt-5.2');
+        }
+
+        function toggleJudgeMode() {
+            judgeMode = judgeMode === 'gpt-5.2' ? 'borda' : 'gpt-5.2';
+            localStorage.setItem('offgrid-open-judge-mode', judgeMode);
+            updateJudgeModeBadge();
+            showSaveToast(`Judge mode: ${getJudgeModeLabel()}`);
+        }
 
         // Build scores HTML table
         function buildScoresHtml(scores, chairmanLabel) {
@@ -5793,7 +5814,7 @@
                 const response = await fetch(`${API_BASE}/api/command/council`, {
                     method: 'POST',
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ messages: messages })
+                    body: JSON.stringify({ messages: messages, judgeMode: judgeMode === 'gpt-5.2' ? 'gpt-5.2' : undefined })
                 });
 
                 if (!response.ok) {
@@ -5864,7 +5885,8 @@
                                                 scores: parsed.scores,
                                                 rawReviews: parsed.rawReviews,
                                                 chairmanLabel: parsed.chairmanLabel,
-                                                chairmanKey: parsed.chairmanKey
+                                                chairmanKey: parsed.chairmanKey,
+                                                judgeMode: parsed.judgeMode || 'borda'
                                             };
                                         }
                                         if (parsed.labelMap) {
@@ -5911,12 +5933,13 @@
                                     chairmanEmoji = parsed.councilMeta.chairmanEmoji;
                                     // Also store deliberation data from councilMeta
                                     if (parsed.councilMeta.rawReviews && !lastCouncilDeliberation) {
-                                        lastCouncilDeliberation = {
-                                            scores: parsed.councilMeta.scores,
-                                            rawReviews: parsed.councilMeta.rawReviews,
-                                            chairmanLabel: null,
-                                            chairmanKey: parsed.councilMeta.chairmanKey
-                                        };
+                                            lastCouncilDeliberation = {
+                                                scores: parsed.councilMeta.scores,
+                                                rawReviews: parsed.councilMeta.rawReviews,
+                                                chairmanLabel: null,
+                                                chairmanKey: parsed.councilMeta.chairmanKey,
+                                                judgeMode: parsed.councilMeta.judgeMode || 'borda'
+                                            };
                                     }
                                     if (parsed.councilMeta.labelMap && !lastCouncilLabelMap) {
                                         lastCouncilLabelMap = parsed.councilMeta.labelMap;
@@ -5973,7 +5996,8 @@
                                         scores: parsed.councilMeta.scores,
                                         rawReviews: parsed.councilMeta.rawReviews,
                                         chairmanLabel: null,
-                                        chairmanKey: parsed.councilMeta.chairmanKey
+                                        chairmanKey: parsed.councilMeta.chairmanKey,
+                                        judgeMode: parsed.councilMeta.judgeMode || 'borda'
                                     };
                                 }
                                 if (parsed.councilMeta.labelMap && !lastCouncilLabelMap) {
@@ -5989,7 +6013,8 @@
                                         scores: parsed.scores,
                                         rawReviews: parsed.rawReviews,
                                         chairmanLabel: parsed.chairmanLabel,
-                                        chairmanKey: parsed.chairmanKey
+                                        chairmanKey: parsed.chairmanKey,
+                                        judgeMode: parsed.judgeMode || 'borda'
                                     };
                                 }
                                 if (parsed.labelMap && !lastCouncilLabelMap) {
@@ -6090,6 +6115,7 @@
                     chairmanName: chairmanName,
                     scores: councilScores,
                     responseTime: parseFloat(responseTime),
+                    judgeMode: lastCouncilDeliberation?.judgeMode || judgeMode,
                     timestamp: new Date()
                 });
 
@@ -7329,6 +7355,8 @@
 
         function showDeliberationModal(delib, labelMap, scores) {
             if (!delib || !delib.rawReviews) return;
+            const isGptJudge = delib.judgeMode === 'gpt-5.2';
+            const judgeLabel = isGptJudge ? 'GPT-5.2 single judge' : 'Borda peer review';
 
             const overlay = document.createElement('div');
             overlay.className = 'deliberation-overlay';
@@ -7362,7 +7390,7 @@
             };
 
             for (const review of delib.rawReviews) {
-                const reviewerDisplay = REVIEWER_NAMES[review.reviewer] || review.modelName || review.reviewer;
+                const reviewerDisplay = review.reviewer === 'gpt-judge' ? '🔭 GPT-5.2 Judge' : (REVIEWER_NAMES[review.reviewer] || review.modelName || review.reviewer);
 
                 // Map label rankings to model names
                 const mapRanking = (ranking) => {
@@ -7430,7 +7458,7 @@
                     <div class="delib-summary">
                         <strong>\ud83c\udfc6 Chairman Elected:</strong> ${chairmanDisplay}<br>
                         ${chairmanScoreDetail ? `<span style="font-size: 12px; color: #6b7280;">${chairmanScoreDetail}</span><br>` : ''}
-                        <span style="font-size: 12px; color: #6b7280;">Formula: Score = 2\u00d7Accuracy + 1\u00d7Actionability | Highest score wins. All 4 models voted anonymously.</span>
+                        <span style="font-size: 12px; color: #6b7280;">Formula: Score = 2\u00d7Accuracy + 1\u00d7Actionability | Judge: ${judgeLabel}.</span>
                         ${confBarHtml}
                     </div>
 
@@ -7811,6 +7839,7 @@
                 timestamp: data.timestamp || new Date(),
                 category: category,
                 chairman: data.chairmanKey,
+                judgeMode: data.judgeMode || 'borda',
                 scores: {},
                 responseTime: data.responseTime || 0,
                 query: (data.userMessage || '').substring(0, 60)
@@ -10475,6 +10504,16 @@
             }
 
             initDeepMode();
+            updateJudgeModeBadge();
+
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && !e.shiftKey && !e.altKey && e.key.toLowerCase() === 'j') {
+                    const tag = (e.target?.tagName || '').toLowerCase();
+                    if (tag === 'input' || tag === 'textarea') return;
+                    e.preventDefault();
+                    toggleJudgeMode();
+                }
+            });
 
             // Arena: Auto-open Deep Mode on first visit (desktop only)
             if (!localStorage.getItem('offgrid-open-arena-deep-shown')) {

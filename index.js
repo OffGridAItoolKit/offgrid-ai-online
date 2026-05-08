@@ -680,6 +680,97 @@ Now provide your rankings and explanations as described.`;
     ];
 }
 
+function buildScoresFromRankings(labels, accuracyRanking, secondRanking) {
+    const N = labels.length;
+    const accPoints = {};
+    const insightPoints = {};
+    labels.forEach(label => {
+        accPoints[label] = 0;
+        insightPoints[label] = 0;
+    });
+    accuracyRanking.forEach((label, idx) => {
+        if (labels.includes(label)) accPoints[label] += (N - 1 - idx);
+    });
+    secondRanking.forEach((label, idx) => {
+        if (labels.includes(label)) insightPoints[label] += (N - 1 - idx);
+    });
+    const scores = {};
+    labels.forEach(label => {
+        const a = accPoints[label];
+        const i = insightPoints[label];
+        scores[label] = { accPoints: a, insightPoints: i, councilScore: (2 * a) + i };
+    });
+    return scores;
+}
+
+function selectChairmanLabel(labels, labeledResults, scores) {
+    const eligibleLabels = labeledResults
+        .filter(r => !r.response.startsWith('[Error:'))
+        .map(r => r.label);
+    let chairmanLabel = eligibleLabels[0] || labels[0];
+    for (const label of eligibleLabels) {
+        const current = scores[label];
+        const best = scores[chairmanLabel];
+        if (!best) {
+            chairmanLabel = label;
+            continue;
+        }
+        if (current.councilScore > best.councilScore) {
+            chairmanLabel = label;
+        } else if (current.councilScore === best.councilScore) {
+            if (current.accPoints > best.accPoints) {
+                chairmanLabel = label;
+            } else if (current.accPoints === best.accPoints) {
+                if (current.insightPoints > best.insightPoints) {
+                    chairmanLabel = label;
+                } else if (current.insightPoints === best.insightPoints && label < chairmanLabel) {
+                    chairmanLabel = label;
+                }
+            }
+        }
+    }
+    return chairmanLabel;
+}
+
+async function runSingleJudgeReview(userQuery, labeledResults, activeModels = COMMAND_MODELS) {
+    const labels = labeledResults.map(r => r.label);
+    const answersByLabel = {};
+    for (const r of labeledResults) {
+        answersByLabel[r.label] = r.response || '';
+    }
+
+    const reviewMessages = buildReviewerMessages(userQuery, answersByLabel, shuffleArray(labels), activeModels);
+    const reviewText = await withTimeout(
+        callOpenRouter(COMMAND_MODELS.scout.id, reviewMessages, 1024, 0.2),
+        45000,
+        'GPT-5.2 judge review'
+    );
+    const parsed = safeParseJSON(reviewText);
+    const secondRanking = parsed?.actionability_ranking || parsed?.insight_ranking;
+    if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(secondRanking)) {
+        throw new Error('GPT-5.2 judge returned invalid review JSON');
+    }
+
+    const scores = buildScoresFromRankings(labels, parsed.accuracy_ranking, secondRanking);
+    const chairmanLabel = selectChairmanLabel(labels, labeledResults, scores);
+    const chairmanResult = labeledResults.find(r => r.label === chairmanLabel);
+
+    return {
+        chairmanLabel,
+        chairmanResult,
+        scores,
+        rawReviews: [{
+            reviewer: 'gpt-judge',
+            modelName: 'GPT-5.2 Judge',
+            accuracy_ranking: parsed.accuracy_ranking,
+            insight_ranking: secondRanking,
+            top_accuracy_explanation: parsed.top_accuracy_explanation,
+            top_insight_explanation: parsed.top_actionability_explanation || parsed.top_insight_explanation
+        }],
+        judgeMode: 'gpt-5.2'
+    };
+}
+
 /**
  * Run Stage 2 peer review and compute Chairman using Borda-style scoring.
  * 
@@ -780,48 +871,15 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
 
     // Combine accuracy + insight into CouncilScore
     const scores = {};
-    const wAcc = 2; // Accuracy weight
-    const wIns = 1; // Insight weight
-
     labels.forEach(label => {
         const a = accPoints[label];
         const i = insightPoints[label];
-        const councilScore = wAcc * a + wIns * i;
-        scores[label] = { accPoints: a, insightPoints: i, councilScore };
+        scores[label] = { accPoints: a, insightPoints: i, councilScore: (2 * a) + i };
     });
 
     // Select Chairman by highest CouncilScore, with tie-breakers
     // Skip errored models — they can't be chairman
-    const eligibleLabels = labeledResults
-        .filter(r => !r.response.startsWith('[Error:'))
-        .map(r => r.label);
-    let chairmanLabel = eligibleLabels[0] || labels[0];
-    for (const label of eligibleLabels) {
-        const current = scores[label];
-        const best = scores[chairmanLabel];
-        if (!best) {
-            chairmanLabel = label;
-            continue;
-        }
-        if (current.councilScore > best.councilScore) {
-            chairmanLabel = label;
-        } else if (current.councilScore === best.councilScore) {
-            // Tie-breaker 1: higher accuracy points
-            if (current.accPoints > best.accPoints) {
-                chairmanLabel = label;
-            } else if (current.accPoints === best.accPoints) {
-                // Tie-breaker 2: higher insight points
-                if (current.insightPoints > best.insightPoints) {
-                    chairmanLabel = label;
-                } else if (current.insightPoints === best.insightPoints) {
-                    // Tie-breaker 3: alphabetical label (deterministic)
-                    if (label < chairmanLabel) {
-                        chairmanLabel = label;
-                    }
-                }
-            }
-        }
-    }
+    const chairmanLabel = selectChairmanLabel(labels, labeledResults, scores);
 
     const chairmanResult = labeledResults.find(r => r.label === chairmanLabel);
 
@@ -1105,7 +1163,7 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
 app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, res) => {
     const councilStartTime = Date.now();
     try {
-        const { messages } = req.body;
+        const { messages, judgeMode } = req.body;
         
         if (!OPENROUTER_API_KEY) {
             return res.status(500).json({ error: 'Server configuration error' });
@@ -1200,13 +1258,18 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         }));
 
         // Step 2: Run competitive peer review to select Chairman
+        const useGptJudge = arenaType === 'Open Arena' && judgeMode === 'gpt-5.2';
         const reviewCriteria = isArenaRequest ? 'accuracy + actionability' : 'accuracy + insight';
+        const reviewLabel = useGptJudge ? `GPT-5.2 single judge (${reviewCriteria})` : `anonymous peer review (${reviewCriteria})`;
         res.write(`data: ${JSON.stringify({ 
             progress: 'review', 
-            message: `🤝 Running anonymous peer review (${reviewCriteria})...` 
+            message: `🤝 Running ${reviewLabel}...`,
+            judgeMode: useGptJudge ? 'gpt-5.2' : 'borda'
         })}\n\n`);
 
-        const reviewOutcome = await runCouncilReview(userQuery, labeledResults, activeModels);
+        const reviewOutcome = useGptJudge
+            ? await runSingleJudgeReview(userQuery, labeledResults, activeModels)
+            : await runCouncilReview(userQuery, labeledResults, activeModels);
         const { chairmanLabel, chairmanResult, scores } = reviewOutcome;
 
         // Build a scores summary for the frontend
@@ -1231,6 +1294,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             chairmanLabel: chairmanLabel,
             scores: scoresSummary,
             rawReviews: reviewOutcome.rawReviews,
+            judgeMode: useGptJudge ? 'gpt-5.2' : 'borda',
             labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, fullName: r.name, emoji: r.emoji }; return acc; }, {})
         })}\n\n`);
 
@@ -1308,6 +1372,7 @@ Based on these, write the final Command answer as described.
                 chairmanEmoji: chairmanResult.emoji,
                 scores: scoresSummary,
                 rawReviews: reviewOutcome.rawReviews,
+                judgeMode: useGptJudge ? 'gpt-5.2' : 'borda',
                 labelMap: labeledResults.reduce((acc, r) => { acc[r.label] = { key: r.key, name: r.shortName, fullName: r.name, emoji: r.emoji }; return acc; }, {})
             }
         })}\n\n`);
