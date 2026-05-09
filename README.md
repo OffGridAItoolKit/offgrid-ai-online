@@ -1,6 +1,6 @@
 # OffGrid AI ToolKit Online - Technical Overview
 
-**Version 5.2.0** | **Last Updated:** 2026-02-20
+**Version 5.6.3** | **Last Updated:** 2026-04-30
 
 This document provides a comprehensive technical overview of the OffGrid AI ToolKit Online platform, including the free Online ToolKit and the premium Command Center. It is intended for developers, administrators, and technical staff.
 
@@ -77,11 +77,15 @@ The backend exposes a set of API endpoints for the frontend to consume. All endp
 
 ## 4. Environment Variables
 
-The application is configured using environment variables. A `.env.example` file is provided as a template.
+The application is configured using environment variables. A `.env.example` file is provided as a template. Never commit real `.env` files, API keys, database URLs, admin secrets, JWT secrets, or other credentials.
 
 | Variable | Required | Description |
 |---|---|---|
 | `OPENROUTER_API_KEY` | Yes | Your API key for OpenRouter. |
+| `DATABASE_URL` | Yes | PostgreSQL connection string used by the license key and usage limit system. |
+| `JWT_SECRET` | Yes | Stable secret used to sign license/session JWTs. Changing this invalidates existing customer sessions. |
+| `ADMIN_SECRET` | Yes | Production admin secret checked by admin API routes via the `x-admin-key` request header. This is the required production environment variable. |
+| `ADMIN_SECRET_BACKUP` | No | Optional secondary admin secret for temporary rotation or backup access. |
 | `BETTERSTACK_SOURCE_TOKEN` | No | Your source token for Better Stack logging. |
 | `PORT` | No | The port for the server to run on (default: 3000). |
 | `NODE_ENV` | No | The environment mode (e.g., `production`). |
@@ -89,9 +93,13 @@ The application is configured using environment variables. A `.env.example` file
 | `RATE_LIMIT_WINDOW_MS` | No | The window for rate limiting in milliseconds (default: 60000). |
 | `RATE_LIMIT_MAX_REQUESTS` | No | The maximum number of requests per window (default: 30). |
 
+`ADMIN_KEY` is not a production environment variable. It is only the browser-side variable name used by the admin dashboard when sending the `x-admin-key` header; configure `ADMIN_SECRET` on the server instead.
+
 ## 5. Deployment
 
-The application is deployed on Render, a cloud platform that supports Node.js applications. The deployment is configured to be continuous, meaning that any push to the `main` branch of the GitHub repository will automatically trigger a new deployment.
+The application is deployed on Render, a cloud platform that supports Node.js applications. The deployment is configured to be continuous, meaning that any push to the `main` branch of the GitHub repository will automatically trigger a new Render deployment.
+
+Render handles Brotli/gzip compression at the platform layer. Do not add Express compression middleware unless the deployment architecture changes and compression behavior is re-evaluated.
 
 ## 6. Monitoring & Troubleshooting
 
