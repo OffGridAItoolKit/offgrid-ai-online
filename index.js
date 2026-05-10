@@ -220,20 +220,22 @@ const OPEN_ARENA_MODELS = {
         multimodal: true
     },
     'navigator': {
-        id: 'google/gemma-3-27b-it',
-        name: 'Gemma 3 27B',
-        shortName: 'Gemma 3 27B',
+        id: 'google/gemma-3n-e4b-it',
+        name: 'OffGrid AI Optimized',
+        shortName: 'OffGrid Optimized',
         emoji: '\ud83c\udf2c\ufe0f',
-        description: 'Previous-generation Gemma baseline',
-        multimodal: true
+        description: 'E4B-class Gemma with OffGrid behavior layer',
+        multimodal: true,
+        offgridPrompt: true
     },
     'ranger': {
         id: 'google/gemma-4-26b-a4b-it',
-        name: 'OffGrid AI',
-        shortName: 'OffGrid AI',
+        name: 'OffGrid AI Advanced',
+        shortName: 'OffGrid Advanced',
         emoji: '\ud83c\udfd5\ufe0f',
-        description: 'Field-conditioned Gemma 4',
-        multimodal: true
+        description: '26B Gemma with OffGrid behavior layer',
+        multimodal: true,
+        offgridPrompt: true
     }
 };
 
@@ -624,15 +626,39 @@ function buildReviewerMessages(userQuery, answersByLabel, labelOrder, activeMode
         answersBlock += `Answer ${label}:\n${answersByLabel[label]}\n\n`;
     }
 
-    // Use Actionability criteria for Arena, Insight for Command Center
     const isArenaReview = isArenaModelSet(activeModels);
-    const secondCriterion = isArenaReview ? 'Actionability' : 'Insight';
-    const secondDefinition = isArenaReview
-        ? 'Actionability: clear prioritized steps the user can immediately follow, decisive recommendations rather than open-ended lists, practical with commonly available or improvised resources, and appropriate urgency for the scenario. Penalize excessive hedging, filler, or corporate disclaimers that delay useful guidance.'
-        : 'Insight: depth of reasoning, helpful structure, non-obvious but valid ideas, and practical usefulness to the user.';
     const evalContext = isArenaReview
         ? 'You are evaluating for a human user who needs practical, field-ready answers they can act on immediately.'
         : 'You are evaluating for a human user who cares about both correctness and creativity.';
+    const criteriaInstructions = isArenaReview
+        ? `1. Rank the answers by Accuracy & Safety (most accurate and safest to least).
+2. Rank the answers by Prioritization & Decision Quality (best sequence, urgency, and decision guidance to weakest).
+3. Rank the answers by Actionability & Field Usefulness (most practical and immediately usable to least).
+4. Give a brief explanation for your top choice in each category.`
+        : `1. Rank the answers by Accuracy (most accurate to least accurate).
+2. Rank the answers by Insight (most insightful to least).
+3. Give a brief explanation for your top choice in each category.`;
+    const definitions = isArenaReview
+        ? `- Accuracy & Safety: factual correctness, lack of hallucinations, correct terminology, appropriate caveats, and no dangerous omissions or unsafe advice.
+- Prioritization & Decision Quality: puts life-safety and urgency in the right order, leads with what matters first, recommends the best option when choices exist, and sequences steps correctly.
+- Actionability & Field Usefulness: clear steps the user can immediately follow, practical with commonly available or improvised resources, concise enough to use under stress, and free of filler or excessive hand-holding.`
+        : `- Accuracy: factual correctness, lack of hallucinations, correct use of terminology, and appropriate caveats where the answer is uncertain.
+- Insight: depth of reasoning, helpful structure, non-obvious but valid ideas, and practical usefulness to the user.`;
+    const jsonShape = isArenaReview
+        ? `{
+  "accuracy_ranking": ["A", "B", "C", "D"],
+  "prioritization_ranking": ["B", "A", "C", "D"],
+  "actionability_ranking": ["C", "B", "A", "D"],
+  "top_accuracy_explanation": "Short explanation of why the top-ranked answer is most accurate and safe.",
+  "top_prioritization_explanation": "Short explanation of why the top-ranked answer has the best priorities and decision quality.",
+  "top_actionability_explanation": "Short explanation of why the top-ranked answer is most actionable and field-useful."
+}`
+        : `{
+  "accuracy_ranking": ["A", "B", "C", "D"],
+  "insight_ranking": ["C", "B", "A", "D"],
+  "top_accuracy_explanation": "Short explanation of why the top-ranked answer is most accurate.",
+  "top_insight_explanation": "Short explanation of why the top-ranked answer is most insightful."
+}`;
 
     const systemPrompt = `
 You are part of an anonymous review panel evaluating multiple answers to the same user question.
@@ -644,24 +670,16 @@ Important rules:
 - ${evalContext}
 
 You must:
-1. Rank the answers by Accuracy (most accurate to least accurate).
-2. Rank the answers by ${secondCriterion} (most ${secondCriterion.toLowerCase()} to least).
-3. Give a brief explanation for your top choice in each category.
+${criteriaInstructions}
 
 Definitions:
-- Accuracy: factual correctness, lack of hallucinations, correct use of terminology, and appropriate caveats where the answer is uncertain.
-- ${secondDefinition}
+${definitions}
 
 Do NOT write a new answer to the question. You are only judging the answers provided.
 
 Respond ONLY with a valid JSON object in this exact structure:
 
-{
-  "accuracy_ranking": ["A", "B", "C", "D"],
-  "${secondCriterion.toLowerCase()}_ranking": ["C", "B", "A", "D"],
-  "top_accuracy_explanation": "Short explanation of why the top-ranked answer is most accurate.",
-  "top_${secondCriterion.toLowerCase()}_explanation": "Short explanation of why the top-ranked answer is most ${secondCriterion.toLowerCase()}."
-}
+${jsonShape}
 `;
 
     const userContent = `Original user question:
@@ -680,13 +698,15 @@ Now provide your rankings and explanations as described.`;
     ];
 }
 
-function buildScoresFromRankings(labels, accuracyRanking, secondRanking) {
+function buildScoresFromRankings(labels, accuracyRanking, secondRanking, prioritizationRanking = null) {
     const N = labels.length;
     const accPoints = {};
     const insightPoints = {};
+    const prioritizationPoints = {};
     labels.forEach(label => {
         accPoints[label] = 0;
         insightPoints[label] = 0;
+        prioritizationPoints[label] = 0;
     });
     accuracyRanking.forEach((label, idx) => {
         if (labels.includes(label)) accPoints[label] += (N - 1 - idx);
@@ -694,11 +714,20 @@ function buildScoresFromRankings(labels, accuracyRanking, secondRanking) {
     secondRanking.forEach((label, idx) => {
         if (labels.includes(label)) insightPoints[label] += (N - 1 - idx);
     });
+    if (Array.isArray(prioritizationRanking)) {
+        prioritizationRanking.forEach((label, idx) => {
+            if (labels.includes(label)) prioritizationPoints[label] += (N - 1 - idx);
+        });
+    }
     const scores = {};
     labels.forEach(label => {
         const a = accPoints[label];
         const i = insightPoints[label];
-        scores[label] = { accPoints: a, insightPoints: i, councilScore: (2 * a) + i };
+        const p = prioritizationPoints[label];
+        const councilScore = Array.isArray(prioritizationRanking)
+            ? (2 * a) + (2 * p) + i
+            : (2 * a) + i;
+        scores[label] = { accPoints: a, prioritizationPoints: p, insightPoints: i, councilScore };
     });
     return scores;
 }
@@ -721,10 +750,14 @@ function selectChairmanLabel(labels, labeledResults, scores) {
             if (current.accPoints > best.accPoints) {
                 chairmanLabel = label;
             } else if (current.accPoints === best.accPoints) {
-                if (current.insightPoints > best.insightPoints) {
+                if ((current.prioritizationPoints || 0) > (best.prioritizationPoints || 0)) {
                     chairmanLabel = label;
-                } else if (current.insightPoints === best.insightPoints && label < chairmanLabel) {
-                    chairmanLabel = label;
+                } else if ((current.prioritizationPoints || 0) === (best.prioritizationPoints || 0)) {
+                    if (current.insightPoints > best.insightPoints) {
+                        chairmanLabel = label;
+                    } else if (current.insightPoints === best.insightPoints && label < chairmanLabel) {
+                        chairmanLabel = label;
+                    }
                 }
             }
         }
@@ -746,12 +779,14 @@ async function runSingleJudgeReview(userQuery, labeledResults, activeModels = CO
         'GPT-5.2 judge review'
     );
     const parsed = safeParseJSON(reviewText);
+    const isArenaReview = isArenaModelSet(activeModels);
     const secondRanking = parsed?.actionability_ranking || parsed?.insight_ranking;
-    if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(secondRanking)) {
+    const prioritizationRanking = isArenaReview ? parsed?.prioritization_ranking : null;
+    if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(secondRanking) || (isArenaReview && !Array.isArray(prioritizationRanking))) {
         throw new Error('GPT-5.2 judge returned invalid review JSON');
     }
 
-    const scores = buildScoresFromRankings(labels, parsed.accuracy_ranking, secondRanking);
+    const scores = buildScoresFromRankings(labels, parsed.accuracy_ranking, secondRanking, prioritizationRanking);
     const chairmanLabel = selectChairmanLabel(labels, labeledResults, scores);
     const chairmanResult = labeledResults.find(r => r.label === chairmanLabel);
 
@@ -763,8 +798,10 @@ async function runSingleJudgeReview(userQuery, labeledResults, activeModels = CO
             reviewer: 'gpt-judge',
             modelName: 'GPT-5.2 Judge',
             accuracy_ranking: parsed.accuracy_ranking,
+            prioritization_ranking: prioritizationRanking,
             insight_ranking: secondRanking,
             top_accuracy_explanation: parsed.top_accuracy_explanation,
+            top_prioritization_explanation: parsed.top_prioritization_explanation,
             top_insight_explanation: parsed.top_actionability_explanation || parsed.top_insight_explanation
         }],
         judgeMode: 'gpt-5.2'
@@ -797,11 +834,14 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
     const N = labels.length;
     const accPoints = {};
     const insightPoints = {};
+    const prioritizationPoints = {};
     const rawReviews = [];
+    const isArenaReview = isArenaModelSet(activeModels);
 
     labels.forEach(label => {
         accPoints[label] = 0;
         insightPoints[label] = 0;
+        prioritizationPoints[label] = 0;
     });
 
     // Stage 2: each model acts as a reviewer, anonymously
@@ -822,12 +862,11 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
             );
             const parsed = safeParseJSON(reviewText);
 
-            // Dynamic second criterion: actionability for Arena, insight for Command Center
-            const isArenaReview = isArenaModelSet(activeModels);
             const secondKey = isArenaReview ? 'actionability_ranking' : 'insight_ranking';
             const secondRanking = parsed[secondKey] || parsed.insight_ranking || parsed.actionability_ranking;
+            const prioritizationRanking = isArenaReview ? parsed.prioritization_ranking : null;
 
-            if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(secondRanking)) {
+            if (!parsed || !Array.isArray(parsed.accuracy_ranking) || !Array.isArray(secondRanking) || (isArenaReview && !Array.isArray(prioritizationRanking))) {
                 console.warn(`[Council Review] ${reviewModel.shortName} returned invalid review JSON.`);
                 return { reviewer: reviewKey, success: false, raw: reviewText };
             }
@@ -835,6 +874,7 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
             // Borda scoring: best gets N-1 points, worst gets 0
             const ar = parsed.accuracy_ranking;
             const ir = secondRanking;
+            const pr = prioritizationRanking;
 
             // Accuracy points
             ar.forEach((label, idx) => {
@@ -843,7 +883,15 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
                 }
             });
 
-            // Insight points
+            if (Array.isArray(pr)) {
+                pr.forEach((label, idx) => {
+                    if (labels.includes(label)) {
+                        prioritizationPoints[label] += (N - 1 - idx);
+                    }
+                });
+            }
+
+            // Actionability/Insight points
             ir.forEach((label, idx) => {
                 if (labels.includes(label)) {
                     insightPoints[label] += (N - 1 - idx);
@@ -855,8 +903,10 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
                 reviewer: reviewKey,
                 modelName: reviewModel.name,
                 accuracy_ranking: ar,
+                prioritization_ranking: pr,
                 insight_ranking: ir,
                 top_accuracy_explanation: parsed.top_accuracy_explanation,
+                top_prioritization_explanation: parsed.top_prioritization_explanation,
                 top_insight_explanation: parsed[secondExplKey] || parsed.top_insight_explanation || parsed.top_actionability_explanation
             });
 
@@ -869,12 +919,14 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
 
     await Promise.all(reviewPromises);
 
-    // Combine accuracy + insight into CouncilScore
+    // Combine review rankings into CouncilScore.
     const scores = {};
     labels.forEach(label => {
         const a = accPoints[label];
+        const p = prioritizationPoints[label];
         const i = insightPoints[label];
-        scores[label] = { accPoints: a, insightPoints: i, councilScore: (2 * a) + i };
+        const councilScore = isArenaReview ? (2 * a) + (2 * p) + i : (2 * a) + i;
+        scores[label] = { accPoints: a, prioritizationPoints: p, insightPoints: i, councilScore };
     });
 
     // Select Chairman by highest CouncilScore, with tie-breakers
@@ -1101,8 +1153,8 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
         
         let openRouterMessages = buildOpenRouterMessages(messages, modelConfig.multimodal);
         
-        // Inject OffGrid AI system instructions for ranger in Arena mode only
-        if (isArenaRequest && model === 'ranger') {
+        // Inject OffGrid AI system instructions for branded OffGrid AI models in Arena mode only
+        if (isArenaRequest && modelConfig.offgridPrompt) {
             openRouterMessages = [
                 { role: 'system', content: OFFGRID_AI_SYSTEM_PROMPT },
                 ...openRouterMessages
@@ -1155,7 +1207,7 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
  * Flow:
  * 1. Send user query to Scout, Medic, Navigator, Ranger in parallel
  * 2. Collect all 4 responses
- * 3. Run anonymous peer review (each model ranks all answers for accuracy & insight)
+ * 3. Run anonymous peer review (Arena: accuracy, prioritization, actionability; Council: accuracy & insight)
  * 4. Compute Chairman using Borda-style scoring
  * 5. Use Scout (GPT-5.2) as Command editor to synthesize final answer
  * 6. Stream the synthesized response to the client
@@ -1199,8 +1251,8 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
             try {
                 let modelMessages = buildOpenRouterMessages(messages, model.multimodal);
                 
-                // Inject OffGrid AI system instructions for ranger in Arena mode only
-                if (isArenaRequest && key === 'ranger') {
+                // Inject OffGrid AI system instructions for branded OffGrid AI models in Arena mode only
+                if (isArenaRequest && model.offgridPrompt) {
                     modelMessages = [
                         { role: 'system', content: OFFGRID_AI_SYSTEM_PROMPT },
                         ...modelMessages
@@ -1259,7 +1311,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
 
         // Step 2: Run competitive peer review to select Chairman
         const useGptJudge = arenaType === 'Open Arena' && judgeMode === 'gpt-5.2';
-        const reviewCriteria = isArenaRequest ? 'accuracy + actionability' : 'accuracy + insight';
+        const reviewCriteria = isArenaRequest ? 'accuracy + prioritization + actionability' : 'accuracy + insight';
         const reviewLabel = useGptJudge ? `GPT-5.2 single judge (${reviewCriteria})` : `anonymous peer review (${reviewCriteria})`;
         res.write(`data: ${JSON.stringify({ 
             progress: 'review', 
@@ -1282,6 +1334,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
                 emoji: r.emoji,
                 key: r.key,
                 accPoints: s.accPoints,
+                prioritizationPoints: s.prioritizationPoints || 0,
                 insightPoints: s.insightPoints,
                 councilScore: s.councilScore
             };
@@ -1333,7 +1386,7 @@ You are the Command Center editor-in-chief.
 
 You are given:
 - The user's original question.
-- One "Chairman" answer that was ranked highest by a peer-review process for accuracy and insight.
+- One "Chairman" answer that was ranked highest by a peer-review process for accuracy, prioritization, and practical usefulness.
 - Several "advisor" answers from other models that may contain useful details, edge cases, or alternative perspectives.
 
 Your job:
