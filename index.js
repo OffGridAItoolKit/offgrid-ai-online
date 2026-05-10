@@ -206,25 +206,25 @@ const OPEN_ARENA_MODELS = {
     'scout': {
         id: 'google/gemma-4-26b-a4b-it',
         name: 'Gemma 4 26B',
-        shortName: 'Gemma 4',
-        emoji: '\ud83d\udc8e',
-        description: 'Base Gemma 4 26B',
+        shortName: 'Gemma 4 26B',
+        emoji: '\ud83d\udd2d',
+        description: 'Baseline Gemma 4 26B',
         multimodal: true
     },
     'medic': {
-        id: 'qwen/qwen3.6-35b-a3b',
-        name: 'Qwen3.6 35B',
-        shortName: 'Qwen',
-        emoji: '\ud83d\udd37',
-        description: 'Open-weight reasoning model',
+        id: 'google/gemma-4-31b-it',
+        name: 'Gemma 4 31B',
+        shortName: 'Gemma 4 31B',
+        emoji: '\ud83d\udc8e',
+        description: 'Larger baseline Gemma 4',
         multimodal: true
     },
     'navigator': {
-        id: 'mistralai/mistral-small-2603',
-        name: 'Mistral Small 4',
-        shortName: 'Mistral',
+        id: 'google/gemma-3-27b-it',
+        name: 'Gemma 3 27B',
+        shortName: 'Gemma 3 27B',
         emoji: '\ud83c\udf2c\ufe0f',
-        description: 'Open-weight general model',
+        description: 'Previous-generation Gemma baseline',
         multimodal: true
     },
     'ranger': {
