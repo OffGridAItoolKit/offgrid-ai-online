@@ -1310,7 +1310,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         }));
 
         // Step 2: Run competitive peer review to select Chairman
-        const useGptJudge = arenaType === 'Open Arena' && judgeMode === 'gpt-5.2';
+        const useGptJudge = isArenaRequest && judgeMode === 'gpt-5.2';
         const reviewCriteria = isArenaRequest ? 'accuracy + prioritization + actionability' : 'accuracy + insight';
         const reviewLabel = useGptJudge ? `GPT-5.2 single judge (${reviewCriteria})` : `anonymous peer review (${reviewCriteria})`;
         res.write(`data: ${JSON.stringify({ 
