@@ -198,7 +198,8 @@ const ARENA_MODELS = {
         shortName: 'OffGrid AI',
         emoji: '\ud83c\udfd5\ufe0f',
         description: 'Survival & Field-Tested Expert',
-        multimodal: true
+        multimodal: true,
+        offgridPrompt: true
     }
 };
 
