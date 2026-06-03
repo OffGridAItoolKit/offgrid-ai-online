@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OffGrid AI Image Studio</title>
+    <meta name="description" content="Create a practical companion visual from an OffGrid AI answer and save it with a Knowledge Base-ready Markdown file.">
+    <style>
+        :root {
+            --ink: #221713;
+            --muted: #786d62;
+            --paper: #fbfaf6;
+            --panel: #ffffff;
+            --line: #ded5c8;
+            --gold: #c69618;
+            --gold-dark: #9f7608;
+            --green: #2f7d46;
+            --blue: #315f72;
+            --danger: #b23b3b;
+            --shadow: 0 18px 60px rgba(44, 32, 18, 0.14);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--ink);
+            background:
+                linear-gradient(180deg, rgba(255,255,255,0.84), rgba(251,250,246,0.94)),
+                repeating-linear-gradient(45deg, rgba(198,150,24,0.05) 0, rgba(198,150,24,0.05) 12px, transparent 12px, transparent 24px);
+        }
+
+        button, textarea, input, select { font: inherit; }
+
+        .app-shell {
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .topbar {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 0 28px;
+            border-bottom: 1px solid rgba(92, 69, 38, 0.16);
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .brand-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #2b1a11, #6b3b19);
+            color: #f4b52f;
+            display: grid;
+            place-items: center;
+            font-weight: 900;
+            box-shadow: 0 10px 25px rgba(63, 39, 18, 0.28);
+        }
+
+        .brand-text {
+            display: grid;
+            gap: 2px;
+        }
+
+        .brand-title {
+            font-weight: 900;
+            letter-spacing: 0;
+            font-size: 17px;
+            line-height: 1.1;
+        }
+
+        .brand-subtitle {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(47, 125, 70, 0.24);
+            color: var(--green);
+            background: rgba(47, 125, 70, 0.08);
+            padding: 8px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        main {
+            width: min(1500px, calc(100vw - 40px));
+            margin: 30px auto 48px;
+            display: grid;
+            grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.94);
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+            border-radius: 8px;
+        }
+
+        .input-panel {
+            position: sticky;
+            top: 94px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 20px 20px 14px;
+            border-bottom: 1px solid rgba(123, 92, 49, 0.14);
+        }
+
+        h1, h2, h3, p { margin-top: 0; }
+
+        h1 {
+            font-size: 24px;
+            line-height: 1.12;
+            margin-bottom: 8px;
+            letter-spacing: 0;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            letter-spacing: 0;
+        }
+
+        .copy {
+            color: var(--muted);
+            line-height: 1.5;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+
+        .form-body {
+            padding: 18px 20px 20px;
+            display: grid;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 900;
+            color: #5c4634;
+            margin-bottom: 7px;
+        }
+
+        textarea, input, select {
+            width: 100%;
+            border: 1px solid #d6c8b7;
+            border-radius: 7px;
+            background: #fffdf8;
+            color: var(--ink);
+            outline: none;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(198, 150, 24, 0.18);
+        }
+
+        textarea {
+            min-height: 230px;
+            resize: vertical;
+            padding: 13px;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        input, select {
+            height: 42px;
+            padding: 0 11px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            min-height: 44px;
+            border: 1px solid transparent;
+            border-radius: 7px;
+            padding: 0 15px;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.58;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #d8a71e, #bb8608);
+            color: white;
+            box-shadow: 0 10px 26px rgba(198,150,24,0.28);
+        }
+
+        .btn-secondary {
+            background: #fffaf0;
+            color: #5d4427;
+            border-color: #d8c7aa;
+        }
+
+        .btn-dark {
+            background: #241610;
+            color: #f2ce71;
+            border-color: #241610;
+        }
+
+        .btn-wide { width: 100%; }
+
+        .note {
+            border: 1px solid rgba(49, 95, 114, 0.18);
+            background: rgba(49, 95, 114, 0.07);
+            color: #315f72;
+            padding: 12px;
+            border-radius: 7px;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .workspace {
+            display: grid;
+            gap: 18px;
+        }
+
+        .stage {
+            min-height: 420px;
+            padding: 24px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .progress {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .step {
+            border: 1px solid #e2d7c8;
+            border-radius: 7px;
+            padding: 12px;
+            background: #fffdf8;
+            min-height: 78px;
+        }
+
+        .step-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .step-text {
+            font-size: 13px;
+            line-height: 1.35;
+            color: #4d3a2c;
+        }
+
+        .step.active {
+            border-color: rgba(198,150,24,0.55);
+            background: rgba(198,150,24,0.08);
+        }
+
+        .step.done {
+            border-color: rgba(47,125,70,0.32);
+            background: rgba(47,125,70,0.07);
+        }
+
+        .empty-state {
+            min-height: 340px;
+            border: 1px dashed #d6c8b7;
+            border-radius: 8px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            padding: 34px;
+            color: var(--muted);
+            background: rgba(255, 253, 248, 0.72);
+        }
+
+        .empty-inner {
+            max-width: 560px;
+        }
+
+        .empty-inner h2 {
+            color: var(--ink);
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(320px, 46%);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .article-preview, .image-preview {
+            border: 1px solid #e3d8cb;
+            border-radius: 8px;
+            background: #fffdf9;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e3d8cb;
+            background: #faf4e8;
+        }
+
+        .preview-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #4d3825;
+        }
+
+        .article-body {
+            padding: 18px;
+            max-height: 640px;
+            overflow: auto;
+            font-size: 14px;
+            line-height: 1.62;
+        }
+
+        .article-body pre {
+            white-space: pre-wrap;
+            margin: 0;
+            font-family: inherit;
+        }
+
+        .image-wrap {
+            padding: 12px;
+        }
+
+        .image-wrap img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #e3d8cb;
+            background: #f7f1e6;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding-top: 4px;
+        }
+
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 20;
+            background: #211610;
+            color: #fff7df;
+            border: 1px solid rgba(246, 199, 89, 0.3);
+            padding: 13px 15px;
+            border-radius: 8px;
+            box-shadow: 0 16px 50px rgba(0,0,0,0.26);
+            font-size: 13px;
+            max-width: 360px;
+            display: none;
+        }
+
+        .toast.show { display: block; }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(198,150,24,0.22);
+            border-top-color: var(--gold);
+            border-radius: 999px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .generating {
+            min-height: 340px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            gap: 12px;
+            color: var(--muted);
+        }
+
+        .error-box {
+            border: 1px solid rgba(178,59,59,0.22);
+            color: var(--danger);
+            background: rgba(178,59,59,0.07);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .advanced {
+            border-top: 1px solid rgba(123, 92, 49, 0.14);
+            padding-top: 14px;
+        }
+
+        .advanced summary {
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 900;
+            color: #6b5338;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 980px) {
+            main {
+                width: min(100% - 24px, 760px);
+                grid-template-columns: 1fr;
+                margin-top: 18px;
+            }
+
+            .input-panel {
+                position: static;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .progress {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                height: auto;
+                padding: 14px 16px;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .button-row .btn {
+                flex: 1 1 100%;
+            }
+
+            .stage {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .brand-subtitle {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">OG</div>
+                <div class="brand-text">
+                    <div class="brand-title">OffGrid AI Image Studio</div>
+                    <div class="brand-subtitle">Create Knowledge Base-ready field visuals</div>
+                </div>
+            </div>
+            <div class="status-pill" id="connectionStatus">Internet required for image generation</div>
+        </header>
+
+        <main>
+            <section class="panel input-panel">
+                <div class="panel-header">
+                    <h1>Create Visual</h1>
+                    <p class="copy">Paste an OffGrid AI answer or open this page from the ToolKit. Image Studio will create the companion visual and prepare the Knowledge Base files.</p>
+                </div>
+
+                <div class="form-body">
+                    <div>
+                        <label for="answerInput">Answer or field guide text</label>
+                        <textarea id="answerInput" placeholder="Paste the answer you want to turn into a visual field reference..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <div>
+                            <label for="titleInput">Title</label>
+                            <input id="titleInput" placeholder="Auto-filled from answer">
+                        </div>
+                        <div>
+                            <label for="categoryInput">Knowledge Base category</label>
+                            <select id="categoryInput">
+                                <option>Other</option>
+                                <option>Medical & First Aid</option>
+                                <option>Navigation & Orientation</option>
+                                <option>Water & Food</option>
+                                <option>Shelter & Fire</option>
+                                <option>Emergency Plans</option>
+                                <option>Skills & Reference</option>
+                                <option>Gear & Checklists</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-wide" id="createBtn" onclick="createVisual()">Create Visual</button>
+
+                    <div class="button-row">
+                        <button class="btn btn-secondary" onclick="pasteFromClipboard()">Paste Answer</button>
+                        <button class="btn btn-secondary" onclick="loadSample()">Try Sample</button>
+                        <button class="btn btn-secondary" onclick="clearStudio()">Clear</button>
+                    </div>
+
+                    <details class="advanced">
+                        <summary>Model comparison</summary>
+                        <div style="margin-top: 12px;">
+                            <label for="modelInput">Image model</label>
+                            <select id="modelInput">
+                                <option value="google/gemini-3-pro-image-preview">Nano Banana Pro / Gemini 3 Pro</option>
+                                <option value="openai/gpt-5.4-image-2">GPT Image 2 / GPT-5.4 Image 2</option>
+                            </select>
+                        </div>
+                    </details>
+
+                    <div class="note">Phase 1 downloads two sibling files: a Markdown article and a normal image file. The Markdown links to the image by filename, matching the current Knowledge Base format.</div>
+                </div>
+            </section>
+
+            <section class="workspace">
+                <div class="panel stage">
+                    <div class="progress">
+                        <div class="step" id="stepPrompt">
+                            <div class="step-label">Step 1</div>
+                            <div class="step-text">Read the answer and craft the hidden visual prompt.</div>
+                        </div>
+                        <div class="step" id="stepImage">
+                            <div class="step-label">Step 2</div>
+                            <div class="step-text">Generate the infographic, diagram, or field guide image.</div>
+                        </div>
+                        <div class="step" id="stepFiles">
+                            <div class="step-label">Step 3</div>
+                            <div class="step-text">Prepare Knowledge Base-ready Markdown and image files.</div>
+                        </div>
+                    </div>
+
+                    <div id="stageContent" class="empty-state">
+                        <div class="empty-inner">
+                            <h2>Ready When You Are</h2>
+                            <p>Paste an answer from the ToolKit, then click Create Visual. The image prompt stays behind the curtain; the saved file only contains the clean answer and the generated image link.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        const TOKEN_KEY = 'offgrid-license-token';
+        let generatedImageDataUrl = null;
+        let generatedImageFilename = null;
+        let generatedMarkdown = null;
+        let lastVisualPrompt = null;
+
+        const sampleAnswer = `Here are 5 high-value essentials that cover the main survival priorities:
+
+1. Fire-starting kit
+Waterproof matches or a lighter plus a ferro rod, and tinder. Fire provides warmth, cooking, water purification, and morale.
+
+2. Water system
+A compact water filter or purification tablets and a container. Safe water is a top priority and a metal container lets you boil.
+
+3. Shelter and insulation
+A tarp or emergency bivy plus paracord. Keeping wind and rain off you prevents hypothermia.
+
+4. Cutting tool
+A sturdy fixed-blade knife or robust folding knife. Used for shelter building, fire prep, repairs, and food tasks.
+
+5. First-aid kit
+Include blister care, gauze, tape, antiseptic, pain relief, and personal medications.`;
+
+        function getAuthHeaders() {
+            const headers = { 'Content-Type': 'application/json' };
+            const token = localStorage.getItem(TOKEN_KEY);
+            if (token) headers.Authorization = 'Bearer ' + token;
+            return headers;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        function slugify(text) {
+            return (text || 'offgrid-ai-visual')
+                .toLowerCase()
+                .replace(/['"]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .substring(0, 72) || 'offgrid-ai-visual';
+        }
+
+        function inferTitle(answer) {
+            const heading = (answer.match(/^#\s+(.+)$/m) || [])[1];
+            if (heading) return heading.trim().substring(0, 90);
+            const firstLine = answer.split('\n').map(line => line.trim()).find(Boolean) || 'OffGrid AI Visual Guide';
+            return firstLine.replace(/^[-*\d.\s]+/, '').substring(0, 90);
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+        }
+
+        function setStep(stepId, state) {
+            const el = document.getElementById(stepId);
+            if (!el) return;
+            el.classList.remove('active', 'done');
+            if (state) el.classList.add(state);
+        }
+
+        function resetSteps() {
+            ['stepPrompt', 'stepImage', 'stepFiles'].forEach(id => setStep(id, null));
+        }
+
+        function setBusy(isBusy, label) {
+            const btn = document.getElementById('createBtn');
+            btn.disabled = isBusy;
+            btn.innerHTML = isBusy ? '<span class="spinner"></span>' + (label || 'Working...') : 'Create Visual';
+        }
+
+        function renderGenerating(message) {
+            document.getElementById('stageContent').className = 'generating';
+            document.getElementById('stageContent').innerHTML = `
+                <div>
+                    <div class="spinner" style="margin: 0 auto 12px;"></div>
+                    <h2>${escapeHtml(message)}</h2>
+                    <p class="copy">No conversation or image is stored on OffGrid AI servers.</p>
+                </div>
+            `;
+        }
+
+        function renderError(error) {
+            document.getElementById('stageContent').className = 'error-box';
+            document.getElementById('stageContent').innerHTML = `
+                <h2>Image Studio could not finish</h2>
+                <p>${escapeHtml(error.message || String(error))}</p>
+            `;
+        }
+
+        function dataUrlToBlob(dataUrl) {
+            const parts = dataUrl.split(',');
+            const mime = (parts[0].match(/:(.*?);/) || [])[1] || 'image/png';
+            const binary = atob(parts[1]);
+            const bytes = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            return new Blob([bytes], { type: mime });
+        }
+
+        function imageExtension(dataUrl) {
+            const mime = (dataUrl.match(/^data:image\/([^;]+)/) || [])[1] || 'png';
+            return mime === 'jpeg' ? 'jpeg' : mime.replace('svg+xml', 'svg');
+        }
+
+        function downloadBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
+
+        function buildMarkdown({ title, category, answer, imageFilename }) {
+            const now = new Date().toISOString();
+            const safeTitle = title.replace(/"/g, '\\"');
+            return `---\ntitle: "${safeTitle}"\ndate: ${now}\nsource: image-studio\nmodel: OffGrid AI Image Studio\ncategory: ${category}\nimages:\n  - ${imageFilename}\n---\n\n# ${title}\n\n${answer.trim()}\n\n---\n\n![Generated Image](./${imageFilename})\n\n*Generated using OffGrid AI Image Studio.*\n`;
+        }
+
+        function renderResult({ title, answer, imageSrc, imageFilename, markdownFilename }) {
+            document.getElementById('stageContent').className = '';
+            document.getElementById('stageContent').innerHTML = `
+                <div class="result-grid">
+                    <div class="article-preview">
+                        <div class="preview-header">
+                            <div class="preview-title">${escapeHtml(title)}</div>
+                        </div>
+                        <div class="article-body"><pre>${escapeHtml(answer)}</pre></div>
+                    </div>
+                    <div class="image-preview">
+                        <div class="preview-header">
+                            <div class="preview-title">${escapeHtml(imageFilename)}</div>
+                        </div>
+                        <div class="image-wrap">
+                            <img src="${imageSrc}" alt="Generated visual for ${escapeHtml(title)}">
+                        </div>
+                    </div>
+                </div>
+                <div class="result-actions">
+                    <button class="btn btn-primary" onclick="downloadKnowledgeBaseFiles()">Download KB Files</button>
+                    <button class="btn btn-secondary" onclick="downloadImageOnly()">Download Image</button>
+                    <button class="btn btn-secondary" onclick="downloadMarkdownOnly()">Download Markdown</button>
+                    <button class="btn btn-dark" onclick="createVisual()">Regenerate</button>
+                </div>
+                <div class="note">Prepared files: ${escapeHtml(markdownFilename)} and ${escapeHtml(imageFilename)}. Put both in the same Knowledge Base category folder.</div>
+            `;
+        }
+
+        async function createVisual() {
+            const answerInput = document.getElementById('answerInput');
+            const titleInput = document.getElementById('titleInput');
+            const categoryInput = document.getElementById('categoryInput');
+            const modelInput = document.getElementById('modelInput');
+            const answer = answerInput.value.trim();
+
+            if (!answer) {
+                answerInput.focus();
+                showToast('Paste an answer first.');
+                return;
+            }
+
+            const title = (titleInput.value.trim() || inferTitle(answer)).trim();
+            titleInput.value = title;
+            const category = categoryInput.value || 'Other';
+            const slug = slugify(title);
+
+            generatedImageDataUrl = null;
+            generatedImageFilename = null;
+            generatedMarkdown = null;
+            lastVisualPrompt = null;
+            resetSteps();
+
+            try {
+                setBusy(true, 'Crafting prompt...');
+                setStep('stepPrompt', 'active');
+                renderGenerating('Crafting the visual plan');
+
+                const promptResponse = await fetch(`${API_BASE}/api/image-studio/visual-prompt`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({ conversationContext: answer, category })
+                });
+                const promptData = await promptResponse.json();
+                if (!promptResponse.ok || !promptData.success || !promptData.prompt) {
+                    throw new Error(promptData.error || 'Visual prompt generation failed.');
+                }
+
+                lastVisualPrompt = promptData.prompt;
+                setStep('stepPrompt', 'done');
+                setStep('stepImage', 'active');
+                setBusy(true, 'Generating image...');
+                renderGenerating('Generating your field visual');
+
+                const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify({
+                        prompt: promptData.prompt,
+                        model: modelInput.value
+                    })
+                });
+                const imageData = await imageResponse.json();
+                if (!imageResponse.ok || !imageData.success || !imageData.image) {
+                    throw new Error(imageData.error || 'Image generation failed.');
+                }
+
+                generatedImageDataUrl = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                const ext = imageExtension(generatedImageDataUrl);
+                generatedImageFilename = `${slug}-img-1.${ext}`;
+                generatedMarkdown = buildMarkdown({
+                    title,
+                    category,
+                    answer,
+                    imageFilename: generatedImageFilename
+                });
+
+                setStep('stepImage', 'done');
+                setStep('stepFiles', 'done');
+
+                renderResult({
+                    title,
+                    answer,
+                    imageSrc: generatedImageDataUrl,
+                    imageFilename: generatedImageFilename,
+                    markdownFilename: `${slug}.md`
+                });
+                showToast('Visual created. KB files are ready.');
+            } catch (error) {
+                renderError(error);
+                showToast(error.message || 'Image Studio failed.');
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        function downloadKnowledgeBaseFiles() {
+            downloadImageOnly();
+            setTimeout(downloadMarkdownOnly, 300);
+            showToast('Downloaded image and Markdown. Keep both files together.');
+        }
+
+        function downloadImageOnly() {
+            if (!generatedImageDataUrl || !generatedImageFilename) return showToast('No image is ready yet.');
+            downloadBlob(dataUrlToBlob(generatedImageDataUrl), generatedImageFilename);
+        }
+
+        function downloadMarkdownOnly() {
+            if (!generatedMarkdown) return showToast('No Markdown is ready yet.');
+            const title = document.getElementById('titleInput').value.trim() || 'offgrid-ai-visual';
+            downloadBlob(new Blob([generatedMarkdown], { type: 'text/markdown;charset=utf-8' }), `${slugify(title)}.md`);
+        }
+
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (!text.trim()) return showToast('Clipboard is empty.');
+                document.getElementById('answerInput').value = text.trim();
+                const titleInput = document.getElementById('titleInput');
+                if (!titleInput.value.trim()) titleInput.value = inferTitle(text);
+                showToast('Answer pasted.');
+            } catch (error) {
+                showToast('Clipboard access was blocked. You can paste manually.');
+            }
+        }
+
+        function loadSample() {
+            document.getElementById('answerInput').value = sampleAnswer;
+            document.getElementById('titleInput').value = '5 Essential Survival Priorities and Gear';
+            document.getElementById('categoryInput').value = 'Gear & Checklists';
+        }
+
+        function clearStudio() {
+            document.getElementById('answerInput').value = '';
+            document.getElementById('titleInput').value = '';
+            generatedImageDataUrl = null;
+            generatedImageFilename = null;
+            generatedMarkdown = null;
+            lastVisualPrompt = null;
+            resetSteps();
+            document.getElementById('stageContent').className = 'empty-state';
+            document.getElementById('stageContent').innerHTML = `
+                <div class="empty-inner">
+                    <h2>Ready When You Are</h2>
+                    <p>Paste an answer from the ToolKit, then click Create Visual. The image prompt stays behind the curtain; the saved file only contains the clean answer and the generated image link.</p>
+                </div>
+            `;
+        }
+
+        function readPayloadFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const payload = params.get('payload');
+            const answer = params.get('answer') || params.get('text');
+            if (payload) {
+                try {
+                    const json = JSON.parse(decodeURIComponent(escape(atob(payload))));
+                    return json;
+                } catch (error) {
+                    console.warn('Could not parse Image Studio payload:', error);
+                }
+            }
+            if (answer) return { answer };
+            return null;
+        }
+
+        function readPayloadFromStorage() {
+            try {
+                const raw = sessionStorage.getItem('offgrid-image-studio-payload') || localStorage.getItem('offgrid-image-studio-payload');
+                if (!raw) return null;
+                sessionStorage.removeItem('offgrid-image-studio-payload');
+                return JSON.parse(raw);
+            } catch {
+                return null;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const payload = readPayloadFromUrl() || readPayloadFromStorage();
+            if (payload && payload.answer) {
+                document.getElementById('answerInput').value = payload.answer;
+                document.getElementById('titleInput').value = payload.title || inferTitle(payload.answer);
+                if (payload.category) document.getElementById('categoryInput').value = payload.category;
+                setTimeout(createVisual, 350);
+            }
+        });
+    </script>
+</body>
+</html>

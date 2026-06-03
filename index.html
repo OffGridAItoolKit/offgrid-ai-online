@@ -143,6 +143,11 @@
             border-color: rgba(184, 134, 11, 0.5);
             color: #daa520;
         }
+        .action-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
         .action-btn:active {
             transform: scale(0.97);
         }
@@ -168,6 +173,16 @@
             background: rgba(16, 185, 129, 0.15);
             border-color: rgba(16, 185, 129, 0.5);
             color: #059669;
+        }
+        .visual-btn {
+            color: #f0c040;
+            border-color: rgba(218, 165, 32, 0.34);
+            background: rgba(218, 165, 32, 0.09);
+        }
+        .visual-btn:hover {
+            background: rgba(218, 165, 32, 0.16);
+            border-color: rgba(218, 165, 32, 0.55);
+            color: #f5d76e;
         }
         .prompts-btn {
             color: #daa520;
@@ -1829,6 +1844,9 @@
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
                             Save
                         </button>
+                        <button class="action-btn visual-btn" id="createVisualBtn" onclick="handleCreateVisual()" disabled>
+                            Create Visual
+                        </button>
                         <button class="action-btn voice-btn" onclick="toggleVoiceInput()" title="Voice Input">
                             <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
                         </button>
@@ -2104,6 +2122,8 @@
                 // Enable Save to KB button
                 const saveBtn = document.getElementById('saveToKbBtn');
                 if (saveBtn) saveBtn.disabled = false;
+                const visualBtn = document.getElementById('createVisualBtn');
+                if (visualBtn) visualBtn.disabled = false;
                 
             } catch (error) {
                 console.error('Error:', error);
@@ -3100,6 +3120,39 @@
             setTimeout(() => {
                 if (toast.parentNode) toast.remove();
             }, 2000);
+        }
+
+        function getVisualTitleFromConversation(answerText) {
+            const firstUserMsg = conversationHistory.find(m => m.role === 'user' && m.content);
+            if (firstUserMsg && firstUserMsg.content) {
+                return firstUserMsg.content.substring(0, 90).replace(/\s+/g, ' ').trim();
+            }
+            const firstLine = (answerText || '').split('\n').map(line => line.trim()).find(Boolean);
+            return firstLine ? firstLine.substring(0, 90) : 'OffGrid AI Visual Guide';
+        }
+
+        function handleCreateVisual() {
+            const latestAssistant = [...conversationHistory].reverse().find(m => m.role === 'assistant' && m.content && m.content.trim());
+            if (!latestAssistant) {
+                showCopyToast('Ask a question first, then create a visual.');
+                return;
+            }
+
+            const payload = {
+                answer: latestAssistant.content,
+                title: getVisualTitleFromConversation(latestAssistant.content),
+                category: 'Other',
+                source: CONFIG.isCustomer ? 'online-toolkit' : 'demo-toolkit'
+            };
+
+            try {
+                sessionStorage.setItem('offgrid-image-studio-payload', JSON.stringify(payload));
+            } catch (error) {
+                localStorage.setItem('offgrid-image-studio-payload', JSON.stringify(payload));
+            }
+
+            showCopyToast('Opening Image Studio...');
+            window.location.href = '/image-studio';
         }
         
         // ============================================

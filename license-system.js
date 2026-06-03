@@ -151,14 +151,14 @@ async function initializeDatabase() {
 // =============================================================================
 
 const TIER_LIMITS = {
-    // Tier 1: OffGrid AI ToolKit ($129) - no Command Center access
+    // Tier 1: OffGrid AI ToolKit ($129) - Image Studio access, no Command Center access
     1: {
         name: 'OffGrid AI ToolKit',
         price: 129,
         hasCommandCenter: false,
-        hasImageStudio: false,
+        hasImageStudio: true,
         monthlyPrompts: 0,
-        monthlyImages: 0
+        monthlyImages: 10
     },
     // Tier 2: ToolKit + Command Center ($249)
     2: {

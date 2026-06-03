@@ -38,6 +38,10 @@ const PORT = process.env.PORT || 3000;
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const IMAGE_STUDIO_IMAGE_MODELS = {
+    gemini: 'google/gemini-3-pro-image-preview',
+    openai: 'openai/gpt-5.4-image-2'
+};
 
 // =============================================================================
 // BETTER STACK LOGGING (persistent, privacy-safe operational logs)
@@ -328,6 +332,7 @@ const commandLimiter = rateLimit({
 app.use('/api/chat', limiter);
 app.use('/api/stream', limiter);
 app.use('/api/command/', commandLimiter);
+app.use('/api/image-studio/', commandLimiter);
 
 // =============================================================================
 // SUBDOMAIN ROUTING: imagestudio.offgridtoolkit.ai
@@ -1560,10 +1565,10 @@ app.get('/api/health/image-gen', async (req, res) => {
     }
 });
 
-app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (req, res) => {
+app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], requireLicense, checkImageLimit, async (req, res) => {
     const genStartTime = Date.now();
     try {
-        const { prompt } = req.body;
+        const { prompt, model } = req.body;
         
         if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
             return res.status(400).json({ error: 'A text prompt is required' });
@@ -1573,7 +1578,13 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
             return res.status(500).json({ error: 'Server configuration error' });
         }
         
-        console.log(`[Nano Banana] Generating image for: "${prompt.substring(0, 80)}..."`);
+        const requestedModel = typeof model === 'string' ? model.trim() : '';
+        const imageModel = Object.values(IMAGE_STUDIO_IMAGE_MODELS).includes(requestedModel)
+            ? requestedModel
+            : IMAGE_STUDIO_IMAGE_MODELS.gemini;
+        const imageModelLabel = imageModel === IMAGE_STUDIO_IMAGE_MODELS.openai ? 'GPT Image 2' : 'Nano Banana';
+        
+        console.log(`[${imageModelLabel}] Generating image for: "${prompt.substring(0, 80)}..."`);
         
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',
@@ -1584,7 +1595,7 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
                 'X-Title': 'OffGrid AI Command Center - Image Studio'
             },
             body: JSON.stringify({
-                model: 'google/gemini-3-pro-image-preview',
+                model: imageModel,
                 messages: [
                     {
                         role: 'user',
@@ -1597,7 +1608,7 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error('[Nano Banana] API error:', errorData);
+            console.error(`[${imageModelLabel}] API error:`, errorData);
             throw new Error(errorData.error?.message || `Image generation failed (${response.status})`);
         }
         
@@ -1605,7 +1616,7 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
         
         // Check finish_reason for content policy / safety blocks
         const finishReason = data.choices?.[0]?.finish_reason || '';
-        console.log('[Nano Banana] finish_reason:', finishReason);
+        console.log(`[${imageModelLabel}] finish_reason:`, finishReason);
         
         // Extract image from response
         // OpenRouter returns images in message.images[] array as base64 data URLs
@@ -1645,9 +1656,9 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
         
         if (!imageBase64) {
             const failDuration = Date.now() - genStartTime;
-            console.warn('[Nano Banana] No image in response. finish_reason:', finishReason);
-            console.warn('[Nano Banana] Message keys:', JSON.stringify(Object.keys(message || {})));
-            console.warn('[Nano Banana] Text response:', (textResponse || '').substring(0, 200));
+            console.warn(`[${imageModelLabel}] No image in response. finish_reason:`, finishReason);
+            console.warn(`[${imageModelLabel}] Message keys:`, JSON.stringify(Object.keys(message || {})));
+            console.warn(`[${imageModelLabel}] Text response:`, (textResponse || '').substring(0, 200));
             
             // Determine specific error reason based on finish_reason
             let errorReason = 'unknown';
@@ -1683,7 +1694,7 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
         }
         
         const successDuration = Date.now() - genStartTime;
-        console.log(`[Nano Banana] Image generated successfully in ${successDuration}ms`);
+        console.log(`[${imageModelLabel}] Image generated successfully in ${successDuration}ms`);
         logImageGen({ status: 'success', durationMs: successDuration, finishReason, errorReason: null, httpStatus: response.status });
         
         // Increment image usage ONLY after successful generation
@@ -1697,12 +1708,13 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
             success: true,
             image: imageBase64,
             textResponse: textResponse,
-            prompt: prompt.trim()
+            prompt: prompt.trim(),
+            model: imageModel
         });
         
     } catch (error) {
         const errorDuration = Date.now() - genStartTime;
-        console.error('[Nano Banana] Error:', error);
+        console.error('[Image Studio] Error:', error);
         logImageGen({ status: 'error', durationMs: errorDuration, finishReason: null, errorReason: error.message, httpStatus: null });
         res.status(500).json({ 
             error: 'Image generation failed: ' + error.message 
@@ -1721,12 +1733,16 @@ app.post('/api/command/generate-image', requireLicense, checkImageLimit, async (
  * Includes audience-specific context for OffGrid AI ToolKit users.
  * No data is stored — processed in memory and discarded.
  */
-app.post('/api/command/craft-prompt', requireLicense, async (req, res) => {
+app.post(['/api/command/craft-prompt', '/api/image-studio/craft-prompt'], requireLicense, async (req, res) => {
     try {
         const { description, category } = req.body;
 
         if (!description || typeof description !== 'string' || description.trim().length === 0) {
             return res.status(400).json({ error: 'Please describe what image you need.' });
+        }
+
+        if (!OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'Server configuration error' });
         }
 
         console.log(`[Prompt Assistant] Crafting prompt for category: ${category || 'general'}`);
@@ -1846,12 +1862,16 @@ RULES:
  * Uses GPT-4.1 Mini for fast, cost-effective generation.
  * No data is stored — processed in memory and discarded.
  */
-app.post('/api/command/image-summary', requireLicense, async (req, res) => {
+app.post(['/api/command/image-summary', '/api/image-studio/image-summary'], requireLicense, async (req, res) => {
     try {
         const { prompt, category } = req.body;
 
         if (!prompt || typeof prompt !== 'string') {
             return res.status(400).json({ error: 'Image prompt is required' });
+        }
+
+        if (!OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'Server configuration error' });
         }
 
         const categoryContext = {
@@ -1953,12 +1973,16 @@ Rules:
  * Uses GPT-4.1 Mini for fast, cost-effective generation.
  * No data is stored — processed in memory and discarded.
  */
-app.post('/api/command/visual-prompt', requireLicense, async (req, res) => {
+app.post(['/api/command/visual-prompt', '/api/image-studio/visual-prompt'], requireLicense, async (req, res) => {
     try {
         const { conversationContext, category } = req.body;
 
         if (!conversationContext || typeof conversationContext !== 'string' || conversationContext.trim().length === 0) {
             return res.status(400).json({ error: 'Conversation context is required.' });
+        }
+
+        if (!OPENROUTER_API_KEY) {
+            return res.status(500).json({ error: 'Server configuration error' });
         }
 
         console.log(`[Visual Prompt] Generating image prompt from conversation (${conversationContext.length} chars)`);
@@ -2306,6 +2330,14 @@ function markdownToHtml(md) {
 }
 
 // (Subdomain routing moved above express.static — see line ~188)
+
+// =============================================================================
+// ROUTE: /image-studio - Working Image Studio app
+// =============================================================================
+
+app.get('/image-studio', (req, res) => {
+    res.sendFile(path.join(__dirname, 'image-studio-app.html'));
+});
 
 // =============================================================================
 // ROUTE: /command - Serve Command Center page
