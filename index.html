@@ -194,6 +194,120 @@
             border-color: rgba(218, 165, 32, 0.5);
             color: #f0c040;
         }
+
+        .online-studio-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            background: rgba(8, 12, 16, 0.74);
+            backdrop-filter: blur(5px);
+        }
+        .online-studio-modal {
+            width: min(720px, 100%);
+            max-height: calc(100vh - 48px);
+            overflow: auto;
+            background: #161d26;
+            border: 1px solid rgba(218, 165, 32, 0.38);
+            border-top: 4px solid #ff8f32;
+            border-radius: 10px;
+            box-shadow: 0 24px 90px rgba(0, 0, 0, 0.42);
+            color: #f8fafc;
+            padding: 24px;
+        }
+        .online-studio-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .online-studio-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+        .online-studio-subtitle {
+            color: #a9b3c2;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+        .online-studio-status {
+            color: #f0c040;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+        .online-studio-preview {
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: #0d141d;
+            border-radius: 8px;
+            min-height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        .online-studio-preview img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .online-studio-loading {
+            display: grid;
+            justify-items: center;
+            gap: 12px;
+            padding: 34px;
+            color: #cbd5e1;
+            text-align: center;
+        }
+        .online-studio-spinner {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            border: 3px solid rgba(218, 165, 32, 0.18);
+            border-top-color: #f0c040;
+            animation: voicePulse 1s ease-in-out infinite;
+        }
+        .online-studio-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+        .online-studio-btn {
+            border: 1px solid rgba(218, 165, 32, 0.35);
+            border-radius: 8px;
+            padding: 10px 16px;
+            background: rgba(218, 165, 32, 0.12);
+            color: #f0c040;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .online-studio-btn.primary {
+            background: linear-gradient(135deg, #ff9a3d, #d99116);
+            border-color: transparent;
+            color: #111827;
+        }
+        .online-studio-error {
+            color: #fecaca;
+            background: rgba(239, 68, 68, 0.14);
+            border: 1px solid rgba(239, 68, 68, 0.26);
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+        .online-studio-note {
+            color: #94a3b8;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 14px;
+        }
         
         /* Voice input button */
         .voice-btn {
@@ -1418,6 +1532,7 @@
         let selectedVideo = null;
         let conversationHistory = [];
         let voiceRecognition = null;
+        let onlineStudioState = null;
         const API_BASE = '';  // Same origin - Express proxy
         
         // Model display name (single model architecture)
@@ -3138,21 +3253,238 @@
                 return;
             }
 
-            const payload = {
+            openOnlineImageStudio({
                 answer: latestAssistant.content,
                 title: getVisualTitleFromConversation(latestAssistant.content),
                 category: 'Other',
                 source: CONFIG.isCustomer ? 'online-toolkit' : 'demo-toolkit'
-            };
+            }, { autoGenerate: true, addSourceToChat: false });
+        }
 
-            try {
-                sessionStorage.setItem('offgrid-image-studio-payload', JSON.stringify(payload));
-            } catch (error) {
-                localStorage.setItem('offgrid-image-studio-payload', JSON.stringify(payload));
+        function inferImageStudioTitle(answerText) {
+            const firstLine = (answerText || '').split('\n').map(line => line.trim()).find(Boolean);
+            return firstLine ? firstLine.substring(0, 90) : 'OffGrid AI Visual Guide';
+        }
+
+        function normalizeImageStudioPayload(payload) {
+            if (!payload || typeof payload !== 'object') return null;
+            const answer = String(payload.answer || payload.text || '').trim();
+            if (!answer) return null;
+            return {
+                answer,
+                title: String(payload.title || inferImageStudioTitle(answer)).trim(),
+                category: String(payload.category || 'Other').trim(),
+                source: String(payload.source || 'online')
+            };
+        }
+
+        function readOnlineImageStudioPayload() {
+            const params = new URLSearchParams(window.location.search);
+            const encodedPayload = params.get('payload');
+            const answerParam = params.get('answer') || params.get('text');
+
+            if (encodedPayload) {
+                try {
+                    const json = JSON.parse(decodeURIComponent(escape(atob(encodedPayload))));
+                    return normalizeImageStudioPayload(json);
+                } catch (error) {
+                    console.warn('Could not parse Image Studio payload:', error);
+                }
             }
 
-            showCopyToast('Opening Image Studio...');
-            window.location.href = '/image-studio';
+            if (answerParam) {
+                return normalizeImageStudioPayload({
+                    answer: answerParam,
+                    title: params.get('title'),
+                    category: params.get('category'),
+                    source: params.get('source')
+                });
+            }
+
+            try {
+                const raw = sessionStorage.getItem('offgrid-image-studio-payload') || localStorage.getItem('offgrid-image-studio-payload');
+                if (!raw) return null;
+                sessionStorage.removeItem('offgrid-image-studio-payload');
+                return normalizeImageStudioPayload(JSON.parse(raw));
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function openOnlineImageStudio(payload, options = {}) {
+            const normalized = normalizeImageStudioPayload(payload);
+            if (!normalized) {
+                showCopyToast('No answer was available for Image Studio.');
+                return;
+            }
+
+            onlineStudioState = {
+                ...normalized,
+                prompt: '',
+                image: '',
+                model: '',
+                addedToChat: false,
+                addSourceToChat: options.addSourceToChat !== false
+            };
+
+            const existing = document.getElementById('onlineImageStudioOverlay');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'online-studio-overlay';
+            overlay.id = 'onlineImageStudioOverlay';
+            overlay.innerHTML = `
+                <div class="online-studio-modal">
+                    <div class="online-studio-header">
+                        <div class="online-studio-title">Image Studio</div>
+                        <div class="online-studio-subtitle">by OffGrid AI</div>
+                    </div>
+                    <div class="online-studio-status" id="onlineStudioStatus">Preparing visual...</div>
+                    <div class="online-studio-preview" id="onlineStudioPreview">
+                        <div class="online-studio-loading">
+                            <div class="online-studio-spinner"></div>
+                            <div>Creating a field-ready visual from the answer...</div>
+                        </div>
+                    </div>
+                    <div id="onlineStudioError"></div>
+                    <div class="online-studio-actions">
+                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">Cancel</button>
+                        <button class="online-studio-btn primary" id="onlineStudioChatBtn" onclick="addOnlineStudioResultToChat()" disabled>Add to Chat</button>
+                    </div>
+                    <div class="online-studio-note">Images are generated on-demand and never stored on our servers.</div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+
+            if (options.autoGenerate !== false) {
+                generateOnlineStudioImage();
+            }
+        }
+
+        function closeOnlineImageStudio() {
+            const overlay = document.getElementById('onlineImageStudioOverlay');
+            if (overlay) overlay.remove();
+        }
+
+        async function generateOnlineStudioImage() {
+            if (!onlineStudioState) return;
+            const statusEl = document.getElementById('onlineStudioStatus');
+            const previewEl = document.getElementById('onlineStudioPreview');
+            const errorEl = document.getElementById('onlineStudioError');
+            const chatBtn = document.getElementById('onlineStudioChatBtn');
+
+            try {
+                if (chatBtn) chatBtn.disabled = true;
+                if (errorEl) errorEl.innerHTML = '';
+                if (statusEl) statusEl.textContent = 'Crafting visual prompt...';
+
+                const promptResponse = await fetch(`${API_BASE}/api/image-studio/visual-prompt`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        conversationContext: onlineStudioState.answer,
+                        category: onlineStudioState.category
+                    })
+                });
+                const promptData = await promptResponse.json();
+                if (!promptResponse.ok || !promptData.success || !promptData.prompt) {
+                    throw new Error(promptData.error || 'Could not create the visual prompt.');
+                }
+
+                onlineStudioState.prompt = promptData.prompt;
+                if (statusEl) statusEl.textContent = 'Generating image...';
+
+                const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        prompt: promptData.prompt,
+                        model: 'google/gemini-3-pro-image-preview'
+                    })
+                });
+                const imageData = await imageResponse.json();
+                if (!imageResponse.ok || !imageData.success || !imageData.image) {
+                    throw new Error(imageData.error || 'Image generation failed.');
+                }
+
+                onlineStudioState.image = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                onlineStudioState.model = imageData.model || 'google/gemini-3-pro-image-preview';
+
+                if (previewEl) {
+                    previewEl.innerHTML = `<img src="${onlineStudioState.image}" alt="Generated Image Studio visual">`;
+                }
+                if (statusEl) statusEl.textContent = 'Visual ready - added to chat.';
+                if (chatBtn) chatBtn.disabled = false;
+
+                addOnlineStudioResultToChat();
+            } catch (error) {
+                console.error('Online Image Studio error:', error);
+                if (statusEl) statusEl.textContent = 'Image Studio needs attention';
+                if (previewEl) {
+                    previewEl.innerHTML = `
+                        <div class="online-studio-loading">
+                            <div>Image generation did not complete.</div>
+                        </div>
+                    `;
+                }
+                if (errorEl) {
+                    errorEl.innerHTML = `<div class="online-studio-error">${escapeHtml(error.message)}</div>`;
+                }
+            }
+        }
+
+        function ensureChatViewForStudio() {
+            const welcome = document.getElementById('welcome');
+            if (welcome) {
+                transitionToChat();
+                welcome.remove();
+            } else {
+                transitionToChat();
+            }
+        }
+
+        function addOnlineStudioResultToChat() {
+            if (!onlineStudioState || !onlineStudioState.image || onlineStudioState.addedToChat) return;
+
+            ensureChatViewForStudio();
+
+            if (onlineStudioState.addSourceToChat) {
+                addMessage(onlineStudioState.title, 'user');
+                conversationHistory.push({
+                    role: 'user',
+                    content: onlineStudioState.title
+                });
+
+                addMessage(onlineStudioState.answer, 'assistant');
+                conversationHistory.push({
+                    role: 'assistant',
+                    content: onlineStudioState.answer
+                });
+            }
+
+            addMessageWithImage('Generated using Image Studio.', onlineStudioState.image, 'assistant');
+            conversationHistory.push({
+                role: 'assistant',
+                content: 'Generated using Image Studio.',
+                image: onlineStudioState.image,
+                imageLabel: 'Generated Image',
+                model: 'OffGrid AI Image Studio'
+            });
+
+            onlineStudioState.addedToChat = true;
+
+            const saveBtn = document.getElementById('saveToKbBtn');
+            if (saveBtn) saveBtn.disabled = false;
+            const visualBtn = document.getElementById('createVisualBtn');
+            if (visualBtn) visualBtn.disabled = false;
+
+            const modalChatBtn = document.getElementById('onlineStudioChatBtn');
+            if (modalChatBtn) {
+                modalChatBtn.textContent = 'Added to Chat';
+                modalChatBtn.disabled = true;
+            }
+
+            setTimeout(closeOnlineImageStudio, 900);
         }
         
         // ============================================
@@ -3391,26 +3723,27 @@
             content += `**Category:** ${category}\n\n`;
             content += '---\n\n';
             
-            // Track image replacement index
             let imageIndex = 0;
 
             conversationHistory.forEach((msg, index) => {
                 if (msg.role === 'user') {
-                    content += `## 🧑 User\n\n`;
-                    content += `${msg.content}\n\n`;
-                    if (msg.image) {
-                        // Replace base64 user image with relative file path
-                        if (imageFilenames && imageIndex < imageFilenames.length) {
-                            content += `![Uploaded Image](./${imageFilenames[imageIndex]})\n\n`;
-                            imageIndex++;
-                        } else {
-                            content += `![Uploaded Image](${msg.image})\n\n`;
-                        }
-                    }
+                    content += `## User\n\n`;
+                    if (msg.content) content += `${msg.content}\n\n`;
                 } else if (msg.role === 'assistant') {
-                    content += `## 🤖 OffGrid AI\n\n`;
-                    content += `${msg.content}\n\n`;
+                    content += `## OffGrid AI\n\n`;
+                    if (msg.content) content += `${msg.content}\n\n`;
                 }
+
+                if (msg.image) {
+                    const label = msg.imageLabel || (msg.role === 'assistant' ? 'Generated Image' : 'Uploaded Image');
+                    if (imageFilenames && imageIndex < imageFilenames.length) {
+                        content += `![${label}](./${imageFilenames[imageIndex]})\n\n`;
+                        imageIndex++;
+                    } else {
+                        content += `![${label}](${msg.image})\n\n`;
+                    }
+                }
+
                 if (index < conversationHistory.length - 1) {
                     content += '---\n\n';
                 }
@@ -3419,22 +3752,23 @@
             return frontmatter + content;
         }
 
-        // Extract base64 images from conversation history
+        // Extract chat images so Knowledge Base saves use sibling image files instead of base64 markdown.
         function extractBase64Images() {
             const images = [];
             conversationHistory.forEach(msg => {
-                if (msg.role === 'user' && msg.image) {
-                    const formatMatch = msg.image.match(/data:image\/([^;]+);/);
-                    images.push({
-                        dataUrl: msg.image,
-                        format: formatMatch ? formatMatch[1] : 'jpeg',
-                        source: 'user-upload'
-                    });
-                }
+                if (!msg.image || !msg.image.startsWith('data:image/')) return;
+                const formatMatch = msg.image.match(/data:image\/([^;]+);/);
+                const rawFormat = formatMatch ? formatMatch[1].toLowerCase() : 'png';
+                const format = rawFormat === 'jpeg' ? 'jpg' : rawFormat;
+                images.push({
+                    dataUrl: msg.image,
+                    format,
+                    source: msg.role === 'assistant' ? 'generated-image' : 'user-upload',
+                    label: msg.imageLabel || (msg.role === 'assistant' ? 'Generated Image' : 'Uploaded Image')
+                });
             });
             return images;
         }
-
         // Convert base64 data URL to Blob
         function dataUrlToBlob(dataUrl) {
             const parts = dataUrl.split(',');
@@ -3787,6 +4121,20 @@
                         chatInput.focus();
                     }
                 }, 500);
+            }
+
+            const studioPayload = readOnlineImageStudioPayload();
+            if (studioPayload) {
+                if (window.location.search) {
+                    const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }
+                setTimeout(() => {
+                    openOnlineImageStudio(studioPayload, {
+                        autoGenerate: true,
+                        addSourceToChat: true
+                    });
+                }, 650);
             }
 
             console.log('OffGrid AI ToolKit Online - Ready!');
