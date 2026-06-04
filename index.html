@@ -308,6 +308,43 @@
             text-align: center;
             margin-top: 14px;
         }
+
+        .online-kb-save-callout {
+            margin: 14px 0 18px 52px;
+            max-width: min(760px, calc(100% - 64px));
+            padding: 16px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 8px;
+            background: rgba(236, 253, 245, 0.95);
+            color: #064e3b;
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+        .online-kb-save-title {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+        .online-kb-save-copy {
+            font-size: 13px;
+            line-height: 1.45;
+            margin-bottom: 12px;
+        }
+        .online-kb-save-copy strong {
+            font-weight: 800;
+        }
+        .online-kb-save-btn {
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            font-weight: 800;
+            padding: 11px 16px;
+            cursor: pointer;
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.22);
+        }
+        .online-kb-save-btn:hover {
+            transform: translateY(-1px);
+        }
         
         /* Voice input button */
         .voice-btn {
@@ -1958,7 +1995,7 @@
                             Clear
                         </button>
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
-                            Save
+                            Save to KB
                         </button>
                         <button class="action-btn visual-btn" id="createVisualBtn" onclick="handleCreateVisual()" disabled>
                             Create Visual
@@ -2293,12 +2330,17 @@
             messageDiv.className = `message ${sender}`;
             
             const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const isGeneratedImage = sender === 'assistant';
+            const imageAlt = isGeneratedImage ? 'Generated Image Studio visual' : 'Uploaded image';
+            const imageStyle = isGeneratedImage
+                ? 'width: min(100%, 820px); max-width: 820px; height: auto; border-radius: 8px; margin-top: 10px; display: block; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);'
+                : 'max-width: 300px; height: auto; border-radius: 8px; margin-top: 8px; display: block;';
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${sender === 'user' ? 'U' : 'AI'}</div>
                 <div class="message-content">
                     <div class="message-text">${escapeHtml(text)}</div>
-                    <img class="message-image" src="${imageUrl}" alt="Uploaded image" style="max-width: 300px; border-radius: 8px; margin-top: 8px;">
+                    <img class="message-image" src="${imageUrl}" alt="${imageAlt}" style="${imageStyle}">
                     <div class="message-time">${time}</div>
                 </div>
             `;
@@ -3444,6 +3486,28 @@
             }
         }
 
+        function addOnlineStudioSaveCallout() {
+            const messagesDiv = document.getElementById('messages');
+            if (!messagesDiv) return;
+
+            const existing = document.getElementById('onlineKbSaveCallout');
+            if (existing) existing.remove();
+
+            const callout = document.createElement('div');
+            callout.className = 'online-kb-save-callout';
+            callout.id = 'onlineKbSaveCallout';
+            callout.innerHTML = `
+                <div class="online-kb-save-title">Save this visual to your offline Knowledge Base</div>
+                <div class="online-kb-save-copy">
+                    Click below, choose the matching folder inside <strong>Saved Knowledge Base</strong>, and the article plus image will be saved together. Reopen your OffGrid AI drive and it will appear offline in the left Knowledge Base menu.
+                </div>
+                <button class="online-kb-save-btn" onclick="handleSaveToKB()">Save to Your Knowledge Base</button>
+            `;
+
+            messagesDiv.appendChild(callout);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
         function addOnlineStudioResultToChat() {
             if (!onlineStudioState || !onlineStudioState.image || onlineStudioState.addedToChat) return;
 
@@ -3471,6 +3535,7 @@
                 imageLabel: 'Generated Image',
                 model: 'OffGrid AI Image Studio'
             });
+            addOnlineStudioSaveCallout();
 
             onlineStudioState.addedToChat = true;
 
