@@ -207,7 +207,7 @@
             backdrop-filter: blur(5px);
         }
         .online-studio-modal {
-            width: min(720px, 100%);
+            width: min(980px, 100%);
             max-height: calc(100vh - 48px);
             overflow: auto;
             background: #161d26;
@@ -244,7 +244,7 @@
             border: 1px solid rgba(148, 163, 184, 0.22);
             background: #0d141d;
             border-radius: 8px;
-            min-height: 240px;
+            min-height: 360px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -254,6 +254,8 @@
         .online-studio-preview img {
             display: block;
             width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
             height: auto;
         }
         .online-studio-loading {
@@ -3392,7 +3394,7 @@
                     <div id="onlineStudioError"></div>
                     <div class="online-studio-actions">
                         <button class="online-studio-btn" onclick="closeOnlineImageStudio()">Cancel</button>
-                        <button class="online-studio-btn primary" id="onlineStudioChatBtn" onclick="addOnlineStudioResultToChat()" disabled>Add to Chat</button>
+                        <button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>
                     </div>
                     <div class="online-studio-note">Images are generated on-demand and never stored on our servers.</div>
                 </div>
@@ -3414,10 +3416,10 @@
             const statusEl = document.getElementById('onlineStudioStatus');
             const previewEl = document.getElementById('onlineStudioPreview');
             const errorEl = document.getElementById('onlineStudioError');
-            const chatBtn = document.getElementById('onlineStudioChatBtn');
+            const saveBtn = document.getElementById('onlineStudioSaveBtn');
 
             try {
-                if (chatBtn) chatBtn.disabled = true;
+                if (saveBtn) saveBtn.disabled = true;
                 if (errorEl) errorEl.innerHTML = '';
                 if (statusEl) statusEl.textContent = 'Crafting visual prompt...';
 
@@ -3456,8 +3458,8 @@
                 if (previewEl) {
                     previewEl.innerHTML = `<img src="${onlineStudioState.image}" alt="Generated Image Studio visual">`;
                 }
-                if (statusEl) statusEl.textContent = 'Visual ready - added to chat.';
-                if (chatBtn) chatBtn.disabled = false;
+                if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
+                if (saveBtn) saveBtn.disabled = false;
 
                 addOnlineStudioResultToChat();
             } catch (error) {
@@ -3544,13 +3546,11 @@
             const visualBtn = document.getElementById('createVisualBtn');
             if (visualBtn) visualBtn.disabled = false;
 
-            const modalChatBtn = document.getElementById('onlineStudioChatBtn');
-            if (modalChatBtn) {
-                modalChatBtn.textContent = 'Added to Chat';
-                modalChatBtn.disabled = true;
+            const modalSaveBtn = document.getElementById('onlineStudioSaveBtn');
+            if (modalSaveBtn) {
+                modalSaveBtn.textContent = 'Save to Knowledge Base';
+                modalSaveBtn.disabled = false;
             }
-
-            setTimeout(closeOnlineImageStudio, 900);
         }
         
         // ============================================
@@ -3856,6 +3856,114 @@
                 .substring(0, 50)
                 .replace(/-+$/, '');
             return `${dateStr}_${safeTitle}.md`;
+        }
+
+        async function saveOnlineStudioToKnowledgeBase() {
+            if (!onlineStudioState || !onlineStudioState.image) {
+                showSaveToast('Image not ready yet', 'Please wait for Image Studio to finish generating.');
+                return;
+            }
+
+            addOnlineStudioResultToChat();
+
+            const saveBtn = document.getElementById('onlineStudioSaveBtn');
+            const statusEl = document.getElementById('onlineStudioStatus');
+            const title = onlineStudioState.title || 'OffGrid AI Visual Guide';
+            const category = onlineStudioState.category || 'Other';
+            const tags = '';
+            const filename = generateFilename(title);
+            const baseName = filename.replace('.md', '');
+            const embeddedImages = extractBase64Images();
+
+            if (embeddedImages.length === 0) {
+                showSaveToast('No image found to save', 'The visual was not available in the chat package.');
+                return;
+            }
+
+            const imageFilenames = embeddedImages.map((img, i) =>
+                `${baseName}-img-${i + 1}.${img.format}`
+            );
+            const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
+
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Choose Folder...';
+            }
+            if (statusEl) statusEl.textContent = 'Choose your Saved Knowledge Base category folder...';
+
+            if ('showDirectoryPicker' in window) {
+                try {
+                    const dirHandle = await window.showDirectoryPicker({
+                        mode: 'readwrite',
+                        startIn: 'documents'
+                    });
+
+                    const mdHandle = await dirHandle.getFileHandle(filename, { create: true });
+                    const mdWritable = await mdHandle.createWritable();
+                    await mdWritable.write(markdownContent);
+                    await mdWritable.close();
+
+                    for (let i = 0; i < embeddedImages.length; i++) {
+                        const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
+                        const imgHandle = await dirHandle.getFileHandle(imageFilenames[i], { create: true });
+                        const imgWritable = await imgHandle.createWritable();
+                        await imgWritable.write(imgBlob);
+                        await imgWritable.close();
+                    }
+
+                    if (saveBtn) saveBtn.textContent = 'Saved to Knowledge Base';
+                    if (statusEl) statusEl.textContent = 'Saved - reopen your OffGrid AI drive to view it offline.';
+                    showSaveToast(
+                        `Saved: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
+                        'Files saved to the folder you selected. Never stored on our servers.'
+                    );
+                    setTimeout(closeOnlineImageStudio, 1200);
+                    return;
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = 'Save to Knowledge Base';
+                        }
+                        if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
+                        return;
+                    }
+                    console.error('Image Studio direct save failed, falling back:', err);
+                }
+            }
+
+            const mdBlob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+            const mdUrl = URL.createObjectURL(mdBlob);
+            const mdLink = document.createElement('a');
+            mdLink.href = mdUrl;
+            mdLink.download = filename;
+            document.body.appendChild(mdLink);
+            mdLink.click();
+            document.body.removeChild(mdLink);
+            URL.revokeObjectURL(mdUrl);
+
+            for (let i = 0; i < embeddedImages.length; i++) {
+                const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
+                const imgUrl = URL.createObjectURL(imgBlob);
+                const imgLink = document.createElement('a');
+                imgLink.href = imgUrl;
+                imgLink.download = imageFilenames[i];
+                document.body.appendChild(imgLink);
+                await new Promise(resolve => setTimeout(resolve, 300));
+                imgLink.click();
+                document.body.removeChild(imgLink);
+                URL.revokeObjectURL(imgUrl);
+            }
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Download Again';
+            }
+            if (statusEl) statusEl.textContent = 'Downloaded files - move them to your Knowledge Base folder.';
+            showSaveToast(
+                `Downloaded: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
+                `Move ALL downloaded files to your OffGrid AI drive > Saved Knowledge Base > ${category}.`
+            );
         }
         
         async function executeSave() {
