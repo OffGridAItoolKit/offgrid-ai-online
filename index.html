@@ -1533,6 +1533,7 @@
         let conversationHistory = [];
         let voiceRecognition = null;
         let onlineStudioState = null;
+        let pendingOnlineStudioPayload = null;
         const API_BASE = '';  // Same origin - Express proxy
         
         // Model display name (single model architecture)
@@ -4003,6 +4004,17 @@
                 banner.style.opacity = '0';
                 setTimeout(() => { banner.style.display = 'none'; }, 300);
             }
+
+            if (pendingOnlineStudioPayload) {
+                const studioPayload = pendingOnlineStudioPayload;
+                pendingOnlineStudioPayload = null;
+                setTimeout(() => {
+                    openOnlineImageStudio(studioPayload, {
+                        autoGenerate: true,
+                        addSourceToChat: true
+                    });
+                }, 380);
+            }
         }
         
         // ============================================
@@ -4129,12 +4141,17 @@
                     const cleanUrl = `${window.location.origin}${window.location.pathname}`;
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
-                setTimeout(() => {
-                    openOnlineImageStudio(studioPayload, {
-                        autoGenerate: true,
-                        addSourceToChat: true
-                    });
-                }, 650);
+
+                if (!localStorage.getItem('offgrid-online-initialized')) {
+                    pendingOnlineStudioPayload = studioPayload;
+                } else {
+                    setTimeout(() => {
+                        openOnlineImageStudio(studioPayload, {
+                            autoGenerate: true,
+                            addSourceToChat: true
+                        });
+                    }, 650);
+                }
             }
 
             console.log('OffGrid AI ToolKit Online - Ready!');
