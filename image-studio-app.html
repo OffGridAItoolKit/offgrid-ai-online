@@ -329,6 +329,20 @@
             font-weight: 800;
         }
 
+        .usage-pill {
+            min-height: 34px;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid rgba(33, 201, 139, 0.24);
+            border-radius: 999px;
+            padding: 0 12px;
+            background: rgba(33, 201, 139, 0.08);
+            color: #bff4d8;
+            font-size: 12px;
+            font-weight: 850;
+            white-space: nowrap;
+        }
+
         .stage {
             border: 1px solid var(--line);
             border-radius: 8px;
@@ -532,6 +546,7 @@
                             <button class="btn btn-primary" id="createBtn" onclick="createImage()">Create Image</button>
                             <button class="btn btn-secondary" onclick="pasteFromClipboard()">Paste</button>
                             <button class="btn btn-secondary" onclick="clearStudio()">New Visual</button>
+                            <div class="usage-pill" id="imageUsagePill">Images remaining this month: checking...</div>
                             <div class="status-line" id="statusLine"></div>
                         </div>
                     </div>
@@ -662,6 +677,10 @@
             return headers;
         }
 
+        function getAuthToken() {
+            return localStorage.getItem(TOKEN_KEY);
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text || '';
@@ -694,6 +713,36 @@
 
         function setStatus(text) {
             document.getElementById('statusLine').textContent = text || '';
+        }
+
+        function setImageUsageText(text) {
+            const el = document.getElementById('imageUsagePill');
+            if (el) el.textContent = text;
+        }
+
+        async function refreshImageUsage() {
+            const token = getAuthToken();
+            if (!token) {
+                setImageUsageText('Images remaining this month: 10 / 10');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/license/usage`, {
+                    headers: { Authorization: 'Bearer ' + token }
+                });
+                if (!response.ok) throw new Error('Usage unavailable');
+                const usage = await response.json();
+                const remaining = usage?.images?.remaining;
+                const limit = usage?.images?.limit;
+                if (Number.isFinite(remaining) && Number.isFinite(limit)) {
+                    setImageUsageText(`Images remaining this month: ${remaining} / ${limit}`);
+                } else {
+                    setImageUsageText('Images remaining this month: 10 / 10');
+                }
+            } catch (error) {
+                setImageUsageText('Images remaining this month: 10 / 10');
+            }
         }
 
         function setBusy(isBusy, text) {
@@ -855,6 +904,7 @@
                 current.markdown = buildMarkdown(title, category, request, current.imageFilename);
 
                 renderResult();
+                refreshImageUsage();
                 setStatus('Visual ready.');
                 showToast('Visual ready', 'Save it to your Knowledge Base or export a PDF.');
             } catch (error) {
@@ -1003,6 +1053,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             renderPromptLibrary();
+            refreshImageUsage();
             const payload = readPayloadFromUrl() || readPayloadFromStorage();
             if (payload && (payload.answer || payload.text)) {
                 const request = payload.answer || payload.text;
