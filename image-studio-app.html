@@ -4,20 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OffGrid AI Image Studio</title>
-    <meta name="description" content="Create a practical companion visual from an OffGrid AI answer and save it with a Knowledge Base-ready Markdown file.">
+    <meta name="description" content="Create diagrams, infographics, and visual field guides with OffGrid AI Image Studio.">
     <style>
         :root {
-            --ink: #221713;
-            --muted: #786d62;
-            --paper: #fbfaf6;
-            --panel: #ffffff;
-            --line: #ded5c8;
-            --gold: #c69618;
-            --gold-dark: #9f7608;
-            --green: #2f7d46;
-            --blue: #315f72;
-            --danger: #b23b3b;
-            --shadow: 0 18px 60px rgba(44, 32, 18, 0.14);
+            --bg: #0d141a;
+            --panel: #151d26;
+            --panel-2: #1b2531;
+            --panel-3: #202b38;
+            --text: #f5f0e6;
+            --muted: #aeb8c5;
+            --gold: #d5a722;
+            --gold-2: #f59a38;
+            --green: #21c98b;
+            --line: rgba(213, 167, 34, 0.22);
+            --line-soft: rgba(255, 255, 255, 0.08);
+            --dark-brown: #2b170f;
+            --shadow: 0 24px 80px rgba(0, 0, 0, 0.34);
         }
 
         * { box-sizing: border-box; }
@@ -25,376 +27,427 @@
         body {
             margin: 0;
             min-height: 100vh;
+            color: var(--text);
             font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            color: var(--ink);
             background:
-                linear-gradient(180deg, rgba(255,255,255,0.84), rgba(251,250,246,0.94)),
-                repeating-linear-gradient(45deg, rgba(198,150,24,0.05) 0, rgba(198,150,24,0.05) 12px, transparent 12px, transparent 24px);
+                radial-gradient(circle at 80% 0%, rgba(213, 167, 34, 0.12), transparent 28%),
+                linear-gradient(180deg, #101820 0%, #0b1117 100%);
         }
 
-        button, textarea, input, select { font: inherit; }
+        button, textarea, input { font: inherit; }
 
-        .app-shell {
+        .shell {
             min-height: 100vh;
             display: grid;
-            grid-template-rows: auto 1fr;
+            grid-template-columns: 300px minmax(0, 1fr);
         }
 
-        .topbar {
-            height: 72px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            padding: 0 28px;
-            border-bottom: 1px solid rgba(92, 69, 38, 0.16);
-            background: rgba(255,255,255,0.82);
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 5;
+        .sidebar {
+            border-right: 1px solid var(--line-soft);
+            background:
+                linear-gradient(180deg, rgba(48, 26, 15, 0.86), rgba(19, 24, 31, 0.95)),
+                repeating-linear-gradient(45deg, rgba(213, 167, 34, 0.04) 0, rgba(213, 167, 34, 0.04) 12px, transparent 12px, transparent 24px);
+            padding: 20px;
+            overflow: auto;
         }
 
         .brand {
             display: flex;
             align-items: center;
             gap: 12px;
-            min-width: 0;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--line-soft);
+            margin-bottom: 18px;
         }
 
-        .brand-mark {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: linear-gradient(135deg, #2b1a11, #6b3b19);
-            color: #f4b52f;
-            display: grid;
-            place-items: center;
-            font-weight: 900;
-            box-shadow: 0 10px 25px rgba(63, 39, 18, 0.28);
-        }
-
-        .brand-text {
-            display: grid;
-            gap: 2px;
+        .brand img {
+            width: 32px;
+            height: 32px;
         }
 
         .brand-title {
+            font-size: 16px;
             font-weight: 900;
             letter-spacing: 0;
-            font-size: 17px;
             line-height: 1.1;
         }
 
         .brand-subtitle {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(47, 125, 70, 0.24);
-            color: var(--green);
-            background: rgba(47, 125, 70, 0.08);
-            padding: 8px 11px;
-            border-radius: 999px;
-            font-size: 12px;
+            color: var(--gold);
+            font-size: 11px;
             font-weight: 800;
-            white-space: nowrap;
+            text-transform: uppercase;
+            margin-top: 3px;
         }
 
-        main {
-            width: min(1500px, calc(100vw - 40px));
-            margin: 30px auto 48px;
-            display: grid;
-            grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
-            gap: 24px;
-            align-items: start;
-        }
-
-        .panel {
-            background: rgba(255,255,255,0.94);
-            border: 1px solid var(--line);
-            box-shadow: var(--shadow);
+        .privacy {
+            border: 1px solid rgba(33, 201, 139, 0.25);
+            background: rgba(33, 201, 139, 0.08);
             border-radius: 8px;
+            padding: 12px;
+            color: #c9f6df;
+            font-size: 12px;
+            line-height: 1.45;
+            margin-bottom: 18px;
         }
 
-        .input-panel {
-            position: sticky;
-            top: 94px;
+        .section-title {
+            color: var(--gold);
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 20px 0 9px;
+        }
+
+        .category {
+            border: 1px solid rgba(213, 167, 34, 0.22);
+            border-radius: 8px;
+            background: rgba(21, 29, 38, 0.72);
+            margin-bottom: 9px;
             overflow: hidden;
         }
 
-        .panel-header {
-            padding: 20px 20px 14px;
-            border-bottom: 1px solid rgba(123, 92, 49, 0.14);
+        .category summary {
+            cursor: pointer;
+            padding: 12px;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 850;
+            list-style: none;
+        }
+
+        .category summary::-webkit-details-marker { display: none; }
+
+        .category summary::after {
+            content: "+";
+            float: right;
+            color: var(--gold);
+        }
+
+        .category[open] summary::after { content: "-"; }
+
+        .prompt-list {
+            display: grid;
+            gap: 7px;
+            padding: 0 10px 12px;
+        }
+
+        .prompt-btn {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.055);
+            color: #d9e2ee;
+            border-radius: 7px;
+            padding: 9px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1.32;
+        }
+
+        .prompt-btn:hover {
+            border-color: rgba(245, 154, 56, 0.55);
+            background: rgba(245, 154, 56, 0.12);
+            color: #fff6e8;
+        }
+
+        .main {
+            min-width: 0;
+            display: grid;
+            grid-template-rows: auto 1fr;
+        }
+
+        .topbar {
+            height: 66px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 26px;
+            border-bottom: 1px solid var(--line-soft);
+            background: rgba(15, 22, 29, 0.84);
+            backdrop-filter: blur(14px);
+            position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+
+        .topbar-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 900;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            padding: 0 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(33, 201, 139, 0.28);
+            color: var(--green);
+            background: rgba(33, 201, 139, 0.08);
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        .workspace {
+            width: min(1180px, calc(100vw - 340px));
+            margin: 34px auto 54px;
+            display: grid;
+            gap: 20px;
+        }
+
+        .composer {
+            border: 1px solid var(--line);
+            background: rgba(21, 29, 38, 0.92);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .composer-head {
+            padding: 20px 22px 14px;
+            border-bottom: 1px solid var(--line-soft);
         }
 
         h1, h2, h3, p { margin-top: 0; }
 
         h1 {
-            font-size: 24px;
-            line-height: 1.12;
-            margin-bottom: 8px;
+            font-size: 26px;
+            line-height: 1.1;
+            margin-bottom: 7px;
             letter-spacing: 0;
         }
 
         h2 {
-            font-size: 18px;
+            font-size: 20px;
             margin-bottom: 8px;
             letter-spacing: 0;
         }
 
         .copy {
-            color: var(--muted);
-            line-height: 1.5;
-            font-size: 14px;
             margin-bottom: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.5;
         }
 
-        .form-body {
-            padding: 18px 20px 20px;
+        .composer-body {
+            padding: 18px 22px 22px;
             display: grid;
-            gap: 16px;
+            gap: 14px;
         }
 
         label {
             display: block;
+            color: #d6c184;
             font-size: 12px;
             font-weight: 900;
-            color: #5c4634;
-            margin-bottom: 7px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
         }
 
-        textarea, input, select {
+        textarea, input {
             width: 100%;
-            border: 1px solid #d6c8b7;
-            border-radius: 7px;
-            background: #fffdf8;
-            color: var(--ink);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            background: #101821;
+            color: var(--text);
             outline: none;
         }
 
-        textarea:focus, input:focus, select:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(198, 150, 24, 0.18);
-        }
-
         textarea {
-            min-height: 230px;
+            min-height: 170px;
             resize: vertical;
-            padding: 13px;
+            padding: 14px;
             line-height: 1.5;
-            font-size: 14px;
         }
 
-        input, select {
-            height: 42px;
-            padding: 0 11px;
+        input {
+            min-height: 42px;
+            padding: 0 12px;
         }
 
-        .row {
+        textarea:focus, input:focus {
+            border-color: rgba(245, 154, 56, 0.72);
+            box-shadow: 0 0 0 3px rgba(245, 154, 56, 0.14);
+        }
+
+        .field-row {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: minmax(0, 1fr) 220px;
             gap: 12px;
         }
 
-        .button-row {
+        .actions {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .btn {
             min-height: 44px;
             border: 1px solid transparent;
-            border-radius: 7px;
-            padding: 0 15px;
-            font-weight: 900;
+            border-radius: 8px;
+            padding: 0 16px;
             cursor: pointer;
+            font-weight: 900;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
-        }
-
-        .btn:hover:not(:disabled) {
-            transform: translateY(-1px);
         }
 
         .btn:disabled {
-            opacity: 0.58;
             cursor: not-allowed;
+            opacity: 0.56;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #d8a71e, #bb8608);
-            color: white;
-            box-shadow: 0 10px 26px rgba(198,150,24,0.28);
+            background: linear-gradient(135deg, #ff9a3d, #d9a11e);
+            color: #1b120c;
+            box-shadow: 0 12px 26px rgba(245, 154, 56, 0.24);
         }
 
         .btn-secondary {
-            background: #fffaf0;
-            color: #5d4427;
-            border-color: #d8c7aa;
+            background: #202a36;
+            color: #e9edf4;
+            border-color: rgba(255,255,255,0.12);
         }
 
-        .btn-dark {
-            background: #241610;
-            color: #f2ce71;
-            border-color: #241610;
+        .btn-kb {
+            background: linear-gradient(135deg, #1fd096, #11a977);
+            color: #07130f;
         }
 
-        .btn-wide { width: 100%; }
-
-        .note {
-            border: 1px solid rgba(49, 95, 114, 0.18);
-            background: rgba(49, 95, 114, 0.07);
-            color: #315f72;
-            padding: 12px;
-            border-radius: 7px;
-            font-size: 12px;
-            line-height: 1.45;
+        .status-line {
+            min-height: 20px;
+            color: #e2cb72;
+            font-size: 13px;
+            font-weight: 800;
         }
 
-        .workspace {
+        .sample-strip {
             display: grid;
-            gap: 18px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .sample-card {
+            border: 1px solid var(--line-soft);
+            border-radius: 8px;
+            overflow: hidden;
+            background: rgba(21,29,38,0.82);
+            cursor: pointer;
+        }
+
+        .sample-card img {
+            display: block;
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background: #1a242f;
+        }
+
+        .sample-card div {
+            padding: 10px 12px;
+            color: #fff5df;
+            font-size: 13px;
+            font-weight: 850;
         }
 
         .stage {
-            min-height: 420px;
-            padding: 24px;
-            display: grid;
-            gap: 20px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(21, 29, 38, 0.92);
+            box-shadow: var(--shadow);
+            min-height: 440px;
+            padding: 18px;
         }
 
-        .progress {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .step {
-            border: 1px solid #e2d7c8;
-            border-radius: 7px;
-            padding: 12px;
-            background: #fffdf8;
-            min-height: 78px;
-        }
-
-        .step-label {
-            font-size: 11px;
-            color: var(--muted);
-            font-weight: 900;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .step-text {
-            font-size: 13px;
-            line-height: 1.35;
-            color: #4d3a2c;
-        }
-
-        .step.active {
-            border-color: rgba(198,150,24,0.55);
-            background: rgba(198,150,24,0.08);
-        }
-
-        .step.done {
-            border-color: rgba(47,125,70,0.32);
-            background: rgba(47,125,70,0.07);
-        }
-
-        .empty-state {
-            min-height: 340px;
-            border: 1px dashed #d6c8b7;
+        .empty {
+            min-height: 400px;
+            border: 1px dashed rgba(213, 167, 34, 0.24);
             border-radius: 8px;
             display: grid;
             place-items: center;
             text-align: center;
-            padding: 34px;
             color: var(--muted);
-            background: rgba(255, 253, 248, 0.72);
+            padding: 28px;
         }
 
         .empty-inner {
-            max-width: 560px;
+            width: min(620px, 100%);
         }
 
-        .empty-inner h2 {
-            color: var(--ink);
-            font-size: 26px;
-            margin-bottom: 10px;
-        }
-
-        .result-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(320px, 46%);
-            gap: 18px;
-            align-items: start;
-        }
-
-        .article-preview, .image-preview {
-            border: 1px solid #e3d8cb;
+        .empty img {
+            width: min(520px, 100%);
             border-radius: 8px;
-            background: #fffdf9;
-            overflow: hidden;
+            border: 1px solid var(--line-soft);
+            margin-bottom: 18px;
         }
 
-        .preview-header {
-            min-height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 12px 14px;
-            border-bottom: 1px solid #e3d8cb;
-            background: #faf4e8;
+        .generating {
+            min-height: 400px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            color: var(--muted);
         }
 
-        .preview-title {
-            font-size: 13px;
-            font-weight: 900;
-            color: #4d3825;
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            border: 3px solid rgba(213, 167, 34, 0.2);
+            border-top-color: var(--gold-2);
+            animation: spin 0.8s linear infinite;
         }
 
-        .article-body {
-            padding: 18px;
-            max-height: 640px;
-            overflow: auto;
-            font-size: 14px;
-            line-height: 1.62;
+        .result {
+            display: grid;
+            gap: 14px;
         }
 
-        .article-body pre {
-            white-space: pre-wrap;
-            margin: 0;
-            font-family: inherit;
-        }
-
-        .image-wrap {
-            padding: 12px;
-        }
-
-        .image-wrap img {
+        .result-image img {
             display: block;
             width: 100%;
             height: auto;
-            border-radius: 6px;
-            border: 1px solid #e3d8cb;
-            background: #f7f1e6;
+            max-height: 78vh;
+            object-fit: contain;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: #0e151d;
         }
 
-        .result-actions {
+        .result-head {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
             flex-wrap: wrap;
-            padding-top: 4px;
+        }
+
+        .result-title {
+            font-size: 22px;
+            font-weight: 950;
+        }
+
+        .result-meta {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .hint {
+            border: 1px solid rgba(213, 167, 34, 0.2);
+            background: rgba(213, 167, 34, 0.08);
+            color: #f3df9b;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.45;
         }
 
         .toast {
@@ -402,231 +455,258 @@
             right: 22px;
             bottom: 22px;
             z-index: 20;
-            background: #211610;
-            color: #fff7df;
-            border: 1px solid rgba(246, 199, 89, 0.3);
-            padding: 13px 15px;
-            border-radius: 8px;
-            box-shadow: 0 16px 50px rgba(0,0,0,0.26);
-            font-size: 13px;
-            max-width: 360px;
             display: none;
+            width: min(380px, calc(100vw - 32px));
+            border: 1px solid rgba(213, 167, 34, 0.28);
+            border-radius: 8px;
+            background: #141b24;
+            color: var(--text);
+            box-shadow: 0 18px 55px rgba(0,0,0,0.42);
+            padding: 13px 15px;
         }
 
         .toast.show { display: block; }
 
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 3px solid rgba(198,150,24,0.22);
-            border-top-color: var(--gold);
-            border-radius: 999px;
-            animation: spin 0.8s linear infinite;
+        .toast-title {
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 4px;
         }
 
-        .generating {
-            min-height: 340px;
-            display: grid;
-            place-items: center;
-            text-align: center;
-            gap: 12px;
+        .toast-subtitle {
             color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
         }
 
-        .error-box {
-            border: 1px solid rgba(178,59,59,0.22);
-            color: var(--danger);
-            background: rgba(178,59,59,0.07);
+        .error {
+            border: 1px solid rgba(255, 98, 98, 0.28);
+            background: rgba(255, 98, 98, 0.08);
+            color: #ffb8b8;
             border-radius: 8px;
             padding: 16px;
-        }
-
-        .advanced {
-            border-top: 1px solid rgba(123, 92, 49, 0.14);
-            padding-top: 14px;
-        }
-
-        .advanced summary {
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 900;
-            color: #6b5338;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
         @media (max-width: 980px) {
-            main {
-                width: min(100% - 24px, 760px);
-                grid-template-columns: 1fr;
+            .shell { grid-template-columns: 1fr; }
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--line-soft);
+                max-height: 420px;
+            }
+            .workspace {
+                width: min(100% - 24px, 860px);
                 margin-top: 18px;
             }
-
-            .input-panel {
-                position: static;
-            }
-
-            .result-grid {
+            .field-row,
+            .sample-strip {
                 grid-template-columns: 1fr;
             }
-
-            .progress {
-                grid-template-columns: 1fr;
-            }
-
             .topbar {
                 height: auto;
                 padding: 14px 16px;
                 align-items: flex-start;
-            }
-        }
-
-        @media (max-width: 560px) {
-            .row {
-                grid-template-columns: 1fr;
-            }
-
-            .button-row .btn {
-                flex: 1 1 100%;
-            }
-
-            .stage {
-                padding: 16px;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            .brand-subtitle {
-                display: none;
+                gap: 10px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="app-shell">
-        <header class="topbar">
+    <div class="shell">
+        <aside class="sidebar">
             <div class="brand">
-                <div class="brand-mark">OG</div>
-                <div class="brand-text">
+                <img src="/compass-192.png" alt="OffGrid AI">
+                <div>
                     <div class="brand-title">OffGrid AI Image Studio</div>
-                    <div class="brand-subtitle">Create Knowledge Base-ready field visuals</div>
+                    <div class="brand-subtitle">Visual Field Guides</div>
                 </div>
             </div>
-            <div class="status-pill" id="connectionStatus">Internet required for image generation</div>
-        </header>
 
-        <main>
-            <section class="panel input-panel">
-                <div class="panel-header">
-                    <h1>Create Visual</h1>
-                    <p class="copy">Paste an OffGrid AI answer or open this page from the ToolKit. Image Studio will create the companion visual and prepare the Knowledge Base files.</p>
+            <div class="privacy">
+                Private session. Images are generated on demand and are not stored on OffGrid AI servers.
+            </div>
+
+            <div class="section-title">Ready-Made Image Prompts</div>
+            <div id="promptLibrary"></div>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="topbar-title">
+                    <span>OffGrid AI Image Studio</span>
+                    <span class="pill">Nano Banana Pro</span>
                 </div>
+                <span class="pill" id="connectionStatus">Connected</span>
+            </header>
 
-                <div class="form-body">
-                    <div>
-                        <label for="answerInput">Answer or field guide text</label>
-                        <textarea id="answerInput" placeholder="Paste the answer you want to turn into a visual field reference..."></textarea>
+            <div class="workspace">
+                <section class="composer">
+                    <div class="composer-head">
+                        <h1>Create a Field Visual</h1>
+                        <p class="copy">Describe the visual you need or paste source notes. Image Studio will create the diagram, infographic, or reference guide.</p>
                     </div>
 
-                    <div class="row">
+                    <div class="composer-body">
                         <div>
-                            <label for="titleInput">Title</label>
-                            <input id="titleInput" placeholder="Auto-filled from answer">
+                            <label for="visualInput">Describe what you want</label>
+                            <textarea id="visualInput" placeholder="Example: Create a clear infographic showing how to build a simple emergency water filter with labeled layers, materials, and safety notes."></textarea>
                         </div>
-                        <div>
-                            <label for="categoryInput">Knowledge Base category</label>
-                            <select id="categoryInput">
-                                <option>Other</option>
-                                <option>Medical & First Aid</option>
-                                <option>Navigation & Orientation</option>
-                                <option>Water & Food</option>
-                                <option>Shelter & Fire</option>
-                                <option>Emergency Plans</option>
-                                <option>Skills & Reference</option>
-                                <option>Gear & Checklists</option>
-                            </select>
+
+                        <div class="field-row">
+                            <div>
+                                <label for="titleInput">Title</label>
+                                <input id="titleInput" placeholder="Auto-filled from your request">
+                            </div>
+                            <div>
+                                <label for="categoryInput">Category</label>
+                                <input id="categoryInput" value="Other">
+                            </div>
                         </div>
-                    </div>
 
-                    <button class="btn btn-primary btn-wide" id="createBtn" onclick="createVisual()">Create Visual</button>
-
-                    <div class="button-row">
-                        <button class="btn btn-secondary" onclick="pasteFromClipboard()">Paste Answer</button>
-                        <button class="btn btn-secondary" onclick="loadSample()">Try Sample</button>
-                        <button class="btn btn-secondary" onclick="clearStudio()">Clear</button>
-                    </div>
-
-                    <details class="advanced">
-                        <summary>Model comparison</summary>
-                        <div style="margin-top: 12px;">
-                            <label for="modelInput">Image model</label>
-                            <select id="modelInput">
-                                <option value="google/gemini-3-pro-image-preview">Nano Banana Pro / Gemini 3 Pro</option>
-                                <option value="openai/gpt-5.4-image-2">GPT Image 2 / GPT-5.4 Image 2</option>
-                            </select>
-                        </div>
-                    </details>
-
-                    <div class="note">Phase 1 downloads two sibling files: a Markdown article and a normal image file. The Markdown links to the image by filename, matching the current Knowledge Base format.</div>
-                </div>
-            </section>
-
-            <section class="workspace">
-                <div class="panel stage">
-                    <div class="progress">
-                        <div class="step" id="stepPrompt">
-                            <div class="step-label">Step 1</div>
-                            <div class="step-text">Read the answer and craft the hidden visual prompt.</div>
-                        </div>
-                        <div class="step" id="stepImage">
-                            <div class="step-label">Step 2</div>
-                            <div class="step-text">Generate the infographic, diagram, or field guide image.</div>
-                        </div>
-                        <div class="step" id="stepFiles">
-                            <div class="step-label">Step 3</div>
-                            <div class="step-text">Prepare Knowledge Base-ready Markdown and image files.</div>
+                        <div class="actions">
+                            <button class="btn btn-primary" id="createBtn" onclick="createImage()">Create Image</button>
+                            <button class="btn btn-secondary" onclick="pasteFromClipboard()">Paste</button>
+                            <button class="btn btn-secondary" onclick="clearStudio()">New Visual</button>
+                            <div class="status-line" id="statusLine"></div>
                         </div>
                     </div>
+                </section>
 
-                    <div id="stageContent" class="empty-state">
+                <section class="sample-strip" aria-label="Example visuals">
+                    <div class="sample-card" onclick="usePresetByTitle('Chicken Coop Blueprint')">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png" alt="Chicken coop blueprint example">
+                        <div>Chicken Coop Blueprint</div>
+                    </div>
+                    <div class="sample-card" onclick="usePresetByTitle('Edible Plants of North America')">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/AqzaxPhPfxKUgXah.png" alt="Edible plants guide example">
+                        <div>Edible Plants Guide</div>
+                    </div>
+                    <div class="sample-card" onclick="usePresetByTitle('Medical Supplies Checklist')">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/ABKFWcnoSloPLnLE.png" alt="Medical checklist example">
+                        <div>Medical Supplies Checklist</div>
+                    </div>
+                </section>
+
+                <section class="stage" id="stage">
+                    <div class="empty">
                         <div class="empty-inner">
-                            <h2>Ready When You Are</h2>
-                            <p>Paste an answer from the ToolKit, then click Create Visual. The image prompt stays behind the curtain; the saved file only contains the clean answer and the generated image link.</p>
+                            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/PzTSIdYsyaMrWsup.png" alt="Foraging guide example">
+                            <h2>Ready to Create</h2>
+                            <p class="copy">Choose a ready-made prompt from the left or describe your own visual above.</p>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            </div>
         </main>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast">
+        <div class="toast-title" id="toastTitle"></div>
+        <div class="toast-subtitle" id="toastSubtitle"></div>
+    </div>
 
     <script>
         const API_BASE = window.location.origin;
         const TOKEN_KEY = 'offgrid-license-token';
-        let generatedImageDataUrl = null;
-        let generatedImageFilename = null;
-        let generatedMarkdown = null;
-        let lastVisualPrompt = null;
+        const IMAGE_MODEL = 'google/gemini-3-pro-image-preview';
 
-        const sampleAnswer = `Here are 5 high-value essentials that cover the main survival priorities:
+        let current = {
+            title: '',
+            category: 'Other',
+            request: '',
+            image: '',
+            imageFilename: '',
+            markdown: ''
+        };
 
-1. Fire-starting kit
-Waterproof matches or a lighter plus a ferro rod, and tinder. Fire provides warmth, cooking, water purification, and morale.
-
-2. Water system
-A compact water filter or purification tablets and a container. Safe water is a top priority and a metal container lets you boil.
-
-3. Shelter and insulation
-A tarp or emergency bivy plus paracord. Keeping wind and rain off you prevents hypothermia.
-
-4. Cutting tool
-A sturdy fixed-blade knife or robust folding knife. Used for shelter building, fire prep, repairs, and food tasks.
-
-5. First-aid kit
-Include blister care, gauze, tape, antiseptic, pain relief, and personal medications.`;
+        const promptCategories = [
+            {
+                name: 'Survival & Emergency Prep',
+                category: 'Emergency Plans',
+                prompts: [
+                    ['72-Hour Grid-Down Decision Guide', 'Create a field-ready decision tree for the first 72 hours of a grid-down event, covering water, food, power, communication, sanitation, and security priorities.'],
+                    ['5 C Survival Gear Infographic', 'Create a labeled infographic explaining the 5 Cs of survival gear with examples, priorities, and quick-use notes.'],
+                    ['Emergency Water Filter Diagram', 'Create a step-by-step diagram showing how to build a simple emergency water filter with gravel, sand, charcoal, cloth, container setup, and final purification warning.'],
+                    ['Bug-Out Bag Weight Planner', 'Create a visual packing guide for a 30 lb bug-out bag with categories, weight tradeoffs, and must-have vs optional items.'],
+                    ['Hypothermia Field Response', 'Create a quick-reference medical-style field guide for recognizing and responding to hypothermia safely.'],
+                    ['Emergency Meal Plan Poster', 'Create a 3-day shelf-stable emergency meal planning infographic with calories, water needs, and simple prep notes.'],
+                    ['Home Blackout Checklist', 'Create a room-by-room blackout readiness checklist covering lighting, power banks, refrigeration, safety, and communications.'],
+                    ['Barter Value Guide', 'Create an infographic ranking practical barter items in a long-term disruption with why each item matters and storage cautions.']
+                ]
+            },
+            {
+                name: 'Homesteading',
+                category: 'Skills & Reference',
+                prompts: [
+                    ['Chicken Coop Blueprint', 'Create a multi-angle chicken coop blueprint with dimensions, nesting boxes, roosts, ventilation, predator protection, materials, and maintenance notes.'],
+                    ['Raised Bed Warmth and Drainage', 'Create a labeled raised bed garden design optimized for cold ground, drainage, soil layers, dimensions, and seasonal protection.'],
+                    ['Rainwater Harvesting Setup', 'Create a technical diagram for a simple rainwater collection system with gutters, first flush diverter, filter, tank, overflow, and safety notes.'],
+                    ['Root Cellar Storage Map', 'Create a visual guide to root cellar zones, humidity, temperature, ventilation, and which foods belong in each zone.'],
+                    ['Composting System Guide', 'Create an infographic comparing hot compost, cold compost, worm bin, and leaf mold with inputs, timelines, and troubleshooting.'],
+                    ['Small Solar Shed Wiring', 'Create a beginner-friendly off-grid shed solar wiring diagram with panel, charge controller, battery, fuse, inverter, and loads.'],
+                    ['Drip Irrigation Layout', 'Create a garden drip irrigation layout with main line, emitters, pressure reducer, filter, zones, and maintenance notes.'],
+                    ['Goat Shelter Layout', 'Create a practical small goat shelter diagram with wind protection, bedding, feed area, water, fencing, and cleaning access.']
+                ]
+            },
+            {
+                name: 'Healthcare & First Responders',
+                category: 'Medical & First Aid',
+                prompts: [
+                    ['Wound Care Field Guide', 'Create a medical reference poster for basic wound cleaning, dressing, infection warning signs, and when to seek professional care.'],
+                    ['Trauma Kit Layout', 'Create a labeled trauma kit layout grouped by bleeding control, airway, burns, tools, gloves, medications, and documentation.'],
+                    ['Triage Flowchart', 'Create a simple triage flowchart for multiple injuries in a remote setting with immediate, delayed, minor, and expectant categories.'],
+                    ['Burn Care Reference', 'Create a field guide for burn types, cooling, dressing, warning signs, and avoid-doing-this safety notes.'],
+                    ['Dehydration Signs Chart', 'Create a quick-reference chart for dehydration signs by severity, oral rehydration basics, and emergency warning signs.'],
+                    ['Splinting Basics Diagram', 'Create a visual guide for improvised splinting using common materials with joints above and below, padding, and circulation checks.'],
+                    ['Medication Storage Guide', 'Create an infographic for storing common emergency medications safely with heat, moisture, labeling, and expiration notes.'],
+                    ['Responder Station Setup', 'Create a diagram for a small field first-aid station with clean zone, dirty zone, supplies, patient flow, and documentation area.']
+                ]
+            },
+            {
+                name: 'Overlanders & Adventurers',
+                category: 'Gear & Checklists',
+                prompts: [
+                    ['Vehicle Recovery Kit', 'Create a labeled overlanding vehicle recovery kit guide with straps, shackles, boards, shovel, gloves, compressor, and safety cautions.'],
+                    ['Remote Breakdown Decision Tree', 'Create a decision tree for whether to stay with a disabled vehicle or travel for help in a remote area.'],
+                    ['Desert Travel Water Plan', 'Create a desert overlanding water planning infographic with gallons per person, reserve margin, storage locations, and heat warnings.'],
+                    ['Camp Kitchen Layout', 'Create a compact camp kitchen layout with food prep, stove, water, sanitation, trash, and fire safety zones.'],
+                    ['Trail Repair Toolkit', 'Create a visual checklist for a trail repair toolkit with tire, electrical, fluids, fasteners, tape, tools, and diagnostics.'],
+                    ['Winter Vehicle Emergency Kit', 'Create a cold-weather vehicle emergency kit diagram with warmth, signaling, traction, food, water, and battery support.'],
+                    ['Backcountry Communication Plan', 'Create an infographic comparing phone, satellite messenger, ham radio, whistle, mirror, and written route plan.'],
+                    ['Overlander Load Plan', 'Create a vehicle load distribution guide showing heavy items low, recovery access, water placement, tools, and roof load cautions.']
+                ]
+            },
+            {
+                name: 'Navigation & Field Skills',
+                category: 'Navigation & Orientation',
+                prompts: [
+                    ['Shadow-Stick Navigation', 'Create a step-by-step visual guide for finding east-west and north-south with a shadow stick.'],
+                    ['Map and Compass Basics', 'Create a labeled map and compass reference guide showing orienting the map, taking a bearing, declination, and common mistakes.'],
+                    ['Signal for Rescue', 'Create a field guide for rescue signaling with mirror, whistle, fire, ground symbols, bright cloth, and timing.'],
+                    ['Lost Person Priorities', 'Create a calm decision flow for what to do after realizing you are lost: stop, shelter, signal, water, navigation, and risk checks.'],
+                    ['Star Navigation Basics', 'Create a simple night navigation chart for identifying Polaris and using major constellations for direction.'],
+                    ['Terrain Association Guide', 'Create an illustrated guide to matching map contours to terrain features like ridges, valleys, saddles, and spurs.'],
+                    ['Pace Count Reference', 'Create a reference card for estimating distance with pace count, terrain adjustments, beads, and reset points.'],
+                    ['Field Notebook Template', 'Create a visual field notebook page template for route notes, weather, bearings, water points, hazards, and timestamps.']
+                ]
+            },
+            {
+                name: 'Food, Foraging & Water',
+                category: 'Water & Food',
+                prompts: [
+                    ['Safe Wild Plant Foraging Protocol', 'Create a safety-first foraging protocol infographic emphasizing positive identification, local knowledge, plant parts, lookalikes, and do-not-eat warnings.'],
+                    ['Edible Plants of North America', 'Create a field identification guide for common edible plants of North America with labeled features and safety cautions.'],
+                    ['Water Purification Methods', 'Create a comparison chart for boiling, filtering, chemical treatment, and solar disinfection with use cases and limitations.'],
+                    ['Long-Term Water Storage', 'Create a visual checklist for long-term water storage containers, treatment, storage conditions, rotation, and withdrawal safety.'],
+                    ['Acorn Processing Guide', 'Create a step-by-step visual guide for processing acorns safely, including sorting, shelling, leaching tannins, drying, and cooking.'],
+                    ['Emergency Food Storage Zones', 'Create a pantry organization infographic for short-term, long-term, cooking fuel, water, spices, and rotation.'],
+                    ['Fishing Kit Pocket Guide', 'Create a compact survival fishing kit visual with line, hooks, weights, lures, repair items, and legal/safety notes.'],
+                    ['Food Spoilage Warning Chart', 'Create a quick-reference chart for food spoilage signs after a power outage with fridge/freezer timing and discard rules.']
+                ]
+            }
+        ];
 
         function getAuthHeaders() {
             const headers = { 'Content-Type': 'application/json' };
@@ -642,63 +722,69 @@ Include blister care, gauze, tape, antiseptic, pain relief, and personal medicat
         }
 
         function slugify(text) {
-            return (text || 'offgrid-ai-visual')
+            return (text || 'offgrid-ai-image-studio-visual')
                 .toLowerCase()
                 .replace(/['"]/g, '')
                 .replace(/[^a-z0-9]+/g, '-')
                 .replace(/^-+|-+$/g, '')
-                .substring(0, 72) || 'offgrid-ai-visual';
+                .substring(0, 72) || 'offgrid-ai-image-studio-visual';
         }
 
-        function inferTitle(answer) {
-            const heading = (answer.match(/^#\s+(.+)$/m) || [])[1];
-            if (heading) return heading.trim().substring(0, 90);
-            const firstLine = answer.split('\n').map(line => line.trim()).find(Boolean) || 'OffGrid AI Visual Guide';
-            return firstLine.replace(/^[-*\d.\s]+/, '').substring(0, 90);
+        function inferTitle(text) {
+            const clean = (text || '').replace(/\s+/g, ' ').trim();
+            if (!clean) return 'OffGrid AI Image Studio Visual';
+            return clean.split(/[.!?]/)[0].replace(/^(create|make|design|build)\s+/i, '').substring(0, 80) || 'OffGrid AI Image Studio Visual';
         }
 
-        function showToast(message) {
+        function showToast(title, subtitle) {
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastSubtitle').textContent = subtitle || '';
             const toast = document.getElementById('toast');
-            toast.textContent = message;
             toast.classList.add('show');
             clearTimeout(window._toastTimer);
-            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+            window._toastTimer = setTimeout(() => toast.classList.remove('show'), 4200);
         }
 
-        function setStep(stepId, state) {
-            const el = document.getElementById(stepId);
-            if (!el) return;
-            el.classList.remove('active', 'done');
-            if (state) el.classList.add(state);
+        function setStatus(text) {
+            document.getElementById('statusLine').textContent = text || '';
         }
 
-        function resetSteps() {
-            ['stepPrompt', 'stepImage', 'stepFiles'].forEach(id => setStep(id, null));
-        }
-
-        function setBusy(isBusy, label) {
+        function setBusy(isBusy, text) {
             const btn = document.getElementById('createBtn');
             btn.disabled = isBusy;
-            btn.innerHTML = isBusy ? '<span class="spinner"></span>' + (label || 'Working...') : 'Create Visual';
+            btn.innerHTML = isBusy ? '<span class="spinner"></span>' + (text || 'Working...') : 'Create Image';
         }
 
-        function renderGenerating(message) {
-            document.getElementById('stageContent').className = 'generating';
-            document.getElementById('stageContent').innerHTML = `
-                <div>
-                    <div class="spinner" style="margin: 0 auto 12px;"></div>
-                    <h2>${escapeHtml(message)}</h2>
-                    <p class="copy">No conversation or image is stored on OffGrid AI servers.</p>
-                </div>
-            `;
+        function renderPromptLibrary() {
+            const root = document.getElementById('promptLibrary');
+            root.innerHTML = promptCategories.map((group, index) => `
+                <details class="category" ${index === 0 ? 'open' : ''}>
+                    <summary>${escapeHtml(group.name)}</summary>
+                    <div class="prompt-list">
+                        ${group.prompts.map(([title], promptIndex) => `
+                            <button class="prompt-btn" onclick="usePreset(${index}, ${promptIndex})">${escapeHtml(title)}</button>
+                        `).join('')}
+                    </div>
+                </details>
+            `).join('');
         }
 
-        function renderError(error) {
-            document.getElementById('stageContent').className = 'error-box';
-            document.getElementById('stageContent').innerHTML = `
-                <h2>Image Studio could not finish</h2>
-                <p>${escapeHtml(error.message || String(error))}</p>
-            `;
+        function usePreset(categoryIndex, promptIndex) {
+            const group = promptCategories[categoryIndex];
+            const preset = group.prompts[promptIndex];
+            if (!group || !preset) return;
+            const [title, request] = preset;
+            document.getElementById('titleInput').value = title;
+            document.getElementById('categoryInput').value = group.category;
+            document.getElementById('visualInput').value = request;
+            createImage();
+        }
+
+        function usePresetByTitle(title) {
+            for (let i = 0; i < promptCategories.length; i++) {
+                const promptIndex = promptCategories[i].prompts.findIndex(([promptTitle]) => promptTitle === title);
+                if (promptIndex >= 0) return usePreset(i, promptIndex);
+            }
         }
 
         function dataUrlToBlob(dataUrl) {
@@ -712,7 +798,7 @@ Include blister care, gauze, tape, antiseptic, pain relief, and personal medicat
 
         function imageExtension(dataUrl) {
             const mime = (dataUrl.match(/^data:image\/([^;]+)/) || [])[1] || 'png';
-            return mime === 'jpeg' ? 'jpeg' : mime.replace('svg+xml', 'svg');
+            return mime === 'jpeg' ? 'jpg' : mime.replace('svg+xml', 'svg');
         }
 
         function downloadBlob(blob, filename) {
@@ -726,177 +812,225 @@ Include blister care, gauze, tape, antiseptic, pain relief, and personal medicat
             setTimeout(() => URL.revokeObjectURL(url), 1000);
         }
 
-        function buildMarkdown({ title, category, answer, imageFilename }) {
+        function buildMarkdown(title, category, request, imageFilename, imageForPdf) {
+            const imageRef = imageForPdf || `./${imageFilename}`;
             const now = new Date().toISOString();
-            const safeTitle = title.replace(/"/g, '\\"');
-            return `---\ntitle: "${safeTitle}"\ndate: ${now}\nsource: image-studio\nmodel: OffGrid AI Image Studio\ncategory: ${category}\nimages:\n  - ${imageFilename}\n---\n\n# ${title}\n\n${answer.trim()}\n\n---\n\n![Generated Image](./${imageFilename})\n\n*Generated using OffGrid AI Image Studio.*\n`;
+            return `---\ntitle: "${title.replace(/"/g, '\\"')}"\ndate: ${now}\nsource: image-studio\nmodel: OffGrid AI Image Studio\ncategory: ${category}\nimages:\n  - ${imageFilename}\n---\n\n# ${title}\n\n${request.trim()}\n\n---\n\n![Generated Image](${imageRef})\n\n*Generated using OffGrid AI Image Studio.*\n`;
         }
 
-        function renderResult({ title, answer, imageSrc, imageFilename, markdownFilename }) {
-            document.getElementById('stageContent').className = '';
-            document.getElementById('stageContent').innerHTML = `
-                <div class="result-grid">
-                    <div class="article-preview">
-                        <div class="preview-header">
-                            <div class="preview-title">${escapeHtml(title)}</div>
-                        </div>
-                        <div class="article-body"><pre>${escapeHtml(answer)}</pre></div>
-                    </div>
-                    <div class="image-preview">
-                        <div class="preview-header">
-                            <div class="preview-title">${escapeHtml(imageFilename)}</div>
-                        </div>
-                        <div class="image-wrap">
-                            <img src="${imageSrc}" alt="Generated visual for ${escapeHtml(title)}">
-                        </div>
+        function renderGenerating(message) {
+            document.getElementById('stage').innerHTML = `
+                <div class="generating">
+                    <div>
+                        <div class="spinner" style="margin: 0 auto 14px;"></div>
+                        <h2>${escapeHtml(message)}</h2>
+                        <p class="copy">OffGrid AI Image Studio is preparing your visual.</p>
                     </div>
                 </div>
-                <div class="result-actions">
-                    <button class="btn btn-primary" onclick="downloadKnowledgeBaseFiles()">Download KB Files</button>
-                    <button class="btn btn-secondary" onclick="downloadImageOnly()">Download Image</button>
-                    <button class="btn btn-secondary" onclick="downloadMarkdownOnly()">Download Markdown</button>
-                    <button class="btn btn-dark" onclick="createVisual()">Regenerate</button>
-                </div>
-                <div class="note">Prepared files: ${escapeHtml(markdownFilename)} and ${escapeHtml(imageFilename)}. Put both in the same Knowledge Base category folder.</div>
             `;
         }
 
-        async function createVisual() {
-            const answerInput = document.getElementById('answerInput');
+        function renderError(error) {
+            document.getElementById('stage').innerHTML = `
+                <div class="error">
+                    <h2>Image Studio could not finish</h2>
+                    <p>${escapeHtml(error.message || String(error))}</p>
+                </div>
+            `;
+        }
+
+        function renderResult() {
+            document.getElementById('stage').innerHTML = `
+                <div class="result">
+                    <div class="result-head">
+                        <div>
+                            <div class="result-title">${escapeHtml(current.title)}</div>
+                            <div class="result-meta">${escapeHtml(current.imageFilename)} | Generated using OffGrid AI Image Studio</div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn btn-kb" onclick="saveToKnowledgeBase()">Save to Knowledge Base</button>
+                            <button class="btn btn-secondary" onclick="savePDF()">Save PDF</button>
+                            <button class="btn btn-secondary" onclick="downloadKBFiles()">Download KB Files</button>
+                            <button class="btn btn-secondary" onclick="clearStudio()">New Visual</button>
+                        </div>
+                    </div>
+                    <div class="result-image">
+                        <img src="${current.image}" alt="Generated OffGrid AI Image Studio visual">
+                    </div>
+                    <div class="hint">For Knowledge Base saves, choose: This PC > OffGrid AI drive > Saved Knowledge Base > category folder. If Windows asks, allow this site to edit the selected folder.</div>
+                </div>
+            `;
+        }
+
+        async function createImage() {
+            const requestInput = document.getElementById('visualInput');
             const titleInput = document.getElementById('titleInput');
             const categoryInput = document.getElementById('categoryInput');
-            const modelInput = document.getElementById('modelInput');
-            const answer = answerInput.value.trim();
+            const request = requestInput.value.trim();
 
-            if (!answer) {
-                answerInput.focus();
-                showToast('Paste an answer first.');
+            if (!request) {
+                requestInput.focus();
+                showToast('Add a visual request first', 'Describe what you want Image Studio to create.');
                 return;
             }
 
-            const title = (titleInput.value.trim() || inferTitle(answer)).trim();
+            const title = (titleInput.value.trim() || inferTitle(request)).trim();
             titleInput.value = title;
-            const category = categoryInput.value || 'Other';
-            const slug = slugify(title);
+            const category = categoryInput.value.trim() || 'Other';
 
-            generatedImageDataUrl = null;
-            generatedImageFilename = null;
-            generatedMarkdown = null;
-            lastVisualPrompt = null;
-            resetSteps();
+            current = { title, category, request, image: '', imageFilename: '', markdown: '' };
 
             try {
-                setBusy(true, 'Crafting prompt...');
-                setStep('stepPrompt', 'active');
+                setBusy(true, 'Crafting...');
+                setStatus('Crafting Image Studio prompt...');
                 renderGenerating('Crafting the visual plan');
 
                 const promptResponse = await fetch(`${API_BASE}/api/image-studio/visual-prompt`, {
                     method: 'POST',
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ conversationContext: answer, category })
+                    body: JSON.stringify({ conversationContext: request, category })
                 });
                 const promptData = await promptResponse.json();
                 if (!promptResponse.ok || !promptData.success || !promptData.prompt) {
-                    throw new Error(promptData.error || 'Visual prompt generation failed.');
+                    throw new Error(promptData.error || 'Prompt generation failed.');
                 }
 
-                lastVisualPrompt = promptData.prompt;
-                setStep('stepPrompt', 'done');
-                setStep('stepImage', 'active');
-                setBusy(true, 'Generating image...');
-                renderGenerating('Generating your field visual');
+                setBusy(true, 'Generating...');
+                setStatus('Generating visual...');
+                renderGenerating('Generating the image');
 
                 const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
                     method: 'POST',
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({
-                        prompt: promptData.prompt,
-                        model: modelInput.value
-                    })
+                    body: JSON.stringify({ prompt: promptData.prompt, model: IMAGE_MODEL })
                 });
                 const imageData = await imageResponse.json();
                 if (!imageResponse.ok || !imageData.success || !imageData.image) {
                     throw new Error(imageData.error || 'Image generation failed.');
                 }
 
-                generatedImageDataUrl = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
-                const ext = imageExtension(generatedImageDataUrl);
-                generatedImageFilename = `${slug}-img-1.${ext}`;
-                generatedMarkdown = buildMarkdown({
-                    title,
-                    category,
-                    answer,
-                    imageFilename: generatedImageFilename
-                });
+                current.image = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                current.imageFilename = `${slugify(title)}-img-1.${imageExtension(current.image)}`;
+                current.markdown = buildMarkdown(title, category, request, current.imageFilename);
 
-                setStep('stepImage', 'done');
-                setStep('stepFiles', 'done');
-
-                renderResult({
-                    title,
-                    answer,
-                    imageSrc: generatedImageDataUrl,
-                    imageFilename: generatedImageFilename,
-                    markdownFilename: `${slug}.md`
-                });
-                showToast('Visual created. KB files are ready.');
+                renderResult();
+                setStatus('Visual ready.');
+                showToast('Visual ready', 'Save it to your Knowledge Base or export a PDF.');
             } catch (error) {
+                console.error('Image Studio error:', error);
                 renderError(error);
-                showToast(error.message || 'Image Studio failed.');
+                setStatus('Image Studio needs attention.');
+                showToast('Image Studio could not finish', error.message || 'Please try again.');
             } finally {
                 setBusy(false);
             }
         }
 
-        function downloadKnowledgeBaseFiles() {
-            downloadImageOnly();
-            setTimeout(downloadMarkdownOnly, 300);
-            showToast('Downloaded image and Markdown. Keep both files together.');
+        async function saveToKnowledgeBase() {
+            if (!current.image || !current.markdown) {
+                showToast('No visual is ready yet', 'Create an image first.');
+                return;
+            }
+
+            const mdFilename = `${slugify(current.title)}.md`;
+
+            if ('showDirectoryPicker' in window) {
+                try {
+                    const dirHandle = await window.showDirectoryPicker({
+                        id: 'offgrid-image-studio-kb',
+                        mode: 'readwrite',
+                        startIn: 'documents'
+                    });
+
+                    const imageHandle = await dirHandle.getFileHandle(current.imageFilename, { create: true });
+                    const imageWritable = await imageHandle.createWritable();
+                    await imageWritable.write(dataUrlToBlob(current.image));
+                    await imageWritable.close();
+
+                    const mdHandle = await dirHandle.getFileHandle(mdFilename, { create: true });
+                    const mdWritable = await mdHandle.createWritable();
+                    await mdWritable.write(new Blob([current.markdown], { type: 'text/markdown;charset=utf-8' }));
+                    await mdWritable.close();
+
+                    showToast('Saved to your Knowledge Base', 'The image and field guide were added to the selected folder.');
+                    return;
+                } catch (error) {
+                    if (error && error.name === 'AbortError') return;
+                    console.warn('Direct KB save failed, downloading files instead:', error);
+                }
+            }
+
+            downloadKBFiles();
+            showToast('Downloaded KB files', 'Put both files in the same Knowledge Base category folder.');
         }
 
-        function downloadImageOnly() {
-            if (!generatedImageDataUrl || !generatedImageFilename) return showToast('No image is ready yet.');
-            downloadBlob(dataUrlToBlob(generatedImageDataUrl), generatedImageFilename);
+        function downloadKBFiles() {
+            if (!current.image || !current.markdown) {
+                showToast('No visual is ready yet', 'Create an image first.');
+                return;
+            }
+            downloadBlob(dataUrlToBlob(current.image), current.imageFilename);
+            setTimeout(() => {
+                downloadBlob(new Blob([current.markdown], { type: 'text/markdown;charset=utf-8' }), `${slugify(current.title)}.md`);
+            }, 250);
         }
 
-        function downloadMarkdownOnly() {
-            if (!generatedMarkdown) return showToast('No Markdown is ready yet.');
-            const title = document.getElementById('titleInput').value.trim() || 'offgrid-ai-visual';
-            downloadBlob(new Blob([generatedMarkdown], { type: 'text/markdown;charset=utf-8' }), `${slugify(title)}.md`);
+        async function savePDF() {
+            if (!current.image || !current.markdown) {
+                showToast('No visual is ready yet', 'Create an image first.');
+                return;
+            }
+
+            const markdownForPdf = buildMarkdown(current.title, current.category, current.request, current.imageFilename, current.image);
+            showToast('Preparing PDF', 'Use the print dialog to save the visual guide as a PDF.');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/export-pdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ markdown: markdownForPdf, title: current.title })
+                });
+                if (!response.ok) throw new Error('PDF view could not be created.');
+                const data = await response.json();
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    downloadBlob(new Blob([data.html], { type: 'text/html;charset=utf-8' }), `${slugify(current.title)}.html`);
+                    showToast('Downloaded PDF-ready HTML', 'Open it and use Print > Save as PDF.');
+                    return;
+                }
+                printWindow.document.write(data.html);
+                printWindow.document.close();
+                printWindow.onload = () => setTimeout(() => printWindow.print(), 250);
+            } catch (error) {
+                showToast('PDF export failed', error.message || 'Please try again.');
+            }
         }
 
         async function pasteFromClipboard() {
             try {
                 const text = await navigator.clipboard.readText();
-                if (!text.trim()) return showToast('Clipboard is empty.');
-                document.getElementById('answerInput').value = text.trim();
+                if (!text.trim()) return showToast('Clipboard is empty', 'Copy text first, then paste here.');
+                document.getElementById('visualInput').value = text.trim();
                 const titleInput = document.getElementById('titleInput');
                 if (!titleInput.value.trim()) titleInput.value = inferTitle(text);
-                showToast('Answer pasted.');
-            } catch (error) {
-                showToast('Clipboard access was blocked. You can paste manually.');
+            } catch {
+                showToast('Clipboard blocked', 'Paste manually into the text box.');
             }
         }
 
-        function loadSample() {
-            document.getElementById('answerInput').value = sampleAnswer;
-            document.getElementById('titleInput').value = '5 Essential Survival Priorities and Gear';
-            document.getElementById('categoryInput').value = 'Gear & Checklists';
-        }
-
         function clearStudio() {
-            document.getElementById('answerInput').value = '';
+            document.getElementById('visualInput').value = '';
             document.getElementById('titleInput').value = '';
-            generatedImageDataUrl = null;
-            generatedImageFilename = null;
-            generatedMarkdown = null;
-            lastVisualPrompt = null;
-            resetSteps();
-            document.getElementById('stageContent').className = 'empty-state';
-            document.getElementById('stageContent').innerHTML = `
-                <div class="empty-inner">
-                    <h2>Ready When You Are</h2>
-                    <p>Paste an answer from the ToolKit, then click Create Visual. The image prompt stays behind the curtain; the saved file only contains the clean answer and the generated image link.</p>
+            document.getElementById('categoryInput').value = 'Other';
+            setStatus('');
+            current = { title: '', category: 'Other', request: '', image: '', imageFilename: '', markdown: '' };
+            document.getElementById('stage').innerHTML = `
+                <div class="empty">
+                    <div class="empty-inner">
+                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/PzTSIdYsyaMrWsup.png" alt="Foraging guide example">
+                        <h2>Ready to Create</h2>
+                        <p class="copy">Choose a ready-made prompt from the left or describe your own visual above.</p>
+                    </div>
                 </div>
             `;
         }
@@ -907,8 +1041,7 @@ Include blister care, gauze, tape, antiseptic, pain relief, and personal medicat
             const answer = params.get('answer') || params.get('text');
             if (payload) {
                 try {
-                    const json = JSON.parse(decodeURIComponent(escape(atob(payload))));
-                    return json;
+                    return JSON.parse(decodeURIComponent(escape(atob(payload))));
                 } catch (error) {
                     console.warn('Could not parse Image Studio payload:', error);
                 }
@@ -929,12 +1062,14 @@ Include blister care, gauze, tape, antiseptic, pain relief, and personal medicat
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            renderPromptLibrary();
             const payload = readPayloadFromUrl() || readPayloadFromStorage();
-            if (payload && payload.answer) {
-                document.getElementById('answerInput').value = payload.answer;
-                document.getElementById('titleInput').value = payload.title || inferTitle(payload.answer);
-                if (payload.category) document.getElementById('categoryInput').value = payload.category;
-                setTimeout(createVisual, 350);
+            if (payload && (payload.answer || payload.text)) {
+                const request = payload.answer || payload.text;
+                document.getElementById('visualInput').value = request;
+                document.getElementById('titleInput').value = payload.title || inferTitle(request);
+                document.getElementById('categoryInput').value = payload.category || 'Other';
+                setTimeout(createImage, 250);
             }
         });
     </script>
