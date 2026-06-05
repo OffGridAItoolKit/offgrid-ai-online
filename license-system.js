@@ -666,8 +666,7 @@ function checkImageLimit(req, res, next) {
                     used: result.used,
                     limit: result.limit,
                     nextReset: result.nextReset,
-                    message: `You have used all ${result.limit} image generations for this month. Your limit resets on ${result.nextReset}. Upgrade to Command Center Pro for 40 monthly images.`,
-                    upgradeUrl: 'https://offgridaitoolkit.com/products/offgrid-ai-toolkit-command-center-pro'
+                    message: `You have used all ${result.limit} image generations for this month. Your limit resets on ${result.nextReset}.`
                 });
             }
             next();

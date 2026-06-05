@@ -258,7 +258,7 @@
         }
 
         textarea {
-            min-height: 170px;
+            min-height: 104px;
             resize: vertical;
             padding: 14px;
             line-height: 1.5;
@@ -329,46 +329,17 @@
             font-weight: 800;
         }
 
-        .sample-strip {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .sample-card {
-            border: 1px solid var(--line-soft);
-            border-radius: 8px;
-            overflow: hidden;
-            background: rgba(21,29,38,0.82);
-            cursor: pointer;
-        }
-
-        .sample-card img {
-            display: block;
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            background: #1a242f;
-        }
-
-        .sample-card div {
-            padding: 10px 12px;
-            color: #fff5df;
-            font-size: 13px;
-            font-weight: 850;
-        }
-
         .stage {
             border: 1px solid var(--line);
             border-radius: 8px;
             background: rgba(21, 29, 38, 0.92);
             box-shadow: var(--shadow);
-            min-height: 440px;
+            min-height: 320px;
             padding: 18px;
         }
 
         .empty {
-            min-height: 400px;
+            min-height: 282px;
             border: 1px dashed rgba(213, 167, 34, 0.24);
             border-radius: 8px;
             display: grid;
@@ -382,15 +353,8 @@
             width: min(620px, 100%);
         }
 
-        .empty img {
-            width: min(520px, 100%);
-            border-radius: 8px;
-            border: 1px solid var(--line-soft);
-            margin-bottom: 18px;
-        }
-
         .generating {
-            min-height: 400px;
+            min-height: 282px;
             display: grid;
             place-items: center;
             text-align: center;
@@ -500,8 +464,7 @@
                 width: min(100% - 24px, 860px);
                 margin-top: 18px;
             }
-            .field-row,
-            .sample-strip {
+            .field-row {
                 grid-template-columns: 1fr;
             }
             .topbar {
@@ -536,7 +499,7 @@
             <header class="topbar">
                 <div class="topbar-title">
                     <span>OffGrid AI Image Studio</span>
-                    <span class="pill">Nano Banana Pro</span>
+                    <span class="pill">OffGrid AI Visuals</span>
                 </div>
                 <span class="pill" id="connectionStatus">Connected</span>
             </header>
@@ -574,27 +537,11 @@
                     </div>
                 </section>
 
-                <section class="sample-strip" aria-label="Example visuals">
-                    <div class="sample-card" onclick="usePresetByTitle('Chicken Coop Blueprint')">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png" alt="Chicken coop blueprint example">
-                        <div>Chicken Coop Blueprint</div>
-                    </div>
-                    <div class="sample-card" onclick="usePresetByTitle('Edible Plants of North America')">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/AqzaxPhPfxKUgXah.png" alt="Edible plants guide example">
-                        <div>Edible Plants Guide</div>
-                    </div>
-                    <div class="sample-card" onclick="usePresetByTitle('Medical Supplies Checklist')">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/ABKFWcnoSloPLnLE.png" alt="Medical checklist example">
-                        <div>Medical Supplies Checklist</div>
-                    </div>
-                </section>
-
                 <section class="stage" id="stage">
                     <div class="empty">
                         <div class="empty-inner">
-                            <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/PzTSIdYsyaMrWsup.png" alt="Foraging guide example">
                             <h2>Ready to Create</h2>
-                            <p class="copy">Choose a ready-made prompt from the left or describe your own visual above.</p>
+                            <p class="copy">Choose a ready-made prompt from the left, or describe your own visual above, then click Create Image.</p>
                         </div>
                     </div>
                 </section>
@@ -777,14 +724,8 @@
             document.getElementById('titleInput').value = title;
             document.getElementById('categoryInput').value = group.category;
             document.getElementById('visualInput').value = request;
-            createImage();
-        }
-
-        function usePresetByTitle(title) {
-            for (let i = 0; i < promptCategories.length; i++) {
-                const promptIndex = promptCategories[i].prompts.findIndex(([promptTitle]) => promptTitle === title);
-                if (promptIndex >= 0) return usePreset(i, promptIndex);
-            }
+            setStatus('Prompt loaded. Click Create Image when ready.');
+            showToast('Prompt loaded', 'Review it, then click Create Image.');
         }
 
         function dataUrlToBlob(dataUrl) {
@@ -1027,9 +968,8 @@
             document.getElementById('stage').innerHTML = `
                 <div class="empty">
                     <div class="empty-inner">
-                        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/PzTSIdYsyaMrWsup.png" alt="Foraging guide example">
                         <h2>Ready to Create</h2>
-                        <p class="copy">Choose a ready-made prompt from the left or describe your own visual above.</p>
+                        <p class="copy">Choose a ready-made prompt from the left, or describe your own visual above, then click Create Image.</p>
                     </div>
                 </div>
             `;
