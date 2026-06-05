@@ -295,6 +295,32 @@
             border-color: transparent;
             color: #111827;
         }
+        .online-studio-btn.pdf {
+            background: rgba(148, 163, 184, 0.12);
+            border-color: rgba(148, 163, 184, 0.28);
+            color: #d7dee8;
+        }
+        .online-studio-guidance {
+            display: none;
+            margin: 14px 0 4px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(218, 165, 32, 0.25);
+            color: #d7dee8;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+        .online-studio-guidance strong {
+            color: #f8fafc;
+            font-weight: 800;
+        }
+        .online-studio-guidance-title {
+            color: #f0c040;
+            font-weight: 800;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
         .online-studio-error {
             color: #fecaca;
             background: rgba(239, 68, 68, 0.14);
@@ -3392,8 +3418,15 @@
                         </div>
                     </div>
                     <div id="onlineStudioError"></div>
+                    <div class="online-studio-guidance" id="onlineStudioGuidance">
+                        <div class="online-studio-guidance-title">Next Steps After Image Is Generated</div>
+                        Click <strong>Save to Knowledge Base</strong>, then choose your OffGrid AI drive folder:
+                        <strong>This PC > OffGrid AI (D: or E:) > Saved Knowledge Base > category folder</strong>.
+                        If Windows asks for permission, click <strong>Allow</strong>. A backup is also added to this online session below.
+                    </div>
                     <div class="online-studio-actions">
                         <button class="online-studio-btn" onclick="closeOnlineImageStudio()">Cancel</button>
+                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>Save PDF</button>
                         <button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>
                     </div>
                     <div class="online-studio-note">Images are generated on-demand and never stored on our servers.</div>
@@ -3417,9 +3450,13 @@
             const previewEl = document.getElementById('onlineStudioPreview');
             const errorEl = document.getElementById('onlineStudioError');
             const saveBtn = document.getElementById('onlineStudioSaveBtn');
+            const pdfBtn = document.getElementById('onlineStudioPdfBtn');
+            const guidanceEl = document.getElementById('onlineStudioGuidance');
 
             try {
                 if (saveBtn) saveBtn.disabled = true;
+                if (pdfBtn) pdfBtn.disabled = true;
+                if (guidanceEl) guidanceEl.style.display = 'none';
                 if (errorEl) errorEl.innerHTML = '';
                 if (statusEl) statusEl.textContent = 'Crafting visual prompt...';
 
@@ -3460,6 +3497,8 @@
                 }
                 if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
                 if (saveBtn) saveBtn.disabled = false;
+                if (pdfBtn) pdfBtn.disabled = false;
+                if (guidanceEl) guidanceEl.style.display = 'block';
 
                 addOnlineStudioResultToChat();
             } catch (error) {
@@ -3529,10 +3568,10 @@
                 });
             }
 
-            addMessageWithImage('Generated using Image Studio.', onlineStudioState.image, 'assistant');
+            addMessageWithImage('Generated using OffGrid AI Image Studio.', onlineStudioState.image, 'assistant');
             conversationHistory.push({
                 role: 'assistant',
-                content: 'Generated using Image Studio.',
+                content: 'Generated using OffGrid AI Image Studio.',
                 image: onlineStudioState.image,
                 imageLabel: 'Generated Image',
                 model: 'OffGrid AI Image Studio'
@@ -3848,14 +3887,12 @@
         }
         
         function generateFilename(title) {
-            const now = new Date();
-            const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
             const safeTitle = title
                 .replace(/[^a-zA-Z0-9\s-]/g, '')
                 .replace(/\s+/g, '-')
-                .substring(0, 50)
+                .substring(0, 70)
                 .replace(/-+$/, '');
-            return `${dateStr}_${safeTitle}.md`;
+            return `${safeTitle || 'offgrid-ai-field-guide'}.md`;
         }
 
         async function saveOnlineStudioToKnowledgeBase() {
@@ -3894,6 +3931,7 @@
             if ('showDirectoryPicker' in window) {
                 try {
                     const dirHandle = await window.showDirectoryPicker({
+                        id: 'offgrid-knowledge-base',
                         mode: 'readwrite',
                         startIn: 'documents'
                     });
@@ -3912,10 +3950,10 @@
                     }
 
                     if (saveBtn) saveBtn.textContent = 'Saved to Knowledge Base';
-                    if (statusEl) statusEl.textContent = 'Saved - reopen your OffGrid AI drive to view it offline.';
+                    if (statusEl) statusEl.textContent = 'Saved - backup added to this online session below.';
                     showSaveToast(
-                        `Saved: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
-                        'Files saved to the folder you selected. Never stored on our servers.'
+                        'Your field guide has been saved to your Knowledge Base',
+                        'A backup has also been added to this online session below.'
                     );
                     setTimeout(closeOnlineImageStudio, 1200);
                     return;
@@ -3965,6 +4003,71 @@
                 `Move ALL downloaded files to your OffGrid AI drive > Saved Knowledge Base > ${category}.`
             );
         }
+
+        async function exportOnlineStudioPDF() {
+            if (!onlineStudioState || !onlineStudioState.image) {
+                showSaveToast('Image not ready yet', 'Please wait for Image Studio to finish generating.');
+                return;
+            }
+
+            addOnlineStudioResultToChat();
+
+            const title = onlineStudioState.title || 'OffGrid AI Visual Guide';
+            const category = onlineStudioState.category || 'Other';
+            const markdownContent = generateMarkdownContent(title, category, '');
+            const pdfBtn = document.getElementById('onlineStudioPdfBtn');
+            const statusEl = document.getElementById('onlineStudioStatus');
+
+            if (pdfBtn) {
+                pdfBtn.disabled = true;
+                pdfBtn.textContent = 'Preparing PDF...';
+            }
+            if (statusEl) statusEl.textContent = 'Preparing PDF view...';
+            showSaveToast('Preparing PDF...', 'Use the print dialog to save the article and image together.');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/export-pdf`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ markdown: markdownContent, title })
+                });
+
+                if (!response.ok) {
+                    throw new Error('PDF generation failed');
+                }
+
+                const data = await response.json();
+                const printWindow = window.open('', '_blank');
+                if (printWindow) {
+                    printWindow.document.write(data.html);
+                    printWindow.document.close();
+                    printWindow.onload = () => {
+                        setTimeout(() => printWindow.print(), 250);
+                    };
+                    showSaveToast('PDF ready', 'Choose Save as PDF in the print dialog.');
+                } else {
+                    const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = generateFilename(title).replace('.md', '.html');
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showSaveToast('Downloaded PDF-ready HTML', 'Open it and use File > Print > Save as PDF.');
+                }
+            } catch (error) {
+                console.error('Image Studio PDF export error:', error);
+                showSaveToast('PDF export failed', 'Please try again or save to Knowledge Base instead.');
+            } finally {
+                if (pdfBtn) {
+                    pdfBtn.disabled = false;
+                    pdfBtn.textContent = 'Save PDF';
+                }
+                if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
+            }
+        }
         
         async function executeSave() {
             const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
@@ -3991,6 +4094,7 @@
                     try {
                         showSaveToast('Select folder...', `Choose the Knowledge Base > ${category} folder on your OffGrid AI drive.`);
                         const dirHandle = await window.showDirectoryPicker({
+                            id: 'offgrid-knowledge-base',
                             mode: 'readwrite',
                             startIn: 'documents'
                         });
