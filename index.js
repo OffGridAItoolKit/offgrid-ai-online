@@ -1565,11 +1565,9 @@ app.get('/api/health/image-gen', async (req, res) => {
     }
 });
 
-const IMAGE_STUDIO_BRANDING_TEXT = 'Image created with OffGrid AI ToolKit - offgridaitoolkit.com';
-
 function withOffGridImageBranding(prompt) {
     const trimmedPrompt = prompt.trim();
-    return `${trimmedPrompt}\n\nBranding requirement: include only this exact small footer credit on the finished visual: "${IMAGE_STUDIO_BRANDING_TEXT}". Do not include any year, copyright symbol, alternate organization name, or other watermark text.`;
+    return `${trimmedPrompt}\n\nDo not include any footer, credit line, watermark, year, copyright symbol, website address, or brand attribution in the generated artwork. The OffGrid AI app adds its own small attribution after generation.`;
 }
 
 app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], requireLicense, checkImageLimit, async (req, res) => {
@@ -2030,8 +2028,7 @@ RULES:
 - Always specify illustration/visual style
 - Always mention background color
 - Include "labeled" or "annotated" for diagrams
-- Include only this exact small footer credit on the finished visual: "Image created with OffGrid AI ToolKit - offgridaitoolkit.com"
-- Do not include any year, copyright symbol, alternate organization name, or other watermark text`;
+- Do not include any footer, credit line, watermark, year, copyright symbol, website address, or brand attribution in the generated artwork`;
 
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',

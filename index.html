@@ -3462,27 +3462,30 @@
                 img.onload = () => {
                     try {
                         const canvas = document.createElement('canvas');
-                        const imageWidth = img.naturalWidth || img.width;
-                        const imageHeight = img.naturalHeight || img.height;
-                        const footerHeight = Math.max(54, Math.min(92, Math.round(imageHeight * 0.075)));
-                        canvas.width = imageWidth;
-                        canvas.height = imageHeight + footerHeight;
+                        canvas.width = img.naturalWidth || img.width;
+                        canvas.height = img.naturalHeight || img.height;
                         const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                        const y = imageHeight;
                         const text = 'Image created with OffGrid AI ToolKit - offgridaitoolkit.com';
-
-                        ctx.fillStyle = 'rgba(250, 246, 235, 0.96)';
-                        ctx.fillRect(0, y, canvas.width, footerHeight);
-                        ctx.fillStyle = 'rgba(185, 126, 20, 0.85)';
-                        ctx.fillRect(0, y, canvas.width, Math.max(2, Math.round(canvas.height * 0.003)));
-
+                        const fontSize = Math.max(12, Math.min(15, Math.round(canvas.width / 110)));
+                        const padX = Math.max(10, Math.round(fontSize * 0.8));
+                        const padY = Math.max(6, Math.round(fontSize * 0.45));
+                        const margin = Math.max(10, Math.round(fontSize * 0.9));
                         ctx.fillStyle = 'rgba(62, 40, 25, 0.88)';
-                        ctx.font = `700 ${Math.max(16, Math.min(26, Math.round(canvas.width / 62)))}px Arial, sans-serif`;
-                        ctx.textAlign = 'center';
+                        ctx.font = `600 ${fontSize}px Arial, sans-serif`;
+                        const metrics = ctx.measureText(text);
+                        const labelWidth = Math.ceil(metrics.width + padX * 2);
+                        const labelHeight = Math.ceil(fontSize + padY * 2);
+                        const x = canvas.width - labelWidth - margin;
+                        const y = canvas.height - labelHeight - margin;
+
+                        ctx.fillStyle = 'rgba(250, 246, 235, 0.82)';
+                        ctx.fillRect(x, y, labelWidth, labelHeight);
+                        ctx.fillStyle = 'rgba(62, 40, 25, 0.82)';
+                        ctx.textAlign = 'left';
                         ctx.textBaseline = 'middle';
-                        ctx.fillText(text, canvas.width / 2, y + footerHeight / 2);
+                        ctx.fillText(text, x + padX, y + labelHeight / 2);
 
                         resolve(canvas.toDataURL('image/png'));
                     } catch (error) {
