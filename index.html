@@ -2148,6 +2148,12 @@
         
         async function sendMessage() {
             const input = document.getElementById('messageInput');
+            const welcomeInput = document.getElementById('welcomeMessageInput');
+            if (!input && welcomeInput) {
+                sendWelcomeMessage();
+                return;
+            }
+            if (!input) return;
             const message = input.value.trim();
             const requestStartTime = Date.now();
             
