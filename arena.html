@@ -8910,7 +8910,7 @@
                 let finalPrompt = (typeof enhanceImagePromptForMobile === 'function') ? enhanceImagePromptForMobile(prompt) : prompt;
                 
                 // Add watermark/branding instruction to the prompt
-                finalPrompt += '. Include a small, subtle watermark or credit line at the bottom of the image that reads "OffGrid AI Image Studio - offgridaitoolkit.com" in a clean, professional font that complements the image style';
+                finalPrompt += '. Include a small, subtle watermark or credit line at the bottom of the image that reads "Image created with OffGrid AI ToolKit - offgridaitoolkit.com" in a clean, professional font that complements the image style';
 
                 const response = await fetch(`${API_BASE}/api/command/generate-image`, {
                     method: 'POST',
@@ -9021,7 +9021,7 @@
                     ctx.fillStyle = 'rgba(218, 165, 32, 0.9)';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
-                    ctx.fillText('Created with OffGrid AI Image Studio \u2022 offgridaitoolkit.com', img.width / 2, img.height - barHeight / 2);
+                    ctx.fillText('Image created with OffGrid AI ToolKit - offgridaitoolkit.com', img.width / 2, img.height - barHeight / 2);
                     
                     resolve(canvas.toDataURL('image/png'));
                 };
@@ -9056,7 +9056,7 @@
                 const fileName = `offgrid-image-${slug}-${ts}.png`;
                 const file = new File([blob], fileName, { type: 'image/png' });
                 
-                const shareText = 'Created with OffGrid AI Image Studio';
+                const shareText = 'Image created with OffGrid AI ToolKit';
                 const shareHashtags = '#OffGridAI #AIArt #ImageStudio';
                 const shareUrl = 'https://offgridaitoolkit.com';
                 

@@ -258,6 +258,10 @@
             object-fit: contain;
             height: auto;
         }
+        .online-studio-preview a {
+            display: block;
+            width: 100%;
+        }
         .online-studio-loading {
             display: grid;
             justify-items: center;
@@ -2352,7 +2356,7 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         
-        function addMessageWithImage(text, imageUrl, sender) {
+        function addMessageWithImage(text, imageUrl, sender, displayImageUrl = imageUrl) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
@@ -2368,7 +2372,9 @@
                 <div class="message-avatar">${sender === 'user' ? 'U' : 'AI'}</div>
                 <div class="message-content">
                     <div class="message-text">${escapeHtml(text)}</div>
-                    <img class="message-image" src="${imageUrl}" alt="${imageAlt}" style="${imageStyle}">
+                    <a href="${displayImageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; max-width: 100%;">
+                        <img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">
+                    </a>
                     <div class="message-time">${time}</div>
                 </div>
             `;
@@ -3393,6 +3399,7 @@
                 ...normalized,
                 prompt: '',
                 image: '',
+                displayImageUrl: '',
                 model: '',
                 addedToChat: false,
                 addSourceToChat: options.addSourceToChat !== false
@@ -3439,9 +3446,53 @@
             }
         }
 
+        function createImageDisplayUrl(dataUrl) {
+            if (!dataUrl || !dataUrl.startsWith('data:image/')) return dataUrl;
+            return URL.createObjectURL(dataUrlToBlob(dataUrl));
+        }
+
         function closeOnlineImageStudio() {
             const overlay = document.getElementById('onlineImageStudioOverlay');
             if (overlay) overlay.remove();
+        }
+
+        function applyOffGridImageWatermark(imageSrc) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const imageWidth = img.naturalWidth || img.width;
+                        const imageHeight = img.naturalHeight || img.height;
+                        const footerHeight = Math.max(54, Math.min(92, Math.round(imageHeight * 0.075)));
+                        canvas.width = imageWidth;
+                        canvas.height = imageHeight + footerHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
+
+                        const y = imageHeight;
+                        const text = 'Image created with OffGrid AI ToolKit - offgridaitoolkit.com';
+
+                        ctx.fillStyle = 'rgba(250, 246, 235, 0.96)';
+                        ctx.fillRect(0, y, canvas.width, footerHeight);
+                        ctx.fillStyle = 'rgba(185, 126, 20, 0.85)';
+                        ctx.fillRect(0, y, canvas.width, Math.max(2, Math.round(canvas.height * 0.003)));
+
+                        ctx.fillStyle = 'rgba(62, 40, 25, 0.88)';
+                        ctx.font = `700 ${Math.max(16, Math.min(26, Math.round(canvas.width / 62)))}px Arial, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(text, canvas.width / 2, y + footerHeight / 2);
+
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (error) {
+                        console.warn('Image Studio watermark failed:', error);
+                        resolve(imageSrc);
+                    }
+                };
+                img.onerror = () => resolve(imageSrc);
+                img.src = imageSrc;
+            });
         }
 
         async function generateOnlineStudioImage() {
@@ -3489,11 +3540,13 @@
                     throw new Error(imageData.error || 'Image generation failed.');
                 }
 
-                onlineStudioState.image = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                const rawImage = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                onlineStudioState.image = await applyOffGridImageWatermark(rawImage);
+                onlineStudioState.displayImageUrl = createImageDisplayUrl(onlineStudioState.image);
                 onlineStudioState.model = imageData.model || 'google/gemini-3-pro-image-preview';
 
                 if (previewEl) {
-                    previewEl.innerHTML = `<img src="${onlineStudioState.image}" alt="Generated Image Studio visual">`;
+                    previewEl.innerHTML = `<a href="${onlineStudioState.displayImageUrl || onlineStudioState.image}" target="_blank" rel="noopener noreferrer"><img src="${onlineStudioState.displayImageUrl || onlineStudioState.image}" alt="Generated Image Studio visual"></a>`;
                 }
                 if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
                 if (saveBtn) saveBtn.disabled = false;
@@ -3568,7 +3621,7 @@
                 });
             }
 
-            addMessageWithImage('Generated using OffGrid AI Image Studio.', onlineStudioState.image, 'assistant');
+            addMessageWithImage('Generated using OffGrid AI Image Studio.', onlineStudioState.image, 'assistant', onlineStudioState.displayImageUrl || onlineStudioState.image);
             conversationHistory.push({
                 role: 'assistant',
                 content: 'Generated using OffGrid AI Image Studio.',

@@ -400,6 +400,10 @@
             background: #0e151d;
         }
 
+        .result-image a {
+            display: block;
+        }
+
         .result-head {
             display: flex;
             justify-content: space-between;
@@ -579,6 +583,7 @@
             category: 'Other',
             request: '',
             image: '',
+            displayImageUrl: '',
             imageFilename: '',
             markdown: ''
         };
@@ -791,6 +796,56 @@
             return mime === 'jpeg' ? 'jpg' : mime.replace('svg+xml', 'svg');
         }
 
+        function revokeObjectUrl(url) {
+            if (url && url.startsWith('blob:')) {
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function createImageDisplayUrl(dataUrl) {
+            if (!dataUrl || !dataUrl.startsWith('data:image/')) return dataUrl;
+            return URL.createObjectURL(dataUrlToBlob(dataUrl));
+        }
+
+        function applyOffGridImageWatermark(imageSrc) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const canvas = document.createElement('canvas');
+                        const imageWidth = img.naturalWidth || img.width;
+                        const imageHeight = img.naturalHeight || img.height;
+                        const footerHeight = Math.max(54, Math.min(92, Math.round(imageHeight * 0.075)));
+                        canvas.width = imageWidth;
+                        canvas.height = imageHeight + footerHeight;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, imageWidth, imageHeight);
+
+                        const y = imageHeight;
+                        const text = 'Image created with OffGrid AI ToolKit - offgridaitoolkit.com';
+
+                        ctx.fillStyle = 'rgba(250, 246, 235, 0.96)';
+                        ctx.fillRect(0, y, canvas.width, footerHeight);
+                        ctx.fillStyle = 'rgba(185, 126, 20, 0.85)';
+                        ctx.fillRect(0, y, canvas.width, Math.max(2, Math.round(canvas.height * 0.003)));
+
+                        ctx.fillStyle = 'rgba(62, 40, 25, 0.88)';
+                        ctx.font = `700 ${Math.max(16, Math.min(26, Math.round(canvas.width / 62)))}px Arial, sans-serif`;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(text, canvas.width / 2, y + footerHeight / 2);
+
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (error) {
+                        console.warn('Image Studio watermark failed:', error);
+                        resolve(imageSrc);
+                    }
+                };
+                img.onerror = () => resolve(imageSrc);
+                img.src = imageSrc;
+            });
+        }
+
         function downloadBlob(blob, filename) {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -845,7 +900,9 @@
                         </div>
                     </div>
                     <div class="result-image">
-                        <img src="${current.image}" alt="Generated OffGrid AI Image Studio visual">
+                        <a href="${current.displayImageUrl || current.image}" target="_blank" rel="noopener noreferrer">
+                            <img src="${current.displayImageUrl || current.image}" alt="Generated OffGrid AI Image Studio visual">
+                        </a>
                     </div>
                     <div class="hint">For Knowledge Base saves, choose: This PC > OffGrid AI drive > Saved Knowledge Base > category folder. If Windows asks, allow this site to edit the selected folder.</div>
                 </div>
@@ -868,7 +925,8 @@
             titleInput.value = title;
             const category = categoryInput.value.trim() || 'Other';
 
-            current = { title, category, request, image: '', imageFilename: '', markdown: '' };
+            revokeObjectUrl(current.displayImageUrl);
+            current = { title, category, request, image: '', displayImageUrl: '', imageFilename: '', markdown: '' };
 
             try {
                 setBusy(true, 'Crafting...');
@@ -899,7 +957,9 @@
                     throw new Error(imageData.error || 'Image generation failed.');
                 }
 
-                current.image = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                const rawImage = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
+                current.image = await applyOffGridImageWatermark(rawImage);
+                current.displayImageUrl = createImageDisplayUrl(current.image);
                 current.imageFilename = `${slugify(title)}-img-1.${imageExtension(current.image)}`;
                 current.markdown = buildMarkdown(title, category, request, current.imageFilename);
 
@@ -1014,7 +1074,8 @@
             document.getElementById('titleInput').value = '';
             document.getElementById('categoryInput').value = 'Other';
             setStatus('');
-            current = { title: '', category: 'Other', request: '', image: '', imageFilename: '', markdown: '' };
+            revokeObjectUrl(current.displayImageUrl);
+            current = { title: '', category: 'Other', request: '', image: '', displayImageUrl: '', imageFilename: '', markdown: '' };
             document.getElementById('stage').innerHTML = `
                 <div class="empty">
                     <div class="empty-inner">

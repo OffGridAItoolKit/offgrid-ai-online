@@ -1565,6 +1565,13 @@ app.get('/api/health/image-gen', async (req, res) => {
     }
 });
 
+const IMAGE_STUDIO_BRANDING_TEXT = 'Image created with OffGrid AI ToolKit - offgridaitoolkit.com';
+
+function withOffGridImageBranding(prompt) {
+    const trimmedPrompt = prompt.trim();
+    return `${trimmedPrompt}\n\nBranding requirement: include only this exact small footer credit on the finished visual: "${IMAGE_STUDIO_BRANDING_TEXT}". Do not include any year, copyright symbol, alternate organization name, or other watermark text.`;
+}
+
 app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], requireLicense, checkImageLimit, async (req, res) => {
     const genStartTime = Date.now();
     try {
@@ -1584,6 +1591,8 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
             : IMAGE_STUDIO_IMAGE_MODELS.gemini;
         const imageModelLabel = imageModel === IMAGE_STUDIO_IMAGE_MODELS.openai ? 'GPT Image 2' : 'Nano Banana';
         
+        const finalPrompt = withOffGridImageBranding(prompt);
+
         console.log(`[${imageModelLabel}] Generating image for: "${prompt.substring(0, 80)}..."`);
         
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
@@ -1599,7 +1608,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
                 messages: [
                     {
                         role: 'user',
-                        content: prompt.trim()
+                        content: finalPrompt
                     }
                 ],
                 modalities: ['image', 'text']
@@ -1708,7 +1717,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
             success: true,
             image: imageBase64,
             textResponse: textResponse,
-            prompt: prompt.trim(),
+            prompt: finalPrompt,
             model: imageModel
         });
         
@@ -2020,7 +2029,9 @@ RULES:
 - Be specific and descriptive
 - Always specify illustration/visual style
 - Always mention background color
-- Include "labeled" or "annotated" for diagrams`;
+- Include "labeled" or "annotated" for diagrams
+- Include only this exact small footer credit on the finished visual: "Image created with OffGrid AI ToolKit - offgridaitoolkit.com"
+- Do not include any year, copyright symbol, alternate organization name, or other watermark text`;
 
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',
