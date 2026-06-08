@@ -3353,9 +3353,12 @@
             if (!payload || typeof payload !== 'object') return null;
             const answer = String(payload.answer || payload.text || '').trim();
             if (!answer) return null;
+            const title = String(payload.title || inferImageStudioTitle(answer)).trim();
+            const sourcePrompt = String(payload.prompt || payload.question || title).trim();
             return {
                 answer,
-                title: String(payload.title || inferImageStudioTitle(answer)).trim(),
+                title,
+                sourcePrompt: sourcePrompt || title,
                 category: String(payload.category || 'Other').trim(),
                 source: String(payload.source || 'online')
             };
@@ -3617,10 +3620,10 @@
             ensureChatViewForStudio();
 
             if (onlineStudioState.addSourceToChat) {
-                addMessage(onlineStudioState.title, 'user');
+                addMessage(onlineStudioState.sourcePrompt || onlineStudioState.title, 'user');
                 conversationHistory.push({
                     role: 'user',
-                    content: onlineStudioState.title
+                    content: onlineStudioState.sourcePrompt || onlineStudioState.title
                 });
 
                 addMessage(onlineStudioState.answer, 'assistant');
