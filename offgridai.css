@@ -1206,14 +1206,20 @@ body.live-compass-enabled .live-compass .welcome-icon {
         font-size: 14px;
     }
 
-    body.is-app-surface .mobile-secondary-row .mobile-secondary-btn[onclick*="/command"],
-    body.is-app-surface .tool-button[href*="/command"],
+    .mobile-secondary-row .mobile-secondary-btn[onclick*="/command"],
+    .tool-button[href*="/command"],
+    .tool-button[href*="offgridtoolkit.ai/command"],
     body.is-app-surface .purchase-cta,
     body.is-app-surface .save-btn,
     body.is-app-surface .save-kb-button,
     body.is-app-surface .online-kb-save-callout,
     body.is-app-surface #onlineStudioSaveBtn {
         display: none !important;
+    }
+
+    .mobile-secondary-row {
+        grid-template-columns: 1fr !important;
+        display: grid !important;
     }
 
     body.is-app-surface .mobile-secondary-row {
