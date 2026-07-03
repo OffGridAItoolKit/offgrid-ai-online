@@ -2025,10 +2025,13 @@ YOUR TASK:
 
 IMAGE SIZE & STYLE RULES:
 - Create PRACTICAL REFERENCE VISUALS — NOT large posters
-- Target size: standard document/screen size (like a reference card, field guide page, or single-page infographic)
-- Style: clean, organized, labeled, easy to read at normal screen/print size
-- Best formats: labeled diagrams, step-by-step infographics, checklists with icons, comparison charts, flow charts, identification cards, quick-reference guides
-- Use clear section dividers, consistent icons, readable text sizes
+- Assume the visual will often be viewed on a mobile phone first
+- Prefer portrait or mobile-friendly layouts such as 3:4, 4:5, or 9:16 unless the content truly needs a landscape diagram
+- It is OK for the visual to be a little taller or longer if that improves readability and usefulness; do not cram too much into one short/wide image
+- Style: clean, organized, labeled, easy to read on a phone screen and useful when saved as a field reference
+- Best formats: mobile-readable field cards, labeled diagrams, step-by-step infographics, checklists with icons, comparison charts, flow charts, identification cards, quick-reference guides
+- Use generous spacing, clear section dividers, consistent icons, and large readable text sizes
+- If the source answer contains many details, prioritize the most actionable 3-5 ideas and present them clearly rather than squeezing in every point
 - Specify: clean white or light background, professional illustration style, labeled components
 - Include color palette suggestions (earth tones for survival, clinical blues for medical, etc.)
 
@@ -2046,6 +2049,7 @@ RULES:
 - Always specify illustration/visual style
 - Always mention background color
 - Include "labeled" or "annotated" for diagrams
+- Include wording such as "mobile-readable", "large legible labels", and "portrait field-card layout" when appropriate
 - Do not include any footer, credit line, watermark, year, copyright symbol, website address, or brand attribution in the generated artwork`;
 
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
@@ -2249,16 +2253,17 @@ app.post('/api/export-pdf', async (req, res) => {
         
         img {
             max-width: 100%;
-            max-height: 38vh;
+            max-height: 72vh;
             object-fit: contain;
             border-radius: 8px;
-            margin: 8px 0;
+            margin: 14px auto 22px;
+            display: block;
             page-break-inside: avoid;
         }
         
         @media print {
             img {
-                max-height: 340px;
+                max-height: 780px;
                 page-break-inside: avoid;
             }
         }
@@ -2411,8 +2416,17 @@ function serveWithExperience(req, res, isCustomer) {
             console.error('Error reading index.html:', err);
             return res.status(500).send('Server error');
         }
+        const surface = req.query.surface === 'app' ? 'app' : 'web';
+        const platform = ['ios', 'android'].includes(req.query.platform) ? req.query.platform : 'web';
+        const apiBase = req.query.apiBase === 'production' ? 'https://offgridtoolkit.ai' : '';
         // Inject the experience config right before </head>
-        const configScript = `<script>window.OFFGRID_CONFIG = { isCustomer: ${isCustomer}, experience: '${isCustomer ? 'online' : 'demo'}' };</script>`;
+        const configScript = `<script>window.OFFGRID_CONFIG = ${JSON.stringify({
+            isCustomer,
+            experience: isCustomer ? 'online' : 'demo',
+            surface,
+            platform,
+            apiBase
+        })};</script>`;
         const injectedHtml = html.replace('</head>', configScript + '\n</head>');
         res.setHeader('Content-Type', 'text/html');
         res.send(injectedHtml);

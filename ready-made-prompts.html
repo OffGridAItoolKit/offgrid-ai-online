@@ -1402,7 +1402,28 @@
         // CONTEXT DETECTION
         // ============================================
         
-        const isCommandContext = window.location.pathname.includes('/command');
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAppSurface = urlParams.get('surface') === 'app';
+        const platformParam = urlParams.get('platform');
+        const apiBaseParam = urlParams.get('apiBase');
+        const isCommandContext = !isAppSurface && window.location.pathname.includes('/command');
+
+        if (isAppSurface) {
+            document.body.classList.add('is-app-surface');
+        }
+
+        function buildReturnQuery() {
+            const params = new URLSearchParams();
+            if (isAppSurface) params.set('surface', 'app');
+            if (platformParam) params.set('platform', platformParam);
+            if (apiBaseParam) params.set('apiBase', apiBaseParam);
+            return params.toString();
+        }
+
+        function returnPathFor(path) {
+            const query = buildReturnQuery();
+            return query ? `${path}?${query}` : path;
+        }
         
         // Apply dark theme for Command Center context
         if (isCommandContext) {
@@ -1419,10 +1440,20 @@
             badge.style.background = 'linear-gradient(135deg, #b8860b 0%, #daa520 100%)';
             badge.classList.remove('online-badge');
             badge.classList.add('command-badge');
-            document.querySelector('.back-link').href = '/command';
+            document.querySelector('.back-link').href = returnPathFor('/command');
             document.querySelector('.back-link').textContent = '\u2190 Back to Chat';
             document.querySelector('.hero p').textContent = 'Expert prompts designed to challenge and showcase the AI Council. Click any prompt to copy it, or send it directly to the Command Center.';
             document.querySelector('.footer p').textContent = 'All prompts have been curated for the Command Center AI Council.';
+        } else {
+            document.querySelector('.back-link').href = returnPathFor('/online');
+            const footerReturnLink = document.querySelector('.footer a[href="/online"]');
+            if (footerReturnLink) footerReturnLink.href = returnPathFor('/online');
+        }
+
+        if (isAppSurface) {
+            document.querySelector('.hero p').textContent = 'Field-ready prompts for practical decisions, image analysis, repairs, planning, and preparedness. Tap any prompt to send it back to OffGrid AI.';
+            const kbBadge = document.querySelector('.hero-badge.kb');
+            if (kbBadge) kbBadge.textContent = 'Field Prompts';
         }
         
         // Filter out challenging categories and survival filter for online context
@@ -1490,7 +1521,6 @@
         // ============================================
         
         // Support URL parameter filtering (e.g., ?filter=survival)
-        const urlParams = new URLSearchParams(window.location.search);
         const urlFilter = urlParams.get('filter');
         const validFilters = ['all', 'survival', 'kb', 'vision', 'challenging'];
         let activeFilter = (urlFilter && validFilters.includes(urlFilter)) ? urlFilter : 'all';
@@ -1618,7 +1648,7 @@
             sessionStorage.setItem('offgrid-ready-prompt', text);
             // Detect if user came from Command Center based on referrer or URL path
             const isCommand = document.referrer.includes('/command') || window.location.pathname.includes('/command');
-            window.location.href = isCommand ? '/command' : '/online';
+            window.location.href = isCommandContext || isCommand ? returnPathFor('/command') : returnPathFor('/online');
         }
         
         function showToast(message) {

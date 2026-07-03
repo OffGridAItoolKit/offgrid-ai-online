@@ -224,6 +224,16 @@
             gap: 10px;
             margin-bottom: 18px;
         }
+        .online-studio-done-top {
+            margin-left: auto;
+            border: 1px solid rgba(218, 165, 32, 0.35);
+            border-radius: 8px;
+            padding: 8px 12px;
+            background: rgba(218, 165, 32, 0.12);
+            color: #f0c040;
+            font-weight: 800;
+            cursor: pointer;
+        }
         .online-studio-title {
             font-size: 20px;
             font-weight: 800;
@@ -304,6 +314,11 @@
             border-color: rgba(148, 163, 184, 0.28);
             color: #d7dee8;
         }
+        .online-studio-btn.download {
+            background: rgba(16, 185, 129, 0.14);
+            border-color: rgba(16, 185, 129, 0.38);
+            color: #a7f3d0;
+        }
         .online-studio-guidance {
             display: none;
             margin: 14px 0 4px;
@@ -339,6 +354,58 @@
             font-size: 11px;
             text-align: center;
             margin-top: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .online-studio-overlay {
+                align-items: flex-start;
+                padding: 12px;
+                overflow-y: auto;
+            }
+
+            .online-studio-modal {
+                width: 100%;
+                max-height: none;
+                min-height: auto;
+                padding: 16px;
+                border-radius: 10px;
+            }
+
+            .online-studio-header {
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-bottom: 12px;
+            }
+
+            .online-studio-title {
+                font-size: 18px;
+            }
+
+            .online-studio-preview {
+                min-height: 0;
+                aspect-ratio: 3 / 4;
+                max-height: 58vh;
+                align-items: center;
+            }
+
+            .online-studio-preview img {
+                max-height: 58vh;
+            }
+
+            .online-studio-guidance {
+                font-size: 11px;
+            }
+
+            .online-studio-actions {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .online-studio-btn {
+                width: 100%;
+                padding: 11px 12px;
+            }
         }
 
         .online-kb-save-callout {
@@ -1366,22 +1433,28 @@
             <div class="messages" id="messages">
                 <div class="welcome" id="welcome">
                 <div class="welcome-content">
-                    <svg class="welcome-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Main compass points (N,S,E,W) -->
-                        <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
-                        <path d="M50 95 L45 55 L50 50 L55 55 Z" fill="#daa520"/>
-                        <path d="M95 50 L55 55 L50 50 L55 45 Z" fill="#cd853f"/>
-                        <path d="M5 50 L45 45 L50 50 L45 55 Z" fill="#d2691e"/>
-                        <!-- Diagonal points -->
-                        <path d="M78 22 L55 45 L50 50 L45 45 Z" fill="#deb887" opacity="0.7"/>
-                        <path d="M78 78 L55 55 L50 50 L55 45 Z" fill="#deb887" opacity="0.7"/>
-                        <path d="M22 78 L45 55 L50 50 L45 45 Z" fill="#deb887" opacity="0.7"/>
-                        <path d="M22 22 L45 45 L50 50 L45 55 Z" fill="#deb887" opacity="0.7"/>
-                        <!-- Thin circle -->
-                        <circle cx="50" cy="50" r="35" fill="none" stroke="#8b4513" stroke-width="1" opacity="0.5"/>
-                        <!-- Center circle -->
-                        <circle cx="50" cy="50" r="6" fill="#8b4513"/>
-                    </svg>
+                    <button class="live-compass" id="liveCompass" type="button" onclick="toggleLiveCompass()" aria-label="Tap to enable live compass">
+                        <svg class="welcome-icon" id="compassRose" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Main compass points (N,S,E,W) -->
+                            <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
+                            <path d="M50 95 L45 55 L50 50 L55 55 Z" fill="#daa520"/>
+                            <path d="M95 50 L55 55 L50 50 L55 45 Z" fill="#cd853f"/>
+                            <path d="M5 50 L45 45 L50 50 L45 55 Z" fill="#d2691e"/>
+                            <!-- Diagonal points -->
+                            <path d="M78 22 L55 45 L50 50 L45 45 Z" fill="#deb887" opacity="0.7"/>
+                            <path d="M78 78 L55 55 L50 50 L55 45 Z" fill="#deb887" opacity="0.7"/>
+                            <path d="M22 78 L45 55 L50 50 L45 45 Z" fill="#deb887" opacity="0.7"/>
+                            <path d="M22 22 L45 45 L50 50 L45 55 Z" fill="#deb887" opacity="0.7"/>
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="#c8a06b" stroke-width="0.7" opacity="0.75"/>
+                            <circle cx="50" cy="50" r="35" fill="none" stroke="#8b4513" stroke-width="1" opacity="0.5"/>
+                            <text class="compass-cardinal compass-cardinal-n" x="50" y="8" text-anchor="middle">N</text>
+                            <text class="compass-cardinal" x="96" y="53" text-anchor="middle">E</text>
+                            <text class="compass-cardinal" x="50" y="99" text-anchor="middle">S</text>
+                            <text class="compass-cardinal" x="4" y="53" text-anchor="middle">W</text>
+                            <circle cx="50" cy="50" r="6" fill="#8b4513"/>
+                        </svg>
+                    </button>
+                    <div class="compass-heading" id="compassHeading">Tap compass for heading</div>
                     <p class="welcome-tagline"><em>Built for weak signals and hard decisions.</em></p>
                     <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
@@ -1454,7 +1527,7 @@
                                 </div>
                             </div>
                             <div class="welcome-button-row">
-                                <button class="action-btn prompts-btn" onclick="window.location.href='/online/ready-made-prompts'">
+                                <button class="action-btn prompts-btn" onclick="navigateToReadyMadePrompts()">
                                     <span class="action-btn-icon">💡</span> Prompts
                                 </button>
                                 <button class="action-btn voice-btn" onclick="toggleVoiceInput()" title="Voice Input">
@@ -1494,7 +1567,7 @@
                             <div class="quick-action-title">📂 Open File Explorer</div>
                             <div class="quick-action-desc">Navigate to your offline survival library</div>
                         </div>
-                        <div class="quick-action" onclick="window.location.href='/online/ready-made-prompts'" style="border-color: #b8860b;">
+                        <div class="quick-action" onclick="navigateToReadyMadePrompts()" style="border-color: #b8860b;">
                             <div class="quick-action-title">💡 Ready-Made Prompts</div>
                             <div class="quick-action-desc">Expert prompts for your library</div>
                         </div>
@@ -1521,7 +1594,7 @@
                             </div>
                         </div>
                         <div class="mobile-secondary-row">
-                            <div class="mobile-secondary-btn" onclick="window.location.href='/online/ready-made-prompts'">
+                            <div class="mobile-secondary-btn" onclick="navigateToReadyMadePrompts()">
                                 <span>💡</span> Ready-Made Prompts
                             </div>
                             <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
@@ -1551,7 +1624,7 @@
                             </div>
                         </div>
                         <div class="mobile-secondary-row">
-                            <div class="mobile-secondary-btn" onclick="window.location.href='/online/ready-made-prompts'">
+                            <div class="mobile-secondary-btn" onclick="navigateToReadyMadePrompts()">
                                 <span>💡</span> Ready-Made Prompts
                             </div>
                             <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
@@ -1588,10 +1661,22 @@
         // ============================================
         
         // Experience config injected by server
-        const CONFIG = window.OFFGRID_CONFIG || { isCustomer: false, experience: 'demo' };
+        const CONFIG = window.OFFGRID_CONFIG || { isCustomer: false, experience: 'demo', surface: 'web', platform: 'web', apiBase: '' };
+        const IS_APP_SURFACE = CONFIG.surface === 'app';
         
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
+        document.body.classList.add(IS_APP_SURFACE ? 'is-app-surface' : 'is-web-surface');
+        if (CONFIG.platform) {
+            document.body.classList.add(`platform-${CONFIG.platform}`);
+        }
+        if (IS_APP_SURFACE) {
+            document.querySelectorAll('.header .online-badge').forEach((badge) => {
+                if (badge.textContent.trim().toUpperCase() === 'ONLINE') {
+                    badge.textContent = 'OffGrid AI';
+                }
+            });
+        }
         
         // Single model architecture - always use Gemma 4 26B A4B
         let selectedModel = 'gemma-4-26b';
@@ -1603,7 +1688,121 @@
         let voiceRecognition = null;
         let onlineStudioState = null;
         let pendingOnlineStudioPayload = null;
-        const API_BASE = '';  // Same origin - Express proxy
+        let liveCompassEnabled = false;
+        let liveCompassHeading = null;
+        let liveCompassStatusTimer = null;
+        const API_BASE = CONFIG.apiBase || '';  // Same origin by default; app debug builds can use production API.
+
+        function cardinalFromHeading(degrees) {
+            const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+            return directions[Math.round((((degrees % 360) + 360) % 360) / 45) % 8];
+        }
+
+        function buildAppContextQuery() {
+            const params = new URLSearchParams();
+            if (IS_APP_SURFACE) {
+                params.set('surface', 'app');
+            }
+            if (CONFIG.platform && CONFIG.platform !== 'web') {
+                params.set('platform', CONFIG.platform);
+            }
+            if (CONFIG.apiBase === 'https://offgridtoolkit.ai') {
+                params.set('apiBase', 'production');
+            }
+            return params.toString();
+        }
+
+        function appContextPath(path) {
+            const query = buildAppContextQuery();
+            return query ? `${path}?${query}` : path;
+        }
+
+        function navigateToReadyMadePrompts() {
+            window.location.href = appContextPath('/online/ready-made-prompts');
+        }
+
+        function setCompassStatus(text) {
+            const headingEl = document.getElementById('compassHeading');
+            if (headingEl) headingEl.textContent = text;
+        }
+
+        function extractCompassHeading(event) {
+            if (typeof event.webkitCompassHeading === 'number') {
+                return event.webkitCompassHeading;
+            }
+            if (event.absolute === true && typeof event.alpha === 'number') {
+                return (360 - event.alpha + 360) % 360;
+            }
+            if (typeof event.alpha === 'number') {
+                return (360 - event.alpha + 360) % 360;
+            }
+            return null;
+        }
+
+        function handleCompassOrientation(event) {
+            const heading = extractCompassHeading(event);
+            if (heading === null || Number.isNaN(heading)) return;
+
+            liveCompassHeading = liveCompassHeading === null
+                ? heading
+                : (liveCompassHeading * 0.82) + (heading * 0.18);
+
+            const normalized = ((liveCompassHeading % 360) + 360) % 360;
+            const compassRose = document.getElementById('compassRose');
+            if (compassRose) {
+                compassRose.style.transform = `rotate(${-normalized}deg)`;
+            }
+            setCompassStatus(`${cardinalFromHeading(normalized)} ${Math.round(normalized)} deg`);
+        }
+
+        function stopLiveCompass() {
+            window.removeEventListener('deviceorientationabsolute', handleCompassOrientation, true);
+            window.removeEventListener('deviceorientation', handleCompassOrientation, true);
+            liveCompassEnabled = false;
+            liveCompassHeading = null;
+            document.body.classList.remove('live-compass-enabled');
+            const compassRose = document.getElementById('compassRose');
+            if (compassRose) compassRose.style.transform = '';
+            setCompassStatus('Tap compass for heading');
+        }
+
+        async function toggleLiveCompass() {
+            if (liveCompassEnabled) {
+                stopLiveCompass();
+                return;
+            }
+
+            if (typeof DeviceOrientationEvent === 'undefined') {
+                setCompassStatus('Compass unavailable on this device');
+                return;
+            }
+
+            try {
+                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    const permission = await DeviceOrientationEvent.requestPermission();
+                    if (permission !== 'granted') {
+                        setCompassStatus('Compass permission denied');
+                        return;
+                    }
+                }
+
+                liveCompassEnabled = true;
+                document.body.classList.add('live-compass-enabled');
+                setCompassStatus('Move phone to calibrate');
+                window.addEventListener('deviceorientationabsolute', handleCompassOrientation, true);
+                window.addEventListener('deviceorientation', handleCompassOrientation, true);
+
+                clearTimeout(liveCompassStatusTimer);
+                liveCompassStatusTimer = setTimeout(() => {
+                    if (liveCompassEnabled && liveCompassHeading === null) {
+                        setCompassStatus('Heading unavailable');
+                    }
+                }, 2500);
+            } catch (error) {
+                console.warn('Live compass could not start:', error);
+                setCompassStatus('Compass unavailable');
+            }
+        }
         
         // Model display name (single model architecture)
         const MODEL_DISPLAY = {
@@ -1961,7 +2160,8 @@
                         <button class="remove-image" onclick="removeImage()">Remove</button>
                     </div>
                     <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
-                    <input type="file" id="galleryInput" class="image-upload-input" accept="image/*" onchange="handleImageSelect(event)">
+                    <input type="file" id="galleryInput" class="image-upload-input" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.heic,.heif" onchange="handleImageSelect(event)">
+                    <input type="file" id="imageFileInput" class="image-upload-input" accept="*/*" onchange="handleImageSelect(event)">
                     <input type="file" id="videoInput" class="image-upload-input" accept="video/*" onchange="handleVideoSelect(event)">
                     <input type="file" id="videoRecordInput" class="image-upload-input" accept="video/*" capture="environment" onchange="handleVideoSelect(event)">
                     <div class="video-preview" id="videoPreview">
@@ -2026,9 +2226,10 @@
                         <button class="action-btn clear-btn" onclick="clearChat()">
                             Clear
                         </button>
+                        ${IS_APP_SURFACE ? '' : `
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
                             Save to KB
-                        </button>
+                        </button>`}
                         <button class="action-btn visual-btn" id="createVisualBtn" onclick="handleCreateVisual()" disabled>
                             Create Visual
                         </button>
@@ -2373,14 +2574,24 @@
             const imageStyle = isGeneratedImage
                 ? 'width: min(100%, 820px); max-width: 820px; height: auto; border-radius: 8px; margin-top: 10px; display: block; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);'
                 : 'max-width: 300px; height: auto; border-radius: 8px; margin-top: 8px; display: block;';
+            const imageMarkup = IS_APP_SURFACE && isGeneratedImage
+                ? `<img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">`
+                : `<a href="${displayImageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; max-width: 100%;">
+                        <img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">
+                    </a>`;
+            const imageActions = IS_APP_SURFACE && isGeneratedImage
+                ? `<div class="message-image-actions">
+                        <button onclick="exportOnlineStudioPDF()">Save Full Field Guide</button>
+                        <button onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share Image</button>
+                    </div>`
+                : '';
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${sender === 'user' ? 'U' : 'AI'}</div>
                 <div class="message-content">
                     <div class="message-text">${escapeHtml(text)}</div>
-                    <a href="${displayImageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; max-width: 100%;">
-                        <img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">
-                    </a>
+                    ${imageMarkup}
+                    ${imageActions}
                     <div class="message-time">${time}</div>
                 </div>
             `;
@@ -2467,7 +2678,8 @@
         }
 
         function triggerGalleryUpload() {
-            let input = document.getElementById('galleryInput');
+            const uploadInputId = IS_APP_SURFACE ? 'imageFileInput' : 'galleryInput';
+            let input = document.getElementById(uploadInputId);
             if (!input) {
                 // Save any existing text from welcome input before transitioning
                 const welcomeInput = document.getElementById('welcomeMessageInput');
@@ -2476,7 +2688,7 @@
                 transitionToChat();
                 const welcome = document.getElementById('welcome');
                 if (welcome) welcome.remove();
-                input = document.getElementById('galleryInput');
+                input = document.getElementById(uploadInputId);
                 
                 // Restore the saved text to the new input
                 if (savedText) {
@@ -2507,11 +2719,18 @@
                     };
                     showImagePreview();
                     
-                    // Dismiss keyboard on mobile so user can see the image preview
                     if (window.innerWidth <= 768) {
-                        document.activeElement.blur();
+                        setTimeout(() => {
+                            const newInput = document.getElementById('messageInput');
+                            if (newInput) {
+                                newInput.focus();
+                                autoResize(newInput);
+                            }
+                        }, 120);
                     }
                 });
+            } else if (file) {
+                showSaveToast('Please choose an image file', 'Screenshots, downloads, PNG, JPG, WEBP, HEIC, and similar image files are supported.');
             }
         }
         
@@ -2550,6 +2769,8 @@
                 previewImg.src = selectedImage.dataUrl;
                 previewFilename.textContent = selectedImage.name;
                 preview.classList.add('active');
+                updateInputAttachmentState();
+                refreshActiveInputSize();
             }
         }
         
@@ -2559,8 +2780,12 @@
             if (preview) preview.classList.remove('active');
             const imageInput = document.getElementById('imageInput');
             const galleryInput = document.getElementById('galleryInput');
+            const imageFileInput = document.getElementById('imageFileInput');
             if (imageInput) imageInput.value = '';
             if (galleryInput) galleryInput.value = '';
+            if (imageFileInput) imageFileInput.value = '';
+            updateInputAttachmentState();
+            refreshActiveInputSize();
         }
         
         // ============================================
@@ -2957,6 +3182,8 @@
                     metaEl.textContent = duration + 's • ' + sizeMB + 'MB';
                 }
                 preview.classList.add('active');
+                updateInputAttachmentState();
+                refreshActiveInputSize();
             }
         }
         
@@ -2968,6 +3195,8 @@
             if (videoInput) videoInput.value = '';
             const videoWarning = document.getElementById('videoModelWarning');
             if (videoWarning) videoWarning.classList.remove('active');
+            updateInputAttachmentState();
+            refreshActiveInputSize();
         }
         
         function addMessageWithVideo(text, thumbnailUrl, videoName, duration, sender) {
@@ -3050,17 +3279,39 @@
         }
         
         function autoResize(textarea) {
+            updateInputAttachmentState();
             textarea.style.height = 'auto';
             textarea.style.overflow = 'hidden';
             // Max ~6 lines on mobile, ~8 lines on desktop before scrolling
             const maxHeight = window.innerWidth <= 768 ? 160 : 220;
-            const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+            const minHeight = 40;
+            const newHeight = Math.max(minHeight, Math.min(textarea.scrollHeight, maxHeight));
             textarea.style.height = newHeight + 'px';
             if (textarea.scrollHeight > maxHeight) {
                 textarea.style.overflowY = 'auto';
             } else {
                 textarea.style.overflowY = 'hidden';
             }
+        }
+
+        function updateInputAttachmentState() {
+            const inputArea = document.getElementById('bottomInputArea');
+            const container = inputArea ? inputArea.querySelector('.input-container') : null;
+            if (!container) return;
+            const hasAttachment = !!(selectedImage || selectedVideo);
+            container.classList.toggle('has-attachment', hasAttachment);
+        }
+
+        function refreshActiveInputSize() {
+            requestAnimationFrame(() => {
+                const input = document.getElementById('messageInput') || document.getElementById('welcomeMessageInput');
+                if (!input) return;
+                if (input.id === 'welcomeMessageInput') {
+                    autoResizeWelcome(input);
+                } else {
+                    autoResize(input);
+                }
+            });
         }
         
         function sendQuickPrompt(prompt) {
@@ -3124,7 +3375,7 @@
                 document.querySelectorAll('.voice-btn').forEach(btn => btn.classList.remove('voice-active'));
                 voiceRecognition = null;
                 if (event.error === 'not-allowed') {
-                    alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+                    showMicrophonePermissionHelp();
                 }
             };
 
@@ -3174,11 +3425,22 @@
                 recording.classList.remove('active');
                 voiceRecognition = null;
                 if (event.error === 'not-allowed') {
-                    alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+                    showMicrophonePermissionHelp();
                 }
             };
 
             voiceRecognition.start();
+        }
+
+        function showMicrophonePermissionHelp() {
+            if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.openAppSettings === 'function') {
+                const openSettings = confirm('Microphone access is blocked for OffGrid AI ToolKit. Open app settings now so you can allow Microphone access?');
+                if (openSettings) {
+                    window.OffGridNative.openAppSettings();
+                }
+                return;
+            }
+            alert('Microphone access was denied. Please allow microphone access in your browser or app settings.');
         }
 
         function stopVoiceInput() {
@@ -3425,6 +3687,7 @@
                     <div class="online-studio-header">
                         <div class="online-studio-title">Image Studio</div>
                         <div class="online-studio-subtitle">by OffGrid AI</div>
+                        ${IS_APP_SURFACE ? '<button class="online-studio-done-top" onclick="closeOnlineImageStudio()">Done</button>' : ''}
                     </div>
                     <div class="online-studio-status" id="onlineStudioStatus">Preparing visual...</div>
                     <div class="online-studio-preview" id="onlineStudioPreview">
@@ -3435,15 +3698,16 @@
                     </div>
                     <div id="onlineStudioError"></div>
                     <div class="online-studio-guidance" id="onlineStudioGuidance">
-                        <div class="online-studio-guidance-title">Next Steps After Image Is Generated</div>
-                        Click <strong>Save to Knowledge Base</strong>, then choose your OffGrid AI drive folder:
-                        <strong>This PC > OffGrid AI (D: or E:) > Saved Knowledge Base > category folder</strong>.
-                        If Windows asks for permission, click <strong>Allow</strong>. A backup is also added to this online session below.
+                        <div class="online-studio-guidance-title">${IS_APP_SURFACE ? 'Save or Share This Visual' : 'Next Steps After Image Is Generated'}</div>
+                        ${IS_APP_SURFACE
+                            ? 'Use <strong>Save Image</strong> for the graphic, or <strong>Save Field Guide PDF</strong> to keep the image and answer together on your phone. You can also continue the conversation below.'
+                            : 'Click <strong>Save to Knowledge Base</strong>, then choose your OffGrid AI drive folder: <strong>This PC > OffGrid AI (D: or E:) > Saved Knowledge Base > category folder</strong>. If Windows asks for permission, click <strong>Allow</strong>. A backup is also added to this online session below.'}
                     </div>
                     <div class="online-studio-actions">
-                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">Cancel</button>
-                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>Save PDF</button>
-                        <button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>
+                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">${IS_APP_SURFACE ? 'Done / Back to Chat' : 'Cancel'}</button>
+                        ${IS_APP_SURFACE ? '<button class="online-studio-btn download" id="onlineStudioImageBtn" onclick="downloadOnlineStudioImage()" disabled>Save Image</button>' : ''}
+                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>${IS_APP_SURFACE ? 'Save Field Guide PDF' : 'Save PDF'}</button>
+                        ${IS_APP_SURFACE ? '' : '<button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>'}
                     </div>
                     <div class="online-studio-note">Images are generated on-demand and never stored on our servers.</div>
                 </div>
@@ -3507,6 +3771,18 @@
             });
         }
 
+        function enhanceVisualPromptForApp(prompt) {
+            if (!IS_APP_SURFACE || !prompt) return prompt;
+            return `${prompt}
+
+Mobile app output requirements:
+- Create a vertical portrait field-guide card, preferably 9:16 or 4:5.
+- Avoid wide horizontal infographic layouts.
+- Use large, legible labels and generous spacing for phone screens.
+- Prioritize the most useful field-ready details instead of cramming every detail into one wide chart.
+- It is okay for the image to be taller if that makes the guide more useful and readable.`;
+        }
+
         async function generateOnlineStudioImage() {
             if (!onlineStudioState) return;
             const statusEl = document.getElementById('onlineStudioStatus');
@@ -3514,11 +3790,13 @@
             const errorEl = document.getElementById('onlineStudioError');
             const saveBtn = document.getElementById('onlineStudioSaveBtn');
             const pdfBtn = document.getElementById('onlineStudioPdfBtn');
+            const imageBtn = document.getElementById('onlineStudioImageBtn');
             const guidanceEl = document.getElementById('onlineStudioGuidance');
 
             try {
                 if (saveBtn) saveBtn.disabled = true;
                 if (pdfBtn) pdfBtn.disabled = true;
+                if (imageBtn) imageBtn.disabled = true;
                 if (guidanceEl) guidanceEl.style.display = 'none';
                 if (errorEl) errorEl.innerHTML = '';
                 if (statusEl) statusEl.textContent = 'Crafting visual prompt...';
@@ -3536,14 +3814,15 @@
                     throw new Error(promptData.error || 'Could not create the visual prompt.');
                 }
 
-                onlineStudioState.prompt = promptData.prompt;
+                const imagePrompt = enhanceVisualPromptForApp(promptData.prompt);
+                onlineStudioState.prompt = imagePrompt;
                 if (statusEl) statusEl.textContent = 'Generating image...';
 
                 const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        prompt: promptData.prompt,
+                        prompt: imagePrompt,
                         model: 'google/gemini-3-pro-image-preview'
                     })
                 });
@@ -3558,11 +3837,17 @@
                 onlineStudioState.model = imageData.model || 'google/gemini-3-pro-image-preview';
 
                 if (previewEl) {
-                    previewEl.innerHTML = `<a href="${onlineStudioState.displayImageUrl || onlineStudioState.image}" target="_blank" rel="noopener noreferrer"><img src="${onlineStudioState.displayImageUrl || onlineStudioState.image}" alt="Generated Image Studio visual"></a>`;
+                    const displaySrc = onlineStudioState.displayImageUrl || onlineStudioState.image;
+                    previewEl.innerHTML = IS_APP_SURFACE
+                        ? `<img class="online-studio-result-image" src="${displaySrc}" alt="Generated Image Studio visual" onclick="handleOnlineStudioImageTap(event)" oncontextmenu="openOnlineStudioImageMenu(event)" onpointerdown="startOnlineStudioImagePress(event)" onpointerup="cancelOnlineStudioImagePress()" onpointerleave="cancelOnlineStudioImagePress()" onpointercancel="cancelOnlineStudioImagePress()">`
+                        : `<a href="${displaySrc}" target="_blank" rel="noopener noreferrer"><img src="${displaySrc}" alt="Generated Image Studio visual"></a>`;
                 }
-                if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
+                if (statusEl) statusEl.textContent = IS_APP_SURFACE
+                    ? 'Visual ready - save to phone or continue in chat.'
+                    : 'Visual ready - review, save, or continue in chat.';
                 if (saveBtn) saveBtn.disabled = false;
                 if (pdfBtn) pdfBtn.disabled = false;
+                if (imageBtn) imageBtn.disabled = false;
                 if (guidanceEl) guidanceEl.style.display = 'block';
 
                 addOnlineStudioResultToChat();
@@ -3641,7 +3926,9 @@
                 imageLabel: 'Generated Image',
                 model: 'OffGrid AI Image Studio'
             });
-            addOnlineStudioSaveCallout();
+            if (!IS_APP_SURFACE) {
+                addOnlineStudioSaveCallout();
+            }
 
             onlineStudioState.addedToChat = true;
 
@@ -3655,6 +3942,192 @@
                 modalSaveBtn.textContent = 'Save to Knowledge Base';
                 modalSaveBtn.disabled = false;
             }
+        }
+
+        let onlineStudioImagePressTimer = null;
+        let onlineStudioImageLongPressTriggered = false;
+
+        function getOnlineStudioImageFilename() {
+            const source = onlineStudioState?.title || onlineStudioState?.sourcePrompt || 'offgrid-ai-visual';
+            const slug = generateFilename(source).replace(/\.md$/i, '').substring(0, 70);
+            return `${slug || 'offgrid-ai-visual'}-${Date.now()}.png`;
+        }
+
+        function parseNativeBridgeResult(result) {
+            if (!result) return { ok: false, error: 'No response from phone.' };
+            if (typeof result === 'string') {
+                try {
+                    return JSON.parse(result);
+                } catch (error) {
+                    return { ok: false, error: result };
+                }
+            }
+            return result;
+        }
+
+        function saveImageDataUrlToPhone(dataUrl, filename) {
+            if (!dataUrl) return false;
+            if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.saveImageToGallery === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.saveImageToGallery(dataUrl, filename));
+                if (result.ok) {
+                    showSaveToast('Saved to Gallery', 'Look for the OffGrid AI album/folder.');
+                    return true;
+                }
+                showSaveToast('Image save failed', result.error || 'Could not save to Gallery.');
+                return false;
+            }
+
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            showSaveToast('Image downloaded', 'Check your browser downloads.');
+            return true;
+        }
+
+        function shareImageDataUrlFromPhone(dataUrl, filename) {
+            if (!dataUrl) return false;
+            if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.shareImage === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.shareImage(dataUrl, filename));
+                if (!result.ok) {
+                    showSaveToast('Share failed', result.error || 'Could not open share sheet.');
+                    return false;
+                }
+                return true;
+            }
+            showSaveToast('Share not available yet', 'Use Save Image, then share from your gallery.');
+            return false;
+        }
+
+        function downloadOnlineStudioImage() {
+            if (!onlineStudioState || !onlineStudioState.image) return;
+            saveImageDataUrlToPhone(onlineStudioState.image, getOnlineStudioImageFilename());
+        }
+
+        function handleOnlineStudioImageTap(event) {
+            if (!IS_APP_SURFACE) return;
+            event.preventDefault();
+            if (onlineStudioImageLongPressTriggered) {
+                onlineStudioImageLongPressTriggered = false;
+                return;
+            }
+            downloadOnlineStudioImage();
+        }
+
+        function startOnlineStudioImagePress(event) {
+            if (!IS_APP_SURFACE) return;
+            cancelOnlineStudioImagePress();
+            onlineStudioImageLongPressTriggered = false;
+            onlineStudioImagePressTimer = setTimeout(() => {
+                onlineStudioImageLongPressTriggered = true;
+                openOnlineStudioImageMenu(event);
+            }, 520);
+        }
+
+        function cancelOnlineStudioImagePress() {
+            if (onlineStudioImagePressTimer) {
+                clearTimeout(onlineStudioImagePressTimer);
+                onlineStudioImagePressTimer = null;
+            }
+        }
+
+        function openOnlineStudioImageMenu(event) {
+            if (!onlineStudioState || !onlineStudioState.image) return;
+            if (event) event.preventDefault();
+            cancelOnlineStudioImagePress();
+
+            const existing = document.getElementById('onlineStudioImageMenu');
+            if (existing) existing.remove();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'online-studio-menu-overlay';
+            overlay.id = 'onlineStudioImageMenu';
+            overlay.innerHTML = `
+                <div class="online-studio-menu-sheet">
+                    <div class="online-studio-menu-title">OffGrid AI Visual</div>
+                    <button onclick="downloadOnlineStudioImage(); closeOnlineStudioImageMenu();">Save to Gallery</button>
+                    <button onclick="shareImageDataUrlFromPhone(onlineStudioState.image, getOnlineStudioImageFilename()); closeOnlineStudioImageMenu();">Share Image</button>
+                    <button onclick="exportOnlineStudioPDF(); closeOnlineStudioImageMenu();">Save Field Guide PDF</button>
+                    <button class="secondary" onclick="closeOnlineStudioImageMenu();">Cancel</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            overlay.addEventListener('click', (clickEvent) => {
+                if (clickEvent.target === overlay) closeOnlineStudioImageMenu();
+            });
+        }
+
+        function closeOnlineStudioImageMenu() {
+            const overlay = document.getElementById('onlineStudioImageMenu');
+            if (overlay) overlay.remove();
+        }
+
+        let appPdfPreviewPayload = null;
+
+        function showAppPdfPreview(html, title, payload = null) {
+            const existing = document.getElementById('appPdfPreview');
+            if (existing) existing.remove();
+            appPdfPreviewPayload = payload;
+
+            const parsed = new DOMParser().parseFromString(html, 'text/html');
+            const styles = Array.from(parsed.querySelectorAll('style'))
+                .map(style => style.textContent)
+                .join('\n');
+            const bodyHtml = parsed.body ? parsed.body.innerHTML : html;
+            const saveLabel = payload && payload.type === 'image-studio' ? 'Save PDF' : 'Save / Print PDF';
+
+            const overlay = document.createElement('div');
+            overlay.id = 'appPdfPreview';
+            overlay.className = 'app-pdf-preview';
+            overlay.innerHTML = `
+                <div class="app-pdf-toolbar">
+                    <button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>
+                    <button class="app-pdf-btn primary" onclick="printAppPdfPreview()">${saveLabel}</button>
+                </div>
+                <div class="app-pdf-floating-actions" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483002;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px calc(12px + env(safe-area-inset-bottom, 0px));background:rgba(44,24,16,0.97);border-top:1px solid rgba(184,134,11,0.38);box-shadow:0 -12px 32px rgba(0,0,0,0.24);">
+                    <button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>
+                    <button class="app-pdf-btn primary" onclick="printAppPdfPreview()">${saveLabel}</button>
+                </div>
+                <div class="app-pdf-document" aria-label="${escapeHtml(title || 'OffGrid AI field guide')}">
+                    <style>${styles}</style>
+                    ${bodyHtml}
+                </div>
+                <div class="app-pdf-bottom-actions">
+                    <button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+            document.body.classList.add('pdf-preview-active');
+        }
+
+        function closeAppPdfPreview() {
+            const overlay = document.getElementById('appPdfPreview');
+            if (overlay) overlay.remove();
+            appPdfPreviewPayload = null;
+            document.body.classList.remove('pdf-preview-active');
+        }
+
+        function printAppPdfPreview() {
+            if (!document.getElementById('appPdfPreview')) return;
+            if (appPdfPreviewPayload && appPdfPreviewPayload.type === 'image-studio' && window.OffGridNative && typeof window.OffGridNative.saveFieldGuidePdf === 'function') {
+                const filename = generateFilename(appPdfPreviewPayload.title || 'OffGrid AI Field Guide').replace(/\.md$/i, '.pdf');
+                const result = parseNativeBridgeResult(window.OffGridNative.saveFieldGuidePdf(
+                    appPdfPreviewPayload.image,
+                    appPdfPreviewPayload.title || 'OffGrid AI Field Guide',
+                    appPdfPreviewPayload.question || '',
+                    appPdfPreviewPayload.answer || '',
+                    filename
+                ));
+                if (result.ok) {
+                    showSaveToast('PDF saved', 'Look in Downloads > OffGrid AI.');
+                } else {
+                    showSaveToast('PDF save failed', result.error || 'Could not save the PDF.');
+                }
+                return;
+            }
+            window.print();
         }
         
         // ============================================
@@ -3922,6 +4395,43 @@
             return frontmatter + content;
         }
 
+        function generateImageStudioFieldGuideMarkdown(title, category) {
+            const now = new Date();
+            const isoDate = now.toISOString();
+            const safeTitle = title.replace(/"/g, '\\"');
+            const visual = onlineStudioState?.image || '';
+            const question = onlineStudioState?.sourcePrompt || onlineStudioState?.title || '';
+            const answer = onlineStudioState?.answer || '';
+
+            let frontmatter = '---\n';
+            frontmatter += `title: "${safeTitle}"\n`;
+            frontmatter += `date: ${isoDate}\n`;
+            frontmatter += `source: online-image-studio\n`;
+            frontmatter += `model: ${selectedModel}\n`;
+            frontmatter += `category: ${category}\n`;
+            frontmatter += '---\n\n';
+
+            let content = `# ${title}\n\n`;
+            content += `*Saved from OffGrid AI Online on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
+            content += `**Model:** ${MODEL_DISPLAY[selectedModel]?.name || selectedModel}  \n`;
+            content += `**Category:** ${category}\n\n`;
+
+            if (visual) {
+                content += `![OffGrid AI field guide visual](${visual})\n\n`;
+                content += '---\n\n';
+            }
+
+            if (question) {
+                content += `## Question\n\n${question}\n\n`;
+            }
+
+            if (answer) {
+                content += `## Field Guide\n\n${answer}\n\n`;
+            }
+
+            return frontmatter + content;
+        }
+
         // Extract chat images so Knowledge Base saves use sibling image files instead of base64 markdown.
         function extractBase64Images() {
             const images = [];
@@ -4079,7 +4589,7 @@
 
             const title = onlineStudioState.title || 'OffGrid AI Visual Guide';
             const category = onlineStudioState.category || 'Other';
-            const markdownContent = generateMarkdownContent(title, category, '');
+            const markdownContent = generateImageStudioFieldGuideMarkdown(title, category);
             const pdfBtn = document.getElementById('onlineStudioPdfBtn');
             const statusEl = document.getElementById('onlineStudioStatus');
 
@@ -4087,8 +4597,8 @@
                 pdfBtn.disabled = true;
                 pdfBtn.textContent = 'Preparing PDF...';
             }
-            if (statusEl) statusEl.textContent = 'Preparing PDF view...';
-            showSaveToast('Preparing PDF...', 'Use the print dialog to save the article and image together.');
+            if (statusEl) statusEl.textContent = 'Preparing field guide PDF...';
+            showSaveToast('Preparing field guide...', 'The image and answer will stay together in one PDF view.');
 
             try {
                 const response = await fetch(`${API_BASE}/api/export-pdf`, {
@@ -4102,35 +4612,51 @@
                 }
 
                 const data = await response.json();
-                const printWindow = window.open('', '_blank');
-                if (printWindow) {
-                    printWindow.document.write(data.html);
-                    printWindow.document.close();
-                    printWindow.onload = () => {
-                        setTimeout(() => printWindow.print(), 250);
-                    };
-                    showSaveToast('PDF ready', 'Choose Save as PDF in the print dialog.');
+                if (IS_APP_SURFACE) {
+                    closeOnlineImageStudio();
+                    requestAnimationFrame(() => {
+                        showAppPdfPreview(data.html, title, {
+                            type: 'image-studio',
+                            title,
+                            image: onlineStudioState.image,
+                            question: onlineStudioState.sourcePrompt || onlineStudioState.title || '',
+                            answer: onlineStudioState.answer || ''
+                        });
+                        showSaveToast('Field guide ready', 'Tap Save PDF to save it to Downloads > OffGrid AI.');
+                    });
                 } else {
-                    const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = generateFilename(title).replace('.md', '.html');
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    showSaveToast('Downloaded PDF-ready HTML', 'Open it and use File > Print > Save as PDF.');
+                    const printWindow = window.open('', '_blank');
+                    if (printWindow) {
+                        printWindow.document.write(data.html);
+                        printWindow.document.close();
+                        printWindow.onload = () => {
+                            setTimeout(() => printWindow.print(), 250);
+                        };
+                        showSaveToast('PDF ready', 'Choose Save as PDF in the print dialog.');
+                    } else {
+                        const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = generateFilename(title).replace('.md', '.html');
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showSaveToast('Downloaded PDF-ready HTML', 'Open it and use File > Print > Save as PDF.');
+                    }
                 }
             } catch (error) {
                 console.error('Image Studio PDF export error:', error);
-                showSaveToast('PDF export failed', 'Please try again or save to Knowledge Base instead.');
+                showSaveToast('PDF export failed', 'Please try again or save the image instead.');
             } finally {
                 if (pdfBtn) {
                     pdfBtn.disabled = false;
-                    pdfBtn.textContent = 'Save PDF';
+                    pdfBtn.textContent = IS_APP_SURFACE ? 'Save Field Guide PDF' : 'Save PDF';
                 }
-                if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
+                if (statusEl) statusEl.textContent = IS_APP_SURFACE
+                    ? 'Visual ready - save to phone or continue in chat.'
+                    : 'Visual ready - review, save, or continue in chat.';
             }
         }
         
@@ -4281,32 +4807,37 @@
                 
                 const data = await response.json();
                 
-                // Open styled HTML in a new window for print-to-PDF
-                const printWindow = window.open('', '_blank');
-                if (printWindow) {
-                    printWindow.document.write(data.html);
-                    printWindow.document.close();
-                    
+                if (IS_APP_SURFACE) {
+                    showAppPdfPreview(data.html, title);
+                    showSaveToast('PDF preview ready', 'Use Save / Print PDF, then Return to App when finished.');
+                } else {
+                    // Open styled HTML in a new window for print-to-PDF
+                    const printWindow = window.open('', '_blank');
+                    if (printWindow) {
+                        printWindow.document.write(data.html);
+                        printWindow.document.close();
+
                     // Auto-trigger print dialog after content loads
                     printWindow.onload = function() {
                         setTimeout(() => {
                             printWindow.print();
                         }, 500);
                     };
-                    
+
                     showSaveToast('PDF ready!', 'Use your browser\'s print dialog to save as PDF. Saved directly to your computer \u2014 never to our servers.');
-                } else {
-                    // Popup blocked - fall back to download
-                    const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = data.filename.replace('.pdf', '.html');
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    showSaveToast('Downloaded HTML version', 'Open the file and use File > Print > Save as PDF');
+                    } else {
+                        // Popup blocked - fall back to download
+                        const blob = new Blob([data.html], { type: 'text/html;charset=utf-8' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = data.filename.replace('.pdf', '.html');
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showSaveToast('Downloaded HTML version', 'Open the file and use File > Print > Save as PDF');
+                    }
                 }
                 
             } catch (error) {
