@@ -22,7 +22,7 @@
     <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" href="compasstilted.png">
-    <link rel="stylesheet" href="offgridai.css?v=5.3">
+    <link rel="stylesheet" href="offgridai.css?v=5.4">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -1675,14 +1675,19 @@
         // Experience config injected by server
         const CONFIG = window.OFFGRID_CONFIG || { isCustomer: false, experience: 'demo', surface: 'web', platform: 'web', apiBase: '' };
         const IS_APP_SURFACE = CONFIG.surface === 'app';
+        const IS_MOBILE_VIEW = window.matchMedia ? window.matchMedia('(max-width: 768px)').matches : window.innerWidth <= 768;
+        const IS_PHONE_SURFACE = IS_APP_SURFACE || IS_MOBILE_VIEW;
         
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
         document.body.classList.add(IS_APP_SURFACE ? 'is-app-surface' : 'is-web-surface');
+        if (IS_PHONE_SURFACE) {
+            document.body.classList.add('is-phone-surface');
+        }
         if (CONFIG.platform) {
             document.body.classList.add(`platform-${CONFIG.platform}`);
         }
-        if (IS_APP_SURFACE) {
+        if (IS_PHONE_SURFACE) {
             document.querySelectorAll('.header .online-badge').forEach((badge) => {
                 if (badge.textContent.trim().toUpperCase() === 'ONLINE') {
                     badge.textContent = 'OffGrid AI';
@@ -2284,7 +2289,7 @@
                         <button class="action-btn clear-btn" onclick="clearChat()">
                             Clear
                         </button>
-                        ${IS_APP_SURFACE ? '' : `
+                        ${IS_PHONE_SURFACE ? '' : `
                         <button class="action-btn save-btn" onclick="handleSaveToKB()">
                             Save to KB
                         </button>`}
@@ -2632,14 +2637,15 @@
             const imageStyle = isGeneratedImage
                 ? 'width: min(100%, 820px); max-width: 820px; height: auto; border-radius: 8px; margin-top: 10px; display: block; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);'
                 : 'max-width: 300px; height: auto; border-radius: 8px; margin-top: 8px; display: block;';
-            const imageMarkup = IS_APP_SURFACE && isGeneratedImage
+            const imageMarkup = IS_PHONE_SURFACE && isGeneratedImage
                 ? `<img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">`
                 : `<a href="${displayImageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; max-width: 100%;">
                         <img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">
                     </a>`;
-            const imageActions = IS_APP_SURFACE && isGeneratedImage
+            const imageActions = IS_PHONE_SURFACE && isGeneratedImage
                 ? `<div class="message-image-actions">
-                        <button onclick="exportOnlineStudioPDF()">Save Full Field Guide</button>
+                        <button onclick="downloadOnlineStudioImage()">Save Image</button>
+                        <button onclick="exportOnlineStudioPDF()">Save Field Guide PDF</button>
                         <button onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share Image</button>
                     </div>`
                 : '';
@@ -2736,7 +2742,7 @@
         }
 
         function triggerGalleryUpload() {
-            const uploadInputId = IS_APP_SURFACE ? 'imageFileInput' : 'galleryInput';
+            const uploadInputId = IS_PHONE_SURFACE ? 'imageFileInput' : 'galleryInput';
             let input = document.getElementById(uploadInputId);
             if (!input) {
                 // Save any existing text from welcome input before transitioning
@@ -3765,7 +3771,7 @@
                     <div class="online-studio-header">
                         <div class="online-studio-title">Image Studio</div>
                         <div class="online-studio-subtitle">by OffGrid AI</div>
-                        ${IS_APP_SURFACE ? '<button class="online-studio-done-top" onclick="closeOnlineImageStudio()">Done</button>' : ''}
+                        ${IS_PHONE_SURFACE ? '<button class="online-studio-done-top" onclick="closeOnlineImageStudio()">Done</button>' : ''}
                     </div>
                     <div class="online-studio-status" id="onlineStudioStatus">Preparing visual...</div>
                     <div class="online-studio-preview" id="onlineStudioPreview">
@@ -3776,16 +3782,16 @@
                     </div>
                     <div id="onlineStudioError"></div>
                     <div class="online-studio-guidance" id="onlineStudioGuidance">
-                        <div class="online-studio-guidance-title">${IS_APP_SURFACE ? 'Save or Share This Visual' : 'Next Steps After Image Is Generated'}</div>
-                        ${IS_APP_SURFACE
-                            ? 'Use <strong>Save Image</strong> for the graphic, or <strong>Save Field Guide PDF</strong> to keep the image and answer together on your phone. You can also continue the conversation below.'
+                        <div class="online-studio-guidance-title">${IS_PHONE_SURFACE ? 'Save or Share This Visual' : 'Next Steps After Image Is Generated'}</div>
+                        ${IS_PHONE_SURFACE
+                            ? 'Use <strong>Save Image</strong> for just the graphic, <strong>Save Field Guide PDF</strong> to keep the image and answer together, or <strong>Share Image</strong> from your phone.'
                             : 'Click <strong>Save to Knowledge Base</strong>, then choose your OffGrid AI drive folder: <strong>This PC > OffGrid AI (D: or E:) > Saved Knowledge Base > category folder</strong>. If Windows asks for permission, click <strong>Allow</strong>. A backup is also added to this online session below.'}
                     </div>
                     <div class="online-studio-actions">
-                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">${IS_APP_SURFACE ? 'Done / Back to Chat' : 'Cancel'}</button>
-                        ${IS_APP_SURFACE ? '<button class="online-studio-btn download" id="onlineStudioImageBtn" onclick="downloadOnlineStudioImage()" disabled>Save Image</button>' : ''}
-                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>${IS_APP_SURFACE ? 'Save Field Guide PDF' : 'Save PDF'}</button>
-                        ${IS_APP_SURFACE ? '' : '<button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>'}
+                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">${IS_PHONE_SURFACE ? 'Done / Back to Chat' : 'Cancel'}</button>
+                        ${IS_PHONE_SURFACE ? '<button class="online-studio-btn download" id="onlineStudioImageBtn" onclick="downloadOnlineStudioImage()" disabled>Save Image</button>' : ''}
+                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>${IS_PHONE_SURFACE ? 'Save Field Guide PDF' : 'Save PDF'}</button>
+                        ${IS_PHONE_SURFACE ? '<button class="online-studio-btn share" id="onlineStudioShareBtn" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())" disabled>Share Image</button>' : '<button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>'}
                     </div>
                     <div class="online-studio-note">Images are generated on-demand and never stored on our servers.</div>
                 </div>
@@ -3850,7 +3856,7 @@
         }
 
         function enhanceVisualPromptForApp(prompt) {
-            if (!IS_APP_SURFACE || !prompt) return prompt;
+            if (!IS_PHONE_SURFACE || !prompt) return prompt;
             return `${prompt}
 
 Mobile app output requirements:
@@ -3869,12 +3875,14 @@ Mobile app output requirements:
             const saveBtn = document.getElementById('onlineStudioSaveBtn');
             const pdfBtn = document.getElementById('onlineStudioPdfBtn');
             const imageBtn = document.getElementById('onlineStudioImageBtn');
+            const shareBtn = document.getElementById('onlineStudioShareBtn');
             const guidanceEl = document.getElementById('onlineStudioGuidance');
 
             try {
                 if (saveBtn) saveBtn.disabled = true;
                 if (pdfBtn) pdfBtn.disabled = true;
                 if (imageBtn) imageBtn.disabled = true;
+                if (shareBtn) shareBtn.disabled = true;
                 if (guidanceEl) guidanceEl.style.display = 'none';
                 if (errorEl) errorEl.innerHTML = '';
                 if (statusEl) statusEl.textContent = 'Crafting visual prompt...';
@@ -3916,16 +3924,17 @@ Mobile app output requirements:
 
                 if (previewEl) {
                     const displaySrc = onlineStudioState.displayImageUrl || onlineStudioState.image;
-                    previewEl.innerHTML = IS_APP_SURFACE
+                    previewEl.innerHTML = IS_PHONE_SURFACE
                         ? `<img class="online-studio-result-image" src="${displaySrc}" alt="Generated Image Studio visual" onclick="handleOnlineStudioImageTap(event)" oncontextmenu="openOnlineStudioImageMenu(event)" onpointerdown="startOnlineStudioImagePress(event)" onpointerup="cancelOnlineStudioImagePress()" onpointerleave="cancelOnlineStudioImagePress()" onpointercancel="cancelOnlineStudioImagePress()">`
                         : `<a href="${displaySrc}" target="_blank" rel="noopener noreferrer"><img src="${displaySrc}" alt="Generated Image Studio visual"></a>`;
                 }
-                if (statusEl) statusEl.textContent = IS_APP_SURFACE
+                if (statusEl) statusEl.textContent = IS_PHONE_SURFACE
                     ? 'Visual ready - save to phone or continue in chat.'
                     : 'Visual ready - review, save, or continue in chat.';
                 if (saveBtn) saveBtn.disabled = false;
                 if (pdfBtn) pdfBtn.disabled = false;
                 if (imageBtn) imageBtn.disabled = false;
+                if (shareBtn) shareBtn.disabled = false;
                 if (guidanceEl) guidanceEl.style.display = 'block';
 
                 addOnlineStudioResultToChat();
@@ -3956,6 +3965,7 @@ Mobile app output requirements:
         }
 
         function addOnlineStudioSaveCallout() {
+            if (IS_PHONE_SURFACE) return;
             const messagesDiv = document.getElementById('messages');
             if (!messagesDiv) return;
 
@@ -4004,7 +4014,7 @@ Mobile app output requirements:
                 imageLabel: 'Generated Image',
                 model: 'OffGrid AI Image Studio'
             });
-            if (!IS_APP_SURFACE) {
+            if (!IS_PHONE_SURFACE) {
                 addOnlineStudioSaveCallout();
             }
 
@@ -4013,7 +4023,10 @@ Mobile app output requirements:
             const saveBtn = document.getElementById('saveToKbBtn');
             if (saveBtn) saveBtn.disabled = false;
             const visualBtn = document.getElementById('createVisualBtn');
-            if (visualBtn) visualBtn.disabled = false;
+            if (visualBtn) {
+                visualBtn.disabled = false;
+                if (IS_PHONE_SURFACE) visualBtn.textContent = 'Create Another Visual';
+            }
 
             const modalSaveBtn = document.getElementById('onlineStudioSaveBtn');
             if (modalSaveBtn) {
@@ -4075,6 +4088,29 @@ Mobile app output requirements:
                 }
                 return true;
             }
+
+            if (navigator.share) {
+                try {
+                    const blob = dataUrlToBlob(dataUrl);
+                    const file = new File([blob], filename || 'offgrid-ai-visual.png', { type: blob.type || 'image/png' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            title: 'OffGrid AI Visual',
+                            text: 'Created with OffGrid AI ToolKit.',
+                            files: [file]
+                        }).catch(() => {});
+                        return true;
+                    }
+                    navigator.share({
+                        title: 'OffGrid AI Visual',
+                        text: 'Created with OffGrid AI ToolKit. Save the image from OffGrid AI, then share it from your phone gallery.'
+                    }).catch(() => {});
+                    return true;
+                } catch (error) {
+                    console.warn('Web share image failed:', error);
+                }
+            }
+
             showSaveToast('Share not available yet', 'Use Save Image, then share from your gallery.');
             return false;
         }
@@ -4085,7 +4121,7 @@ Mobile app output requirements:
         }
 
         function handleOnlineStudioImageTap(event) {
-            if (!IS_APP_SURFACE) return;
+            if (!IS_PHONE_SURFACE) return;
             event.preventDefault();
             if (onlineStudioImageLongPressTriggered) {
                 onlineStudioImageLongPressTriggered = false;
@@ -4095,7 +4131,7 @@ Mobile app output requirements:
         }
 
         function startOnlineStudioImagePress(event) {
-            if (!IS_APP_SURFACE) return;
+            if (!IS_PHONE_SURFACE) return;
             cancelOnlineStudioImagePress();
             onlineStudioImageLongPressTriggered = false;
             onlineStudioImagePressTimer = setTimeout(() => {
@@ -4690,7 +4726,7 @@ Mobile app output requirements:
                 }
 
                 const data = await response.json();
-                if (IS_APP_SURFACE) {
+                if (IS_PHONE_SURFACE) {
                     closeOnlineImageStudio();
                     requestAnimationFrame(() => {
                         showAppPdfPreview(data.html, title, {
@@ -4730,9 +4766,9 @@ Mobile app output requirements:
             } finally {
                 if (pdfBtn) {
                     pdfBtn.disabled = false;
-                    pdfBtn.textContent = IS_APP_SURFACE ? 'Save Field Guide PDF' : 'Save PDF';
+                    pdfBtn.textContent = IS_PHONE_SURFACE ? 'Save Field Guide PDF' : 'Save PDF';
                 }
-                if (statusEl) statusEl.textContent = IS_APP_SURFACE
+                if (statusEl) statusEl.textContent = IS_PHONE_SURFACE
                     ? 'Visual ready - save to phone or continue in chat.'
                     : 'Visual ready - review, save, or continue in chat.';
             }
@@ -4885,7 +4921,7 @@ Mobile app output requirements:
                 
                 const data = await response.json();
                 
-                if (IS_APP_SURFACE) {
+                if (IS_PHONE_SURFACE) {
                     showAppPdfPreview(data.html, title);
                     showSaveToast('PDF preview ready', 'Use Save / Print PDF, then Return to App when finished.');
                 } else {

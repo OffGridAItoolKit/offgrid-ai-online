@@ -1213,7 +1213,12 @@ body.live-compass-enabled .live-compass .welcome-icon {
     body.is-app-surface .save-btn,
     body.is-app-surface .save-kb-button,
     body.is-app-surface .online-kb-save-callout,
-    body.is-app-surface #onlineStudioSaveBtn {
+    body.is-app-surface #onlineStudioSaveBtn,
+    body.is-phone-surface .purchase-cta,
+    body.is-phone-surface .save-btn,
+    body.is-phone-surface .save-kb-button,
+    body.is-phone-surface .online-kb-save-callout,
+    body.is-phone-surface #onlineStudioSaveBtn {
         display: none !important;
     }
 
@@ -1222,7 +1227,8 @@ body.live-compass-enabled .live-compass .welcome-icon {
         display: grid !important;
     }
 
-    body.is-app-surface .mobile-secondary-row {
+    body.is-app-surface .mobile-secondary-row,
+    body.is-phone-surface .mobile-secondary-row {
         grid-template-columns: 1fr !important;
         display: grid !important;
     }
@@ -1374,7 +1380,8 @@ body.live-compass-enabled .live-compass .welcome-icon {
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
     }
 
-    body.is-app-surface .input-container {
+    body.is-app-surface .input-container,
+    body.is-phone-surface .input-container {
         max-height: calc(100dvh - 140px);
         overflow: visible;
     }
@@ -1397,7 +1404,9 @@ body.live-compass-enabled .live-compass .welcome-icon {
     }
 
     body.is-app-surface .image-preview,
-    body.is-app-surface .video-preview {
+    body.is-app-surface .video-preview,
+    body.is-phone-surface .image-preview,
+    body.is-phone-surface .video-preview {
         position: static !important;
         left: auto !important;
         right: auto !important;
@@ -1409,20 +1418,27 @@ body.live-compass-enabled .live-compass .welcome-icon {
     }
     
     body.is-app-surface .image-preview.active,
-    body.is-app-surface .video-preview.active {
+    body.is-app-surface .video-preview.active,
+    body.is-phone-surface .image-preview.active,
+    body.is-phone-surface .video-preview.active {
         display: flex;
         animation: slideUp 0.3s ease;
     }
 
     body.is-app-surface .preview-filename,
-    body.is-app-surface .video-preview-name {
+    body.is-app-surface .video-preview-name,
+    body.is-phone-surface .preview-filename,
+    body.is-phone-surface .video-preview-name {
         overflow-wrap: anywhere;
         word-break: break-word;
     }
 
     body.is-app-surface .image-upload-btn,
     body.is-app-surface .gallery-upload-btn,
-    body.is-app-surface .video-upload-btn {
+    body.is-app-surface .video-upload-btn,
+    body.is-phone-surface .image-upload-btn,
+    body.is-phone-surface .gallery-upload-btn,
+    body.is-phone-surface .video-upload-btn {
         margin-top: 10px;
     }
     
@@ -2985,7 +3001,8 @@ body.command-theme {
         margin-top: 0 !important;
     }
 
-    body.is-app-surface:not(.command-theme) .welcome-icon {
+    body.is-app-surface:not(.command-theme) .welcome-icon,
+    body.is-phone-surface:not(.command-theme) .welcome-icon {
         width: 30vw !important;
         height: 30vw !important;
         max-width: 175px !important;
