@@ -79,6 +79,25 @@
             background: rgba(218, 165, 32, 0.1);
             border-color: #daa520;
         }
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 32px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(218, 165, 32, 0.35);
+            background: rgba(255, 250, 240, 0.08);
+            color: #f5e6d3;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .theme-toggle:hover {
+            border-color: #daa520;
+            background: rgba(218, 165, 32, 0.12);
+        }
         
         /* Hero section */
         .hero {
@@ -442,6 +461,9 @@
             color: var(--bg-deep);
             font-weight: 700;
         }
+        .command-theme .online-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
         .command-theme .back-link {
             color: var(--gold-primary);
             border-color: var(--border-subtle);
@@ -449,6 +471,15 @@
         .command-theme .back-link:hover {
             background: rgba(201, 168, 76, 0.1);
             border-color: var(--gold-primary);
+        }
+        .command-theme .theme-toggle {
+            background: rgba(33, 38, 45, 0.92);
+            border-color: var(--border-subtle);
+            color: var(--text-primary);
+        }
+        .command-theme .theme-toggle:hover {
+            border-color: var(--gold-primary);
+            background: rgba(201, 168, 76, 0.1);
         }
 
         /* Hero */
@@ -609,6 +640,10 @@
             <span class="online-badge">ONLINE</span>
         </div>
         <div class="header-right">
+            <button class="theme-toggle" id="themeToggle" type="button" onclick="togglePromptTheme()" aria-label="Toggle theme">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-label">Night</span>
+            </button>
             <a href="/online" class="back-link">← Back to Chat</a>
         </div>
     </div>
@@ -1406,11 +1441,36 @@
         const isAppSurface = urlParams.get('surface') === 'app';
         const platformParam = urlParams.get('platform');
         const apiBaseParam = urlParams.get('apiBase');
+        const isPhoneSurface = isAppSurface || window.innerWidth <= 768;
         const isCommandContext = !isAppSurface && window.location.pathname.includes('/command');
+        const APP_THEME_STORAGE_KEY = 'offgrid-toolkit-theme';
 
         if (isAppSurface) {
             document.body.classList.add('is-app-surface');
         }
+
+        function applyPromptTheme(theme, persist = true) {
+            const normalized = theme === 'night' ? 'night' : 'day';
+            document.body.classList.toggle('command-theme', isCommandContext || normalized === 'night');
+            if (persist) localStorage.setItem(APP_THEME_STORAGE_KEY, normalized);
+
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                const icon = toggle.querySelector('.theme-toggle-icon');
+                const label = toggle.querySelector('.theme-toggle-label');
+                if (icon) icon.textContent = normalized === 'night' ? '☀️' : '🌙';
+                if (label) label.textContent = normalized === 'night' ? 'Day' : 'Night';
+                toggle.setAttribute('aria-label', normalized === 'night' ? 'Switch to day mode' : 'Switch to night mode');
+            }
+        }
+
+        function togglePromptTheme() {
+            const nextTheme = document.body.classList.contains('command-theme') && !isCommandContext ? 'day' : 'night';
+            applyPromptTheme(nextTheme);
+        }
+
+        const savedPromptTheme = localStorage.getItem(APP_THEME_STORAGE_KEY);
+        applyPromptTheme(savedPromptTheme === 'night' ? 'night' : 'day', false);
 
         function buildReturnQuery() {
             const params = new URLSearchParams();
@@ -1423,11 +1483,6 @@
         function returnPathFor(path) {
             const query = buildReturnQuery();
             return query ? `${path}?${query}` : path;
-        }
-        
-        // Apply dark theme for Command Center context
-        if (isCommandContext) {
-            document.body.classList.add('command-theme');
         }
         
         // Adapt header for context
@@ -1448,9 +1503,12 @@
             document.querySelector('.back-link').href = returnPathFor('/online');
             const footerReturnLink = document.querySelector('.footer a[href="/online"]');
             if (footerReturnLink) footerReturnLink.href = returnPathFor('/online');
+            const badge = document.querySelector('.online-badge');
+            if (badge) badge.textContent = 'OffGrid AI';
+            document.querySelector('.footer p').textContent = 'All prompts have been curated for OffGrid AI.';
         }
 
-        if (isAppSurface) {
+        if (isPhoneSurface) {
             document.querySelector('.hero p').textContent = 'Field-ready prompts for practical decisions, image analysis, repairs, planning, and preparedness. Tap any prompt to send it back to OffGrid AI.';
             const kbBadge = document.querySelector('.hero-badge.kb');
             if (kbBadge) kbBadge.textContent = 'Field Prompts';
@@ -1552,7 +1610,7 @@
                         catPromptCount++;
                         
                         const badgeClass = p.badge === 'all' ? 'all-models' : p.badge === 'vision' ? 'vision' : 'advanced';
-                        const badgeText = p.badge === 'all' ? 'Gemma 4' : p.badge === 'vision' ? '📷 Vision' : (isCommandContext ? 'Advanced' : 'Gemma 4');
+                        const badgeText = p.badge === 'all' ? 'OffGrid AI' : p.badge === 'vision' ? '📷 Vision' : 'OffGrid AI Advanced';
                         const kbHtml = p.kb ? `<div class="kb-tag">📚 ${p.kb}</div>` : '';
                         
                         promptsHtml += `

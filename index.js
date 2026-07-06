@@ -2260,11 +2260,23 @@ app.post('/api/export-pdf', async (req, res) => {
             display: block;
             page-break-inside: avoid;
         }
+
+        body > img:first-of-type {
+            max-height: 92vh;
+            margin: 0 auto 24px;
+            page-break-after: always;
+        }
         
         @media print {
             img {
                 max-height: 780px;
                 page-break-inside: avoid;
+            }
+
+            body > img:first-of-type {
+                max-width: 100%;
+                max-height: 96vh;
+                page-break-after: always;
             }
         }
         

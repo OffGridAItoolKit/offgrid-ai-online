@@ -789,6 +789,34 @@ body.live-compass-enabled .live-compass .welcome-icon {
     cursor: pointer;
 }
 
+.message-image-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    max-width: min(100%, 820px);
+}
+
+.message-image-actions button {
+    appearance: none;
+    border: 1px solid rgba(184, 134, 11, 0.35);
+    border-radius: 999px;
+    background: rgba(255, 250, 240, 0.94);
+    color: #5f351d;
+    padding: 9px 13px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1;
+    box-shadow: 0 6px 18px rgba(44, 24, 16, 0.08);
+    cursor: pointer;
+}
+
+.message-image-actions button:hover,
+.message-image-actions button:active {
+    border-color: rgba(184, 134, 11, 0.68);
+    background: #fff6dc;
+}
+
 .message-time {
     font-size: 12px;
     color: #9ca3af;
@@ -3571,6 +3599,19 @@ body.app-theme-night:not(.command-theme) .quick-action-title,
 body.app-theme-night:not(.command-theme) .resource-card-title,
 body.app-theme-night:not(.command-theme) .plus-menu-label {
     color: #f3f4f6 !important;
+}
+
+body.app-theme-night:not(.command-theme) .message-image-actions button {
+    background: rgba(26, 31, 37, 0.96);
+    border-color: rgba(218, 165, 32, 0.35);
+    color: #f3d37a;
+    box-shadow: none;
+}
+
+body.app-theme-night:not(.command-theme) .message-image-actions button:hover,
+body.app-theme-night:not(.command-theme) .message-image-actions button:active {
+    background: rgba(218, 165, 32, 0.12);
+    border-color: rgba(218, 165, 32, 0.62);
 }
 
 body.app-theme-night:not(.command-theme) .resource-card-desc,
