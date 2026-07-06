@@ -1243,6 +1243,10 @@
             <span>You are using OffGrid AI Online</span>
         </div>
         <div class="status">
+            <button class="app-theme-toggle" id="appThemeToggle" onclick="toggleAppTheme()" type="button" aria-label="Switch to night mode" title="Day / Night mode">
+                <span class="theme-toggle-icon">🌙</span>
+                <span class="theme-toggle-label">Night</span>
+            </button>
             <span class="status-dot disconnected" id="statusDot"></span>
             <span id="statusText" class="status-text">Connecting...</span>
         </div>
@@ -1501,7 +1505,7 @@
                                 <textarea 
                                     id="welcomeMessageInput" 
                                     class="welcome-message-input"
-                                    placeholder="Ask OffGrid AI anything..."
+                                    placeholder="Ask OffGrid AI..."
                                     rows="1"
                                     onkeydown="handleWelcomeKeyDown(event)"
                                     oninput="autoResizeWelcome(this)"
@@ -1576,6 +1580,10 @@
                     <!-- Mobile quick actions (Prospect) -->
                     <div class="mobile-quick-actions prospect-only">
                         <div class="mobile-action-grid">
+                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="startStandaloneVisualPrompt()">
+                                <div class="mobile-action-icon">🎨</div>
+                                <div class="mobile-action-label">Create Visual</div>
+                            </div>
                             <div class="mobile-action-btn" onclick="triggerCameraCapture()">
                                 <div class="mobile-action-icon">📷</div>
                                 <div class="mobile-action-label">Take Picture</div>
@@ -1606,6 +1614,10 @@
                     <!-- Mobile quick actions (Customer) -->
                     <div class="mobile-quick-actions customer-only">
                         <div class="mobile-action-grid">
+                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="startStandaloneVisualPrompt()">
+                                <div class="mobile-action-icon">🎨</div>
+                                <div class="mobile-action-label">Create Visual</div>
+                            </div>
                             <div class="mobile-action-btn" onclick="triggerCameraCapture()">
                                 <div class="mobile-action-icon">📷</div>
                                 <div class="mobile-action-label">Take Picture</div>
@@ -1677,6 +1689,52 @@
                 }
             });
         }
+
+        const APP_THEME_STORAGE_KEY = 'offgrid-toolkit-theme';
+
+        function haptic(type = 'light') {
+            if (!navigator.vibrate) return;
+            if (type === 'heavy') navigator.vibrate(38);
+            else if (type === 'medium') navigator.vibrate(20);
+            else if (type === 'success') navigator.vibrate([10, 40, 10]);
+            else navigator.vibrate(10);
+        }
+
+        function getPreferredAppTheme() {
+            const saved = localStorage.getItem(APP_THEME_STORAGE_KEY);
+            if (saved === 'night' || saved === 'day') return saved;
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'night';
+            }
+            return 'day';
+        }
+
+        function setAppTheme(theme, persist = true) {
+            const normalized = theme === 'night' ? 'night' : 'day';
+            document.body.classList.toggle('app-theme-night', normalized === 'night');
+            document.body.classList.toggle('app-theme-day', normalized !== 'night');
+            if (persist) localStorage.setItem(APP_THEME_STORAGE_KEY, normalized);
+
+            const toggle = document.getElementById('appThemeToggle');
+            if (toggle) {
+                const isNight = normalized === 'night';
+                const icon = toggle.querySelector('.theme-toggle-icon');
+                const label = toggle.querySelector('.theme-toggle-label');
+                if (icon) icon.textContent = isNight ? '☀️' : '🌙';
+                if (label) label.textContent = isNight ? 'Day' : 'Night';
+                toggle.setAttribute('aria-label', isNight ? 'Switch to day mode' : 'Switch to night mode');
+                toggle.title = isNight ? 'Switch to Day mode' : 'Switch to Night mode';
+            }
+        }
+
+        function toggleAppTheme() {
+            haptic('light');
+            const nextTheme = document.body.classList.contains('app-theme-night') ? 'day' : 'night';
+            setAppTheme(nextTheme);
+            showSaveToast(nextTheme === 'night' ? 'Night mode on' : 'Day mode on');
+        }
+
+        setAppTheme(getPreferredAppTheme(), false);
         
         // Single model architecture - always use Gemma 4 26B A4B
         let selectedModel = 'gemma-4-26b';
@@ -2203,7 +2261,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea id="messageInput" class="message-input" placeholder="Ask OffGrid AI anything..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+                        <textarea id="messageInput" class="message-input" placeholder="Ask OffGrid AI..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
                         <div style="position: relative;">
                             <svg class="video-upload-btn" onclick="triggerVideoUpload();" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Upload Video">
                                 <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
@@ -3606,6 +3664,26 @@
             }, { autoGenerate: true, addSourceToChat: false });
         }
 
+        function startStandaloneVisualPrompt() {
+            haptic('medium');
+            const starter = 'Create a practical mobile-friendly field guide visual for: ';
+            const welcomeInput = document.getElementById('welcomeMessageInput');
+            const chatInput = document.getElementById('messageInput');
+            const input = (welcomeInput && document.getElementById('welcome')) ? welcomeInput : chatInput;
+
+            if (input) {
+                if (!input.value.trim()) input.value = starter;
+                if (input.id === 'welcomeMessageInput') {
+                    autoResizeWelcome(input);
+                } else {
+                    autoResize(input);
+                }
+                input.focus();
+                input.setSelectionRange(input.value.length, input.value.length);
+            }
+            showSaveToast('Describe the visual', 'Send the request, then tap Create Visual after OffGrid AI answers.');
+        }
+
         function inferImageStudioTitle(answerText) {
             const firstLine = (answerText || '').split('\n').map(line => line.trim()).find(Boolean);
             return firstLine ? firstLine.substring(0, 90) : 'OffGrid AI Visual Guide';
@@ -4862,6 +4940,475 @@ Mobile app output requirements:
                 if (toast.parentNode) toast.remove();
             }, 3000);
         }
+
+        function copyTextToClipboardReliable(text) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0.01;z-index:9999';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                textarea.setSelectionRange(0, text.length);
+                const success = document.execCommand('copy');
+                textarea.remove();
+                if (success) {
+                    showSaveToast('Copied to clipboard', 'Paste anywhere to share.');
+                    return;
+                }
+            } catch (error) {
+                // Fall back to Clipboard API below.
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text)
+                    .then(() => showSaveToast('Copied to clipboard', 'Paste anywhere to share.'))
+                    .catch(() => showSaveToast('Could not copy', 'Use Select Text from the menu.'));
+            } else {
+                showSaveToast('Could not copy', 'Use Select Text from the menu.');
+            }
+        }
+
+        function cleanTextForSharing(text) {
+            return String(text || '')
+                .replace(/```[\s\S]*?```/g, ' code block omitted ')
+                .replace(/`([^`]+)`/g, '$1')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                .replace(/[#*_~>`|]/g, '')
+                .replace(/\n{3,}/g, '\n\n')
+                .trim();
+        }
+
+        function shareToolkitText(text) {
+            const cleanText = cleanTextForSharing(text);
+            const shareText = `${cleanText}\n\n---\nOffGrid AI ToolKit | Built for weak signals and hard decisions.`;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'OffGrid AI ToolKit',
+                    text: shareText
+                }).catch(() => copyTextToClipboardReliable(cleanText));
+            } else {
+                copyTextToClipboardReliable(cleanText);
+            }
+        }
+
+        let toolkitTtsChunks = [];
+        let toolkitTtsIndex = 0;
+        let toolkitTtsActive = false;
+        let toolkitTtsWatchdog = null;
+        let toolkitTtsVoice = null;
+
+        function splitTextForToolkitTTS(text) {
+            const isAndroidChrome = /android/i.test(navigator.userAgent) && /chrome/i.test(navigator.userAgent);
+            const maxChunk = isAndroidChrome ? 80 : 220;
+            const chunks = [];
+            const sentences = text.match(/[^.!?]+(?:[.!?]+(?:\s|$))?/g) || [text];
+            let current = '';
+
+            for (const sentence of sentences) {
+                const trimmed = sentence.trim();
+                if (!trimmed) continue;
+                if ((current + ' ' + trimmed).length > maxChunk && current) {
+                    chunks.push(current.trim());
+                    current = '';
+                }
+                if (trimmed.length > maxChunk) {
+                    const words = trimmed.split(/\s+/);
+                    for (const word of words) {
+                        if ((current + ' ' + word).length > maxChunk && current) {
+                            chunks.push(current.trim());
+                            current = '';
+                        }
+                        current += (current ? ' ' : '') + word;
+                    }
+                } else {
+                    current += (current ? ' ' : '') + trimmed;
+                }
+            }
+
+            if (current.trim()) chunks.push(current.trim());
+            return chunks.length ? chunks : [text.slice(0, maxChunk)];
+        }
+
+        function showToolkitTTSIndicator() {
+            dismissToolkitTTSIndicator();
+            const indicator = document.createElement('div');
+            indicator.className = 'tts-indicator toolkit-tts-indicator';
+            indicator.id = 'toolkitTtsIndicator';
+            indicator.innerHTML = `
+                <div class="tts-pulse"></div>
+                <span class="tts-label">Reading aloud...</span>
+                <button class="tts-stop-btn" onclick="stopToolkitReadAloud()">Stop</button>
+            `;
+            document.body.appendChild(indicator);
+        }
+
+        function dismissToolkitTTSIndicator() {
+            const indicator = document.getElementById('toolkitTtsIndicator');
+            if (indicator) indicator.remove();
+        }
+
+        function speakNextToolkitChunk() {
+            if (toolkitTtsWatchdog) {
+                clearTimeout(toolkitTtsWatchdog);
+                toolkitTtsWatchdog = null;
+            }
+            if (!toolkitTtsActive || toolkitTtsIndex >= toolkitTtsChunks.length) {
+                stopToolkitReadAloud(false);
+                return;
+            }
+
+            window.speechSynthesis.cancel();
+            const chunk = toolkitTtsChunks[toolkitTtsIndex];
+            const utterance = new SpeechSynthesisUtterance(chunk);
+            utterance.rate = 1;
+            utterance.pitch = 1;
+            if (toolkitTtsVoice) utterance.voice = toolkitTtsVoice;
+            let handled = false;
+
+            const advance = (delay = 250) => {
+                if (handled) return;
+                handled = true;
+                if (toolkitTtsWatchdog) clearTimeout(toolkitTtsWatchdog);
+                toolkitTtsIndex++;
+                setTimeout(speakNextToolkitChunk, delay);
+            };
+
+            utterance.onend = () => advance(/[.!?]$/.test(chunk.trim()) ? 450 : 180);
+            utterance.onerror = (event) => {
+                if (event.error === 'canceled') {
+                    stopToolkitReadAloud();
+                    return;
+                }
+                advance(250);
+            };
+
+            setTimeout(() => {
+                if (!toolkitTtsActive) return;
+                window.speechSynthesis.speak(utterance);
+                toolkitTtsWatchdog = setTimeout(() => {
+                    if (!handled && toolkitTtsActive) {
+                        window.speechSynthesis.cancel();
+                        advance(250);
+                    }
+                }, /android/i.test(navigator.userAgent) ? 8000 : 15000);
+            }, 100);
+        }
+
+        function toggleToolkitReadAloud(text) {
+            if (!window.speechSynthesis) {
+                showSaveToast('Read aloud unavailable', 'This browser does not support speech output.');
+                return;
+            }
+            if (toolkitTtsActive) {
+                stopToolkitReadAloud();
+                return;
+            }
+
+            const cleanText = cleanTextForSharing(text)
+                .replace(/^\d+\.\s+/gm, '')
+                .replace(/^[-*]\s+/gm, '')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!cleanText) {
+                showSaveToast('Nothing to read');
+                return;
+            }
+
+            const voices = window.speechSynthesis.getVoices();
+            toolkitTtsVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
+                || voices.find(v => v.lang.startsWith('en'))
+                || null;
+            toolkitTtsChunks = splitTextForToolkitTTS(cleanText);
+            toolkitTtsIndex = 0;
+            toolkitTtsActive = true;
+            showToolkitTTSIndicator();
+            speakNextToolkitChunk();
+        }
+
+        function stopToolkitReadAloud(cancelSpeech = true) {
+            toolkitTtsActive = false;
+            if (cancelSpeech && window.speechSynthesis) window.speechSynthesis.cancel();
+            toolkitTtsChunks = [];
+            toolkitTtsIndex = 0;
+            if (toolkitTtsWatchdog) clearTimeout(toolkitTtsWatchdog);
+            toolkitTtsWatchdog = null;
+            dismissToolkitTTSIndicator();
+        }
+
+        let toolkitChatSearchMatches = [];
+        let toolkitChatSearchIndex = -1;
+
+        function closeToolkitChatSearch() {
+            document.querySelectorAll('.chat-search-highlight').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+            toolkitChatSearchMatches = [];
+            toolkitChatSearchIndex = -1;
+            const bar = document.getElementById('toolkitChatSearchBar');
+            if (bar) bar.remove();
+        }
+
+        function updateToolkitSearchCount() {
+            const count = document.getElementById('toolkitChatSearchCount');
+            if (count) count.textContent = toolkitChatSearchMatches.length ? `${toolkitChatSearchIndex + 1}/${toolkitChatSearchMatches.length}` : '';
+        }
+
+        function performToolkitChatSearch(query) {
+            closeToolkitChatSearchHighlightsOnly();
+            toolkitChatSearchMatches = [];
+            toolkitChatSearchIndex = -1;
+            if (!query || query.length < 2) {
+                updateToolkitSearchCount();
+                return;
+            }
+
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            document.querySelectorAll('#messages .message-text, #messages .markdown-content').forEach(msgEl => {
+                const walker = document.createTreeWalker(msgEl, NodeFilter.SHOW_TEXT);
+                const textNodes = [];
+                while (walker.nextNode()) textNodes.push(walker.currentNode);
+                textNodes.forEach(node => {
+                    const text = node.textContent;
+                    if (!regex.test(text)) return;
+                    regex.lastIndex = 0;
+                    const fragment = document.createDocumentFragment();
+                    let lastIndex = 0;
+                    let match;
+                    while ((match = regex.exec(text)) !== null) {
+                        if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+                        const mark = document.createElement('mark');
+                        mark.className = 'chat-search-highlight';
+                        mark.textContent = match[0];
+                        fragment.appendChild(mark);
+                        toolkitChatSearchMatches.push(mark);
+                        lastIndex = regex.lastIndex;
+                    }
+                    if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+                    node.parentNode.replaceChild(fragment, node);
+                });
+            });
+
+            if (toolkitChatSearchMatches.length) {
+                toolkitChatSearchIndex = 0;
+                toolkitChatSearchMatches[0].classList.add('chat-search-highlight-active');
+                toolkitChatSearchMatches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            updateToolkitSearchCount();
+        }
+
+        function closeToolkitChatSearchHighlightsOnly() {
+            document.querySelectorAll('.chat-search-highlight').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+        }
+
+        function toolkitChatSearchNext(direction = 1) {
+            if (!toolkitChatSearchMatches.length) return;
+            toolkitChatSearchMatches[toolkitChatSearchIndex].classList.remove('chat-search-highlight-active');
+            toolkitChatSearchIndex = (toolkitChatSearchIndex + direction + toolkitChatSearchMatches.length) % toolkitChatSearchMatches.length;
+            toolkitChatSearchMatches[toolkitChatSearchIndex].classList.add('chat-search-highlight-active');
+            toolkitChatSearchMatches[toolkitChatSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            updateToolkitSearchCount();
+        }
+
+        function openToolkitChatSearch() {
+            closeToolkitChatSearch();
+            const bar = document.createElement('div');
+            bar.className = 'chat-search-bar';
+            bar.id = 'toolkitChatSearchBar';
+            bar.innerHTML = `
+                <input type="text" id="toolkitChatSearchInput" placeholder="Search in chat..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <div class="search-nav">
+                    <span id="toolkitChatSearchCount"></span>
+                    <button class="search-nav-btn" onclick="toolkitChatSearchNext(-1)">↑</button>
+                    <button class="search-nav-btn" onclick="toolkitChatSearchNext(1)">↓</button>
+                </div>
+                <button class="search-close-btn" onclick="closeToolkitChatSearch()">×</button>
+            `;
+            document.body.appendChild(bar);
+            const input = document.getElementById('toolkitChatSearchInput');
+            if (input) {
+                input.focus();
+                input.addEventListener('input', () => performToolkitChatSearch(input.value));
+                input.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        toolkitChatSearchNext(1);
+                    }
+                });
+            }
+        }
+
+        function exportToolkitChat() {
+            if (!conversationHistory.length) {
+                showSaveToast('Nothing to export', 'Start a chat first.');
+                return;
+            }
+
+            const now = new Date();
+            const date = now.toISOString().slice(0, 10);
+            let markdown = `# OffGrid AI ToolKit Chat Export\n\n`;
+            markdown += `Saved on ${now.toLocaleDateString()} at ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n\n---\n\n`;
+            conversationHistory.forEach(msg => {
+                const role = msg.role === 'user' ? 'User' : 'OffGrid AI';
+                let content = msg.content || '';
+                content = content.replace(/data:image\/[a-zA-Z]+;base64,[A-Za-z0-9+/=]{50,}/g, '[Image data]');
+                markdown += `## ${role}\n\n${content}\n\n`;
+                if (msg.image) markdown += `*[Image attached or generated]*\n\n`;
+            });
+            markdown += `---\n\nBuilt for weak signals and hard decisions.\n`;
+
+            const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `offgrid-ai-chat-${date}.md`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+            showSaveToast('Chat exported', 'Saved as a Markdown file.');
+        }
+
+        function enableToolkitTextSelection(msgEl) {
+            const textEl = msgEl.querySelector('.message-text') || msgEl.querySelector('.markdown-content');
+            if (!textEl) return;
+            textEl.style.userSelect = 'text';
+            textEl.style.webkitUserSelect = 'text';
+            const range = document.createRange();
+            range.selectNodeContents(textEl);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            showSaveToast('Text selected', 'Use your phone copy controls.');
+        }
+
+        function promptToolkitAddToHomeScreen() {
+            if (IS_APP_SURFACE) {
+                showSaveToast('Already installed', 'You are using the OffGrid AI ToolKit app.');
+            } else {
+                showSaveToast('Add to Home Screen', 'Use your browser menu, then choose Install App or Add to Home screen.');
+            }
+        }
+
+        function getAssistantMessageText(msgEl) {
+            const textEl = msgEl.querySelector('.message-text') || msgEl.querySelector('.markdown-content');
+            return textEl ? textEl.innerText.trim() : '';
+        }
+
+        function getMessageImageSource(msgEl) {
+            const img = msgEl.querySelector('img');
+            if (!img) return '';
+            if (img.src && img.src.startsWith('data:image/')) return img.src;
+            if (onlineStudioState && onlineStudioState.image) return onlineStudioState.image;
+            return img.src || '';
+        }
+
+        let toolkitLongPressTimer = null;
+
+        function dismissToolkitContextMenu() {
+            document.querySelectorAll('.mobile-context-menu').forEach(menu => menu.remove());
+        }
+
+        function showToolkitContextMenu(x, y, msgEl) {
+            dismissToolkitContextMenu();
+            haptic('medium');
+
+            const msgText = getAssistantMessageText(msgEl);
+            const imageSrc = getMessageImageSource(msgEl);
+            const items = [
+                { icon: '📋', label: 'Copy Response', action: () => copyTextToClipboardReliable(msgText) },
+                { icon: '🧭', label: 'Add to Home Screen', action: promptToolkitAddToHomeScreen },
+                { icon: '📤', label: 'Share', action: () => shareToolkitText(msgText) },
+                { icon: '🔊', label: toolkitTtsActive ? 'Stop Reading' : 'Read Aloud', action: () => toggleToolkitReadAloud(msgText) },
+                { divider: true }
+            ];
+
+            if (imageSrc) {
+                items.push(
+                    { icon: '🖼️', label: 'Save Image', action: () => saveImageDataUrlToPhone(imageSrc, getOnlineStudioImageFilename()) },
+                    { icon: '📤', label: 'Share Image', action: () => shareImageDataUrlFromPhone(imageSrc, getOnlineStudioImageFilename()) },
+                    { icon: '📄', label: 'Save Field Guide PDF', action: () => onlineStudioState?.image ? exportOnlineStudioPDF() : exportAsPDF() },
+                    { divider: true }
+                );
+            }
+
+            items.push(
+                { icon: '🔍', label: 'Search in Chat', action: openToolkitChatSearch },
+                { icon: '📁', label: 'Export Chat', action: exportToolkitChat },
+                { divider: true },
+                { icon: document.body.classList.contains('app-theme-night') ? '☀️' : '🌙', label: document.body.classList.contains('app-theme-night') ? 'Toggle Day Mode' : 'Toggle Night Mode', action: toggleAppTheme },
+                { icon: '✋', label: 'Select Text', action: () => enableToolkitTextSelection(msgEl) },
+                { icon: '🗑️', label: 'Clear Chat', action: () => {
+                    if (confirm('Clear the conversation?')) clearChat();
+                }}
+            );
+
+            const menu = document.createElement('div');
+            menu.className = 'mobile-context-menu';
+            items.forEach(item => {
+                if (item.divider) {
+                    const divider = document.createElement('div');
+                    divider.className = 'ctx-divider';
+                    menu.appendChild(divider);
+                    return;
+                }
+                const row = document.createElement('div');
+                row.className = 'ctx-item';
+                row.innerHTML = `<span class="ctx-icon">${item.icon}</span><span>${item.label}</span>`;
+                row.addEventListener('click', () => {
+                    item.action();
+                    dismissToolkitContextMenu();
+                });
+                menu.appendChild(row);
+            });
+
+            const width = Math.min(290, window.innerWidth - 28);
+            const itemCount = items.filter(item => !item.divider).length;
+            const dividerCount = items.length - itemCount;
+            const height = Math.min(window.innerHeight - 110, itemCount * 50 + dividerCount * 9 + 8);
+            let top = y - height / 2;
+            top = Math.max(78, Math.min(top, window.innerHeight - height - 24));
+            menu.style.width = `${width}px`;
+            menu.style.left = `${Math.max(14, (window.innerWidth - width) / 2)}px`;
+            menu.style.top = `${top}px`;
+            menu.style.maxHeight = `${height}px`;
+            document.body.appendChild(menu);
+        }
+
+        function initToolkitLongPressMenu() {
+            const messages = document.getElementById('messages');
+            if (!messages || messages.dataset.longPressReady === 'true') return;
+            messages.dataset.longPressReady = 'true';
+
+            messages.addEventListener('pointerdown', (event) => {
+                if (event.pointerType === 'mouse') return;
+                const msgEl = event.target.closest('.message.assistant');
+                if (!msgEl || event.target.closest('button, a, input, textarea')) return;
+                toolkitLongPressTimer = setTimeout(() => {
+                    haptic('heavy');
+                    showToolkitContextMenu(event.clientX, event.clientY, msgEl);
+                }, 520);
+            });
+
+            ['pointerup', 'pointermove', 'pointercancel', 'pointerleave'].forEach(type => {
+                messages.addEventListener(type, () => {
+                    if (toolkitLongPressTimer) {
+                        clearTimeout(toolkitLongPressTimer);
+                        toolkitLongPressTimer = null;
+                    }
+                });
+            });
+
+            document.addEventListener('pointerdown', (event) => {
+                if (!event.target.closest('.mobile-context-menu')) dismissToolkitContextMenu();
+            });
+        }
         
         // ============================================
         // FIRST RUN HANDLING
@@ -4923,6 +5470,10 @@ Mobile app output requirements:
             const welcomeInput = document.getElementById('welcomeMessageInput');
             if (welcomeInput && document.getElementById('welcome')) {
                 welcomeInput.focus();
+            }
+
+            if (window.innerWidth <= 768 || IS_APP_SURFACE) {
+                initToolkitLongPressMenu();
             }
             
             // Auto-open the Survival & Emergency accordion on page load
