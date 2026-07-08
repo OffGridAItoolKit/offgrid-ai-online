@@ -1845,13 +1845,17 @@
             return null;
         }
 
+        function smoothCompassHeading(previous, next, weight = 0.18) {
+            if (previous === null) return next;
+            const delta = ((((next - previous) % 360) + 540) % 360) - 180;
+            return (previous + (delta * weight) + 360) % 360;
+        }
+
         function handleCompassOrientation(event) {
             const heading = extractCompassHeading(event);
             if (heading === null || Number.isNaN(heading)) return;
 
-            liveCompassHeading = liveCompassHeading === null
-                ? heading
-                : (liveCompassHeading * 0.82) + (heading * 0.18);
+            liveCompassHeading = smoothCompassHeading(liveCompassHeading, heading);
 
             const normalized = ((liveCompassHeading % 360) + 360) % 360;
             const compassRose = document.getElementById('compassRose');
