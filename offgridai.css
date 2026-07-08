@@ -47,6 +47,13 @@ body {
     transform: scale(1.15) rotate(10deg);
 }
 
+.header-compass-icon {
+    width: 30px;
+    height: 30px;
+    display: block;
+    filter: drop-shadow(0 1px 4px rgba(218, 165, 32, 0.18));
+}
+
 .title {
     font-family: 'Black Ops One', 'Inter', sans-serif;
     font-size: 18px;
@@ -790,9 +797,9 @@ body.live-compass-enabled .live-compass .welcome-icon {
 }
 
 .message-image-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(126px, 1fr));
+    gap: 9px;
     margin-top: 10px;
     max-width: min(100%, 820px);
 }
@@ -800,21 +807,34 @@ body.live-compass-enabled .live-compass .welcome-icon {
 .message-image-actions button {
     appearance: none;
     border: 1px solid rgba(184, 134, 11, 0.35);
-    border-radius: 999px;
-    background: rgba(255, 250, 240, 0.94);
+    border-radius: 10px;
+    background: rgba(255, 250, 240, 0.96);
     color: #5f351d;
-    padding: 9px 13px;
+    padding: 11px 12px;
     font-size: 13px;
     font-weight: 800;
-    line-height: 1;
+    line-height: 1.15;
     box-shadow: 0 6px 18px rgba(44, 24, 16, 0.08);
     cursor: pointer;
+    min-height: 42px;
 }
 
 .message-image-actions button:hover,
 .message-image-actions button:active {
     border-color: rgba(184, 134, 11, 0.68);
     background: #fff6dc;
+}
+
+.message-image-actions button.guide {
+    border-color: rgba(16, 185, 129, 0.34);
+    background: rgba(236, 253, 245, 0.98);
+    color: #047857;
+}
+
+.message-image-actions button.share {
+    border-color: rgba(148, 163, 184, 0.38);
+    background: rgba(248, 250, 252, 0.98);
+    color: #475569;
 }
 
 .message-time {
@@ -1801,12 +1821,31 @@ body.live-compass-enabled .live-compass .welcome-icon {
 
 .first-run-logo {
     font-family: 'Black Ops One', cursive;
-    font-size: 32px;
+    font-size: 30px;
     color: #daa520;
     text-transform: uppercase;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    letter-spacing: 2px;
+    letter-spacing: 1.4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.first-run-mark {
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+}
+
+.first-run-mark svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .first-run-tagline {
@@ -1822,6 +1861,7 @@ body.live-compass-enabled .live-compass .welcome-icon {
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 25px;
+    text-align: left;
 }
 
 .first-run-message p {
@@ -1936,6 +1976,14 @@ body.live-compass-enabled .live-compass .welcome-icon {
     .first-run-logo {
         font-size: 22px;
         margin-bottom: 6px;
+        gap: 10px;
+        letter-spacing: 0.7px;
+    }
+
+    .first-run-mark {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
     }
     
     .first-run-tagline {
@@ -3606,6 +3654,18 @@ body.app-theme-night:not(.command-theme) .message-image-actions button {
     border-color: rgba(218, 165, 32, 0.35);
     color: #f3d37a;
     box-shadow: none;
+}
+
+body.app-theme-night:not(.command-theme) .message-image-actions button.guide {
+    background: rgba(6, 78, 59, 0.34);
+    border-color: rgba(52, 211, 153, 0.32);
+    color: #a7f3d0;
+}
+
+body.app-theme-night:not(.command-theme) .message-image-actions button.share {
+    background: rgba(30, 41, 59, 0.72);
+    border-color: rgba(148, 163, 184, 0.32);
+    color: #dbe4ef;
 }
 
 body.app-theme-night:not(.command-theme) .message-image-actions button:hover,

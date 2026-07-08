@@ -22,7 +22,7 @@
     <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" href="compasstilted.png">
-    <link rel="stylesheet" href="offgridai.css?v=5.5">
+    <link rel="stylesheet" href="offgridai.css?v=5.6">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -1220,22 +1220,38 @@
     <!-- First Run Banner (Online Version - No PIN required) -->
     <div id="firstRunBanner" class="first-run-banner" style="display: none;">
         <div class="first-run-content">
-            <div class="first-run-logo">OffGrid AI ToolKit</div>
-            <div class="first-run-tagline">Cloud-Powered Gemma 4 • Private Sessions • No Data Stored</div>
+            <div class="first-run-logo">
+                <span class="first-run-mark" aria-hidden="true">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
+                        <path d="M50 95 L45 55 L50 50 L55 55 Z" fill="#daa520"/>
+                        <path d="M95 50 L55 55 L50 50 L55 45 Z" fill="#cd853f"/>
+                        <path d="M5 50 L45 45 L50 50 L45 55 Z" fill="#d2691e"/>
+                        <path d="M78 22 L55 45 L50 50 L45 45 Z" fill="#deb887" opacity="0.72"/>
+                        <path d="M78 78 L55 55 L50 50 L55 45 Z" fill="#deb887" opacity="0.72"/>
+                        <path d="M22 78 L45 55 L50 50 L45 45 Z" fill="#deb887" opacity="0.72"/>
+                        <path d="M22 22 L45 45 L50 50 L45 55 Z" fill="#deb887" opacity="0.72"/>
+                        <circle cx="50" cy="50" r="38" fill="none" stroke="#c8a06b" stroke-width="1.5" opacity="0.72"/>
+                        <circle cx="50" cy="50" r="7" fill="#8b4513"/>
+                    </svg>
+                </span>
+                <span>OffGrid AI ToolKit</span>
+            </div>
+            <div class="first-run-tagline">Built for weak signals and hard decisions.</div>
             <div class="first-run-message">
-                <p><strong>Welcome to OffGrid AI Online!</strong> This is the cloud-powered version of the OffGrid AI ToolKit.</p>
-                <p>This uses the same Gemma AI models as the USB version, now powered by Gemma 4 on secure cloud infrastructure.</p>
+                <p><strong>Welcome to OffGrid AI ToolKit.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
+                <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
                 <p>Your conversations are <strong>not stored</strong>. Each session is ephemeral and private.</p>
-                <p>AI may occasionally generate inaccurate or incomplete information. Please verify important details.</p>
+                <p>AI can make mistakes. Verify important survival, medical, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
                 <label class="terms-checkbox">
                     <input type="checkbox" id="acceptTermsBanner">
-                    <span>I understand and accept the terms of use</span>
+                    <span>I understand and accept these safety and privacy notes</span>
                 </label>
             </div>
             <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
-                Start Using OffGrid AI Online
+                Start Using OffGrid AI
             </button>
         </div>
     </div>
@@ -1243,14 +1259,17 @@
     <div class="header">
         <div class="header-left">
             <div class="logo" onclick="returnToHome()" style="cursor: pointer;" title="Clear chat and return to home">
-                <svg viewBox="0 0 24 24" fill="none" style="width: 28px; height: 28px;">
-                    <!-- USB body -->
-                    <rect x="4" y="7" width="14" height="10" rx="1" fill="#d2691e"/>
-                    <!-- USB connector -->
-                    <rect x="18" y="9" width="4" height="6" fill="#b8860b"/>
-                    <!-- USB details -->
-                    <rect x="19" y="10" width="2" height="1" fill="#f4e4c1"/>
-                    <rect x="19" y="13" width="2" height="1" fill="#f4e4c1"/>
+                <svg class="header-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
+                    <path d="M50 95 L45 55 L50 50 L55 55 Z" fill="#daa520"/>
+                    <path d="M95 50 L55 55 L50 50 L55 45 Z" fill="#cd853f"/>
+                    <path d="M5 50 L45 45 L50 50 L45 55 Z" fill="#d2691e"/>
+                    <path d="M78 22 L55 45 L50 50 L45 45 Z" fill="#deb887" opacity="0.72"/>
+                    <path d="M78 78 L55 55 L50 50 L55 45 Z" fill="#deb887" opacity="0.72"/>
+                    <path d="M22 78 L45 55 L50 50 L45 45 Z" fill="#deb887" opacity="0.72"/>
+                    <path d="M22 22 L45 45 L50 50 L45 55 Z" fill="#deb887" opacity="0.72"/>
+                    <circle cx="50" cy="50" r="39" fill="none" stroke="#c8a06b" stroke-width="1.3" opacity="0.65"/>
+                    <circle cx="50" cy="50" r="7" fill="#8b4513"/>
                 </svg>
             </div>
             <h1 class="title">OffGrid AI ToolKit</h1>
@@ -1623,6 +1642,9 @@
                             <div class="mobile-secondary-btn" onclick="navigateToReadyMadePrompts()">
                                 <span>💡</span> Ready-Made Prompts
                             </div>
+                            <div class="mobile-secondary-btn" onclick="openSavedGuides()">
+                                <span>📚</span> Saved Guides
+                            </div>
                             <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
                                 <span>⭐</span> Command Center
                             </div>
@@ -1656,6 +1678,9 @@
                         <div class="mobile-secondary-row">
                             <div class="mobile-secondary-btn" onclick="navigateToReadyMadePrompts()">
                                 <span>💡</span> Ready-Made Prompts
+                            </div>
+                            <div class="mobile-secondary-btn" onclick="openSavedGuides()">
+                                <span>📚</span> Saved Guides
                             </div>
                             <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
                                 <span>⭐</span> Command Center
@@ -2662,9 +2687,9 @@
                     </a>`;
             const imageActions = IS_PHONE_SURFACE && isGeneratedImage
                 ? `<div class="message-image-actions">
-                        <button onclick="downloadOnlineStudioImage()">Save Image</button>
-                        <button onclick="exportOnlineStudioPDF()">Save Field Guide PDF</button>
-                        <button onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share Image</button>
+                        <button class="message-image-action save" onclick="downloadOnlineStudioImage()">Save Image</button>
+                        <button class="message-image-action guide" onclick="exportOnlineStudioPDF()">Save Guide PDF</button>
+                        <button class="message-image-action share" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share</button>
                     </div>`
                 : '';
             
@@ -4087,6 +4112,21 @@ Mobile app output requirements:
                 return;
             }
             window.open(uri, '_blank');
+        }
+
+        function openSavedGuides() {
+            if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.openSavedGuides === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.openSavedGuides());
+                if (result.ok) {
+                    showSaveToast('Saved Guides', 'PDFs are in Downloads > OffGrid AI. Images are in Gallery > OffGrid AI.');
+                    return true;
+                }
+                showSaveToast('Saved Guides', result.error || 'Open Files > Downloads > OffGrid AI, or Gallery > OffGrid AI.');
+                return false;
+            }
+
+            showSaveToast('Saved Guides', 'PDFs save to Downloads. Images save to your Gallery or browser downloads.');
+            return false;
         }
 
         function saveImageDataUrlToPhone(dataUrl, filename) {
