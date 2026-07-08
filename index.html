@@ -1237,7 +1237,7 @@
                 </span>
                 <span>OffGrid AI ToolKit</span>
             </div>
-            <div class="first-run-tagline">Built for weak signals and hard decisions.</div>
+            <div class="first-run-tagline">Private sessions. Phone-native tools. Field-ready help.</div>
             <div class="first-run-message">
                 <p><strong>Welcome to OffGrid AI ToolKit.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
                 <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
@@ -5130,7 +5130,7 @@ Mobile app output requirements:
 
         function shareToolkitText(text) {
             const cleanText = cleanTextForSharing(text);
-            const shareText = `${cleanText}\n\n---\nOffGrid AI ToolKit | Built for weak signals and hard decisions.`;
+            const shareText = `${cleanText}\n\n---\nOffGrid AI ToolKit`;
             if (navigator.share) {
                 navigator.share({
                     title: 'OffGrid AI ToolKit',
@@ -5410,7 +5410,7 @@ Mobile app output requirements:
                 markdown += `## ${role}\n\n${content}\n\n`;
                 if (msg.image) markdown += `*[Image attached or generated]*\n\n`;
             });
-            markdown += `---\n\nBuilt for weak signals and hard decisions.\n`;
+            markdown += `---\n\nOffGrid AI ToolKit\n`;
 
             const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
             const url = URL.createObjectURL(blob);
