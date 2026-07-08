@@ -1495,8 +1495,7 @@
                             <circle cx="50" cy="50" r="6" fill="#8b4513"/>
                         </svg>
                     </button>
-                    <div class="compass-heading" id="compassHeading">Tap compass for heading</div>
-                    <p class="welcome-tagline"><em>Built for weak signals and hard decisions.</em></p>
+                    <p class="compass-heading welcome-tagline" id="compassHeading">Tap compass for heading</p>
                     <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
                     <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</div>
@@ -1796,6 +1795,7 @@
         let pendingOnlineStudioPayload = null;
         let liveCompassEnabled = false;
         let liveCompassHeading = null;
+        let liveCompassNative = false;
         let liveCompassStatusTimer = null;
         const API_BASE = CONFIG.apiBase || '';  // Same origin by default; app debug builds can use production API.
 
@@ -1851,10 +1851,8 @@
             return (previous + (delta * weight) + 360) % 360;
         }
 
-        function handleCompassOrientation(event) {
-            const heading = extractCompassHeading(event);
+        function updateCompassDisplay(heading, accuracyLabel = '') {
             if (heading === null || Number.isNaN(heading)) return;
-
             liveCompassHeading = smoothCompassHeading(liveCompassHeading, heading);
 
             const normalized = ((liveCompassHeading % 360) + 360) % 360;
@@ -1862,13 +1860,27 @@
             if (compassRose) {
                 compassRose.style.transform = `rotate(${-normalized}deg)`;
             }
-            setCompassStatus(`${cardinalFromHeading(normalized)} ${Math.round(normalized)} deg`);
+            setCompassStatus(`${cardinalFromHeading(normalized)} ${Math.round(normalized)} deg${accuracyLabel ? ` · ${accuracyLabel}` : ''}`);
+        }
+
+        window.offgridNativeCompassUpdate = function(payload) {
+            if (!payload || payload.heading === undefined) return;
+            const accuracy = payload.accuracy || '';
+            updateCompassDisplay(Number(payload.heading), accuracy);
+        };
+
+        function handleCompassOrientation(event) {
+            updateCompassDisplay(extractCompassHeading(event));
         }
 
         function stopLiveCompass() {
             window.removeEventListener('deviceorientationabsolute', handleCompassOrientation, true);
             window.removeEventListener('deviceorientation', handleCompassOrientation, true);
+            if (liveCompassNative && window.OffGridNative && typeof window.OffGridNative.stopCompass === 'function') {
+                window.OffGridNative.stopCompass();
+            }
             liveCompassEnabled = false;
+            liveCompassNative = false;
             liveCompassHeading = null;
             document.body.classList.remove('live-compass-enabled');
             const compassRose = document.getElementById('compassRose');
@@ -1880,6 +1892,24 @@
             if (liveCompassEnabled) {
                 stopLiveCompass();
                 return;
+            }
+
+            if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.startCompass === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.startCompass());
+                if (result && result.ok) {
+                    liveCompassEnabled = true;
+                    liveCompassNative = true;
+                    document.body.classList.add('live-compass-enabled');
+                    setCompassStatus('Move phone in a figure 8');
+                    clearTimeout(liveCompassStatusTimer);
+                    liveCompassStatusTimer = setTimeout(() => {
+                        if (liveCompassEnabled && liveCompassHeading === null) {
+                            setCompassStatus('Calibrating compass');
+                        }
+                    }, 2500);
+                    return;
+                }
+                console.warn('Native compass unavailable:', result && result.error);
             }
 
             if (typeof DeviceOrientationEvent === 'undefined') {
