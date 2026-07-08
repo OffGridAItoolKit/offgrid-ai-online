@@ -1241,7 +1241,8 @@
             <div class="first-run-message">
                 <p><strong>Welcome to OffGrid AI ToolKit.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
                 <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
-                <p>Your conversations are <strong>not stored</strong>. Each session is ephemeral and private.</p>
+                <p>Photos, videos, and prompts are sent to the online AI service only when you choose to use those features.</p>
+                <p>Sessions are designed to be <strong>ephemeral</strong>; no account is required for v1.</p>
                 <p>AI can make mistakes. Verify important survival, medical, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
@@ -1253,6 +1254,10 @@
             <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
                 Start Using OffGrid AI
             </button>
+            <div class="first-run-footer">
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> &middot;
+                <a href="mailto:support@offgridaitoolkit.com?subject=OffGrid%20AI%20ToolKit%20Support">Support</a>
+            </div>
         </div>
     </div>
 
@@ -1577,7 +1582,7 @@
                                     Send
                                 </button>
                             </div>
-                            <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No data stored</div>
+                            <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No account required</div>
                         </div>
                     </div>
 
@@ -1644,8 +1649,8 @@
                             <div class="mobile-secondary-btn" onclick="openSavedGuides()">
                                 <span>📚</span> Saved Guides
                             </div>
-                            <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
-                                <span>⭐</span> Command Center
+                            <div class="mobile-secondary-btn" onclick="openFeedback()">
+                                <span>✉️</span> Feedback
                             </div>
                         </div>
                     </div>
@@ -1681,8 +1686,8 @@
                             <div class="mobile-secondary-btn" onclick="openSavedGuides()">
                                 <span>📚</span> Saved Guides
                             </div>
-                            <div class="mobile-secondary-btn" onclick="window.location.href='https://offgridtoolkit.ai/command'">
-                                <span>⭐</span> Command Center
+                            <div class="mobile-secondary-btn" onclick="openFeedback()">
+                                <span>✉️</span> Feedback
                             </div>
                         </div>
                     </div>
@@ -1750,10 +1755,7 @@
         function getPreferredAppTheme() {
             const saved = localStorage.getItem(APP_THEME_STORAGE_KEY);
             if (saved === 'night' || saved === 'day') return saved;
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                return 'night';
-            }
-            return 'day';
+            return 'night';
         }
 
         function setAppTheme(theme, persist = true) {
@@ -2378,7 +2380,7 @@
                         </button>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
-                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No data stored</div>
+                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No account required</div>
                 </div>
             </div>`;
         }
@@ -4163,6 +4165,18 @@ Mobile app output requirements:
             return false;
         }
 
+        function openFeedback(context = '') {
+            const details = [
+                context ? `Context: ${context}` : '',
+                `Surface: ${IS_APP_SURFACE ? 'App' : (IS_PHONE_SURFACE ? 'Mobile web' : 'Web')}`,
+                `URL: ${window.location.href}`,
+                `Time: ${new Date().toISOString()}`
+            ].filter(Boolean).join('\n');
+            const subject = encodeURIComponent('OffGrid AI ToolKit feedback');
+            const body = encodeURIComponent(`Tell us what happened or what would make this better:\n\n\n---\n${details}`);
+            window.location.href = `mailto:support@offgridaitoolkit.com?subject=${subject}&body=${body}`;
+        }
+
         function saveImageDataUrlToPhone(dataUrl, filename) {
             if (!dataUrl) return false;
             if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.saveImageToGallery === 'function') {
@@ -5490,6 +5504,7 @@ Mobile app output requirements:
             items.push(
                 { icon: '🔍', label: 'Search in Chat', action: openToolkitChatSearch },
                 { icon: '📁', label: 'Export Chat', action: exportToolkitChat },
+                { icon: '✉️', label: 'Report Issue', action: () => openFeedback(imageSrc ? 'Generated image response' : 'Assistant response') },
                 { divider: true },
                 { icon: document.body.classList.contains('app-theme-night') ? '☀️' : '🌙', label: document.body.classList.contains('app-theme-night') ? 'Toggle Day Mode' : 'Toggle Night Mode', action: toggleAppTheme },
                 { icon: '✋', label: 'Select Text', action: () => enableToolkitTextSelection(msgEl) },

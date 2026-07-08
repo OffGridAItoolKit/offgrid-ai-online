@@ -2484,6 +2484,10 @@ app.get('/terms', (req, res) => {
     res.redirect(301, 'https://offgridaitoolkit.com/pages/terms-and-conditions');
 });
 
+app.get('/privacy', (req, res) => {
+    res.sendFile(path.join(__dirname, 'privacy.html'));
+});
+
 // =============================================================================
 // LICENSE SYSTEM ROUTES (must be before catch-all)
 // =============================================================================

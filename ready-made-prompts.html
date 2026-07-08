@@ -1470,7 +1470,7 @@
         }
 
         const savedPromptTheme = localStorage.getItem(APP_THEME_STORAGE_KEY);
-        applyPromptTheme(savedPromptTheme === 'night' ? 'night' : 'day', false);
+        applyPromptTheme(savedPromptTheme === 'day' ? 'day' : 'night', false);
 
         function buildReturnQuery() {
             const params = new URLSearchParams();
