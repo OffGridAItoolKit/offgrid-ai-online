@@ -66,7 +66,7 @@
 <body>
     <main>
         <h1>Privacy Policy</h1>
-        <div class="meta">OffGrid AI ToolKit app and online mobile experience. Last updated July 8, 2026.</div>
+        <div class="meta">OffGrid AI ToolKit app and online mobile experience. Last updated July 9, 2026.</div>
 
         <div class="callout">
             OffGrid AI ToolKit v1 is an online AI app. It does not require an account, does not use ads, and does not use in-app purchases. Prompts, photos, videos, and generated-image requests are sent to online AI services only when you choose to use those features.
@@ -74,6 +74,7 @@
 
         <h2>Information You Choose To Send</h2>
         <p>When you use chat, image upload, camera, video, voice, or Image Studio, the content you provide may be sent to the OffGrid AI ToolKit online service and to third-party AI processors used to generate the response. This can include text prompts, uploaded images, selected videos, extracted video frames, voice transcription text, and generated-image prompts.</p>
+        <p>OffGrid AI ToolKit processes that content in memory to complete the request. It is not written to the OffGrid AI application database as a saved conversation, media library, or personal account history.</p>
 
         <h2>Device Permissions</h2>
         <p>The app asks for permissions only when you use the related feature:</p>
@@ -91,11 +92,16 @@
         <h2>Storage And Saved Guides</h2>
         <p>When you tap Save Image, Save Guide PDF, or Export, the app saves the selected output to your phone or browser download location. Saved outputs are controlled by you and remain on your device unless you choose to share them.</p>
 
+        <h2>Feedback And Content Reports</h2>
+        <p>If you submit feedback or report an AI response, OffGrid AI stores the category, the details you type, basic app context, and the reported AI response only when you choose to include it. Reports do not automatically include your full chat history, account information, or uploaded media. Reports are retained for product support, safety review, and resolution.</p>
+
         <h2>Operational Logs</h2>
-        <p>Like most online services, the hosting platform and server may process basic technical information such as request path, time, IP address, device/browser information, and error details for security, reliability, abuse prevention, and troubleshooting. OffGrid AI ToolKit is designed to avoid unnecessary account-level tracking in v1.</p>
+        <p>Like most online services, the hosting platform and server may process basic technical information such as request path, time, IP address, device/browser information, and error details for security, reliability, abuse prevention, and troubleshooting. OffGrid AI does not intentionally write prompt text, response text, uploaded media, or generated-image content to its operational logs.</p>
+        <p>To enforce free daily limits without creating an account, the server stores a one-way hash derived from the network address with daily request counters. The original network address is not stored in this usage table, the counters contain no prompt or media content, and these anonymous counters are deleted after 31 days.</p>
 
         <h2>Third-Party Processing</h2>
-        <p>The app uses online AI model providers and hosting infrastructure to process requests. Their systems may receive the content needed to complete your request. Do not submit sensitive personal, medical, legal, financial, or confidential information unless you are comfortable sending it to online AI services.</p>
+        <p>The app uses OpenRouter, online AI model providers, hosting infrastructure, and operational logging services to process requests and operate the service. Their systems may receive the content or technical metadata needed to complete your request. OpenRouter states that API prompts and responses are not logged by default unless the account owner opts in, but model-provider retention practices can vary by endpoint. Do not submit sensitive personal, medical, legal, financial, or confidential information unless you are comfortable sending it to online AI services.</p>
+        <p>Learn more in the <a href="https://openrouter.ai/docs/guides/privacy/data-collection" target="_blank" rel="noopener noreferrer">OpenRouter data collection documentation</a>.</p>
 
         <h2>Safety Note</h2>
         <p>AI can make mistakes. Verify important survival, medical, legal, financial, or safety information before acting on it.</p>

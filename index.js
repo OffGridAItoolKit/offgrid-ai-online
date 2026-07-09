@@ -17,6 +17,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 // License Key & Usage Limit System
 const {
@@ -26,6 +27,7 @@ const {
     checkPromptLimit,
     checkImageLimit,
     incrementUsage,
+    pool,
     TIER_LIMITS
 } = require('./license-system');
 
@@ -38,6 +40,11 @@ const PORT = process.env.PORT || 3000;
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const IMAGE_HEALTH_TOKEN = process.env.IMAGE_HEALTH_TOKEN || '';
+const ANON_DAILY_PROMPT_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_PROMPT_LIMIT, 10) || 100);
+const ANON_DAILY_IMAGE_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_IMAGE_LIMIT, 10) || 6);
+const GLOBAL_DAILY_IMAGE_LIMIT = Math.max(1, parseInt(process.env.GLOBAL_DAILY_IMAGE_LIMIT, 10) || 100);
+const ANON_USAGE_HASH_SECRET = process.env.ANON_USAGE_HASH_SECRET || OPENROUTER_API_KEY || crypto.randomBytes(32).toString('hex');
 const IMAGE_STUDIO_IMAGE_MODELS = {
     gemini: 'google/gemini-3-pro-image-preview',
     openai: 'openai/gpt-5.4-image-2'
@@ -309,9 +316,54 @@ const OFFGRID_AI_SYSTEM_PROMPT = `You are OffGrid AI, a seasoned field expert an
 // MIDDLEWARE
 // =============================================================================
 
-// CORS Configuration
+app.disable('x-powered-by');
+
+const DEFAULT_ALLOWED_ORIGINS = [
+    'https://offgridtoolkit.ai',
+    'https://www.offgridtoolkit.ai',
+    'https://imagestudio.offgridtoolkit.ai',
+    'https://cmdcouncil.offgridtoolkit.ai',
+    'capacitor://localhost',
+    'https://localhost',
+    'http://localhost'
+];
+const ALLOWED_ORIGINS = new Set([
+    ...DEFAULT_ALLOWED_ORIGINS,
+    ...[process.env.ALLOWED_ORIGINS, process.env.CORS_ALLOWED_ORIGINS]
+        .filter(Boolean)
+        .flatMap(value => value.split(','))
+        .map(value => value.trim())
+        .filter(Boolean)
+]);
+
+function isAllowedOrigin(origin) {
+    if (!origin) return true;
+    if (ALLOWED_ORIGINS.has(origin)) return true;
+    return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
+}
+
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Permissions-Policy', 'geolocation=(), camera=(self), microphone=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self)');
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' https://offgridtoolkit.ai https://*.offgridtoolkit.ai; frame-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+    );
+    if (process.env.NODE_ENV === 'production') {
+        res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    next();
+});
+
+// CORS is only needed for approved app/dev origins. Requests without an Origin
+// header still work for native/server health checks, but browser origins are not
+// reflected automatically.
 app.use(cors({
-    origin: true,
+    origin(origin, callback) {
+        callback(null, isAllowedOrigin(origin) ? origin || false : false);
+    },
     credentials: true
 }));
 
@@ -347,8 +399,154 @@ const commandLimiter = rateLimit({
     validate: { trustProxy: false, xForwardedForHeader: false }
 });
 
+const imageBurstLimiter = rateLimit({
+    windowMs: 60000,
+    max: Math.max(1, parseInt(process.env.IMAGE_BURST_LIMIT, 10) || 3),
+    message: {
+        error: 'Image Studio is receiving requests too quickly. Please wait a minute and try again.',
+        retryAfter: 60
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false, xForwardedForHeader: false }
+});
+
+const feedbackLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { error: 'Too many feedback submissions. Please wait and try again.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: { trustProxy: false, xForwardedForHeader: false }
+});
+
+function anonymousUsageKey(req) {
+    const address = String(req.ip || req.socket?.remoteAddress || 'unknown');
+    return crypto.createHmac('sha256', ANON_USAGE_HASH_SECRET).update(address).digest('hex');
+}
+
+const anonymousUsageMemory = new Map();
+
+function consumeAnonymousDailyUsageMemory(req, usageType, perUserLimit, globalLimit = null) {
+    const today = new Date().toISOString().slice(0, 10);
+    const userKey = `${today}:${usageType}:${anonymousUsageKey(req)}`;
+    const userCount = anonymousUsageMemory.get(userKey) || 0;
+    if (userCount >= perUserLimit) return { allowed: false, reason: 'user_limit' };
+
+    const globalKey = `${today}:${usageType}:global`;
+    const globalCount = globalLimit ? anonymousUsageMemory.get(globalKey) || 0 : null;
+    if (globalLimit && globalCount >= globalLimit) return { allowed: false, reason: 'global_limit' };
+
+    anonymousUsageMemory.set(userKey, userCount + 1);
+    if (globalLimit) anonymousUsageMemory.set(globalKey, globalCount + 1);
+    return { allowed: true, userCount: userCount + 1, globalCount: globalLimit ? globalCount + 1 : null };
+}
+
+async function consumeAnonymousDailyUsage(req, usageType, perUserLimit, globalLimit = null) {
+    const client = await pool.connect();
+    const today = new Date().toISOString().slice(0, 10);
+    const usageKey = anonymousUsageKey(req);
+
+    async function increment(key, limit) {
+        const result = await client.query(
+            `INSERT INTO anonymous_daily_usage (usage_date, usage_type, usage_key_hash, request_count)
+             VALUES ($1, $2, $3, 1)
+             ON CONFLICT (usage_date, usage_type, usage_key_hash)
+             DO UPDATE SET request_count = anonymous_daily_usage.request_count + 1, updated_at = NOW()
+             WHERE anonymous_daily_usage.request_count < $4
+             RETURNING request_count`,
+            [today, usageType, key, limit]
+        );
+        return result.rows[0]?.request_count || null;
+    }
+
+    try {
+        await client.query('BEGIN');
+        const userCount = await increment(usageKey, perUserLimit);
+        if (!userCount) {
+            await client.query('ROLLBACK');
+            return { allowed: false, reason: 'user_limit' };
+        }
+
+        let globalCount = null;
+        if (globalLimit) {
+            globalCount = await increment('global', globalLimit);
+            if (!globalCount) {
+                await client.query('ROLLBACK');
+                return { allowed: false, reason: 'global_limit' };
+            }
+        }
+
+        await client.query('COMMIT');
+        return { allowed: true, userCount, globalCount };
+    } catch (error) {
+        await client.query('ROLLBACK').catch(() => {});
+        throw error;
+    } finally {
+        client.release();
+    }
+}
+
+function anonymousDailyLimit(usageType, perUserLimit, globalLimit = null) {
+    return async (req, res, next) => {
+        if (req.license) return next();
+        try {
+            const usage = await consumeAnonymousDailyUsage(req, usageType, perUserLimit, globalLimit);
+            if (!usage.allowed) {
+                const isGlobal = usage.reason === 'global_limit';
+                logToBetterStack('warn', 'usage.anonymous.limit', {
+                    summary: `${usageType} ${usage.reason} reached`,
+                    usageType,
+                    reason: usage.reason,
+                    status: 'blocked'
+                });
+                return res.status(429).json({
+                    error: isGlobal
+                        ? 'Image Studio has reached today\'s free capacity. Please try again tomorrow.'
+                        : usageType === 'image'
+                            ? `You have reached today\'s free Image Studio limit of ${perUserLimit} visuals. Please try again tomorrow.`
+                            : 'You have reached today\'s free chat limit. Please try again tomorrow.',
+                    retryAfter: 'tomorrow'
+                });
+            }
+
+            if (usageType === 'image' && usage.globalCount) {
+                const percent = Math.round((usage.globalCount / globalLimit) * 100);
+                if ([50, 80, 90].some(threshold => percent >= threshold && percent - Math.round(100 / globalLimit) < threshold)) {
+                    logToBetterStack('warn', 'usage.image.budget', {
+                        summary: `Daily image budget is ${percent}% used`,
+                        used: usage.globalCount,
+                        limit: globalLimit,
+                        status: 'warning'
+                    });
+                }
+            }
+            next();
+        } catch (error) {
+            console.error('[Usage Guard] Database check failed; using in-memory limits:', error.message);
+            const fallback = consumeAnonymousDailyUsageMemory(req, usageType, perUserLimit, globalLimit);
+            if (!fallback.allowed) {
+                return res.status(429).json({
+                    error: fallback.reason === 'global_limit'
+                        ? 'Image Studio has reached today\'s free capacity. Please try again tomorrow.'
+                        : usageType === 'image'
+                            ? `You have reached today\'s free Image Studio limit of ${perUserLimit} visuals. Please try again tomorrow.`
+                            : 'You have reached today\'s free chat limit. Please try again tomorrow.',
+                    retryAfter: 'tomorrow'
+                });
+            }
+            next();
+        }
+    };
+}
+
+const anonymousPromptDailyLimit = anonymousDailyLimit('prompt', ANON_DAILY_PROMPT_LIMIT);
+const anonymousImageDailyLimit = anonymousDailyLimit('image', ANON_DAILY_IMAGE_LIMIT, GLOBAL_DAILY_IMAGE_LIMIT);
+
 app.use('/api/chat', limiter);
+app.use('/api/chat', anonymousPromptDailyLimit);
 app.use('/api/stream', limiter);
+app.use('/api/stream', anonymousPromptDailyLimit);
 app.use('/api/command/', commandLimiter);
 app.use('/api/image-studio/', commandLimiter);
 
@@ -571,7 +769,7 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temper
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         const errMsg = errorData.error?.message || errorData.error || 'Provider returned error';
-        console.error('OpenRouter stream error:', JSON.stringify(errorData));
+        console.error('OpenRouter stream error status:', response.status);
         res.write(`data: ${JSON.stringify({ error: typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg) })}\n\n`);
         res.end();
         return;
@@ -990,11 +1188,57 @@ app.get('/api/models', (req, res) => {
  * Health check endpoint
  */
 app.get('/api/health', (req, res) => {
-    res.json({ 
+    res.json({
         status: 'ok',
         service: 'OffGrid AI ToolKit Online',
         timestamp: new Date().toISOString()
     });
+});
+
+app.post('/api/feedback', feedbackLimiter, async (req, res) => {
+    const allowedCategories = new Set(['unsafe', 'offensive', 'incorrect', 'app-problem', 'suggestion', 'other']);
+    const category = String(req.body?.category || '').trim().toLowerCase();
+    const details = String(req.body?.details || '').trim();
+    const context = String(req.body?.context || '').trim().slice(0, 160);
+    const reportedContent = String(req.body?.reportedContent || '').trim().slice(0, 12000);
+    const surface = String(req.body?.surface || '').trim().slice(0, 40);
+    const platform = String(req.body?.platform || '').trim().slice(0, 60);
+    const appPath = String(req.body?.appPath || '').trim().slice(0, 255);
+
+    if (!allowedCategories.has(category)) {
+        return res.status(400).json({ error: 'Choose a feedback category.' });
+    }
+    if (details.length < 3 || details.length > 4000) {
+        return res.status(400).json({ error: 'Feedback must be between 3 and 4,000 characters.' });
+    }
+
+    try {
+        const result = await pool.query(
+            `INSERT INTO app_feedback (category, details, context, reported_content, surface, platform, app_path)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id, created_at`,
+            [category, details, context || null, reportedContent || null, surface || null, platform || null, appPath || null]
+        );
+        logToBetterStack('info', 'feedback.submitted', {
+            summary: `In-app feedback submitted: ${category}`,
+            category,
+            hasReportedContent: Boolean(reportedContent),
+            status: 'success'
+        });
+        res.status(201).json({
+            ok: true,
+            id: result.rows[0].id,
+            submittedAt: result.rows[0].created_at
+        });
+    } catch (error) {
+        console.error('[Feedback] Submission error:', error.message);
+        logToBetterStack('error', 'feedback.submitted', {
+            summary: 'In-app feedback storage failed',
+            category,
+            status: 'error'
+        });
+        res.status(503).json({ error: 'Feedback could not be submitted right now. Please try again.' });
+    }
 });
 
 /**
@@ -1261,7 +1505,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         const lastUserMessage = messages.filter(m => m.role === 'user').pop();
         const userQuery = lastUserMessage?.content || '';
         
-        console.log(`[${arenaType}] Starting parallel calls for: "${userQuery.substring(0, 80)}..."`);
+        console.log(`[${arenaType}] Starting parallel calls (${userQuery.length} input characters)`);
         
         // Step 1: Make parallel calls to all 4 models
         const modelKeys = ['scout', 'medic', 'navigator', 'ranger'];
@@ -1531,6 +1775,33 @@ function logImageGen(entry) {
 
 // Health check endpoint for image generation
 app.get('/api/health/image-gen', async (req, res) => {
+    const passiveRecent = imageGenLog.filter(entry => Date.now() - new Date(entry.timestamp).getTime() < 86400000);
+    const passiveSuccesses = passiveRecent.filter(entry => entry.status === 'success').length;
+    const passiveFailures = passiveRecent.length - passiveSuccesses;
+
+    // Default health checks are passive and never spend image-generation credits.
+    if (req.query.probe !== '1') {
+        return res.json({
+            healthy: true,
+            mode: 'passive',
+            recentStats: {
+                totalRequests: passiveRecent.length,
+                successes: passiveSuccesses,
+                failures: passiveFailures,
+                successRate: passiveRecent.length > 0 ? `${Math.round(passiveSuccesses / passiveRecent.length * 100)}%` : 'N/A'
+            },
+            recentLog: imageGenLog.slice(-10)
+        });
+    }
+
+    const suppliedToken = String(req.headers['x-image-health-token'] || '');
+    const expectedTokenBuffer = Buffer.from(IMAGE_HEALTH_TOKEN);
+    const suppliedTokenBuffer = Buffer.from(suppliedToken);
+    if (!IMAGE_HEALTH_TOKEN || suppliedTokenBuffer.length !== expectedTokenBuffer.length ||
+        !crypto.timingSafeEqual(suppliedTokenBuffer, expectedTokenBuffer)) {
+        return res.status(403).json({ error: 'Active image health probe is not authorized.' });
+    }
+
     const startTime = Date.now();
     try {
         const testResponse = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
@@ -1588,7 +1859,7 @@ function withOffGridImageBranding(prompt) {
     return `${trimmedPrompt}\n\nDo not include any footer, credit line, watermark, year, copyright symbol, website address, or brand attribution in the generated artwork. The OffGrid AI app adds its own small attribution after generation.`;
 }
 
-app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], requireLicense, checkImageLimit, async (req, res) => {
+app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], imageBurstLimiter, requireLicense, anonymousImageDailyLimit, checkImageLimit, async (req, res) => {
     const genStartTime = Date.now();
     try {
         const { prompt, model } = req.body;
@@ -1609,7 +1880,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
         
         const finalPrompt = withOffGridImageBranding(prompt);
 
-        console.log(`[${imageModelLabel}] Generating image for: "${prompt.substring(0, 80)}..."`);
+        console.log(`[${imageModelLabel}] Generating image (${prompt.length} prompt characters)`);
         
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',
@@ -1633,7 +1904,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
         
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error(`[${imageModelLabel}] API error:`, errorData);
+            console.error(`[${imageModelLabel}] API error status:`, response.status);
             throw new Error(errorData.error?.message || `Image generation failed (${response.status})`);
         }
         
@@ -1683,7 +1954,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
             const failDuration = Date.now() - genStartTime;
             console.warn(`[${imageModelLabel}] No image in response. finish_reason:`, finishReason);
             console.warn(`[${imageModelLabel}] Message keys:`, JSON.stringify(Object.keys(message || {})));
-            console.warn(`[${imageModelLabel}] Text response:`, (textResponse || '').substring(0, 200));
+            console.warn(`[${imageModelLabel}] Text-only response length:`, (textResponse || '').length);
             
             // Determine specific error reason based on finish_reason
             let errorReason = 'unknown';
@@ -1758,7 +2029,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], re
  * Includes audience-specific context for OffGrid AI ToolKit users.
  * No data is stored — processed in memory and discarded.
  */
-app.post(['/api/command/craft-prompt', '/api/image-studio/craft-prompt'], requireLicense, async (req, res) => {
+app.post(['/api/command/craft-prompt', '/api/image-studio/craft-prompt'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
     try {
         const { description, category } = req.body;
 
@@ -1771,7 +2042,7 @@ app.post(['/api/command/craft-prompt', '/api/image-studio/craft-prompt'], requir
         }
 
         console.log(`[Prompt Assistant] Crafting prompt for category: ${category || 'general'}`);
-        console.log(`[Prompt Assistant] User description: "${description.substring(0, 100)}..."`);
+        console.log(`[Prompt Assistant] User description received (${description.length} characters)`);
 
         // Category-specific context to guide the AI
         const categoryContext = {
@@ -1835,7 +2106,7 @@ RULES:
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error('[Prompt Assistant] API error:', errorData);
+            console.error('[Prompt Assistant] API error status:', response.status);
             throw new Error(errorData.error?.message || `API returned ${response.status}`);
         }
 
@@ -1846,7 +2117,7 @@ RULES:
             throw new Error('No prompt was generated');
         }
 
-        console.log(`[Prompt Assistant] Crafted prompt: "${craftedPrompt.substring(0, 100)}..."`);
+        console.log(`[Prompt Assistant] Crafted prompt (${craftedPrompt.length} characters)`);
 
         logToBetterStack('info', 'prompt.craft', {
             summary: `Prompt crafted for category: ${category || 'other'}`,
@@ -1887,7 +2158,7 @@ RULES:
  * Uses GPT-4.1 Mini for fast, cost-effective generation.
  * No data is stored — processed in memory and discarded.
  */
-app.post(['/api/command/image-summary', '/api/image-studio/image-summary'], requireLicense, async (req, res) => {
+app.post(['/api/command/image-summary', '/api/image-studio/image-summary'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
     try {
         const { prompt, category } = req.body;
 
@@ -1998,7 +2269,7 @@ Rules:
  * Uses GPT-4.1 Mini for fast, cost-effective generation.
  * No data is stored — processed in memory and discarded.
  */
-app.post(['/api/command/visual-prompt', '/api/image-studio/visual-prompt'], requireLicense, async (req, res) => {
+app.post(['/api/command/visual-prompt', '/api/image-studio/visual-prompt'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
     try {
         const { conversationContext, category } = req.body;
 
@@ -2073,7 +2344,7 @@ RULES:
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({}));
-            console.error('[Visual Prompt] API error:', errorData);
+            console.error('[Visual Prompt] API error status:', response.status);
             throw new Error(errorData.error?.message || `API returned ${response.status}`);
         }
 
@@ -2084,7 +2355,7 @@ RULES:
             throw new Error('No visual prompt was generated');
         }
 
-        console.log(`[Visual Prompt] Generated: "${visualPrompt.substring(0, 100)}..."`);
+        console.log(`[Visual Prompt] Generated (${visualPrompt.length} characters)`);
 
         logToBetterStack('info', 'prompt.visual', {
             summary: 'Visual prompt generated from conversation',
@@ -2498,6 +2769,17 @@ registerLicenseRoutes(app, logToBetterStack);
 // IMPORTANT: This must be the LAST route registered
 app.get('*', (req, res) => {
     serveWithExperience(req, res, false);
+});
+
+app.use((error, req, res, next) => {
+    if (error?.type === 'entity.parse.failed') {
+        return res.status(400).json({ error: 'Request body must be valid JSON.' });
+    }
+    if (error?.type === 'entity.too.large') {
+        return res.status(413).json({ error: 'Upload is too large. The maximum request size is 50MB.' });
+    }
+    console.error('[Server] Unhandled request error:', error?.message || 'Unknown error');
+    res.status(500).json({ error: 'An unexpected server error occurred.' });
 });
 
 // =============================================================================

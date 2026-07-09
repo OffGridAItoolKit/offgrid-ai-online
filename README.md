@@ -89,9 +89,16 @@ The application is configured using environment variables. A `.env.example` file
 | `BETTERSTACK_SOURCE_TOKEN` | No | Your source token for Better Stack logging. |
 | `PORT` | No | The port for the server to run on (default: 3000). |
 | `NODE_ENV` | No | The environment mode (e.g., `production`). |
-| `ALLOWED_ORIGINS` | No | A comma-separated list of allowed origins for CORS. |
+| `ALLOWED_ORIGINS` | No | A comma-separated list of additional allowed browser origins for CORS. |
 | `RATE_LIMIT_WINDOW_MS` | No | The window for rate limiting in milliseconds (default: 60000). |
 | `RATE_LIMIT_MAX_REQUESTS` | No | The maximum number of requests per window (default: 30). |
+| `ANON_DAILY_PROMPT_LIMIT` | No | Daily anonymous AI-request allowance per one-way network identifier (default: 100). |
+| `ANON_DAILY_IMAGE_LIMIT` | No | Daily anonymous Image Studio allowance per one-way network identifier (default: 6). |
+| `GLOBAL_DAILY_IMAGE_LIMIT` | No | Global anonymous Image Studio ceiling per UTC day (default: 100). |
+| `IMAGE_BURST_LIMIT` | No | Image-generation requests allowed per minute per network (default: 3). |
+| `ANON_USAGE_HASH_SECRET` | Recommended | Stable secret used to create non-reversible anonymous usage identifiers. |
+| `IMAGE_HEALTH_TOKEN` | Recommended | Secret required for the optional active image-generation health probe. Passive health checks spend no credits. |
+| `CORS_ALLOWED_ORIGINS` | No | Alias for `ALLOWED_ORIGINS`; comma-separated additions to the built-in approved browser-origin list. |
 
 `ADMIN_KEY` is not a production environment variable. It is only the browser-side variable name used by the admin dashboard when sending the `x-admin-key` header; configure `ADMIN_SECRET` on the server instead.
 

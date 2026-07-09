@@ -1277,6 +1277,8 @@ body.live-compass-enabled .live-compass .welcome-icon {
     .mobile-secondary-row .mobile-secondary-btn[onclick*="/command"],
     .tool-button[href*="/command"],
     .tool-button[href*="offgridtoolkit.ai/command"],
+    body.is-app-surface .tool-button[href*="offgridaitoolkit.com"],
+    body.is-app-surface .prospect-only,
     body.is-app-surface .purchase-cta,
     body.is-app-surface .save-btn,
     body.is-app-surface .save-kb-button,
@@ -1338,9 +1340,11 @@ body.live-compass-enabled .live-compass .welcome-icon {
     }
     
     .markdown-content table {
-        display: block !important;
+        display: table !important;
+        width: 100% !important;
+        min-width: 480px;
         max-width: 100% !important;
-        overflow-x: auto !important;
+        table-layout: auto;
     }
     
     .message:last-child {
@@ -3923,6 +3927,236 @@ body.app-theme-night:not(.command-theme) .markdown-content pre,
 body.app-theme-night:not(.command-theme) .markdown-content table {
     background: #111827;
     border-color: #2d333b;
+}
+
+body.app-theme-night:not(.command-theme) .markdown-content th {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+}
+
+body.app-theme-night:not(.command-theme) .markdown-content td {
+    background: #111827;
+    border-color: #374151;
+    color: #f3f4f6;
+}
+
+body.app-theme-night:not(.command-theme) .markdown-content tr:hover th,
+body.app-theme-night:not(.command-theme) .markdown-content tr:hover td {
+    background: #263244;
+}
+
+.feedback-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.feedback-backdrop {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: rgba(5, 9, 14, 0.72);
+}
+
+.feedback-sheet {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 520px);
+    max-height: min(88vh, 720px);
+    overflow-y: auto;
+    padding: 22px;
+    border: 1px solid rgba(184, 134, 11, 0.45);
+    border-radius: 8px;
+    background: #fffdf9;
+    color: #2c1810;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.feedback-sheet-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.feedback-eyebrow {
+    margin-bottom: 4px;
+    color: #9a6d00;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.feedback-sheet h2 {
+    margin: 0;
+    color: inherit;
+    font-size: 22px;
+}
+
+.feedback-close {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    border: 1px solid rgba(44, 24, 16, 0.18);
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    font-size: 26px;
+    line-height: 1;
+}
+
+.feedback-intro {
+    margin: 12px 0 18px;
+    color: #6b4423;
+    line-height: 1.5;
+}
+
+.feedback-label {
+    display: block;
+    margin: 14px 0 7px;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.feedback-select,
+.feedback-textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d6c8ae;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #2c1810;
+    font: inherit;
+}
+
+.feedback-select {
+    min-height: 46px;
+    padding: 0 12px;
+}
+
+.feedback-textarea {
+    min-height: 128px;
+    padding: 12px;
+    resize: vertical;
+    line-height: 1.45;
+}
+
+.feedback-select:focus,
+.feedback-textarea:focus {
+    border-color: #b8860b;
+    outline: 2px solid rgba(184, 134, 11, 0.2);
+}
+
+.feedback-include {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 14px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.feedback-include input {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    margin-top: 1px;
+}
+
+.feedback-privacy {
+    margin-top: 14px;
+    color: #7a6b5d;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.feedback-error {
+    min-height: 20px;
+    margin-top: 10px;
+    color: #b42318;
+    font-size: 12px;
+}
+
+.feedback-error a {
+    color: inherit;
+    font-weight: 700;
+}
+
+.feedback-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.feedback-cancel,
+.feedback-submit {
+    min-height: 48px;
+    border-radius: 6px;
+    font: inherit;
+    font-weight: 800;
+}
+
+.feedback-cancel {
+    border: 1px solid #d6c8ae;
+    background: transparent;
+    color: inherit;
+}
+
+.feedback-submit {
+    border: 1px solid #b8860b;
+    background: #d4a017;
+    color: #211307;
+}
+
+.feedback-submit:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+body.app-theme-night:not(.command-theme) .feedback-sheet {
+    border-color: rgba(212, 160, 23, 0.5);
+    background: #151b24;
+    color: #f7f2e8;
+}
+
+body.app-theme-night:not(.command-theme) .feedback-intro,
+body.app-theme-night:not(.command-theme) .feedback-privacy {
+    color: #aeb7c2;
+}
+
+body.app-theme-night:not(.command-theme) .feedback-close,
+body.app-theme-night:not(.command-theme) .feedback-cancel {
+    border-color: #3a4554;
+    color: #f7f2e8;
+}
+
+body.app-theme-night:not(.command-theme) .feedback-select,
+body.app-theme-night:not(.command-theme) .feedback-textarea {
+    border-color: #3a4554;
+    background: #0f141b;
+    color: #f7f2e8;
+}
+
+@media (max-width: 600px) {
+    .feedback-overlay {
+        align-items: flex-end;
+        padding: 12px 10px calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .feedback-sheet {
+        width: 100%;
+        max-height: 88vh;
+        padding: 18px;
+    }
 }
 
 body.app-theme-night:not(.command-theme) .chat-search-bar {

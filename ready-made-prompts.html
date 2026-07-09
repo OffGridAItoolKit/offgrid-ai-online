@@ -410,6 +410,23 @@
             .category-title { font-size: 17px; }
             .desktop-only { display: none !important; }
         }
+
+        @media (max-width: 420px) {
+            body.is-app-surface .header { gap: 8px; padding: 9px 10px; }
+            body.is-app-surface .header-left { min-width: 0; gap: 7px; }
+            body.is-app-surface .header-title {
+                overflow: hidden;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            body.is-app-surface .online-badge { display: none; }
+            body.is-app-surface .header-right { flex: 0 0 auto; gap: 6px; }
+            body.is-app-surface .theme-toggle { width: 38px; min-height: 38px; padding: 0; }
+            body.is-app-surface .theme-toggle-label { display: none; }
+            body.is-app-surface .back-link { padding: 8px 9px; white-space: nowrap; }
+        }
         
         /* No results */
         .no-results {
@@ -654,7 +671,7 @@
         <p>Expert prompts designed for building your offline Knowledge Base. Click any prompt to copy it, or send it directly to OffGrid AI.</p>
         <div class="hero-badges">
             <span class="hero-badge kb">📚 Save to Knowledge Base</span>
-            <span class="hero-badge privacy">🔒 Private Sessions</span>
+            <span class="hero-badge privacy">🔒 No Account History</span>
         </div>
     </div>
 
@@ -1513,6 +1530,17 @@
             const kbBadge = document.querySelector('.hero-badge.kb');
             if (kbBadge) kbBadge.textContent = 'Field Prompts';
         }
+
+        if (isAppSurface) {
+            const backLink = document.querySelector('.back-link');
+            if (backLink) backLink.textContent = '← Chat';
+            const kbFilter = document.querySelector('[data-filter="kb"]');
+            if (kbFilter) kbFilter.textContent = '📄 Field Guides';
+            const footerLinks = document.querySelectorAll('.footer p');
+            if (footerLinks.length > 1) {
+                footerLinks[1].innerHTML = `<a href="${returnPathFor('/online')}">← Return to OffGrid AI</a>`;
+            }
+        }
         
         // Filter out challenging categories and survival filter for online context
         if (!isCommandContext) {
@@ -1572,6 +1600,20 @@
                 );
                 return !allChallenging;
             });
+        }
+
+        if (isAppSurface) {
+            ACTIVE_CATEGORIES = ACTIVE_CATEGORIES.map(cat => cat.title === 'Knowledge Base Builders'
+                ? {
+                    ...cat,
+                    title: 'Field Guide Builders',
+                    subcategories: cat.subcategories.map(sub => ({
+                        ...sub,
+                        title: sub.title.replace('(Save These!)', '(Save to Phone)')
+                    }))
+                }
+                : cat
+            );
         }
         
         // ============================================

@@ -123,6 +123,36 @@ async function initializeDatabase() {
             );
         `);
 
+        // Anonymous app usage is stored as daily counters keyed by a one-way hash.
+        // No prompt, media, IP address, or conversation content is stored here.
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS anonymous_daily_usage (
+                usage_date DATE NOT NULL,
+                usage_type VARCHAR(40) NOT NULL,
+                usage_key_hash VARCHAR(64) NOT NULL,
+                request_count INTEGER NOT NULL DEFAULT 0,
+                updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                PRIMARY KEY (usage_date, usage_type, usage_key_hash)
+            );
+        `);
+
+        // In-app reports are intentionally separate from chat history. They only
+        // contain what the user explicitly submits through the feedback form.
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS app_feedback (
+                id BIGSERIAL PRIMARY KEY,
+                category VARCHAR(40) NOT NULL,
+                details TEXT NOT NULL,
+                context VARCHAR(160),
+                reported_content TEXT,
+                surface VARCHAR(40),
+                platform VARCHAR(60),
+                app_path VARCHAR(255),
+                status VARCHAR(20) NOT NULL DEFAULT 'new',
+                created_at TIMESTAMP NOT NULL DEFAULT NOW()
+            );
+        `);
+
         // Create indexes for fast lookups
         await client.query(`
             CREATE INDEX IF NOT EXISTS idx_licenses_key ON licenses(license_key);
@@ -135,6 +165,16 @@ async function initializeDatabase() {
         `);
         await client.query(`
             CREATE INDEX IF NOT EXISTS idx_usage_history_period ON usage_history(period);
+        `);
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_app_feedback_created ON app_feedback(created_at DESC);
+        `);
+        await client.query(`
+            CREATE INDEX IF NOT EXISTS idx_app_feedback_status ON app_feedback(status);
+        `);
+        await client.query(`
+            DELETE FROM anonymous_daily_usage
+            WHERE usage_date < CURRENT_DATE - INTERVAL '31 days';
         `);
 
         console.log('[License System] Database tables initialized');
@@ -1783,15 +1823,67 @@ function registerLicenseRoutes(app, logToBetterStack) {
     });
 
     // -------------------------------------------------------------------------
+    // GET /api/admin/feedback
+    // Review reports submitted through the in-app feedback form.
+    // -------------------------------------------------------------------------
+    app.get('/api/admin/feedback', requireAdmin, async (req, res) => {
+        try {
+            const status = typeof req.query.status === 'string' ? req.query.status.trim() : '';
+            const params = [];
+            let where = '';
+            if (status) {
+                params.push(status);
+                where = 'WHERE status = $1';
+            }
+            const result = await pool.query(
+                `SELECT id, category, details, context, reported_content, surface, platform, app_path, status, created_at
+                 FROM app_feedback ${where}
+                 ORDER BY created_at DESC
+                 LIMIT 250`,
+                params
+            );
+            res.json({ feedback: result.rows });
+        } catch (error) {
+            console.error('[Feedback] Admin list error:', error.message);
+            res.status(500).json({ error: 'Could not load feedback' });
+        }
+    });
+
+    // PATCH /api/admin/feedback/:id
+    // Keep review state simple: new, reviewed, or resolved.
+    // -------------------------------------------------------------------------
+    app.patch('/api/admin/feedback/:id', requireAdmin, async (req, res) => {
+        try {
+            const id = Number.parseInt(req.params.id, 10);
+            const status = String(req.body?.status || '').trim().toLowerCase();
+            if (!Number.isInteger(id) || !['new', 'reviewed', 'resolved'].includes(status)) {
+                return res.status(400).json({ error: 'Invalid feedback id or status' });
+            }
+            const result = await pool.query(
+                `UPDATE app_feedback SET status = $1 WHERE id = $2
+                 RETURNING id, status, created_at`,
+                [status, id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Feedback not found' });
+            }
+            res.json({ feedback: result.rows[0] });
+        } catch (error) {
+            console.error('[Feedback] Admin update error:', error.message);
+            res.status(500).json({ error: 'Could not update feedback' });
+        }
+    });
+
     // GET /api/admin/backup
     // Full database backup (JSON download)for manual backup
     // -------------------------------------------------------------------------
     app.get('/api/admin/backup', requireAdmin, async (req, res) => {
         try {
-            const [licenses, log, history] = await Promise.all([
+            const [licenses, log, history, feedback] = await Promise.all([
                 pool.query('SELECT * FROM licenses ORDER BY created_at DESC'),
                 pool.query('SELECT * FROM activation_log ORDER BY created_at DESC'),
-                pool.query('SELECT * FROM usage_history ORDER BY period DESC, license_key ASC')
+                pool.query('SELECT * FROM usage_history ORDER BY period DESC, license_key ASC'),
+                pool.query('SELECT * FROM app_feedback ORDER BY created_at DESC')
             ]);
 
             const backup = {
@@ -1800,7 +1892,8 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 tables: {
                     licenses: { count: licenses.rows.length, rows: licenses.rows },
                     activation_log: { count: log.rows.length, rows: log.rows },
-                    usage_history: { count: history.rows.length, rows: history.rows }
+                    usage_history: { count: history.rows.length, rows: history.rows },
+                    app_feedback: { count: feedback.rows.length, rows: feedback.rows }
                 }
             };
 

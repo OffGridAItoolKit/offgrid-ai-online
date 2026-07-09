@@ -22,9 +22,10 @@
     <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" href="compasstilted.png">
-    <link rel="stylesheet" href="offgridai.css?v=5.9">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="offgridai.css?v=6.1">
+    <script src="/vendor/marked.umd.js"></script>
+    <script src="/vendor/purify.min.js"></script>
+    <script src="/vendor/qrcode.min.js"></script>
     <style>
         /* ============================================ */
         /* Online Version Specific Styles              */
@@ -1237,12 +1238,12 @@
                 </span>
                 <span>OffGrid AI ToolKit</span>
             </div>
-            <div class="first-run-tagline">Private sessions. Phone-native tools. Field-ready help.</div>
+            <div class="first-run-tagline">No account history. Phone-native tools. Field-ready help.</div>
             <div class="first-run-message">
                 <p><strong>Welcome to OffGrid AI ToolKit.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
                 <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
                 <p>Photos, videos, and prompts are sent to the online AI service only when you choose to use those features.</p>
-                <p>Sessions are designed to be <strong>ephemeral</strong>; no account is required for v1.</p>
+                <p>Chats are not saved to an OffGrid AI account or personal cloud history. Online providers process requests under their own privacy policies; no account is required for v1.</p>
                 <p>AI can make mistakes. Verify important survival, medical, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
@@ -1308,7 +1309,7 @@
             <div class="sidebar-section">
                 <div class="sidebar-title">⚡ Online Version</div>
                 <div class="privacy-notice" style="margin: 0 0 12px 0; padding: 10px;">
-                    <strong>🔒 Privacy:</strong> Conversations are not stored. Each session is ephemeral.
+                    <strong>🔒 Privacy:</strong> No account history. Online processing applies.
                 </div>
             </div>
 
@@ -1503,11 +1504,11 @@
                     <p class="compass-heading welcome-tagline" id="compassHeading">Tap compass for heading</p>
                     <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI ToolKit</h2>
                     <span class="online-badge welcome-online-badge">ONLINE</span>
-                    <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 Private Sessions • No Data Stored</div>
+                    <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 No Account History • No Account Required</div>
                     <div class="feature-badges">
                         <div class="feature-badge">👁️ Vision</div>
                         <div class="feature-badge">⚡ Fast</div>
-                        <div class="feature-badge">🔒 Private Sessions</div>
+                        <div class="feature-badge">🔒 No Account History</div>
                     </div>
                     <p>Experience the same AI models from the USB version, now with cloud speed and Gemma 4!</p>
                     
@@ -1594,7 +1595,7 @@
                                     Send
                                 </button>
                             </div>
-                            <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No account required</div>
+                            <div class="privacy-microcopy"><span class="lock-icon">🔒</span> No account required · Online processing</div>
                         </div>
                     </div>
 
@@ -2398,7 +2399,7 @@
                         </button>
                         <button class="send-button" onclick="sendMessage()" id="sendButton">Send</button>
                     </div>
-                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> Ephemeral · No account required</div>
+                    <div class="privacy-microcopy"><span class="lock-icon">🔒</span> No account required · Online processing</div>
                 </div>
             </div>`;
         }
@@ -2746,7 +2747,7 @@
                                 if (parsed.content) {
                                     fullResponse += parsed.content;
                                     if (typeof marked !== 'undefined') {
-                                        streamingTextEl.innerHTML = marked.parse(fullResponse);
+                                        streamingTextEl.innerHTML = renderMarkdownSafe(fullResponse);
                                         // Make links open in new tab
                                         streamingTextEl.querySelectorAll('a').forEach(a => {
                                             a.setAttribute('target', '_blank');
@@ -2779,6 +2780,9 @@
                     role: 'assistant',
                     content: fullResponse
                 });
+                if (IS_PHONE_SURFACE && fullResponse.trim()) {
+                    attachMessageFollowupActions(messageDiv);
+                }
                 
                 // Enable Save to KB button
                 const saveBtn = document.getElementById('saveToKbBtn');
@@ -2801,6 +2805,27 @@
             }
         }
         
+        function getMessageFollowupActionsMarkup() {
+            return `<div class="message-followup-actions">
+                        <button class="message-followup-action primary" onclick="createVisualFromMessageAction(this, 'visual')">Create Visual</button>
+                        <button class="message-followup-action" onclick="createVisualFromMessageAction(this, 'field-guide')">Make Field Guide</button>
+                        <button class="message-followup-action" onclick="exportAsPDF()">Save PDF</button>
+                    </div>`;
+        }
+
+        function attachMessageFollowupActions(messageDiv) {
+            if (!messageDiv) return;
+            document.querySelectorAll('.message-followup-actions').forEach(row => row.remove());
+            const content = messageDiv.querySelector('.message-content');
+            const time = content?.querySelector('.message-time');
+            if (!content) return;
+            const holder = document.createElement('div');
+            holder.innerHTML = getMessageFollowupActionsMarkup();
+            const row = holder.firstElementChild;
+            if (time) content.insertBefore(row, time);
+            else content.appendChild(row);
+        }
+
         function addMessage(text, sender, isError = false) {
             const messagesDiv = document.getElementById('messages');
             const messageDiv = document.createElement('div');
@@ -2810,7 +2835,7 @@
             
             let displayText = text;
             if (sender === 'assistant' && typeof marked !== 'undefined') {
-                displayText = marked.parse(text);
+                displayText = renderMarkdownSafe(text);
                 // Make all links open in new tab
                 displayText = displayText.replace(/<a /g, '<a target="_blank" rel="noopener noreferrer" ');
             } else {
@@ -2823,13 +2848,7 @@
             if (showFollowupActions) {
                 document.querySelectorAll('.message-followup-actions').forEach(row => row.remove());
             }
-            const followupActions = showFollowupActions
-                ? `<div class="message-followup-actions">
-                        <button class="message-followup-action primary" onclick="createVisualFromMessageAction(this, 'visual')">Create Visual</button>
-                        <button class="message-followup-action" onclick="createVisualFromMessageAction(this, 'field-guide')">Make Field Guide</button>
-                        <button class="message-followup-action" onclick="exportAsPDF()">Save PDF</button>
-                    </div>`
-                : '';
+            const followupActions = showFollowupActions ? getMessageFollowupActionsMarkup() : '';
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
@@ -2903,8 +2922,31 @@
         
         function escapeHtml(text) {
             const div = document.createElement('div');
-            div.textContent = text;
+            div.textContent = String(text ?? '');
             return div.innerHTML;
+        }
+
+        function renderMarkdownSafe(text) {
+            const normalized = String(text ?? '')
+                .replace(/\$\\rightarrow\$/g, '→')
+                .replace(/\$\\leftarrow\$/g, '←')
+                .replace(/\$\\leftrightarrow\$/g, '↔');
+
+            if (typeof marked === 'undefined' || typeof marked.parse !== 'function') {
+                return escapeHtml(normalized).replace(/\n/g, '<br>');
+            }
+
+            const rendered = marked.parse(normalized);
+            if (!window.DOMPurify || typeof window.DOMPurify.sanitize !== 'function') {
+                return escapeHtml(normalized).replace(/\n/g, '<br>');
+            }
+
+            return window.DOMPurify.sanitize(rendered, {
+                USE_PROFILES: { html: true },
+                ADD_ATTR: ['target', 'rel'],
+                FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'option', 'svg', 'math'],
+                FORBID_ATTR: ['style']
+            });
         }
         
         // ============================================
@@ -4031,7 +4073,7 @@
                         <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>${IS_PHONE_SURFACE ? 'Save Field Guide PDF' : 'Save PDF'}</button>
                         ${IS_PHONE_SURFACE ? '<button class="online-studio-btn share" id="onlineStudioShareBtn" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())" disabled>Share Image</button>' : '<button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>'}
                     </div>
-                    <div class="online-studio-note">Images are generated on-demand and never stored on our servers.</div>
+                    <div class="online-studio-note">Images are generated on demand and are not saved to an OffGrid AI account history. Online provider processing applies.</div>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -4324,16 +4366,110 @@ Mobile app output requirements:
             return false;
         }
 
-        function openFeedback(context = '') {
-            const details = [
-                context ? `Context: ${context}` : '',
-                `Surface: ${IS_APP_SURFACE ? 'App' : (IS_PHONE_SURFACE ? 'Mobile web' : 'Web')}`,
-                `URL: ${window.location.href}`,
-                `Time: ${new Date().toISOString()}`
-            ].filter(Boolean).join('\n');
-            const subject = encodeURIComponent('OffGrid AI ToolKit feedback');
-            const body = encodeURIComponent(`Tell us what happened or what would make this better:\n\n\n---\n${details}`);
-            window.location.href = `mailto:support@offgridaitoolkit.com?subject=${subject}&body=${body}`;
+        let feedbackDraft = null;
+
+        function openFeedback(context = '', reportedContent = '') {
+            closeFeedback();
+            feedbackDraft = {
+                context: String(context || '').slice(0, 160),
+                reportedContent: String(reportedContent || '').slice(0, 12000)
+            };
+
+            const defaultCategory = reportedContent ? 'incorrect' : 'suggestion';
+            const overlay = document.createElement('div');
+            overlay.className = 'feedback-overlay';
+            overlay.id = 'feedbackOverlay';
+            overlay.innerHTML = `
+                <button class="feedback-backdrop" type="button" aria-label="Close feedback" onclick="closeFeedback()"></button>
+                <section class="feedback-sheet" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+                    <div class="feedback-sheet-header">
+                        <div>
+                            <div class="feedback-eyebrow">OffGrid AI ToolKit</div>
+                            <h2 id="feedbackTitle">${reportedContent ? 'Report this response' : 'Send feedback'}</h2>
+                        </div>
+                        <button class="feedback-close" type="button" onclick="closeFeedback()" aria-label="Close feedback">&times;</button>
+                    </div>
+                    <p class="feedback-intro">${reportedContent
+                        ? 'Tell us what was wrong so we can review the AI output.'
+                        : 'Tell us what worked, what felt confusing, or what would make the app better.'}</p>
+                    <label class="feedback-label" for="feedbackCategory">What kind of feedback is this?</label>
+                    <select class="feedback-select" id="feedbackCategory">
+                        <option value="unsafe">Unsafe or harmful</option>
+                        <option value="offensive">Offensive content</option>
+                        <option value="incorrect" ${defaultCategory === 'incorrect' ? 'selected' : ''}>Incorrect or misleading</option>
+                        <option value="app-problem">App problem</option>
+                        <option value="suggestion" ${defaultCategory === 'suggestion' ? 'selected' : ''}>Suggestion</option>
+                        <option value="other">Other</option>
+                    </select>
+                    <label class="feedback-label" for="feedbackDetails">What happened?</label>
+                    <textarea class="feedback-textarea" id="feedbackDetails" maxlength="4000" rows="5" placeholder="Add enough detail for us to understand and improve it."></textarea>
+                    ${reportedContent ? `
+                        <label class="feedback-include">
+                            <input type="checkbox" id="feedbackIncludeContent" checked>
+                            <span>Include this AI response with my report</span>
+                        </label>` : ''}
+                    <div class="feedback-privacy">Reports are reviewed by OffGrid AI. Chat history is not attached unless you choose to include the reported response.</div>
+                    <div class="feedback-error" id="feedbackError" role="alert"></div>
+                    <div class="feedback-actions">
+                        <button class="feedback-cancel" type="button" onclick="closeFeedback()">Cancel</button>
+                        <button class="feedback-submit" id="feedbackSubmit" type="button" onclick="submitFeedback()">Submit</button>
+                    </div>
+                </section>`;
+            document.body.appendChild(overlay);
+            requestAnimationFrame(() => document.getElementById('feedbackDetails')?.focus());
+        }
+
+        function closeFeedback() {
+            const overlay = document.getElementById('feedbackOverlay');
+            if (overlay) overlay.remove();
+            feedbackDraft = null;
+        }
+
+        async function submitFeedback() {
+            const category = document.getElementById('feedbackCategory')?.value || '';
+            const details = document.getElementById('feedbackDetails')?.value.trim() || '';
+            const includeContent = document.getElementById('feedbackIncludeContent')?.checked !== false;
+            const errorEl = document.getElementById('feedbackError');
+            const submitBtn = document.getElementById('feedbackSubmit');
+
+            if (details.length < 3) {
+                if (errorEl) errorEl.textContent = 'Please add a little more detail before submitting.';
+                return;
+            }
+
+            if (errorEl) errorEl.textContent = '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Submitting...';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        category,
+                        details,
+                        context: feedbackDraft?.context || '',
+                        reportedContent: includeContent ? feedbackDraft?.reportedContent || '' : '',
+                        surface: IS_APP_SURFACE ? 'app' : (IS_PHONE_SURFACE ? 'mobile-web' : 'web'),
+                        platform: CONFIG.platform || navigator.platform || '',
+                        appPath: window.location.pathname
+                    })
+                });
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(result.error || 'Feedback could not be submitted.');
+                closeFeedback();
+                showSaveToast('Feedback sent', 'Thank you. Your report was submitted inside the app.');
+            } catch (error) {
+                if (errorEl) {
+                    errorEl.innerHTML = `${escapeHtml(error.message)} <a href="mailto:support@offgridaitoolkit.com">Email support instead</a>.`;
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit';
+                }
+            }
         }
 
         function saveImageDataUrlToPhone(dataUrl, filename) {
@@ -5663,7 +5799,7 @@ Mobile app output requirements:
             items.push(
                 { icon: '🔍', label: 'Search in Chat', action: openToolkitChatSearch },
                 { icon: '📁', label: 'Export Chat', action: exportToolkitChat },
-                { icon: '✉️', label: 'Report Issue', action: () => openFeedback(imageSrc ? 'Generated image response' : 'Assistant response') },
+                { icon: '✉️', label: 'Report Issue', action: () => openFeedback(imageSrc ? 'Generated image response' : 'Assistant response', msgText) },
                 { divider: true },
                 { icon: document.body.classList.contains('app-theme-night') ? '☀️' : '🌙', label: document.body.classList.contains('app-theme-night') ? 'Toggle Day Mode' : 'Toggle Night Mode', action: toggleAppTheme },
                 { icon: '✋', label: 'Select Text', action: () => enableToolkitTextSelection(msgEl) },
