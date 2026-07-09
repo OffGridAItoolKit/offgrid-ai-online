@@ -22,7 +22,7 @@
     <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" href="compasstilted.png">
-    <link rel="stylesheet" href="offgridai.css?v=5.7">
+    <link rel="stylesheet" href="offgridai.css?v=5.8">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -1521,49 +1521,37 @@
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
                                     </svg>
                                     <div class="plus-menu" id="welcomePlusMenu">
-                                        <div class="plus-menu-item" onclick="plusMenuAction('camera')">
-                                            <span class="plus-menu-icon">📷</span>
-                                            <span class="plus-menu-label">Take Photo</span>
-                                        </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('upload')">
-                                            <span class="plus-menu-icon">🖼️</span>
-                                            <span class="plus-menu-label">Upload Image</span>
-                                        </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('recordVideo')">
-                                            <span class="plus-menu-icon">🎥</span>
-                                            <span class="plus-menu-label">Record Video</span>
-                                        </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('uploadVideo')">
-                                            <span class="plus-menu-icon">🎬</span>
-                                            <span class="plus-menu-label">Upload Video</span>
-                                        </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('createVisual')">
-                                            <span class="plus-menu-icon">🎨</span>
-                                            <span class="plus-menu-label">Create Visual</span>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('savedGuides')">
+                                            <span class="plus-menu-icon">📚</span>
+                                            <span class="plus-menu-label">Saved Guides</span>
                                         </div>
                                         <div class="plus-menu-item" onclick="plusMenuAction('prompts')">
                                             <span class="plus-menu-icon">💡</span>
                                             <span class="plus-menu-label">Ready-Made Prompts</span>
                                         </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('savedGuides')">
-                                            <span class="plus-menu-icon">📚</span>
-                                            <span class="plus-menu-label">Saved Guides</span>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('createVisual')">
+                                            <span class="plus-menu-icon">🎨</span>
+                                            <span class="plus-menu-label">Create Visual</span>
                                         </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
-                                            <span class="plus-menu-icon">✉️</span>
-                                            <span class="plus-menu-label">Feedback</span>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('translate')">
+                                            <span class="plus-menu-icon">🌐</span>
+                                            <span class="plus-menu-label">Translator</span>
                                         </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('transcribe')">
-                                            <span class="plus-menu-icon">✍️</span>
-                                            <span class="plus-menu-label">Transcribe Text from Image</span>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('identifyImage')">
+                                            <span class="plus-menu-icon">🔎</span>
+                                            <span class="plus-menu-label">Identify Image</span>
+                                        </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('analyzeVideo')">
+                                            <span class="plus-menu-icon">🎬</span>
+                                            <span class="plus-menu-label">Analyze Video</span>
                                         </div>
                                         <div class="plus-menu-item" onclick="plusMenuAction('summarize')">
                                             <span class="plus-menu-icon">📝</span>
                                             <span class="plus-menu-label">Summarize Text</span>
                                         </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('translate')">
-                                            <span class="plus-menu-icon">🌐</span>
-                                            <span class="plus-menu-label">Translate Text</span>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
+                                            <span class="plus-menu-icon">✉️</span>
+                                            <span class="plus-menu-label">Feedback</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1666,6 +1654,13 @@
                                     <div class="mobile-action-desc">Field-tested questions</div>
                                 </div>
                             </div>
+                            <div class="mobile-action-btn mobile-action-btn-more" onclick="openMoreActions()">
+                                <div class="mobile-action-icon">🧰</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">More Actions</div>
+                                    <div class="mobile-action-desc">Saved guides, visuals, translate</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1691,6 +1686,13 @@
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Ready-Made Prompts</div>
                                     <div class="mobile-action-desc">Field-tested questions</div>
+                                </div>
+                            </div>
+                            <div class="mobile-action-btn mobile-action-btn-more" onclick="openMoreActions()">
+                                <div class="mobile-action-icon">🧰</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">More Actions</div>
+                                    <div class="mobile-action-desc">Saved guides, visuals, translate</div>
                                 </div>
                             </div>
                         </div>
@@ -2327,49 +2329,37 @@
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
                             <div class="plus-menu" id="bottomPlusMenu">
-                                <div class="plus-menu-item" onclick="plusMenuAction('camera')">
-                                    <span class="plus-menu-icon">📷</span>
-                                    <span class="plus-menu-label">Take Photo</span>
-                                </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('upload')">
-                                    <span class="plus-menu-icon">🖼️</span>
-                                    <span class="plus-menu-label">Upload Image</span>
-                                </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('recordVideo')">
-                                    <span class="plus-menu-icon">🎥</span>
-                                    <span class="plus-menu-label">Record Video</span>
-                                </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('uploadVideo')">
-                                    <span class="plus-menu-icon">🎬</span>
-                                    <span class="plus-menu-label">Upload Video</span>
-                                </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('createVisual')">
-                                    <span class="plus-menu-icon">🎨</span>
-                                    <span class="plus-menu-label">Create Visual</span>
+                                <div class="plus-menu-item" onclick="plusMenuAction('savedGuides')">
+                                    <span class="plus-menu-icon">📚</span>
+                                    <span class="plus-menu-label">Saved Guides</span>
                                 </div>
                                 <div class="plus-menu-item" onclick="plusMenuAction('prompts')">
                                     <span class="plus-menu-icon">💡</span>
                                     <span class="plus-menu-label">Ready-Made Prompts</span>
                                 </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('savedGuides')">
-                                    <span class="plus-menu-icon">📚</span>
-                                    <span class="plus-menu-label">Saved Guides</span>
+                                <div class="plus-menu-item" onclick="plusMenuAction('createVisual')">
+                                    <span class="plus-menu-icon">🎨</span>
+                                    <span class="plus-menu-label">Create Visual</span>
                                 </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
-                                    <span class="plus-menu-icon">✉️</span>
-                                    <span class="plus-menu-label">Feedback</span>
+                                <div class="plus-menu-item" onclick="plusMenuAction('translate')">
+                                    <span class="plus-menu-icon">🌐</span>
+                                    <span class="plus-menu-label">Translator</span>
                                 </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('transcribe')">
-                                    <span class="plus-menu-icon">✍️</span>
-                                    <span class="plus-menu-label">Transcribe Text from Image</span>
+                                <div class="plus-menu-item" onclick="plusMenuAction('identifyImage')">
+                                    <span class="plus-menu-icon">🔎</span>
+                                    <span class="plus-menu-label">Identify Image</span>
+                                </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('analyzeVideo')">
+                                    <span class="plus-menu-icon">🎬</span>
+                                    <span class="plus-menu-label">Analyze Video</span>
                                 </div>
                                 <div class="plus-menu-item" onclick="plusMenuAction('summarize')">
                                     <span class="plus-menu-icon">📝</span>
                                     <span class="plus-menu-label">Summarize Text</span>
                                 </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('translate')">
-                                    <span class="plus-menu-icon">🌐</span>
-                                    <span class="plus-menu-label">Translate Text</span>
+                                <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
+                                    <span class="plus-menu-icon">✉️</span>
+                                    <span class="plus-menu-label">Feedback</span>
                                 </div>
                             </div>
                         </div>
@@ -2467,6 +2457,32 @@
                 }, 10);
             }
         }
+
+        function openMoreActions() {
+            haptic('light');
+            const menu = document.getElementById('welcomePlusMenu') || document.getElementById('bottomPlusMenu');
+            if (!menu) return;
+
+            document.querySelectorAll('.plus-menu.open').forEach(m => {
+                if (m !== menu) m.classList.remove('open');
+            });
+
+            const wrapper = menu.closest('.plus-menu-wrapper');
+            if (wrapper && wrapper.scrollIntoView) {
+                wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            menu.classList.add('open');
+            setTimeout(() => {
+                const closeHandler = (e) => {
+                    if (!e.target.closest('.plus-menu-wrapper') && !e.target.closest('.mobile-action-btn-more')) {
+                        menu.classList.remove('open');
+                        document.removeEventListener('click', closeHandler);
+                    }
+                };
+                document.addEventListener('click', closeHandler);
+            }, 10);
+        }
         
         function plusMenuAction(action) {
             document.querySelectorAll('.plus-menu.open').forEach(m => m.classList.remove('open'));
@@ -2495,6 +2511,14 @@
                     break;
                 case 'feedback':
                     openFeedback('Plus menu');
+                    break;
+                case 'identifyImage':
+                    const identifyPrompt = 'Identify and analyze this image. Point out what matters, any safety concerns, and practical next steps.';
+                    fillInput(identifyPrompt);
+                    triggerGalleryUpload();
+                    break;
+                case 'analyzeVideo':
+                    openVideoActions();
                     break;
                 case 'transcribe':
                     const transcribePrompt = 'Please transcribe all the text you can see in this image. Maintain the original formatting as closely as possible.';

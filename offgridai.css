@@ -1207,6 +1207,11 @@ body.live-compass-enabled .live-compass .welcome-icon {
         background: rgba(184, 134, 11, 0.08);
         transform: scale(0.97);
     }
+
+    .mobile-action-btn-more {
+        background: rgba(250, 245, 237, 0.92);
+        border-style: dashed;
+    }
     
     .mobile-action-icon {
         font-size: 24px;
@@ -3776,6 +3781,11 @@ body.app-theme-night:not(.command-theme) .mobile-action-btn:hover {
 body.app-theme-night:not(.command-theme) .mobile-action-btn-featured {
     background: linear-gradient(135deg, rgba(218, 165, 32, 0.14) 0%, rgba(26, 31, 37, 0.98) 100%) !important;
     border-color: rgba(218, 165, 32, 0.42) !important;
+}
+
+body.app-theme-night:not(.command-theme) .mobile-action-btn-more {
+    background: rgba(17, 24, 39, 0.86) !important;
+    border-color: rgba(218, 165, 32, 0.24) !important;
 }
 
 body.app-theme-night:not(.command-theme) .mobile-action-label,
