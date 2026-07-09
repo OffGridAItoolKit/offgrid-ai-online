@@ -22,7 +22,7 @@
     <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" href="compasstilted.png">
-    <link rel="stylesheet" href="offgridai.css?v=5.6">
+    <link rel="stylesheet" href="offgridai.css?v=5.7">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <style>
@@ -1521,13 +1521,37 @@
                                         <line x1="5" y1="12" x2="19" y2="12"></line>
                                     </svg>
                                     <div class="plus-menu" id="welcomePlusMenu">
+                                        <div class="plus-menu-item" onclick="plusMenuAction('camera')">
+                                            <span class="plus-menu-icon">📷</span>
+                                            <span class="plus-menu-label">Take Photo</span>
+                                        </div>
                                         <div class="plus-menu-item" onclick="plusMenuAction('upload')">
                                             <span class="plus-menu-icon">🖼️</span>
                                             <span class="plus-menu-label">Upload Image</span>
                                         </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('recordVideo')">
+                                            <span class="plus-menu-icon">🎥</span>
+                                            <span class="plus-menu-label">Record Video</span>
+                                        </div>
                                         <div class="plus-menu-item" onclick="plusMenuAction('uploadVideo')">
                                             <span class="plus-menu-icon">🎬</span>
                                             <span class="plus-menu-label">Upload Video</span>
+                                        </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('createVisual')">
+                                            <span class="plus-menu-icon">🎨</span>
+                                            <span class="plus-menu-label">Create Visual</span>
+                                        </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('prompts')">
+                                            <span class="plus-menu-icon">💡</span>
+                                            <span class="plus-menu-label">Ready-Made Prompts</span>
+                                        </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('savedGuides')">
+                                            <span class="plus-menu-icon">📚</span>
+                                            <span class="plus-menu-label">Saved Guides</span>
+                                        </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
+                                            <span class="plus-menu-icon">✉️</span>
+                                            <span class="plus-menu-label">Feedback</span>
                                         </div>
                                         <div class="plus-menu-item" onclick="plusMenuAction('transcribe')">
                                             <span class="plus-menu-icon">✍️</span>
@@ -1621,36 +1645,26 @@
                     <!-- Mobile quick actions (Prospect) -->
                     <div class="mobile-quick-actions prospect-only">
                         <div class="mobile-action-grid">
-                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="startStandaloneVisualPrompt()">
-                                <div class="mobile-action-icon">🎨</div>
-                                <div class="mobile-action-label">Create Visual</div>
-                            </div>
-                            <div class="mobile-action-btn" onclick="triggerCameraCapture()">
+                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="openPhotoImageActions()">
                                 <div class="mobile-action-icon">📷</div>
-                                <div class="mobile-action-label">Take Picture</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">Take Photo / Upload Image</div>
+                                    <div class="mobile-action-desc">Camera, gallery, screenshots</div>
+                                </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="triggerGalleryUpload()">
-                                <div class="mobile-action-icon">🖼️</div>
-                                <div class="mobile-action-label">Upload Image</div>
-                            </div>
-                            <div class="mobile-action-btn" onclick="triggerVideoRecord()">
+                            <div class="mobile-action-btn" onclick="openVideoActions()">
                                 <div class="mobile-action-icon">🎬</div>
-                                <div class="mobile-action-label">Record Video</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">Record Video / Upload Video</div>
+                                    <div class="mobile-action-desc">Analyze short clips</div>
+                                </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="triggerVideoUpload()">
-                                <div class="mobile-action-icon">📁</div>
-                                <div class="mobile-action-label">Upload Video</div>
-                            </div>
-                        </div>
-                        <div class="mobile-secondary-row">
-                            <div class="mobile-secondary-btn" onclick="navigateToReadyMadePrompts()">
-                                <span>💡</span> Ready-Made Prompts
-                            </div>
-                            <div class="mobile-secondary-btn" onclick="openSavedGuides()">
-                                <span>📚</span> Saved Guides
-                            </div>
-                            <div class="mobile-secondary-btn" onclick="openFeedback()">
-                                <span>✉️</span> Feedback
+                            <div class="mobile-action-btn" onclick="navigateToReadyMadePrompts()">
+                                <div class="mobile-action-icon">💡</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">Ready-Made Prompts</div>
+                                    <div class="mobile-action-desc">Field-tested questions</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1658,36 +1672,26 @@
                     <!-- Mobile quick actions (Customer) -->
                     <div class="mobile-quick-actions customer-only">
                         <div class="mobile-action-grid">
-                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="startStandaloneVisualPrompt()">
-                                <div class="mobile-action-icon">🎨</div>
-                                <div class="mobile-action-label">Create Visual</div>
-                            </div>
-                            <div class="mobile-action-btn" onclick="triggerCameraCapture()">
+                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="openPhotoImageActions()">
                                 <div class="mobile-action-icon">📷</div>
-                                <div class="mobile-action-label">Take Picture</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">Take Photo / Upload Image</div>
+                                    <div class="mobile-action-desc">Camera, gallery, screenshots</div>
+                                </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="triggerGalleryUpload()">
-                                <div class="mobile-action-icon">🖼️</div>
-                                <div class="mobile-action-label">Upload Image</div>
-                            </div>
-                            <div class="mobile-action-btn" onclick="triggerVideoRecord()">
+                            <div class="mobile-action-btn" onclick="openVideoActions()">
                                 <div class="mobile-action-icon">🎬</div>
-                                <div class="mobile-action-label">Record Video</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">Record Video / Upload Video</div>
+                                    <div class="mobile-action-desc">Analyze short clips</div>
+                                </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="triggerVideoUpload()">
-                                <div class="mobile-action-icon">📁</div>
-                                <div class="mobile-action-label">Upload Video</div>
-                            </div>
-                        </div>
-                        <div class="mobile-secondary-row">
-                            <div class="mobile-secondary-btn" onclick="navigateToReadyMadePrompts()">
-                                <span>💡</span> Ready-Made Prompts
-                            </div>
-                            <div class="mobile-secondary-btn" onclick="openSavedGuides()">
-                                <span>📚</span> Saved Guides
-                            </div>
-                            <div class="mobile-secondary-btn" onclick="openFeedback()">
-                                <span>✉️</span> Feedback
+                            <div class="mobile-action-btn" onclick="navigateToReadyMadePrompts()">
+                                <div class="mobile-action-icon">💡</div>
+                                <div class="mobile-action-text">
+                                    <div class="mobile-action-label">Ready-Made Prompts</div>
+                                    <div class="mobile-action-desc">Field-tested questions</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2323,13 +2327,37 @@
                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                             </svg>
                             <div class="plus-menu" id="bottomPlusMenu">
+                                <div class="plus-menu-item" onclick="plusMenuAction('camera')">
+                                    <span class="plus-menu-icon">📷</span>
+                                    <span class="plus-menu-label">Take Photo</span>
+                                </div>
                                 <div class="plus-menu-item" onclick="plusMenuAction('upload')">
                                     <span class="plus-menu-icon">🖼️</span>
                                     <span class="plus-menu-label">Upload Image</span>
                                 </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('recordVideo')">
+                                    <span class="plus-menu-icon">🎥</span>
+                                    <span class="plus-menu-label">Record Video</span>
+                                </div>
                                 <div class="plus-menu-item" onclick="plusMenuAction('uploadVideo')">
                                     <span class="plus-menu-icon">🎬</span>
                                     <span class="plus-menu-label">Upload Video</span>
+                                </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('createVisual')">
+                                    <span class="plus-menu-icon">🎨</span>
+                                    <span class="plus-menu-label">Create Visual</span>
+                                </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('prompts')">
+                                    <span class="plus-menu-icon">💡</span>
+                                    <span class="plus-menu-label">Ready-Made Prompts</span>
+                                </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('savedGuides')">
+                                    <span class="plus-menu-icon">📚</span>
+                                    <span class="plus-menu-label">Saved Guides</span>
+                                </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
+                                    <span class="plus-menu-icon">✉️</span>
+                                    <span class="plus-menu-label">Feedback</span>
                                 </div>
                                 <div class="plus-menu-item" onclick="plusMenuAction('transcribe')">
                                     <span class="plus-menu-icon">✍️</span>
@@ -2444,11 +2472,29 @@
             document.querySelectorAll('.plus-menu.open').forEach(m => m.classList.remove('open'));
             
             switch (action) {
+                case 'camera':
+                    triggerCameraCapture();
+                    break;
                 case 'upload':
                     triggerGalleryUpload();
                     break;
+                case 'recordVideo':
+                    triggerVideoRecord();
+                    break;
                 case 'uploadVideo':
                     triggerVideoUpload();
+                    break;
+                case 'createVisual':
+                    startStandaloneVisualPrompt();
+                    break;
+                case 'prompts':
+                    navigateToReadyMadePrompts();
+                    break;
+                case 'savedGuides':
+                    openSavedGuides();
+                    break;
+                case 'feedback':
+                    openFeedback('Plus menu');
                     break;
                 case 'transcribe':
                     const transcribePrompt = 'Please transcribe all the text you can see in this image. Maintain the original formatting as closely as possible.';
@@ -2464,6 +2510,63 @@
                     fillInput(translatePrompt, true);
                     break;
             }
+        }
+
+        function closeMobileActionSheet() {
+            const sheet = document.getElementById('mobileActionSheet');
+            if (sheet) sheet.remove();
+        }
+
+        function openMobileActionSheet(title, items) {
+            closeMobileActionSheet();
+            haptic('medium');
+
+            const sheet = document.createElement('div');
+            sheet.id = 'mobileActionSheet';
+            sheet.className = 'mobile-action-sheet-overlay';
+
+            const buttons = items.map(item => `
+                <button type="button" class="mobile-action-sheet-item" data-action="${escapeHtml(item.action)}">
+                    <span class="sheet-icon">${escapeHtml(item.icon)}</span>
+                    <span class="sheet-copy">
+                        <span class="sheet-label">${escapeHtml(item.label)}</span>
+                        ${item.desc ? `<span class="sheet-desc">${escapeHtml(item.desc)}</span>` : ''}
+                    </span>
+                </button>
+            `).join('');
+
+            sheet.innerHTML = `
+                <div class="mobile-action-sheet-backdrop" onclick="closeMobileActionSheet()"></div>
+                <div class="mobile-action-sheet" role="dialog" aria-modal="true" aria-label="${escapeHtml(title)}">
+                    <div class="mobile-action-sheet-title">${escapeHtml(title)}</div>
+                    ${buttons}
+                    <button type="button" class="mobile-action-sheet-cancel" onclick="closeMobileActionSheet()">Cancel</button>
+                </div>
+            `;
+
+            sheet.querySelectorAll('.mobile-action-sheet-item').forEach(button => {
+                button.addEventListener('click', () => {
+                    const action = button.dataset.action;
+                    closeMobileActionSheet();
+                    plusMenuAction(action);
+                });
+            });
+
+            document.body.appendChild(sheet);
+        }
+
+        function openPhotoImageActions() {
+            openMobileActionSheet('Photo / Image', [
+                { icon: '📷', label: 'Take Photo', desc: 'Use your camera', action: 'camera' },
+                { icon: '🖼️', label: 'Upload Image', desc: 'Gallery, screenshots, downloads', action: 'upload' }
+            ]);
+        }
+
+        function openVideoActions() {
+            openMobileActionSheet('Video Analysis', [
+                { icon: '🎥', label: 'Record Video', desc: 'Capture a short clip', action: 'recordVideo' },
+                { icon: '🎬', label: 'Upload Video', desc: 'Analyze an existing clip', action: 'uploadVideo' }
+            ]);
         }
         
         function fillInput(text, focusAtEnd = false) {
@@ -2692,11 +2795,23 @@
             
             const avatar = sender === 'user' ? 'U' : 'AI';
             const errorClass = isError ? 'style="color: #ef4444;"' : '';
+            const showFollowupActions = IS_PHONE_SURFACE && sender === 'assistant' && !isError;
+            if (showFollowupActions) {
+                document.querySelectorAll('.message-followup-actions').forEach(row => row.remove());
+            }
+            const followupActions = showFollowupActions
+                ? `<div class="message-followup-actions">
+                        <button class="message-followup-action primary" onclick="createVisualFromMessageAction(this, 'visual')">Create Visual</button>
+                        <button class="message-followup-action" onclick="createVisualFromMessageAction(this, 'field-guide')">Make Field Guide</button>
+                        <button class="message-followup-action" onclick="exportAsPDF()">Save PDF</button>
+                    </div>`
+                : '';
             
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatar}</div>
                 <div class="message-content">
                     <div class="message-text markdown-content" ${errorClass}>${displayText}</div>
+                    ${followupActions}
                     <div class="message-time">${time}</div>
                 </div>
             `;
@@ -3767,6 +3882,26 @@
                 input.setSelectionRange(input.value.length, input.value.length);
             }
             showSaveToast('Describe the visual', 'Send the request, then tap Create Visual after OffGrid AI answers.');
+        }
+
+        function createVisualFromMessageAction(button, mode = 'visual') {
+            haptic('medium');
+            const messageEl = button.closest('.message');
+            const textEl = messageEl ? messageEl.querySelector('.message-text') : null;
+            const answerText = textEl ? textEl.innerText.trim() : '';
+            if (!answerText) {
+                handleCreateVisual();
+                return;
+            }
+
+            openOnlineImageStudio({
+                answer: answerText,
+                title: getVisualTitleFromConversation(answerText),
+                category: 'Other',
+                source: mode === 'field-guide' ? 'mobile-field-guide-action' : 'mobile-create-visual-action'
+            }, { autoGenerate: true, addSourceToChat: false });
+
+            showSaveToast(mode === 'field-guide' ? 'Making field guide' : 'Creating visual');
         }
 
         function inferImageStudioTitle(answerText) {
