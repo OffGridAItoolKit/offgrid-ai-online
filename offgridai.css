@@ -2542,6 +2542,11 @@ body.live-compass-enabled .live-compass .welcome-icon {
     padding: 6px;
 }
 
+.welcome-input-container .plus-menu {
+    top: calc(100% + 10px);
+    bottom: auto;
+}
+
 .plus-menu.open {
     display: block;
     animation: dropdownFadeIn 0.2s ease;
@@ -2700,6 +2705,11 @@ body.live-compass-enabled .live-compass .welcome-icon {
     .plus-menu {
         min-width: 220px;
         bottom: calc(100% + 8px);
+    }
+
+    .welcome-input-container .plus-menu {
+        top: calc(100% + 8px);
+        bottom: auto;
     }
     
     .plus-menu-item {
