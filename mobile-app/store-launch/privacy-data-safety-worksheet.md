@@ -41,6 +41,20 @@ Complete this before submitting store forms. Do not submit privacy forms from as
 - Purpose: app functionality, security, abuse prevention, troubleshooting.
 - Sharing: AI processors and hosting/logging providers receive data needed to operate the service.
 
+## Google Play Form Submitted - 2026-07-10
+
+The production submission uses these disclosures:
+
+- Data shared: photos, videos, voice or sound recordings, health information, and other user-generated content.
+- Data collected: diagnostics, app interactions, other user-generated content, and device or other identifiers.
+- Photos, videos, voice input, and health information are optional, processed ephemerally, and used for app functionality.
+- Other user-generated content is optional. It is used for app functionality and limited product-support analysis; it is not marked ephemeral because explicitly submitted feedback can be retained.
+- App interactions and the one-way abuse identifier are required for daily limits, app operation, and abuse prevention and can be retained for up to 31 days.
+- Diagnostics are required for troubleshooting/security and may be retained in Render service logs for up to 7 days.
+- All disclosed data is encrypted in transit.
+- The app does not create accounts, use Advertising ID, collect location, show ads, or make in-app sales.
+- Data-deletion requests are documented at `https://offgridtoolkit.ai/data-deletion`.
+
 ## Plain-Language Disclosure
 
 ```text
