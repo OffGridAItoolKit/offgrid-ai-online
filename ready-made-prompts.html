@@ -11,6 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        [hidden] { display: none !important; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -149,10 +150,36 @@
             max-width: 900px;
             margin: 0 auto 20px;
             padding: 0 24px;
+        }
+        .search-row,
+        .filter-row,
+        .audience-row {
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
-            flex-wrap: wrap;
+        }
+        .search-row {
+            margin-bottom: 10px;
+        }
+        .filter-row,
+        .audience-row {
+            overflow-x: auto;
+            padding: 2px 0 6px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .filter-row::-webkit-scrollbar,
+        .audience-row::-webkit-scrollbar {
+            display: none;
+        }
+        .filter-row + .audience-row {
+            margin-top: 4px;
+        }
+        .control-divider {
+            width: 1px;
+            height: 24px;
+            background: #d4c4a8;
+            flex: 0 0 auto;
         }
         .search-box {
             flex: 1;
@@ -189,10 +216,27 @@
             background: rgba(184, 134, 11, 0.1);
             color: #8b6914;
         }
+        .collection-btn {
+            font-weight: 700;
+        }
+        .audience-btn {
+            padding: 6px 12px;
+            border-width: 1px;
+            font-size: 12px;
+        }
         .prompt-count {
             font-size: 13px;
             color: #9ca3af;
             font-weight: 500;
+            white-space: nowrap;
+        }
+        .collection-note {
+            max-width: 900px;
+            margin: -8px auto 20px;
+            padding: 0 24px;
+            color: #6b5c4a;
+            font-size: 12px;
+            line-height: 1.5;
         }
         
         /* Category sections */
@@ -213,6 +257,12 @@
             border-bottom: 2px solid #d4c4a8;
             cursor: pointer;
             user-select: none;
+            width: 100%;
+            border-top: 0;
+            border-left: 0;
+            border-right: 0;
+            background: transparent;
+            text-align: left;
         }
         .category-header:hover {
             border-bottom-color: #b8860b;
@@ -231,6 +281,12 @@
             font-size: 13px;
             color: #9ca3af;
             font-weight: 500;
+        }
+        .category-description {
+            margin: -8px 0 14px 34px;
+            color: #6b5c4a;
+            font-size: 12px;
+            line-height: 1.45;
         }
         .category-toggle {
             font-size: 18px;
@@ -272,6 +328,34 @@
             align-items: flex-start;
             gap: 12px;
             position: relative;
+        }
+        .prompt-card-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .prompt-card-topline,
+        .prompt-meta-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .prompt-card-topline {
+            margin-bottom: 5px;
+        }
+        .prompt-meta-row {
+            margin-top: 7px;
+        }
+        .prompt-meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 7px;
+            border-radius: 999px;
+            background: rgba(184, 134, 11, 0.09);
+            color: #8b6914;
+            font-size: 10px;
+            font-weight: 600;
         }
         .prompt-card:hover {
             border-color: #b8860b;
@@ -315,6 +399,17 @@
         .prompt-action-btn.use:hover {
             opacity: 0.9;
         }
+        .prompt-action-btn.favorite {
+            min-width: 30px;
+            padding-inline: 7px;
+            font-size: 15px;
+            line-height: 1;
+        }
+        .prompt-action-btn.favorite.is-favorite {
+            border-color: #daa520;
+            background: rgba(218, 165, 32, 0.14);
+            color: #b8860b;
+        }
         .prompt-badge {
             font-size: 10px;
             padding: 2px 8px;
@@ -333,6 +428,10 @@
         .prompt-badge.vision {
             background: rgba(139, 92, 246, 0.1);
             color: #7c3aed;
+        }
+        .prompt-badge.video {
+            background: rgba(14, 165, 233, 0.12);
+            color: #0369a1;
         }
         
         /* KB suggestion badge */
@@ -404,14 +503,19 @@
             .hero p { font-size: 14px; }
             .hero { padding: 24px 16px 20px; }
             .controls { padding: 0 16px; }
+            .collection-note { padding: 0 16px; }
             .categories { padding: 0 16px 40px; }
             .prompt-card { padding: 12px 14px; flex-direction: column; }
-            .prompt-actions { align-self: flex-end; }
+            .prompt-actions { align-self: stretch; justify-content: flex-end; }
+            .search-row { align-items: stretch; }
+            .search-box { min-width: 0; }
+            .filter-row, .audience-row { margin-inline: -2px; }
+            .category-description { margin-left: 0; }
             .category-title { font-size: 17px; }
             .desktop-only { display: none !important; }
         }
 
-        @media (max-width: 420px) {
+        @media (max-width: 480px) {
             body.is-app-surface .header { gap: 8px; padding: 9px 10px; }
             body.is-app-surface .header-left { min-width: 0; gap: 7px; }
             body.is-app-surface .header-title {
@@ -542,6 +646,13 @@
             background: rgba(201, 168, 76, 0.1);
             color: var(--gold-primary);
         }
+        .command-theme .control-divider {
+            background: rgba(218, 165, 32, 0.22);
+        }
+        .command-theme .collection-note,
+        .command-theme .category-description {
+            color: var(--text-secondary);
+        }
 
         /* Category sections */
         .command-theme .category-header {
@@ -613,6 +724,14 @@
             background: rgba(139, 92, 246, 0.1);
             color: #a78bfa;
         }
+        .command-theme .prompt-badge.video {
+            background: rgba(14, 165, 233, 0.16);
+            color: #7dd3fc;
+        }
+        .command-theme .prompt-meta-tag {
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--gold-primary);
+        }
         .command-theme .kb-tag {
             background: rgba(201, 168, 76, 0.1);
             color: var(--gold-primary);
@@ -668,23 +787,41 @@
     <!-- Hero -->
     <div class="hero">
         <h1>💡 Ready-Made Prompts</h1>
-        <p>Expert prompts designed for building your offline Knowledge Base. Click any prompt to copy it, or send it directly to OffGrid AI.</p>
+        <p>Field-ready scenarios for priority decisions, preparedness, repairs, photo and video analysis, and practical guides. Choose a prompt and put OffGrid AI to work.</p>
         <div class="hero-badges">
-            <span class="hero-badge kb">📚 Save to Knowledge Base</span>
+            <span class="hero-badge kb">Practical Scenarios</span>
             <span class="hero-badge privacy">🔒 No Account History</span>
         </div>
     </div>
 
     <!-- Search & Filter -->
-    <div class="controls">
-        <input type="text" class="search-box" id="searchBox" placeholder="Search prompts..." oninput="filterPrompts()">
-        <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
-        <button class="filter-btn" data-filter="survival" onclick="setFilter('survival', this)">🏕️ Survival</button>
-        <button class="filter-btn" data-filter="kb" onclick="setFilter('kb', this)">📚 KB Builders</button>
-        <button class="filter-btn" data-filter="vision" onclick="setFilter('vision', this)">📷 Vision</button>
-        <button class="filter-btn" data-filter="challenging" onclick="setFilter('challenging', this)">🧠 Challenging</button>
-        <span class="prompt-count" id="promptCount"></span>
+    <div class="controls" id="promptControls">
+        <div class="search-row">
+            <input type="text" class="search-box" id="searchBox" placeholder="Search scenarios, gear, skills, or people..." oninput="filterPrompts()">
+            <span class="prompt-count" id="promptCount"></span>
+        </div>
+        <div class="filter-row" id="onlineFilters">
+            <button class="filter-btn collection-btn active" data-collection="showcase" onclick="setCollection('showcase', this)">Showcase</button>
+            <button class="filter-btn collection-btn" data-collection="full" onclick="setCollection('full', this)">Full Library</button>
+            <span class="control-divider" aria-hidden="true"></span>
+            <button class="filter-btn active" data-filter="all" onclick="setOnlineFilter('all', this)">All</button>
+            <button class="filter-btn" data-filter="image" onclick="setOnlineFilter('image', this)">📷 Photo</button>
+            <button class="filter-btn" data-filter="video" onclick="setOnlineFilter('video', this)">🎥 Video</button>
+            <button class="filter-btn" data-filter="guide" onclick="setOnlineFilter('guide', this)">📄 Field Guides</button>
+            <button class="filter-btn" data-filter="visual" onclick="setOnlineFilter('visual', this)">🎨 Create Visual</button>
+            <button class="filter-btn" data-filter="favorites" onclick="setOnlineFilter('favorites', this)">★ Favorites</button>
+            <button class="filter-btn" data-filter="recent" onclick="setOnlineFilter('recent', this)">🕒 Recent</button>
+        </div>
+        <div class="filter-row" id="commandFilters" hidden>
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all', this)">All</button>
+            <button class="filter-btn" data-filter="survival" onclick="setFilter('survival', this)">🏕️ Survival</button>
+            <button class="filter-btn" data-filter="kb" onclick="setFilter('kb', this)">📚 KB Builders</button>
+            <button class="filter-btn" data-filter="vision" onclick="setFilter('vision', this)">📷 Vision</button>
+            <button class="filter-btn" data-filter="challenging" onclick="setFilter('challenging', this)">🧠 Challenging</button>
+        </div>
+        <div class="audience-row" id="audienceFilters" aria-label="Filter prompts by audience"></div>
     </div>
+    <div class="collection-note" id="collectionNote"></div>
 
     <!-- Categories -->
     <div class="categories" id="categoriesContainer">
@@ -697,13 +834,14 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>All prompts have been field-tested with Gemma 4.</p>
+        <p>Showcase prompts are curated for OffGrid AI. The Full Library preserves the previous catalog for reference.</p>
         <p><a href="/online">← Return to OffGrid AI Online</a> · <a href="https://offgridaitoolkit.com" target="_blank">Get the USB Version</a></p>
     </div>
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
+    <script src="/ready-made-prompts-online.js?v=20260710-1"></script>
     <script>
         // ============================================
         // PROMPT DATA
@@ -1522,7 +1660,7 @@
             if (footerReturnLink) footerReturnLink.href = returnPathFor('/online');
             const badge = document.querySelector('.online-badge');
             if (badge) badge.textContent = 'OffGrid AI';
-            document.querySelector('.footer p').textContent = 'All prompts have been curated for OffGrid AI.';
+            document.querySelector('.footer p').textContent = 'Showcase prompts are curated for OffGrid AI. The Full Library preserves the previous catalog for reference.';
         }
 
         if (isPhoneSurface) {
@@ -1534,23 +1672,20 @@
         if (isAppSurface) {
             const backLink = document.querySelector('.back-link');
             if (backLink) backLink.textContent = '← Chat';
-            const kbFilter = document.querySelector('[data-filter="kb"]');
-            if (kbFilter) kbFilter.textContent = '📄 Field Guides';
             const footerLinks = document.querySelectorAll('.footer p');
             if (footerLinks.length > 1) {
                 footerLinks[1].innerHTML = `<a href="${returnPathFor('/online')}">← Return to OffGrid AI</a>`;
             }
         }
         
-        // Filter out challenging categories and survival filter for online context
-        if (!isCommandContext) {
-            // Remove challenging filter button
-            const challengingBtn = document.querySelector('[data-filter="challenging"]');
-            if (challengingBtn) challengingBtn.remove();
-            // Remove survival filter button (online doesn't need it - almost all are survival)
-            const survivalBtn = document.querySelector('[data-filter="survival"]');
-            if (survivalBtn) survivalBtn.remove();
-        }
+        const onlineFilters = document.getElementById('onlineFilters');
+        const commandFilters = document.getElementById('commandFilters');
+        const audienceFilters = document.getElementById('audienceFilters');
+        const collectionNote = document.getElementById('collectionNote');
+        onlineFilters.hidden = isCommandContext;
+        commandFilters.hidden = !isCommandContext;
+        audienceFilters.hidden = isCommandContext;
+        collectionNote.hidden = isCommandContext;
         
         // Build the active prompt list based on context
         let ACTIVE_CATEGORIES;
@@ -1615,6 +1750,122 @@
                 : cat
             );
         }
+
+        const ONLINE_LIBRARY = window.OFFGRID_ONLINE_PROMPT_LIBRARY || { categories: [], audiences: [], ownerSafetyReviewRules: [] };
+        const FAVORITES_STORAGE_KEY = 'offgrid-prompt-favorites-v1';
+        const RECENTS_STORAGE_KEY = 'offgrid-prompt-recents-v1';
+        let collectionMode = 'showcase';
+        let activeAudience = 'all';
+        let expandedCategoryIds = new Set();
+        let promptLookup = new Map();
+
+        function storedArray(key) {
+            try {
+                const value = JSON.parse(localStorage.getItem(key) || '[]');
+                return Array.isArray(value) ? value : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        let favoritePromptIds = new Set(storedArray(FAVORITES_STORAGE_KEY));
+        let recentPromptIds = storedArray(RECENTS_STORAGE_KEY).slice(0, 10);
+
+        function slugifyPromptValue(value) {
+            return String(value || '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '')
+                .slice(0, 64);
+        }
+
+        function normalizeLegacySubcategoryTitle(title) {
+            const value = String(title || 'Prompts');
+            if (/12B or Higher \/ Vision/i.test(value)) return 'OffGrid AI Advanced & Photo Analysis';
+            if (/12B|Higher Recommended/i.test(value)) return 'OffGrid AI Advanced';
+            if (/Works on All Models/i.test(value)) return 'OffGrid AI';
+            if (/All Prompts \(12B Recommended\)/i.test(value)) return 'OffGrid AI Advanced';
+            return value.replace('(Save These!)', '(Save to Phone)');
+        }
+
+        function legacyAudiencesFor(title) {
+            const value = String(title || '').toLowerCase();
+            const matches = [];
+            if (/emergency|urban|security|first aid|healthcare/.test(value)) matches.push('emergency', 'prepper');
+            if (/homestead|food|energy|power/.test(value)) matches.push('homestead', 'rural', 'prepper');
+            if (/wilderness|navigation|wildlife|weather/.test(value)) matches.push('hiker', 'camper');
+            if (/overlander|vehicle|cooking|camp/.test(value)) matches.push('overlander', 'camper', 'van-rv');
+            return [...new Set(matches.length ? matches : ['prepper'])];
+        }
+
+        function isOwnerSafetyReviewPrompt(text, categoryTitle) {
+            if (/Security & Defense|Security & Crisis Response|Healthcare & First Responders/i.test(categoryTitle || '')) return true;
+            return (ONLINE_LIBRARY.ownerSafetyReviewRules || []).some(rule => rule.test(String(text || '')));
+        }
+
+        const showcaseCategories = (ONLINE_LIBRARY.categories || []).map(cat => ({
+            ...cat,
+            subcategories: cat.subcategories.map(sub => ({
+                ...sub,
+                prompts: sub.prompts.map(p => ({ ...p, source: 'showcase' }))
+            }))
+        }));
+
+        const legacyOnlineCategories = PROMPT_CATEGORIES
+            .filter(cat => !cat.subcategories.every(sub => sub.prompts.every(p => p.challenging)))
+            .map((cat, catIndex) => {
+                const displayTitle = cat.title === 'Knowledge Base Builders' ? 'Field Guide Builders' : cat.title;
+                return {
+                    id: `legacy-${slugifyPromptValue(displayTitle) || catIndex}`,
+                    icon: cat.icon,
+                    title: displayTitle,
+                    description: 'Preserved from the previous Ready-Made Prompts catalog.',
+                    audiences: legacyAudiencesFor(displayTitle),
+                    subcategories: cat.subcategories.map((sub, subIndex) => ({
+                        title: normalizeLegacySubcategoryTitle(sub.title),
+                        prompts: sub.prompts.map((p, promptIndex) => {
+                            const isVision = p.badge === 'vision';
+                            const isGuide = /Knowledge Base Builders/i.test(cat.title) || /\b(create|write|design)\b.*\b(guide|manual|handbook|protocol|checklist|plan|calendar|curriculum|worksheet|flowchart|decision tree)\b/i.test(p.text);
+                            const isVisual = /\b(create|design|diagram|layout|visual|illustrat|map)\b/i.test(p.text);
+                            return {
+                                ...p,
+                                id: `legacy-${catIndex}-${subIndex}-${promptIndex}`,
+                                source: 'legacy',
+                                audiences: legacyAudiencesFor(displayTitle),
+                                tags: [displayTitle, normalizeLegacySubcategoryTitle(sub.title), p.kb].filter(Boolean),
+                                capabilities: isVision ? ['image', 'decision'] : [isVisual ? 'visual' : isGuide ? 'field-guide' : 'decision'],
+                                outputType: isGuide ? 'field-guide' : isVisual ? 'visual' : 'answer',
+                                followups: isGuide ? ['Make Field Guide', 'Save PDF'] : isVisual ? ['Create Visual'] : [],
+                                action: isVision ? 'image' : isGuide ? 'field-guide' : isVisual ? 'visual' : 'use',
+                                ownerSafetyReview: isOwnerSafetyReviewPrompt(p.text, displayTitle)
+                            };
+                        })
+                    }))
+                };
+            });
+
+        if (!isCommandContext) {
+            ACTIVE_CATEGORIES = showcaseCategories;
+            if (ACTIVE_CATEGORIES[0]) expandedCategoryIds.add(`showcase:${ACTIVE_CATEGORIES[0].id}`);
+        }
+
+        const countPrompts = categories => categories.reduce((total, cat) =>
+            total + cat.subcategories.reduce((subTotal, sub) => subTotal + sub.prompts.length, 0), 0);
+        const ownerSafetyReviewCount = legacyOnlineCategories.reduce((total, cat) =>
+            total + cat.subcategories.reduce((subTotal, sub) => subTotal + sub.prompts.filter(p => p.ownerSafetyReview).length, 0), 0);
+
+        window.__OFFGRID_PROMPT_LIBRARY_STATUS__ = {
+            version: ONLINE_LIBRARY.version || 'missing',
+            showcaseCategories: showcaseCategories.length,
+            showcasePrompts: countPrompts(showcaseCategories),
+            legacyCategories: legacyOnlineCategories.length,
+            legacyPrompts: countPrompts(legacyOnlineCategories),
+            ownerSafetyReviewPrompts: ownerSafetyReviewCount
+        };
+        document.body.dataset.promptLibraryVersion = ONLINE_LIBRARY.version || 'missing';
+        document.body.dataset.showcasePromptCount = String(countPrompts(showcaseCategories));
+        document.body.dataset.legacyPromptCount = String(countPrompts(legacyOnlineCategories));
+        document.body.dataset.ownerSafetyReviewCount = String(ownerSafetyReviewCount);
         
         // ============================================
         // RENDERING
@@ -1622,11 +1873,18 @@
         
         // Support URL parameter filtering (e.g., ?filter=survival)
         const urlFilter = urlParams.get('filter');
-        const validFilters = ['all', 'survival', 'kb', 'vision', 'challenging'];
-        let activeFilter = (urlFilter && validFilters.includes(urlFilter)) ? urlFilter : 'all';
+        const commandValidFilters = ['all', 'survival', 'kb', 'vision', 'challenging'];
+        const onlineFilterAliases = { all: 'all', vision: 'image', image: 'image', video: 'video', kb: 'guide', guide: 'guide', visual: 'visual', favorites: 'favorites', recent: 'recent' };
+        let activeFilter = isCommandContext
+            ? ((urlFilter && commandValidFilters.includes(urlFilter)) ? urlFilter : 'all')
+            : (onlineFilterAliases[urlFilter] || 'all');
         let totalPrompts = 0;
         
         function renderCategories() {
+            if (!isCommandContext) {
+                renderOnlineCategories();
+                return;
+            }
             const container = document.getElementById('categoriesContainer');
             container.innerHTML = '';
             let visibleCount = 0;
@@ -1701,18 +1959,238 @@
             document.getElementById('promptCount').textContent = `${visibleCount} prompts`;
             document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
         }
+
+        function htmlEscape(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function currentOnlineCategories() {
+            return collectionMode === 'full' ? legacyOnlineCategories : showcaseCategories;
+        }
+
+        function promptMatchesOnlineFilters(promptItem, categoryItem, subcategoryTitle, searchTokens) {
+            const audiences = [...(categoryItem.audiences || []), ...(promptItem.audiences || [])];
+            if (activeAudience !== 'all' && !audiences.includes(activeAudience)) return false;
+
+            const capabilities = promptItem.capabilities || [];
+            if (activeFilter === 'image' && !capabilities.includes('image')) return false;
+            if (activeFilter === 'video' && !capabilities.includes('video')) return false;
+            if (activeFilter === 'guide' && promptItem.outputType !== 'field-guide') return false;
+            if (activeFilter === 'visual' && promptItem.outputType !== 'visual' && !(promptItem.followups || []).includes('Create Visual')) return false;
+            if (activeFilter === 'favorites' && !favoritePromptIds.has(promptItem.id)) return false;
+            if (activeFilter === 'recent' && !recentPromptIds.includes(promptItem.id)) return false;
+
+            if (searchTokens.length) {
+                const searchText = [
+                    promptItem.text,
+                    categoryItem.title,
+                    categoryItem.description,
+                    subcategoryTitle,
+                    ...(categoryItem.audiences || []),
+                    ...(promptItem.audiences || []),
+                    ...(promptItem.tags || []),
+                    ...(promptItem.capabilities || []),
+                    promptItem.outputType,
+                    ...(promptItem.followups || [])
+                ].join(' ').toLowerCase();
+                if (!searchTokens.every(token => searchText.includes(token))) return false;
+            }
+
+            return true;
+        }
+
+        function badgeDetails(promptItem) {
+            if (promptItem.badge === 'vision') return { className: 'vision', text: 'OffGrid AI · Photo' };
+            if (promptItem.badge === 'video') return { className: 'video', text: 'OffGrid AI · Video' };
+            if (promptItem.badge === 'all') return { className: 'all-models', text: 'OffGrid AI' };
+            return { className: 'advanced', text: 'OffGrid AI Advanced' };
+        }
+
+        function onlineActionLabel(promptItem) {
+            if (promptItem.action === 'image') return '📷 Add Photo';
+            if (promptItem.action === 'video') return '🎥 Add Video';
+            if (promptItem.action === 'visual') return '🎨 Use';
+            if (promptItem.action === 'field-guide') return '📄 Use';
+            return '▶ Use';
+        }
+
+        function renderOnlinePromptCard(promptItem) {
+            const badge = badgeDetails(promptItem);
+            const isFavorite = favoritePromptIds.has(promptItem.id);
+            const metaTags = (promptItem.tags || []).slice(0, 2).map(tag =>
+                `<span class="prompt-meta-tag">${htmlEscape(tag)}</span>`
+            );
+            const nextAction = (promptItem.followups || [])[0];
+            if (nextAction) metaTags.push(`<span class="prompt-meta-tag">Next: ${htmlEscape(nextAction)}</span>`);
+
+            return `
+                <div class="prompt-card" id="prompt-card-${htmlEscape(promptItem.id)}"${promptItem.ownerSafetyReview ? ' data-owner-safety-review="true"' : ''}>
+                    <div class="prompt-card-content">
+                        <div class="prompt-card-topline">
+                            <span class="prompt-badge ${badge.className}">${badge.text}</span>
+                        </div>
+                        <div class="prompt-text">${htmlEscape(promptItem.text)}</div>
+                        ${metaTags.length ? `<div class="prompt-meta-row">${metaTags.join('')}</div>` : ''}
+                    </div>
+                    <div class="prompt-actions">
+                        <button class="prompt-action-btn favorite${isFavorite ? ' is-favorite' : ''}" type="button" onclick="favoritePromptById('${htmlEscape(promptItem.id)}')" aria-label="${isFavorite ? 'Remove from favorites' : 'Add to favorites'}">${isFavorite ? '★' : '☆'}</button>
+                        <button class="prompt-action-btn" type="button" onclick="copyPromptById('${htmlEscape(promptItem.id)}')">📋 Copy</button>
+                        <button class="prompt-action-btn use" type="button" onclick="usePromptById('${htmlEscape(promptItem.id)}')">${onlineActionLabel(promptItem)}</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderOnlineCategories() {
+            const container = document.getElementById('categoriesContainer');
+            const searchValue = document.getElementById('searchBox').value.toLowerCase().trim();
+            const searchTokens = searchValue.split(/\s+/).filter(Boolean);
+            const forceExpanded = searchTokens.length > 0 || activeAudience !== 'all' || activeFilter !== 'all';
+            const categories = currentOnlineCategories();
+            promptLookup = new Map();
+            let visibleCount = 0;
+            let html = '';
+
+            categories.forEach(categoryItem => {
+                let categoryCount = 0;
+                const renderedSubcategories = [];
+
+                categoryItem.subcategories.forEach(subcategoryItem => {
+                    const matches = subcategoryItem.prompts.filter(promptItem => {
+                        const matched = promptMatchesOnlineFilters(promptItem, categoryItem, subcategoryItem.title, searchTokens);
+                        if (matched) promptLookup.set(promptItem.id, promptItem);
+                        return matched;
+                    });
+                    if (matches.length) {
+                        categoryCount += matches.length;
+                        renderedSubcategories.push({ title: subcategoryItem.title, prompts: matches });
+                    }
+                });
+
+                if (!categoryCount) return;
+                visibleCount += categoryCount;
+                const categoryKey = `${collectionMode}:${categoryItem.id}`;
+                const isExpanded = forceExpanded || expandedCategoryIds.has(categoryKey);
+                const subcategoriesHtml = isExpanded ? renderedSubcategories.map(subcategoryItem => `
+                    <div class="subcategory">
+                        <div class="subcategory-title">${htmlEscape(subcategoryItem.title)}</div>
+                        <div class="prompt-grid">${subcategoryItem.prompts.map(renderOnlinePromptCard).join('')}</div>
+                    </div>
+                `).join('') : '';
+
+                html += `
+                    <section class="category${isExpanded ? '' : ' collapsed'}" id="category-${htmlEscape(categoryItem.id)}">
+                        <button class="category-header" type="button" onclick="toggleCategory('${htmlEscape(categoryKey)}')" aria-expanded="${isExpanded}">
+                            <span class="category-icon">${htmlEscape(categoryItem.icon)}</span>
+                            <span class="category-title">${htmlEscape(categoryItem.title)}</span>
+                            <span class="category-count">${categoryCount} prompts</span>
+                            <span class="category-toggle">▼</span>
+                        </button>
+                        ${isExpanded && categoryItem.description ? `<div class="category-description">${htmlEscape(categoryItem.description)}</div>` : ''}
+                        ${isExpanded ? `<div class="subcategories">${subcategoriesHtml}</div>` : ''}
+                    </section>
+                `;
+            });
+
+            container.innerHTML = html;
+            document.getElementById('promptCount').textContent = `${visibleCount} prompt${visibleCount === 1 ? '' : 's'}`;
+            document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+            document.getElementById('noResults').textContent = activeFilter === 'favorites'
+                ? 'No favorites yet. Tap the star on any prompt to keep it here.'
+                : activeFilter === 'recent'
+                    ? 'No recent prompts yet. Use a prompt and it will appear here.'
+                    : 'No prompts found. Try a different search term or filter.';
+            collectionNote.textContent = collectionMode === 'full'
+                ? `Full Library: ${countPrompts(legacyOnlineCategories)} preserved prompts. Prompt wording is unchanged; model-size headings are replaced with OffGrid AI branding.`
+                : `${countPrompts(showcaseCategories)} curated prompts across ${showcaseCategories.length} field-ready categories. Search also matches audiences, capabilities, tags, and follow-up actions.`;
+        }
+
+        function setCollection(mode, btn) {
+            collectionMode = mode === 'full' ? 'full' : 'showcase';
+            document.querySelectorAll('#onlineFilters [data-collection]').forEach(button => button.classList.remove('active'));
+            btn.classList.add('active');
+            activeFilter = 'all';
+            activeAudience = 'all';
+            document.querySelectorAll('#onlineFilters [data-filter]').forEach(button => button.classList.toggle('active', button.dataset.filter === 'all'));
+            document.querySelectorAll('#audienceFilters [data-audience]').forEach(button => button.classList.toggle('active', button.dataset.audience === 'all'));
+            expandedCategoryIds = new Set();
+            const firstCategory = currentOnlineCategories()[0];
+            if (firstCategory) expandedCategoryIds.add(`${collectionMode}:${firstCategory.id}`);
+            renderCategories();
+        }
+
+        function setOnlineFilter(filter, btn) {
+            activeFilter = filter;
+            document.querySelectorAll('#onlineFilters [data-filter]').forEach(button => button.classList.remove('active'));
+            btn.classList.add('active');
+            renderCategories();
+        }
+
+        function setAudience(audience, btn) {
+            activeAudience = audience;
+            document.querySelectorAll('#audienceFilters [data-audience]').forEach(button => button.classList.remove('active'));
+            btn.classList.add('active');
+            renderCategories();
+        }
+
+        function renderAudienceFilters() {
+            audienceFilters.innerHTML = (ONLINE_LIBRARY.audiences || []).map(audience => `
+                <button class="filter-btn audience-btn${audience.id === activeAudience ? ' active' : ''}" type="button" data-audience="${htmlEscape(audience.id)}" onclick="setAudience('${htmlEscape(audience.id)}', this)">${htmlEscape(audience.label)}</button>
+            `).join('');
+        }
+
+        function favoritePromptById(promptId) {
+            if (favoritePromptIds.has(promptId)) favoritePromptIds.delete(promptId);
+            else favoritePromptIds.add(promptId);
+            localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify([...favoritePromptIds]));
+            renderCategories();
+        }
+
+        function addRecentPrompt(promptId) {
+            recentPromptIds = [promptId, ...recentPromptIds.filter(id => id !== promptId)].slice(0, 10);
+            localStorage.setItem(RECENTS_STORAGE_KEY, JSON.stringify(recentPromptIds));
+        }
+
+        function copyPromptById(promptId) {
+            const promptItem = promptLookup.get(promptId);
+            if (!promptItem) return;
+            copyPrompt(promptItem.text, `prompt-card-${promptItem.id}`);
+        }
+
+        function usePromptById(promptId) {
+            const promptItem = promptLookup.get(promptId);
+            if (!promptItem) return;
+            addRecentPrompt(promptId);
+            sessionStorage.setItem('offgrid-ready-prompt', promptItem.text);
+            sessionStorage.setItem('offgrid-ready-prompt-id', promptItem.id);
+            sessionStorage.setItem('offgrid-ready-prompt-action', promptItem.action || 'use');
+            sessionStorage.setItem('offgrid-ready-prompt-followups', JSON.stringify(promptItem.followups || []));
+            window.location.href = returnPathFor('/online');
+        }
         
         function escapeForAttr(str) {
             return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
         
         function toggleCategory(catId) {
-            document.getElementById(catId).classList.toggle('collapsed');
+            if (isCommandContext) {
+                const categoryElement = document.getElementById(catId);
+                if (categoryElement) categoryElement.classList.toggle('collapsed');
+                return;
+            }
+            if (expandedCategoryIds.has(catId)) expandedCategoryIds.delete(catId);
+            else expandedCategoryIds.add(catId);
+            renderCategories();
         }
         
         function setFilter(filter, btn) {
             activeFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('#commandFilters .filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             renderCategories();
         }
@@ -1728,9 +2206,9 @@
         function copyPrompt(text, cardId) {
             navigator.clipboard.writeText(text).then(() => {
                 const card = document.getElementById(cardId);
-                card.classList.add('copied');
+                if (card) card.classList.add('copied');
                 showToast('Copied to clipboard!');
-                setTimeout(() => card.classList.remove('copied'), 2000);
+                if (card) setTimeout(() => card.classList.remove('copied'), 2000);
             }).catch(() => {
                 // Fallback
                 const textarea = document.createElement('textarea');
@@ -1769,10 +2247,14 @@
             });
         });
         
-        // If URL param set a filter, update the active button state
-        if (activeFilter !== 'all') {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.querySelector(`.filter-btn[data-filter="${activeFilter}"]`);
+        if (!isCommandContext) {
+            renderAudienceFilters();
+            document.querySelectorAll('#onlineFilters [data-filter]').forEach(button =>
+                button.classList.toggle('active', button.dataset.filter === activeFilter)
+            );
+        } else if (activeFilter !== 'all') {
+            document.querySelectorAll('#commandFilters .filter-btn').forEach(button => button.classList.remove('active'));
+            const activeBtn = document.querySelector(`#commandFilters .filter-btn[data-filter="${activeFilter}"]`);
             if (activeBtn) activeBtn.classList.add('active');
         }
         renderCategories();

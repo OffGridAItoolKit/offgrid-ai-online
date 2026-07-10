@@ -1,11 +1,12 @@
 {
   "name": "offgrid-ai-online",
-  "version": "5.7.2",
-  "description": "OffGrid AI ToolKit Online - Cloud-powered Gemma 4 AI with system prompt",
+  "version": "5.7.3",
+  "description": "OffGrid AI ToolKit Online - priority-first preparedness and field decision support",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node index.js"
+    "dev": "node index.js",
+    "test:prompts": "node scripts/check-ready-made-prompts.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

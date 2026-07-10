@@ -6001,7 +6001,17 @@ Mobile app output requirements:
             // Check for ready-made prompt from prompts page
             const readyPrompt = sessionStorage.getItem('offgrid-ready-prompt');
             if (readyPrompt) {
+                const readyPromptAction = sessionStorage.getItem('offgrid-ready-prompt-action') || 'use';
+                let readyPromptFollowups = [];
+                try {
+                    readyPromptFollowups = JSON.parse(sessionStorage.getItem('offgrid-ready-prompt-followups') || '[]');
+                } catch (_) {
+                    readyPromptFollowups = [];
+                }
                 sessionStorage.removeItem('offgrid-ready-prompt');
+                sessionStorage.removeItem('offgrid-ready-prompt-id');
+                sessionStorage.removeItem('offgrid-ready-prompt-action');
+                sessionStorage.removeItem('offgrid-ready-prompt-followups');
                 // Wait a moment for the page to fully render, then populate the input
                 setTimeout(() => {
                     const welcomeInput = document.getElementById('welcomeMessageInput');
@@ -6014,6 +6024,18 @@ Mobile app output requirements:
                         chatInput.value = readyPrompt;
                         autoResize(chatInput);
                         chatInput.focus();
+                    }
+
+                    if (readyPromptAction === 'image') {
+                        showSaveToast('Photo prompt ready', 'Choose a photo or take a picture to continue.');
+                        setTimeout(() => triggerGalleryUpload(), 100);
+                    } else if (readyPromptAction === 'video') {
+                        showSaveToast('Video prompt ready', 'Record or upload a short video to continue.');
+                        setTimeout(() => openVideoActions(), 100);
+                    } else if (readyPromptFollowups.includes('Create Visual')) {
+                        showSaveToast('Visual-ready prompt', 'Send it, then tap Create Visual after OffGrid AI answers.');
+                    } else if (readyPromptFollowups.includes('Make Field Guide')) {
+                        showSaveToast('Field-guide prompt', 'Send it, then tap Make Field Guide after OffGrid AI answers.');
                     }
                 }, 500);
             }
