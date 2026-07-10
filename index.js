@@ -2605,6 +2605,10 @@ app.get('/privacy', (req, res) => {
     res.sendFile(path.join(__dirname, 'privacy.html'));
 });
 
+app.get('/data-deletion', (req, res) => {
+    res.sendFile(path.join(__dirname, 'data-deletion.html'));
+});
+
 // =============================================================================
 // LICENSE SYSTEM ROUTES (must be before catch-all)
 // =============================================================================
