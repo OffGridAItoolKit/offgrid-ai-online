@@ -19,11 +19,11 @@ App id / bundle id: com.offgridaitoolkit.app
 
 ### Accounts
 
-- [ ] Google Play Console organization account verified.
+- [x] Google Play Console organization account verified.
 - [ ] Apple Developer Program organization account verified.
 - [ ] Tedd invited to App Store Connect with certificate/profile/TestFlight/upload access.
-- [ ] Final public seller/legal name confirmed.
-- [ ] Support email confirmed as support@offgridaitoolkit.com or replaced.
+- [x] Final public developer name confirmed as `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
+- [x] Support email confirmed as `support@offgridaitoolkit.com`.
 
 ### Product Readiness
 
@@ -31,8 +31,10 @@ App id / bundle id: com.offgridaitoolkit.app
 - [x] Production app URL set to https://offgridtoolkit.ai/online?surface=app.
 - [x] Android app icon uses the OffGrid AI ToolKit compass.
 - [x] iOS 1024x1024 icon exists in the Xcode asset catalog.
+- [x] Native launcher icons and web shortcut artwork use the standalone dark-background compass; source copy is `store-launch/app-icon-source-512.png`.
 - [x] Mobile app surfaces hide Command Center and Knowledge Base purchase/save flows.
 - [x] Mobile app has phone-native save/share/Saved Guides behavior.
+- [x] Mobile composer is limited to `Clear`, labeled `Voice Input`, and `Send`; Create Visual remains a post-answer and More Actions feature.
 - [x] Privacy page route exists at /privacy.
 - [x] Feedback path exists from the mobile app surface.
 - [ ] Final legal/privacy review completed before submission.
