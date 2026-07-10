@@ -1,44 +1,31 @@
 # Operations & Troubleshooting Manual
 
-**Version 1.0.0** | **Last Updated:** 2026-02-20
+**Version 1.1.0** | **Last Updated:** 2026-07-10
 
 This manual provides standard operating procedures (SOPs) for monitoring, troubleshooting, and maintaining the OffGrid AI ToolKit Online platform.
 
 ---
 
-## 1. Centralized Logging with Better Stack
+## 1. Render Service Logs
 
-To provide robust, privacy-safe operational monitoring, the platform integrates with Better Stack for centralized logging. This system allows us to track application health and performance without ever logging user prompts, conversation content, or IP addresses.
+The platform uses the logs already provided by its Render web service. Application code does not transmit a second copy of operational events to an external log-aggregation platform.
 
 ### 1.1. Accessing the Logs
 
-All operational logs are sent to a dedicated source on Better Stack. To view the logs:
+1. Log in to the Render dashboard.
+2. Select the `offgrid-ai-online` web service.
+3. Open **Logs** to review deployment output, application console messages, and technical request records.
 
-1.  Log in to your Better Stack account.
-2.  Navigate to the **Logs** section.
-3.  Select the source corresponding to the OffGrid AI Online platform (the source token is configured via the `BETTERSTACK_SOURCE_TOKEN` environment variable).
+### 1.2. Privacy Boundaries
 
-### 1.2. What is Logged
+- Application console messages must not contain prompts, AI responses, uploaded media, feedback details, license keys, email addresses, or raw network addresses.
+- Render request logs may contain technical metadata such as request path, network address, user agent, status, duration, and response size.
+- The current Starter service retains Render logs for seven days.
+- In-app feedback is stored only in the application database after the user explicitly submits it.
 
-The logging system is designed to be **privacy-first**. It only captures metadata about application events. The following table details the events that are logged:
+### 1.3. Troubleshooting
 
-| Event Name | Trigger | Logged Data |
-|---|---|---|
-| `server.startup` | Server starts | Port, Node.js version, API key status, Better Stack status |
-| `chat.free` | `/api/chat` (free) | Model used, response duration, success/error status |
-| `chat.command` | `/api/command/stream` | Model used, response duration, success/error status |
-| `stream.free` | `/api/stream` (free) | Model used, response duration |
-| `council.complete` | AI Council finishes | Duration, Chairman model, which models responded/timed out |
-| `council.error` | AI Council fails | Error type, duration |
-| `image.generate` | `/api/command/generate-image` | Success/fail status, duration, finish reason, error reason |
-| `prompt.craft` | `/api/command/craft-prompt` | Category, success/error status |
-| `prompt.visual` | `/api/command/visual-prompt` | Category, success/error status |
-| `image.summary` | `/api/command/image-summary` | Success/error status |
-| `export.pdf` | `/api/export-pdf` | Error details if the export fails |
-
-### 1.3. Troubleshooting with Logs
-
-When troubleshooting issues, you can use the Better Stack dashboard to filter logs by event name, time range, or status (e.g., `level:error`). This can help you identify patterns, such as a specific model failing frequently or an increase in error rates after a deployment.
+Use the Render logs together with `/api/health`, the passive Image Studio health endpoint, deployment history, and user-submitted feedback. Avoid adding another log processor unless a specific operational need justifies the additional privacy and account-management overhead.
 
 ## 2. Health Checks
 

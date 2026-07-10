@@ -1,6 +1,6 @@
 {
   "name": "offgrid-ai-online",
-  "version": "5.7.1",
+  "version": "5.7.2",
   "description": "OffGrid AI ToolKit Online - Cloud-powered Gemma 4 AI with system prompt",
   "main": "index.js",
   "scripts": {

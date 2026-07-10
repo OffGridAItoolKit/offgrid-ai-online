@@ -50,48 +50,6 @@ const IMAGE_STUDIO_IMAGE_MODELS = {
     openai: 'openai/gpt-5.4-image-2'
 };
 
-// =============================================================================
-// BETTER STACK LOGGING (persistent, privacy-safe operational logs)
-// =============================================================================
-const BETTERSTACK_SOURCE_TOKEN = process.env.BETTERSTACK_SOURCE_TOKEN;
-const BETTERSTACK_ENDPOINT = 'https://s1749343.eu-fsn-3.betterstackdata.com';
-
-/**
- * Send a log entry to Better Stack. Fire-and-forget (non-blocking).
- * PRIVACY: Never logs prompts, messages, user content, IPs, or session data.
- * Only logs: event type, model used, duration, status, error reasons.
- */
-function logToBetterStack(level, event, data = {}) {
-    if (!BETTERSTACK_SOURCE_TOKEN) return;
-    
-    const entry = {
-        dt: new Date().toISOString(),
-        level: level,
-        message: `[${event}] ${data.summary || ''}`,
-        service: 'offgrid-ai-online',
-        event: event,
-        ...data
-    };
-    
-    // Remove any fields that could contain user content (safety net)
-    delete entry.prompt;
-    delete entry.messages;
-    delete entry.content;
-    delete entry.userQuery;
-    delete entry.ip;
-    
-    fetch(BETTERSTACK_ENDPOINT, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${BETTERSTACK_SOURCE_TOKEN}`
-        },
-        body: JSON.stringify(entry)
-    }).catch(() => {}); // Silent fail — logging should never break the app
-}
-
-console.log(`[Better Stack] ${BETTERSTACK_SOURCE_TOKEN ? '✓ Logging enabled' : '✗ No token — logging disabled'}`);
-
 // Gemma 4 Model (Free Tier) - Single model architecture
 const GEMMA_MODELS = {
     'gemma-4-26b': {
@@ -494,12 +452,7 @@ function anonymousDailyLimit(usageType, perUserLimit, globalLimit = null) {
             const usage = await consumeAnonymousDailyUsage(req, usageType, perUserLimit, globalLimit);
             if (!usage.allowed) {
                 const isGlobal = usage.reason === 'global_limit';
-                logToBetterStack('warn', 'usage.anonymous.limit', {
-                    summary: `${usageType} ${usage.reason} reached`,
-                    usageType,
-                    reason: usage.reason,
-                    status: 'blocked'
-                });
+                console.warn(`[Usage Guard] ${usageType} ${usage.reason} reached`);
                 return res.status(429).json({
                     error: isGlobal
                         ? 'Image Studio has reached today\'s free capacity. Please try again tomorrow.'
@@ -513,12 +466,7 @@ function anonymousDailyLimit(usageType, perUserLimit, globalLimit = null) {
             if (usageType === 'image' && usage.globalCount) {
                 const percent = Math.round((usage.globalCount / globalLimit) * 100);
                 if ([50, 80, 90].some(threshold => percent >= threshold && percent - Math.round(100 / globalLimit) < threshold)) {
-                    logToBetterStack('warn', 'usage.image.budget', {
-                        summary: `Daily image budget is ${percent}% used`,
-                        used: usage.globalCount,
-                        limit: globalLimit,
-                        status: 'warning'
-                    });
+                    console.warn(`[Usage Guard] Daily image budget is ${percent}% used (${usage.globalCount}/${globalLimit})`);
                 }
             }
             next();
@@ -1221,12 +1169,7 @@ app.post('/api/feedback', feedbackLimiter, async (req, res) => {
              RETURNING id, created_at`,
             [category, details, context || null, reportedContent || null, surface || null, platform || null, appPath || null]
         );
-        logToBetterStack('info', 'feedback.submitted', {
-            summary: `In-app feedback submitted: ${category}`,
-            category,
-            hasReportedContent: Boolean(reportedContent),
-            status: 'success'
-        });
+        console.log(`[Feedback] Submitted category: ${category}; response included: ${Boolean(reportedContent)}`);
         res.status(201).json({
             ok: true,
             id: result.rows[0].id,
@@ -1234,11 +1177,6 @@ app.post('/api/feedback', feedbackLimiter, async (req, res) => {
         });
     } catch (error) {
         console.error('[Feedback] Submission error:', error.message);
-        logToBetterStack('error', 'feedback.submitted', {
-            summary: 'In-app feedback storage failed',
-            category,
-            status: 'error'
-        });
         res.status(503).json({ error: 'Feedback could not be submitted right now. Please try again.' });
     }
 });
@@ -1277,14 +1215,6 @@ app.post('/api/chat', async (req, res) => {
         const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages, 4096, 0.7, true);
         const responseTime = Date.now() - startTime;
         
-        logToBetterStack('info', 'chat.free', {
-            summary: `${modelConfig.name} responded in ${responseTime}ms`,
-            model: modelConfig.name,
-            modelId: modelConfig.id,
-            durationMs: responseTime,
-            status: 'success'
-        });
-        
         res.json({
             response: aiResponse,
             model: modelConfig.name,
@@ -1294,12 +1224,6 @@ app.post('/api/chat', async (req, res) => {
         
     } catch (error) {
         console.error('Chat endpoint error:', error);
-        logToBetterStack('error', 'chat.free', {
-            summary: `Error: ${error.message}`,
-            status: 'error',
-            errorMessage: error.message,
-            durationMs: Date.now() - startTime
-        });
         res.status(500).json({ 
             error: 'An error occurred while processing your request. Please try again.' 
         });
@@ -1334,24 +1258,10 @@ app.post('/api/stream', async (req, res) => {
         res.setHeader('Connection', 'keep-alive');
         
         await streamOpenRouter(modelConfig.id, openRouterMessages, res, 4096, 0.7, true);
-        logToBetterStack('info', 'stream.free', {
-            summary: `${modelConfig.name} streamed in ${Date.now() - streamStart}ms`,
-            model: modelConfig.name,
-            modelId: modelConfig.id,
-            durationMs: Date.now() - streamStart,
-            status: 'success'
-        });
         res.end();
         
     } catch (error) {
         console.error('Stream endpoint error:', error);
-        logToBetterStack('error', 'stream.free', {
-            summary: `Stream error: ${error.message}`,
-            model: req.body?.model || 'unknown',
-            status: 'error',
-            errorMessage: error.message,
-            durationMs: Date.now() - streamStart
-        });
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
@@ -1444,24 +1354,10 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
             );
         }
         
-        logToBetterStack('info', 'chat.command', {
-            summary: `${modelConfig.shortName} streamed in ${Date.now() - cmdStreamStart}ms`,
-            model: modelConfig.shortName,
-            modelId: modelConfig.id,
-            durationMs: Date.now() - cmdStreamStart,
-            status: 'success'
-        });
         res.end();
         
     } catch (error) {
         console.error('Command stream error:', error);
-        logToBetterStack('error', 'chat.command', {
-            summary: `${req.body?.model || 'unknown'} error: ${error.message}`,
-            model: req.body?.model || 'unknown',
-            status: 'error',
-            errorMessage: error.message,
-            durationMs: Date.now() - cmdStreamStart
-        });
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
@@ -1713,23 +1609,10 @@ Based on these, write the final Command answer as described.
         
         const councilDuration = Date.now() - councilStartTime;
         console.log('[Council] Complete');
-        logToBetterStack('info', 'council.complete', {
-            summary: `Council completed in ${councilDuration}ms | Chairman: ${chairmanResult.shortName}`,
-            durationMs: councilDuration,
-            chairman: chairmanResult.shortName,
-            modelsResponded: labeledResults.filter(r => !r.error).map(r => r.shortName),
-            modelsTimedOut: labeledResults.filter(r => r.error).map(r => r.shortName),
-            status: 'success'
-        });
+        console.log(`[Council] Duration: ${councilDuration}ms; chairman: ${chairmanResult.shortName}`);
         
     } catch (error) {
         console.error('Council endpoint error:', error);
-        logToBetterStack('error', 'council.error', {
-            summary: `Council failed: ${error.message}`,
-            status: 'error',
-            errorMessage: error.message,
-            durationMs: Date.now() - councilStartTime
-        });
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
@@ -1761,18 +1644,6 @@ function logImageGen(entry) {
     if (imageGenLog.length > IMAGE_GEN_LOG_MAX) imageGenLog.shift();
     console.log(`[Nano Banana Monitor] ${entry.status} | ${entry.durationMs}ms | finish: ${entry.finishReason || '-'} | reason: ${entry.errorReason || '-'}`);
     
-    // Persist to Better Stack
-    logToBetterStack(
-        entry.status === 'success' ? 'info' : 'warn',
-        'image.generate',
-        {
-            summary: `Image gen ${entry.status} in ${entry.durationMs}ms | finish: ${entry.finishReason || '-'}`,
-            status: entry.status,
-            durationMs: entry.durationMs,
-            finishReason: entry.finishReason,
-            errorReason: entry.errorReason
-        }
-    );
 }
 
 // Health check endpoint for image generation
@@ -2126,12 +1997,6 @@ RULES:
 
         console.log(`[Prompt Assistant] Crafted prompt (${craftedPrompt.length} characters)`);
 
-        logToBetterStack('info', 'prompt.craft', {
-            summary: `Prompt crafted for category: ${category || 'other'}`,
-            category: category || 'other',
-            status: 'success'
-        });
-
         res.json({
             success: true,
             prompt: craftedPrompt,
@@ -2141,11 +2006,6 @@ RULES:
 
     } catch (error) {
         console.error('[Prompt Assistant] Error:', error);
-        logToBetterStack('error', 'prompt.craft', {
-            summary: `Prompt craft failed: ${error.message}`,
-            status: 'error',
-            errorMessage: error.message
-        });
         res.status(500).json({
             success: false,
             error: 'Prompt crafting failed: ' + error.message
@@ -2248,20 +2108,12 @@ Rules:
         const data = await response.json();
         const summary = data.choices?.[0]?.message?.content || '';
 
-        logToBetterStack('info', 'image.summary', {
-            summary: 'Image summary generated',
-            status: 'success'
-        });
+        console.log('[Image Summary] Generated successfully');
 
         res.json({ success: true, summary });
 
     } catch (error) {
         console.error('Image summary error:', error);
-        logToBetterStack('error', 'image.summary', {
-            summary: `Image summary failed: ${error.message}`,
-            status: 'error',
-            errorMessage: error.message
-        });
         res.status(500).json({ error: 'Failed to generate summary' });
     }
 });
@@ -2366,11 +2218,6 @@ RULES:
 
         console.log(`[Visual Prompt] Generated (${visualPrompt.length} characters)`);
 
-        logToBetterStack('info', 'prompt.visual', {
-            summary: 'Visual prompt generated from conversation',
-            status: 'success'
-        });
-
         res.json({
             success: true,
             prompt: visualPrompt,
@@ -2379,11 +2226,6 @@ RULES:
 
     } catch (error) {
         console.error('[Visual Prompt] Error:', error);
-        logToBetterStack('error', 'prompt.visual', {
-            summary: `Visual prompt failed: ${error.message}`,
-            status: 'error',
-            errorMessage: error.message
-        });
         res.status(500).json({
             success: false,
             error: 'Visual prompt generation failed: ' + error.message
@@ -2597,11 +2439,6 @@ app.post('/api/export-pdf', async (req, res) => {
         
     } catch (error) {
         console.error('PDF export error:', error);
-        logToBetterStack('error', 'export.pdf', {
-            summary: `PDF export failed: ${error.message}`,
-            status: 'error',
-            errorMessage: error.message
-        });
         res.status(500).json({ error: 'Failed to generate PDF export' });
     }
 });
@@ -2772,7 +2609,7 @@ app.get('/privacy', (req, res) => {
 // LICENSE SYSTEM ROUTES (must be before catch-all)
 // =============================================================================
 
-registerLicenseRoutes(app, logToBetterStack);
+registerLicenseRoutes(app);
 
 // Catch-all route - serve prospect experience for any other path
 // IMPORTANT: This must be the LAST route registered
@@ -2840,13 +2677,4 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('╚═══════════════════════════════════════════════════════════╝');
     console.log('');
 
-    // Log server startup to Better Stack
-    logToBetterStack('info', 'server.startup', {
-        summary: `OffGrid AI server started on port ${PORT}`,
-        port: PORT,
-        apiKeyConfigured: !!OPENROUTER_API_KEY,
-        betterStackConfigured: !!BETTERSTACK_SOURCE_TOKEN,
-        nodeVersion: process.version,
-        environment: process.env.NODE_ENV || 'development'
-    });
 });

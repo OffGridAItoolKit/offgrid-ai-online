@@ -721,7 +721,7 @@ function checkImageLimit(req, res, next) {
 // EXPRESS ROUTE HANDLERS
 // =============================================================================
 
-function registerLicenseRoutes(app, logToBetterStack) {
+function registerLicenseRoutes(app) {
 
     // -------------------------------------------------------------------------
     // POST /api/license/activate
@@ -789,15 +789,6 @@ function registerLicenseRoutes(app, logToBetterStack) {
             const tierInfo = TIER_LIMITS[tierKey];
             
             await logActivationEvent(normalizedKey, 'activate.success', `${license.is_trial ? 'Trial' : license.is_mobile ? 'Mobile' : 'Tier ' + license.tier} activated`);
-            
-            if (logToBetterStack) {
-                logToBetterStack('info', 'license.activated', {
-                    summary: `License activated: ${tierInfo.name}`,
-                    tier: license.tier,
-                    isMobile: license.is_mobile,
-                    tierName: tierInfo.name
-                });
-            }
             
             // Calculate trial expiry date for response (30 days from now)
             const trialExpiresAt = license.is_trial
@@ -1100,14 +1091,6 @@ function registerLicenseRoutes(app, logToBetterStack) {
                 keys.push(key);
             }
             
-            if (logToBetterStack) {
-                logToBetterStack('info', 'admin.keys_generated', {
-                    summary: `Generated ${count} ${tier} license keys`,
-                    count,
-                    tier
-                });
-            }
-            
             res.json({
                 success: true,
                 count: keys.length,
@@ -1253,15 +1236,6 @@ function registerLicenseRoutes(app, logToBetterStack) {
             
             await logActivationEvent(licenseKey, 'admin.credit_back', `Credited back ${count} ${type}(s)`);
             
-            if (logToBetterStack) {
-                logToBetterStack('info', 'admin.credit_back', {
-                    summary: `Credited back ${count} ${type}(s) for ${licenseKey}`,
-                    licenseKey,
-                    type,
-                    count
-                });
-            }
-            
             res.json({
                 success: true,
                 message: `Credited back ${count} ${type}(s). New count: ${license[column]}/${type === 'prompt' ? tierLimits.monthlyPrompts : tierLimits.monthlyImages}`,
@@ -1337,16 +1311,6 @@ function registerLicenseRoutes(app, logToBetterStack) {
             
             await logActivationEvent(normalizedKey, 'admin.update_limits', 
                 `Custom limits set: ${effective.monthlyPrompts} prompts, ${effective.monthlyImages} images${resetCounters ? ' (counters reset)' : ''}`);
-            
-            if (logToBetterStack) {
-                logToBetterStack('info', 'admin.update_limits', {
-                    summary: `Custom limits set for ${normalizedKey}: ${effective.monthlyPrompts} prompts, ${effective.monthlyImages} images`,
-                    licenseKey: normalizedKey,
-                    monthlyPrompts: effective.monthlyPrompts,
-                    monthlyImages: effective.monthlyImages,
-                    resetCounters
-                });
-            }
             
             res.json({
                 success: true,
@@ -1792,14 +1756,6 @@ function registerLicenseRoutes(app, logToBetterStack) {
             );
 
             await logActivationEvent(arenaKey, 'arena.register', `New arena registration: ${normalizedEmail}, opt-in: ${optIn || false}`);
-
-            if (logToBetterStack) {
-                logToBetterStack('arena_registration', {
-                    key: arenaKey,
-                    email: normalizedEmail,
-                    optIn: optIn || false
-                });
-            }
 
             const effective = getEffectiveLimits({ tier: 2, is_arena: true, custom_prompt_limit: null, custom_image_limit: null });
 

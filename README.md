@@ -1,6 +1,6 @@
 # OffGrid AI ToolKit Online - Technical Overview
 
-**Version 5.7.1** | **Last Updated:** 2026-07-10
+**Version 5.7.2** | **Last Updated:** 2026-07-10
 
 This document provides a comprehensive technical overview of the OffGrid AI ToolKit Online platform, including the free Online ToolKit and the premium Command Center. It is intended for developers, administrators, and technical staff.
 
@@ -19,7 +19,7 @@ The platform is built on a simple and robust technical stack, prioritizing maint
 
 **External Services**:
 *   **OpenRouter**: Provides a unified API to access a wide range of large language models (LLMs), including Google's Gemma 4, OpenAI's GPT models, Anthropic's Claude, and more.
-*   **Better Stack**: Used for operational logging and monitoring. Application logs exclude prompts, responses, and uploaded media; the configured source retention must remain aligned with the published privacy policy.
+*   **Render**: Hosts the Node.js service and provides short-lived deployment, application-console, and request logs for troubleshooting.
 
 ## 2. Core Features
 
@@ -86,7 +86,6 @@ The application is configured using environment variables. A `.env.example` file
 | `JWT_SECRET` | Yes | Stable secret used to sign license/session JWTs. Changing this invalidates existing customer sessions. |
 | `ADMIN_SECRET` | Yes | Production admin secret checked by admin API routes via the `x-admin-key` request header. This is the required production environment variable. |
 | `ADMIN_SECRET_BACKUP` | No | Optional secondary admin secret for temporary rotation or backup access. |
-| `BETTERSTACK_SOURCE_TOKEN` | No | Your source token for Better Stack logging. |
 | `PORT` | No | The port for the server to run on (default: 3000). |
 | `NODE_ENV` | No | The environment mode (e.g., `production`). |
 | `ALLOWED_ORIGINS` | No | A comma-separated list of additional allowed browser origins for CORS. |
@@ -126,10 +125,10 @@ Render handles Brotli/gzip compression at the platform layer. Do not add Express
 
 ## 7. Monitoring & Troubleshooting
 
-Operational monitoring and troubleshooting are handled through a combination of health checks and external logging.
+Operational monitoring and troubleshooting are handled through health checks and Render's short-lived service logs.
 
 *   **Health Checks**: The `/api/health` and `/api/health/image-gen` endpoints provide real-time status of the server and its key services.
-*   **Better Stack Logging**: All significant application events are logged to Better Stack. This provides a centralized and searchable log of operational data without compromising user privacy. See the **Operations & Troubleshooting Manual** for more details.
+*   **Render Logs**: Deployment output, application console messages, and technical request logs are available from the Render service dashboard. Application code does not send a second copy to an external log-aggregation service.
 *   **Health Check Script**: A shell script (`scripts/health-check.sh`) is available for manual or automated testing of the image generation service.
 
 ---

@@ -1,8 +1,19 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-04-30
+**Last Updated:** 2026-07-10
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
+
+---
+
+### July 2026
+
+**2026-07-10**
+*   **Simplified launch monitoring and privacy surface (v5.7.2)**
+    *   Removed the Better Stack runtime integration, source token, endpoint, and event transmissions.
+    *   Removed the license/admin event hooks that previously sent operational metadata to the external logging service.
+    *   Standardized launch troubleshooting on Render's seven-day service logs, built-in health endpoints, and explicitly submitted in-app feedback.
+    *   Updated environment templates, operations documentation, store privacy worksheets, and launch notes to match the reduced processor list.
 
 ---
 
