@@ -719,7 +719,7 @@ function withTimeout(promise, ms, label = 'Operation') {
 /**
  * Make a non-streaming request to OpenRouter and return the text response
  */
-async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7) {
+async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7, enforceZdr = false) {
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -732,7 +732,8 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature =
             model: modelId,
             messages: messages,
             max_tokens: maxTokens,
-            temperature: temperature
+            temperature: temperature,
+            ...(enforceZdr ? { provider: { zdr: true } } : {})
         })
     });
 
@@ -748,7 +749,7 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature =
 /**
  * Make a streaming request to OpenRouter and pipe SSE chunks to Express response
  */
-async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temperature = 0.7) {
+async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temperature = 0.7, enforceZdr = false) {
     const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -762,7 +763,8 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temper
             messages: messages,
             max_tokens: maxTokens,
             temperature: temperature,
-            stream: true
+            stream: true,
+            ...(enforceZdr ? { provider: { zdr: true } } : {})
         })
     });
 
@@ -1272,7 +1274,7 @@ app.post('/api/chat', async (req, res) => {
             { role: 'system', content: OFFGRID_SYSTEM_PROMPT },
             ...buildOpenRouterMessages(messages, modelConfig.multimodal)
         ];
-        const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages);
+        const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages, 4096, 0.7, true);
         const responseTime = Date.now() - startTime;
         
         logToBetterStack('info', 'chat.free', {
@@ -1331,7 +1333,7 @@ app.post('/api/stream', async (req, res) => {
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         
-        await streamOpenRouter(modelConfig.id, openRouterMessages, res);
+        await streamOpenRouter(modelConfig.id, openRouterMessages, res, 4096, 0.7, true);
         logToBetterStack('info', 'stream.free', {
             summary: `${modelConfig.name} streamed in ${Date.now() - streamStart}ms`,
             model: modelConfig.name,
@@ -1815,7 +1817,8 @@ app.get('/api/health/image-gen', async (req, res) => {
             body: JSON.stringify({
                 model: 'google/gemini-3-pro-image-preview',
                 messages: [{ role: 'user', content: 'Generate a simple image of a green circle on a white background' }],
-                modalities: ['image', 'text']
+                modalities: ['image', 'text'],
+                provider: { zdr: true }
             })
         });
         const durationMs = Date.now() - startTime;
@@ -1873,7 +1876,9 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], im
         }
         
         const requestedModel = typeof model === 'string' ? model.trim() : '';
-        const imageModel = Object.values(IMAGE_STUDIO_IMAGE_MODELS).includes(requestedModel)
+        // The Google Vertex image endpoint is currently ZDR eligible. The OpenAI
+        // image fallback is not, so privacy-first app requests stay on Gemini.
+        const imageModel = requestedModel === IMAGE_STUDIO_IMAGE_MODELS.gemini
             ? requestedModel
             : IMAGE_STUDIO_IMAGE_MODELS.gemini;
         const imageModelLabel = imageModel === IMAGE_STUDIO_IMAGE_MODELS.openai ? 'GPT Image 2' : 'Nano Banana';
@@ -1898,7 +1903,8 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], im
                         content: finalPrompt
                     }
                 ],
-                modalities: ['image', 'text']
+                modalities: ['image', 'text'],
+                provider: { zdr: true }
             })
         });
         
@@ -2100,7 +2106,8 @@ RULES:
                     { role: 'user', content: description.trim() }
                 ],
                 temperature: 0.7,
-                max_tokens: 300
+                max_tokens: 300,
+                provider: { zdr: true }
             })
         });
 
@@ -2227,7 +2234,8 @@ Rules:
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: `Generate a practical companion summary for this image. The image was created from this prompt: "${prompt}"` }
                 ],
-                temperature: 0.4
+                temperature: 0.4,
+                provider: { zdr: true }
             })
         });
 
@@ -2338,7 +2346,8 @@ RULES:
                     { role: 'user', content: `Read this AI response and create an optimized image generation prompt for a practical companion visual:\n\n${conversationContext.substring(0, 4000)}` }
                 ],
                 temperature: 0.7,
-                max_tokens: 400
+                max_tokens: 400,
+                provider: { zdr: true }
             })
         });
 

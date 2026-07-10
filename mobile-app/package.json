@@ -1,0 +1,27 @@
+{
+  "name": "offgrid-ai-toolkit-mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Capacitor shell for the OffGrid AI ToolKit mobile app.",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "sync": "npx cap sync",
+    "doctor": "npx cap doctor"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/camera": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/ios": "^8.0.0",
+    "@capacitor/motion": "^8.0.0",
+    "@capacitor/network": "^8.0.0",
+    "@capacitor/share": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "typescript": "^6.0.3"
+  }
+}

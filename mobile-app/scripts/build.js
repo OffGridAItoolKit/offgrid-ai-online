@@ -1,0 +1,70 @@
+const fs = require('fs');
+const path = require('path');
+
+const wwwDir = path.join(__dirname, '..', 'www');
+fs.mkdirSync(wwwDir, { recursive: true });
+
+const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#2c1810">
+    <title>OffGrid AI ToolKit</title>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        background: #fefdfb;
+        color: #2c1810;
+        font-family: Arial, sans-serif;
+      }
+      .fallback {
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        text-align: center;
+      }
+      .mark {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 20px;
+      }
+      .title {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 8px;
+      }
+      .copy {
+        color: #6b4423;
+        line-height: 1.45;
+        max-width: 320px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="fallback">
+      <div>
+        <svg class="mark" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M50 5 L55 45 L50 50 L45 45 Z" fill="#b8860b"/>
+          <path d="M50 95 L45 55 L50 50 L55 55 Z" fill="#daa520"/>
+          <path d="M95 50 L55 55 L50 50 L55 45 Z" fill="#cd853f"/>
+          <path d="M5 50 L45 45 L50 50 L45 55 Z" fill="#d2691e"/>
+          <path d="M78 22 L55 45 L50 50 L45 45 Z" fill="#deb887" opacity="0.7"/>
+          <path d="M78 78 L55 55 L50 50 L55 45 Z" fill="#deb887" opacity="0.7"/>
+          <path d="M22 78 L45 55 L50 50 L45 45 Z" fill="#deb887" opacity="0.7"/>
+          <path d="M22 22 L45 45 L50 50 L45 55 Z" fill="#deb887" opacity="0.7"/>
+          <circle cx="50" cy="50" r="35" fill="none" stroke="#8b4513" stroke-width="1" opacity="0.5"/>
+          <circle cx="50" cy="50" r="6" fill="#8b4513"/>
+        </svg>
+        <div class="title">OffGrid AI ToolKit</div>
+        <div class="copy">Connect to the internet to use the online mobile app.</div>
+      </div>
+    </main>
+  </body>
+</html>`;
+
+fs.writeFileSync(path.join(wwwDir, 'index.html'), html);
+console.log('Built mobile fallback shell in www/.');

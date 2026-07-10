@@ -1,6 +1,6 @@
 # OffGrid AI ToolKit Online - Technical Overview
 
-**Version 5.6.3** | **Last Updated:** 2026-04-30
+**Version 5.7.1** | **Last Updated:** 2026-07-10
 
 This document provides a comprehensive technical overview of the OffGrid AI ToolKit Online platform, including the free Online ToolKit and the premium Command Center. It is intended for developers, administrators, and technical staff.
 
@@ -19,7 +19,7 @@ The platform is built on a simple and robust technical stack, prioritizing maint
 
 **External Services**:
 *   **OpenRouter**: Provides a unified API to access a wide range of large language models (LLMs), including Google's Gemma 4, OpenAI's GPT models, Anthropic's Claude, and more.
-*   **Better Stack**: Used for privacy-safe operational logging and monitoring. Captures application events for troubleshooting without storing any user data or prompts.
+*   **Better Stack**: Used for operational logging and monitoring. Application logs exclude prompts, responses, and uploaded media; the configured source retention must remain aligned with the published privacy policy.
 
 ## 2. Core Features
 
@@ -32,8 +32,8 @@ The free toolkit provides a demonstration of the core OffGrid AI experience usin
 *   **Gemma 4 26B A4B**: Single model architecture with system prompt for decision-oriented responses.
 *   **Multimodal Input**: Supports image uploads for visual analysis.
 *   **Ephemeral Conversations**: All chat sessions are processed in memory and are not stored, ensuring user privacy.
-*   **Save to Knowledge Base**: Users can save conversations as local Markdown (`.md`) files.
-*   **PDF Export**: Conversations can be exported as styled PDF documents.
+*   **Saved Guides**: Users can save generated visuals to their gallery and complete field guides as local PDF documents.
+*   **PDF Export**: Conversations and generated visuals can be exported as styled PDF field guides.
 
 ### 2.2. Command Center (Premium)
 
@@ -102,13 +102,29 @@ The application is configured using environment variables. A `.env.example` file
 
 `ADMIN_KEY` is not a production environment variable. It is only the browser-side variable name used by the admin dashboard when sending the `x-admin-key` header; configure `ADMIN_SECRET` on the server instead.
 
-## 5. Deployment
+## 5. Mobile App
+
+The `mobile-app/` directory contains the Capacitor shell used for the Android and iOS releases. It loads the production app surface at `https://offgridtoolkit.ai/online?surface=app` and adds native camera, media, microphone, compass, file-saving, and sharing support.
+
+From `mobile-app/`:
+
+```powershell
+npm install
+npm run build
+npm run sync
+```
+
+Open Android with `npm run open:android`. On a Mac with Xcode installed, open iOS with `npm run open:ios`. Android upload keys, `android/key.properties`, Apple signing certificates, provisioning profiles, API keys, and store credentials must remain outside the repository. Store-ready Android releases are uploaded as signed Android App Bundles (`.aab`).
+
+The mobile release checklist, privacy worksheet, store copy, and tester instructions live in `mobile-app/store-launch/`.
+
+## 6. Deployment
 
 The application is deployed on Render, a cloud platform that supports Node.js applications. The deployment is configured to be continuous, meaning that any push to the `main` branch of the GitHub repository will automatically trigger a new Render deployment.
 
 Render handles Brotli/gzip compression at the platform layer. Do not add Express compression middleware unless the deployment architecture changes and compression behavior is re-evaluated.
 
-## 6. Monitoring & Troubleshooting
+## 7. Monitoring & Troubleshooting
 
 Operational monitoring and troubleshooting are handled through a combination of health checks and external logging.
 
