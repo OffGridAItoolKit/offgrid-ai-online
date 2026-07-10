@@ -19,7 +19,7 @@ App id / bundle id: com.offgridaitoolkit.app
 
 ### Accounts
 
-- [x] Google Play Console organization account verified.
+- [ ] Google Play organization onboarding fully cleared. Identity is approved; website verification is requested and phone verification is waiting behind it.
 - [ ] Apple Developer Program organization account verified.
 - [ ] Tedd invited to App Store Connect with certificate/profile/TestFlight/upload access.
 - [x] Final public developer name confirmed as `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
@@ -47,9 +47,9 @@ App id / bundle id: com.offgridaitoolkit.app
 
 ### Android
 
-- [ ] Upload key generated and stored outside the repo.
-- [ ] `mobile-app/android/key.properties` created from `key.properties.example`.
-- [ ] Release AAB built.
+- [x] Upload key generated and stored outside the repo at `C:\OffGridAI\ReleaseKeys`.
+- [x] Release signing uses a temporary gitignored `key.properties`; plaintext is removed immediately after each build.
+- [x] Signed release AAB built and verified at `C:\OffGridAI\ReleaseBuilds\Play\1.0\offgrid-ai-toolkit-1.0.aab`.
 - [ ] Play App Signing enabled.
 - [ ] Internal test uploaded.
 - [ ] Closed test completed if Play Console requires it.
