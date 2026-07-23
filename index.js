@@ -46,7 +46,7 @@ const ANON_DAILY_IMAGE_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_IMAGE
 const GLOBAL_DAILY_IMAGE_LIMIT = Math.max(1, parseInt(process.env.GLOBAL_DAILY_IMAGE_LIMIT, 10) || 100);
 const ANON_USAGE_HASH_SECRET = process.env.ANON_USAGE_HASH_SECRET || OPENROUTER_API_KEY || crypto.randomBytes(32).toString('hex');
 const IMAGE_STUDIO_IMAGE_MODELS = {
-    gemini: 'google/gemini-3-pro-image-preview',
+    gemini: 'google/gemini-3-pro-image',
     openai: 'openai/gpt-5.4-image-2'
 };
 
@@ -1627,7 +1627,7 @@ Based on these, write the final Command answer as described.
 
 /**
  * POST /api/command/generate-image
- * Generates an image using Nano Banana Pro (Gemini 3 Pro Image Preview) via OpenRouter.
+ * Generates an image using Nano Banana Pro (Gemini 3 Pro Image) via OpenRouter.
  * Takes a text prompt and returns the generated image as base64.
  * No data is stored — processed in memory and discarded.
  */
@@ -1686,7 +1686,7 @@ app.get('/api/health/image-gen', async (req, res) => {
                 'X-Title': 'OffGrid AI Health Check'
             },
             body: JSON.stringify({
-                model: 'google/gemini-3-pro-image-preview',
+                model: IMAGE_STUDIO_IMAGE_MODELS.gemini,
                 messages: [{ role: 'user', content: 'Generate a simple image of a green circle on a white background' }],
                 modalities: ['image', 'text'],
                 provider: { zdr: true }

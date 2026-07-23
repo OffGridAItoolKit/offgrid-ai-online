@@ -1,12 +1,18 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-07-10
+**Last Updated:** 2026-07-23
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
 
 ---
 
 ### July 2026
+
+**2026-07-23**
+*   **Restore Image Studio provider routing**
+    *   Replaced the unavailable `google/gemini-3-pro-image-preview` route with its production successor, `google/gemini-3-pro-image`.
+    *   Kept per-request Zero Data Retention enforcement and the existing OpenRouter chat-completions image response contract.
+    *   Updated the active image health probe to use the same shared model configuration as customer requests so monitoring cannot drift to a different model ID.
 
 **2026-07-10**
 *   **Simplified launch monitoring and privacy surface (v5.7.2)**
