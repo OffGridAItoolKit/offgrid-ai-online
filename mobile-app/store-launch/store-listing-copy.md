@@ -14,6 +14,8 @@ OffGrid AI ToolKit is a practical AI companion for preparedness, homesteading, h
 
 Ask questions, upload photos or videos, create field-ready visuals, save guides to your phone, and use the built-in compass when you need a quick heading.
 
+Photo and video analysis can be used for user-requested health, first-aid, or safety questions and provides general educational information only.
+
 Features:
 
 - Practical OffGrid AI chat
@@ -30,7 +32,7 @@ OffGrid AI ToolKit v1 is online-only. Internet access is required for AI respons
 
 No account is required for v1. No ads. No in-app purchases.
 
-AI can make mistakes. Verify important survival, medical, legal, financial, or safety information before acting.
+OffGrid AI ToolKit is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. AI can make mistakes. Verify important survival, medical, legal, financial, or safety information before acting. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services.
 
 ## Keywords
 

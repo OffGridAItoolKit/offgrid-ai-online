@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
-    "test:prompts": "node scripts/check-ready-made-prompts.js"
+    "test:prompts": "node scripts/check-ready-made-prompts.js",
+    "test:health-disclosure": "node scripts/check-health-disclosure.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

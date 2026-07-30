@@ -60,3 +60,19 @@ The production submission uses these disclosures:
 ```text
 OffGrid AI ToolKit sends prompts and selected media to online AI services only when you use chat, upload, camera, video, voice, or Image Studio features. The app does not require an account, does not include ads, and does not include in-app purchases in v1. Optional feedback is saved only when you submit it, and an AI response is included only when you choose that option.
 ```
+
+## Google Play Health Apps Declaration Update - 2026-07-30
+
+Selected categories:
+
+- Emergency and first aid
+- Medical reference and education
+- Other
+
+`Other` explanation:
+
+```text
+General-purpose AI chat analyzes user-selected photos/video frames and answers questions, including health and safety topics, or creates educational visuals. It provides general information only, not diagnosis or medical-device functionality.
+```
+
+The first-run safety notice, photo/video entry points, and store listing use matching language: health-related AI and media analysis is general educational information, not diagnosis, medical advice, or medical-device functionality. Users are directed to qualified healthcare professionals and local emergency services as appropriate.

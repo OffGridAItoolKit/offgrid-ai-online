@@ -1245,7 +1245,8 @@
                 <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
                 <p>Photos, videos, and prompts are sent to the online AI service only when you choose to use those features.</p>
                 <p>Chats are not saved to an OffGrid AI account or personal cloud history. Online providers process requests under their own privacy policies; no account is required for v1.</p>
-                <p>AI can make mistakes. Verify important survival, medical, legal, financial, or safety details before acting.</p>
+                <p><strong>Health information:</strong> OffGrid AI ToolKit is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
+                <p>AI can make mistakes. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services. Verify other important survival, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
                 <label class="terms-checkbox">
@@ -1546,6 +1547,9 @@
                                         <div class="plus-menu-item" onclick="plusMenuAction('analyzeVideo')">
                                             <span class="plus-menu-icon">🎬</span>
                                             <span class="plus-menu-label">Analyze Video</span>
+                                        </div>
+                                        <div class="plus-menu-disclosure">
+                                            Photo/video health results are general information only—not diagnosis or medical advice.
                                         </div>
                                         <div class="plus-menu-item" onclick="plusMenuAction('summarize')">
                                             <span class="plus-menu-icon">📝</span>
@@ -2356,6 +2360,9 @@
                                     <span class="plus-menu-icon">🎬</span>
                                     <span class="plus-menu-label">Analyze Video</span>
                                 </div>
+                                <div class="plus-menu-disclosure">
+                                    Photo/video health results are general information only—not diagnosis or medical advice.
+                                </div>
                                 <div class="plus-menu-item" onclick="plusMenuAction('summarize')">
                                     <span class="plus-menu-icon">📝</span>
                                     <span class="plus-menu-label">Summarize Text</span>
@@ -2546,7 +2553,7 @@
             if (sheet) sheet.remove();
         }
 
-        function openMobileActionSheet(title, items) {
+        function openMobileActionSheet(title, items, disclosure = '') {
             closeMobileActionSheet();
             haptic('medium');
 
@@ -2569,6 +2576,7 @@
                 <div class="mobile-action-sheet" role="dialog" aria-modal="true" aria-label="${escapeHtml(title)}">
                     <div class="mobile-action-sheet-title">${escapeHtml(title)}</div>
                     ${buttons}
+                    ${disclosure ? `<div class="mobile-action-sheet-disclosure">${escapeHtml(disclosure)}</div>` : ''}
                     <button type="button" class="mobile-action-sheet-cancel" onclick="closeMobileActionSheet()">Cancel</button>
                 </div>
             `;
@@ -2588,14 +2596,14 @@
             openMobileActionSheet('Photo / Image', [
                 { icon: '📷', label: 'Take Photo', desc: 'Use your camera', action: 'camera' },
                 { icon: '🖼️', label: 'Upload Image', desc: 'Gallery, screenshots, downloads', action: 'upload' }
-            ]);
+            ], 'Health-related image analysis provides general information only—not diagnosis or medical advice. Seek professional care for medical concerns and emergency services for urgent situations.');
         }
 
         function openVideoActions() {
             openMobileActionSheet('Video Analysis', [
                 { icon: '🎥', label: 'Record Video', desc: 'Capture a short clip', action: 'recordVideo' },
                 { icon: '🎬', label: 'Upload Video', desc: 'Analyze an existing clip', action: 'uploadVideo' }
-            ]);
+            ], 'Health-related video analysis provides general information only—not diagnosis or medical advice. Seek professional care for medical concerns and emergency services for urgent situations.');
         }
         
         function fillInput(text, focusAtEnd = false) {
