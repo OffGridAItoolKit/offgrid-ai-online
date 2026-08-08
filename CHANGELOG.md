@@ -9,6 +9,12 @@ This document provides a reverse-chronological summary of recent development pro
 ### August 2026
 
 **2026-08-08**
+*   **Field Guide becomes the primary answer-to-offline workflow**
+    *   Promoted `Make Field Guide` to the first, primary follow-up action while keeping `Create Visual` immediately available beside it.
+    *   Changed `Make Field Guide` into one automated sequence: generate the supporting visual, assemble it with the answer, and open the final field-guide preview without requiring an intermediate Image Studio save action.
+    *   Renamed the preview's top save action to `Save Field Guide`; the persistent lower actions are now `Share` and `Save PDF`.
+    *   Added an Android native `shareFieldGuidePdf` bridge that creates the same complete PDF in cache and opens the Android share sheet with the PDF attached. This native capability requires the next Android binary release.
+    *   Older installed builds receive explicit guidance to save the PDF and share it from `Files > Downloads > OffGrid AI`.
 *   **Mobile first-visit and welcome-screen polish**
     *   Stopped automatic focus of the welcome composer on phone/app surfaces so the keyboard remains closed until the user taps the input.
     *   Restyled the required first-run safety and privacy consent screen with the app's charcoal, slate, and gold visual system without changing the disclosure wording or acceptance requirement.

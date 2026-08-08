@@ -1,6 +1,7 @@
 package com.offgridaitoolkit.app;
 
 import android.content.ContentValues;
+import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -208,6 +209,59 @@ public class MainActivity extends BridgeActivity {
                     .toString();
             } catch (Exception error) {
                 runOnUiThread(() -> Toast.makeText(MainActivity.this, "PDF save failed", Toast.LENGTH_LONG).show());
+                return nativeError(error);
+            } finally {
+                if (document != null) {
+                    document.close();
+                }
+            }
+        }
+
+        @JavascriptInterface
+        public String shareFieldGuidePdf(String imageDataUrl, String title, String question, String answer, String filename) {
+            PdfDocument document = null;
+            try {
+                ImagePayload imagePayload = parseImagePayload(imageDataUrl);
+                Bitmap visual = BitmapFactory.decodeByteArray(imagePayload.bytes, 0, imagePayload.bytes.length);
+                if (visual == null) {
+                    throw new IllegalArgumentException("Could not decode field guide image.");
+                }
+
+                String safeName = safePdfName(filename, title);
+                document = new PdfDocument();
+                PdfWriter writer = new PdfWriter(document);
+                writer.writeFieldGuide(title, question, answer, visual);
+
+                File shareDir = new File(getCacheDir(), "shared_field_guides");
+                if (!shareDir.exists() && !shareDir.mkdirs()) {
+                    throw new IllegalStateException("Could not create field guide share cache.");
+                }
+
+                File pdfFile = new File(shareDir, safeName);
+                try (FileOutputStream output = new FileOutputStream(pdfFile)) {
+                    document.writeTo(output);
+                }
+
+                Uri uri = FileProvider.getUriForFile(
+                    MainActivity.this,
+                    getPackageName() + ".fileprovider",
+                    pdfFile
+                );
+
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("application/pdf");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, title == null || title.trim().isEmpty() ? "OffGrid AI Field Guide" : title.trim());
+                shareIntent.setClipData(ClipData.newRawUri("OffGrid AI Field Guide", uri));
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                runOnUiThread(() -> startActivity(Intent.createChooser(shareIntent, "Share field guide PDF")));
+                return new JSONObject()
+                    .put("ok", true)
+                    .put("uri", uri.toString())
+                    .put("filename", safeName)
+                    .toString();
+            } catch (Exception error) {
                 return nativeError(error);
             } finally {
                 if (document != null) {

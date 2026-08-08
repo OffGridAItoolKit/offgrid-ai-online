@@ -2811,8 +2811,8 @@
         
         function getMessageFollowupActionsMarkup() {
             return `<div class="message-followup-actions">
-                        <button class="message-followup-action primary" onclick="createVisualFromMessageAction(this, 'visual')">Create Visual</button>
-                        <button class="message-followup-action" onclick="createVisualFromMessageAction(this, 'field-guide')">Make Field Guide</button>
+                        <button class="message-followup-action primary" onclick="createVisualFromMessageAction(this, 'field-guide')">Make Field Guide</button>
+                        <button class="message-followup-action" onclick="createVisualFromMessageAction(this, 'visual')">Create Visual</button>
                         <button class="message-followup-action" onclick="exportAsPDF()">Save PDF</button>
                     </div>`;
         }
@@ -3972,7 +3972,12 @@
                 title: getVisualTitleFromConversation(answerText),
                 category: 'Other',
                 source: mode === 'field-guide' ? 'mobile-field-guide-action' : 'mobile-create-visual-action'
-            }, { autoGenerate: true, addSourceToChat: false });
+            }, {
+                autoGenerate: true,
+                addSourceToChat: false,
+                intent: mode,
+                autoOpenFieldGuide: mode === 'field-guide'
+            });
 
             showSaveToast(mode === 'field-guide' ? 'Making field guide' : 'Creating visual');
         }
@@ -4037,6 +4042,7 @@
                 return;
             }
 
+            const isFieldGuideBuild = options.autoOpenFieldGuide === true;
             onlineStudioState = {
                 ...normalized,
                 prompt: '',
@@ -4044,7 +4050,9 @@
                 displayImageUrl: '',
                 model: '',
                 addedToChat: false,
-                addSourceToChat: options.addSourceToChat !== false
+                addSourceToChat: options.addSourceToChat !== false,
+                intent: options.intent || 'visual',
+                autoOpenFieldGuide: isFieldGuideBuild
             };
 
             const existing = document.getElementById('onlineImageStudioOverlay');
@@ -4056,22 +4064,24 @@
             overlay.innerHTML = `
                 <div class="online-studio-modal">
                     <div class="online-studio-header">
-                        <div class="online-studio-title">Image Studio</div>
+                        <div class="online-studio-title">${isFieldGuideBuild ? 'Building Field Guide' : 'Image Studio'}</div>
                         <div class="online-studio-subtitle">by OffGrid AI</div>
                         ${IS_PHONE_SURFACE ? '<button class="online-studio-done-top" onclick="closeOnlineImageStudio()">Done</button>' : ''}
                     </div>
-                    <div class="online-studio-status" id="onlineStudioStatus">Preparing visual...</div>
+                    <div class="online-studio-status" id="onlineStudioStatus">${isFieldGuideBuild ? 'Preparing your offline-ready guide...' : 'Preparing visual...'}</div>
                     <div class="online-studio-preview" id="onlineStudioPreview">
                         <div class="online-studio-loading">
                             <div class="online-studio-spinner"></div>
-                            <div>Creating a field-ready visual from the answer...</div>
+                            <div>${isFieldGuideBuild ? 'Creating the visual, then assembling your field guide automatically...' : 'Creating a field-ready visual from the answer...'}</div>
                         </div>
                     </div>
                     <div id="onlineStudioError"></div>
                     <div class="online-studio-guidance" id="onlineStudioGuidance">
-                        <div class="online-studio-guidance-title">${IS_PHONE_SURFACE ? 'Save or Share This Visual' : 'Next Steps After Image Is Generated'}</div>
+                        <div class="online-studio-guidance-title">${isFieldGuideBuild ? 'Your field guide is being assembled' : (IS_PHONE_SURFACE ? 'Save or Share This Visual' : 'Next Steps After Image Is Generated')}</div>
                         ${IS_PHONE_SURFACE
-                            ? 'Use <strong>Save Image</strong> for just the graphic, <strong>Save Field Guide PDF</strong> to keep the image and answer together, or <strong>Share Image</strong> from your phone.'
+                            ? (isFieldGuideBuild
+                                ? 'The completed guide will open automatically with the generated visual and answer together.'
+                                : 'Use <strong>Save Image</strong> for just the graphic, <strong>Save Field Guide PDF</strong> to keep the image and answer together, or <strong>Share Image</strong> from your phone.')
                             : 'Click <strong>Save to Knowledge Base</strong>, then choose your OffGrid AI drive folder: <strong>This PC > OffGrid AI (D: or E:) > Saved Knowledge Base > category folder</strong>. If Windows asks for permission, click <strong>Allow</strong>. A backup is also added to this online session below.'}
                     </div>
                     <div class="online-studio-actions">
@@ -4225,6 +4235,11 @@ Mobile app output requirements:
                 if (guidanceEl) guidanceEl.style.display = 'block';
 
                 addOnlineStudioResultToChat();
+                if (onlineStudioState.autoOpenFieldGuide) {
+                    onlineStudioState.autoOpenFieldGuide = false;
+                    if (statusEl) statusEl.textContent = 'Visual ready - assembling field guide...';
+                    await exportOnlineStudioPDF({ automatic: true });
+                }
             } catch (error) {
                 console.error('Online Image Studio error:', error);
                 if (statusEl) statusEl.textContent = 'Image Studio needs attention';
@@ -4236,7 +4251,10 @@ Mobile app output requirements:
                     `;
                 }
                 if (errorEl) {
-                    errorEl.innerHTML = `<div class="online-studio-error">${escapeHtml(error.message)}</div>`;
+                    errorEl.innerHTML = `
+                        <div class="online-studio-error">${escapeHtml(error.message)}</div>
+                        <button class="online-studio-btn pdf" type="button" onclick="generateOnlineStudioImage()">Try Again</button>
+                    `;
                 }
             }
         }
@@ -4614,7 +4632,12 @@ Mobile app output requirements:
                 .map(style => style.textContent)
                 .join('\n');
             const bodyHtml = parsed.body ? parsed.body.innerHTML : html;
-            const saveLabel = payload && payload.type === 'image-studio' ? 'Save PDF' : 'Save / Print PDF';
+            const isFieldGuidePreview = payload && payload.type === 'image-studio';
+            const saveLabel = isFieldGuidePreview ? 'Save Field Guide' : 'Save / Print PDF';
+            const lowerLeftAction = isFieldGuidePreview
+                ? '<button class="app-pdf-btn secondary" onclick="shareAppPdfPreview()">Share</button>'
+                : '<button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>';
+            const lowerSaveLabel = isFieldGuidePreview ? 'Save PDF' : saveLabel;
 
             const overlay = document.createElement('div');
             overlay.id = 'appPdfPreview';
@@ -4625,15 +4648,12 @@ Mobile app output requirements:
                     <button class="app-pdf-btn primary" onclick="printAppPdfPreview()">${saveLabel}</button>
                 </div>
                 <div class="app-pdf-floating-actions" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483002;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px calc(12px + env(safe-area-inset-bottom, 0px));background:rgba(44,24,16,0.97);border-top:1px solid rgba(184,134,11,0.38);box-shadow:0 -12px 32px rgba(0,0,0,0.24);">
-                    <button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>
-                    <button class="app-pdf-btn primary" onclick="printAppPdfPreview()">${saveLabel}</button>
+                    ${lowerLeftAction}
+                    <button class="app-pdf-btn primary" onclick="printAppPdfPreview()">${lowerSaveLabel}</button>
                 </div>
                 <div class="app-pdf-document" aria-label="${escapeHtml(title || 'OffGrid AI field guide')}">
                     <style>${styles}</style>
                     ${bodyHtml}
-                </div>
-                <div class="app-pdf-bottom-actions">
-                    <button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -4666,6 +4686,35 @@ Mobile app output requirements:
                 return;
             }
             window.print();
+        }
+
+        function shareAppPdfPreview() {
+            if (!document.getElementById('appPdfPreview') || !appPdfPreviewPayload || appPdfPreviewPayload.type !== 'image-studio') {
+                showSaveToast('Field guide is not ready', 'Create a field guide before sharing it.');
+                return;
+            }
+
+            const filename = generateFilename(appPdfPreviewPayload.title || 'OffGrid AI Field Guide').replace(/\.md$/i, '.pdf');
+            if (window.OffGridNative && typeof window.OffGridNative.shareFieldGuidePdf === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.shareFieldGuidePdf(
+                    appPdfPreviewPayload.image,
+                    appPdfPreviewPayload.title || 'OffGrid AI Field Guide',
+                    appPdfPreviewPayload.question || '',
+                    appPdfPreviewPayload.answer || '',
+                    filename
+                ));
+                if (result.ok) {
+                    showSaveToast('Field guide ready to share', 'Choose an app or contact from the Android share sheet.');
+                } else {
+                    showSaveToast('PDF share failed', result.error || 'Could not prepare the field guide for sharing.');
+                }
+                return;
+            }
+
+            showSaveToast(
+                'Save PDF, then share',
+                'This installed version cannot attach the PDF directly yet. Tap Save PDF, then share it from Files > Downloads > OffGrid AI.'
+            );
         }
         
         // ============================================
@@ -5114,7 +5163,7 @@ Mobile app output requirements:
             );
         }
 
-        async function exportOnlineStudioPDF() {
+        async function exportOnlineStudioPDF(options = {}) {
             if (!onlineStudioState || !onlineStudioState.image) {
                 showSaveToast('Image not ready yet', 'Please wait for Image Studio to finish generating.');
                 return;
@@ -5133,7 +5182,10 @@ Mobile app output requirements:
                 pdfBtn.textContent = 'Preparing PDF...';
             }
             if (statusEl) statusEl.textContent = 'Preparing field guide PDF...';
-            showSaveToast('Preparing field guide...', 'The image and answer will stay together in one PDF view.');
+            showSaveToast(
+                options.automatic ? 'Building field guide...' : 'Preparing field guide...',
+                'The generated visual and answer will stay together in one offline-ready PDF.'
+            );
 
             try {
                 const response = await fetch(`${API_BASE}/api/export-pdf`, {
@@ -5157,7 +5209,7 @@ Mobile app output requirements:
                             question: onlineStudioState.sourcePrompt || onlineStudioState.title || '',
                             answer: onlineStudioState.answer || ''
                         });
-                        showSaveToast('Field guide ready', 'Tap Save PDF to save it to Downloads > OffGrid AI.');
+                        showSaveToast('Field guide ready', 'Tap Save Field Guide to keep it in Downloads > OffGrid AI, or Share to send the PDF.');
                     });
                 } else {
                     const printWindow = window.open('', '_blank');
