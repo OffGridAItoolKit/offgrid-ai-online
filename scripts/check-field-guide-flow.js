@@ -25,6 +25,8 @@ const checks = [
     ['field guide PDF title has compact line height', /h1 \{[\s\S]*?line-height: 1\.2;/.test(server)],
     ['generated images open the zoom view', html.includes('function openImageZoom(') && html.includes('Open generated image in zoom view')],
     ['generated image actions include New Field Guide', html.includes('onclick="startNewFieldGuide()">New Field Guide</button>')],
+    ['generated image actions use an even two-column grid', css.includes('grid-template-columns: repeat(2, minmax(0, 1fr));') && /button\.new-guide \{\s*grid-column: 2;/.test(css)],
+    ['wide phones show explicit theme mode labels', html.includes("isNight ? 'Light Mode' : 'Dark Mode'") && css.includes('@media (min-width: 400px) and (max-width: 768px)')],
     ['markdown tables receive a scroll region', html.includes("wrapper.className = 'markdown-table-scroll'") && css.includes('.markdown-table-scroll')],
     ['redundant online badges are absent from markup', !html.includes('<span class="online-badge"') && !html.includes('id="customerBadge"')],
     ['customer UI does not name the provider model generation', !html.includes('Gemma 4')]

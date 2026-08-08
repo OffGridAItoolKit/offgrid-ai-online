@@ -23,7 +23,7 @@
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
-    <link rel="stylesheet" href="offgridai.css?v=6.3">
+    <link rel="stylesheet" href="offgridai.css?v=6.4">
     <script src="/vendor/marked.umd.js"></script>
     <script src="/vendor/purify.min.js"></script>
     <script src="/vendor/qrcode.min.js"></script>
@@ -1285,7 +1285,7 @@
         <div class="status">
             <button class="app-theme-toggle" id="appThemeToggle" onclick="toggleAppTheme()" type="button" aria-label="Switch to night mode" title="Day / Night mode">
                 <span class="theme-toggle-icon">🌙</span>
-                <span class="theme-toggle-label">Night</span>
+                <span class="theme-toggle-label">Dark Mode</span>
             </button>
             <span class="status-dot disconnected" id="statusDot"></span>
             <span id="statusText" class="status-text">Connecting...</span>
@@ -1769,7 +1769,7 @@
                 const icon = toggle.querySelector('.theme-toggle-icon');
                 const label = toggle.querySelector('.theme-toggle-label');
                 if (icon) icon.textContent = isNight ? '☀️' : '🌙';
-                if (label) label.textContent = isNight ? 'Day' : 'Night';
+                if (label) label.textContent = isNight ? 'Light Mode' : 'Dark Mode';
                 toggle.setAttribute('aria-label', isNight ? 'Switch to day mode' : 'Switch to night mode');
                 toggle.title = isNight ? 'Switch to Day mode' : 'Switch to Night mode';
             }
