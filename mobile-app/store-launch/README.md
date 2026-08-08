@@ -3,6 +3,8 @@
 Status: in progress
 Launch target: free online v1 for Google Play and Apple App Store
 Production URL: https://offgridtoolkit.ai/online?surface=app
+
+Native changes awaiting a future Play binary are tracked in [android-native-update-queue.md](android-native-update-queue.md).
 App id / bundle id: com.offgridaitoolkit.app
 
 ## Launch Defaults
