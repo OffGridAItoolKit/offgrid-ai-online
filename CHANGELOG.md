@@ -9,11 +9,15 @@ This document provides a reverse-chronological summary of recent development pro
 ### August 2026
 
 **2026-08-07**
-*   **Online product rename prepared**
+*   **Video intake and Saved Guides follow-up**
+    *   Raised the local video-selection limit from 50 MB to 200 MB while preserving the 20-second duration limit; only eight compressed frames are sent for analysis, not the source video.
+    *   Replaced Android's unreliable folder-view request with a document picker initialized at `Downloads/OffGrid AI`; selecting a saved guide opens its PDF.
+    *   The video limit is deployed through the hosted app. The Saved Guides native picker requires the next Android binary release.
+*   **Online product rename deployed**
     *   Updated the online web/app interface, native mobile labels, policy pages, exports, sharing text, and operational metadata to `OffGrid AI Field Guide`.
     *   Used `by OffGrid AI` for consumer-facing attribution while retaining `OFFGRID AI TOOLKIT, LLC` as the legal entity.
     *   Preserved explicit `OffGrid AI ToolKit` references that describe the separate offline/USB product.
-*   **Responsive mobile layout prepared (unreleased)**
+*   **Responsive mobile layout deployed**
     *   Prevented flex children and welcome-screen controls from expanding the document beyond compact Android viewports.
     *   Added a two-row action layout for phones at 420 CSS pixels or narrower so Prompts, Voice Input, and Send remain reachable with enlarged display text.
     *   Added safe vertical centering so short screens begin at the compass and scroll normally instead of hiding content behind the fixed header.
