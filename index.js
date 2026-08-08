@@ -2274,9 +2274,11 @@ app.post('/api/export-pdf', async (req, res) => {
         h1 {
             color: #2c1810;
             font-size: 24px;
+            line-height: 1.2;
             border-bottom: 3px solid #b8860b;
             padding-bottom: 10px;
             margin-bottom: 20px;
+            overflow-wrap: anywhere;
         }
         
         h2 {

@@ -3,6 +3,8 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'offgridai.css'), 'utf8');
+const server = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
 const androidBridge = fs.readFileSync(
     path.join(root, 'mobile-app', 'android', 'app', 'src', 'main', 'java', 'com', 'offgridaitoolkit', 'app', 'MainActivity.java'),
     'utf8'
@@ -17,7 +19,15 @@ const checks = [
     ['web bridge invokes PDF sharing', html.includes('window.OffGridNative.shareFieldGuidePdf(')],
     ['Android exposes PDF sharing', androidBridge.includes('public String shareFieldGuidePdf(')],
     ['Android shares a PDF attachment', androidBridge.includes('shareIntent.setType("application/pdf")') && androidBridge.includes('Intent.EXTRA_STREAM')],
-    ['older Android builds receive a fallback', html.includes('Save PDF, then share')]
+    ['older Android builds receive a fallback', html.includes('Save PDF, then share')],
+    ['successful native save returns to app', /if \(result\.ok\) \{\s*closeAppPdfPreview\(\);\s*showSaveToast\('PDF saved'/.test(html)],
+    ['field guide PDF omits model metadata', !html.includes('**Model:** ${MODEL_DISPLAY') && !html.includes('frontmatter += `model: ${selectedModel}')],
+    ['field guide PDF title has compact line height', /h1 \{[\s\S]*?line-height: 1\.2;/.test(server)],
+    ['generated images open the zoom view', html.includes('function openImageZoom(') && html.includes('Open generated image in zoom view')],
+    ['generated image actions include New Field Guide', html.includes('onclick="startNewFieldGuide()">New Field Guide</button>')],
+    ['markdown tables receive a scroll region', html.includes("wrapper.className = 'markdown-table-scroll'") && css.includes('.markdown-table-scroll')],
+    ['redundant online badges are absent from markup', !html.includes('<span class="online-badge"') && !html.includes('id="customerBadge"')],
+    ['customer UI does not name the provider model generation', !html.includes('Gemma 4')]
 ];
 
 let failed = 0;

@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OffGrid AI Field Guide - Cloud-Powered Field Assistance</title>
-    <meta name="description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <meta name="description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     
     <!-- Open Graph / Social Sharing Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://offgridtoolkit.ai/">
     <meta property="og:title" content="OffGrid AI Field Guide - Cloud-Powered Field Assistance">
-    <meta property="og:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <meta property="og:description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     <meta property="og:image" content="https://offgridtoolkit.ai/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="1200">
@@ -19,11 +19,11 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://offgridtoolkit.ai/">
     <meta name="twitter:title" content="OffGrid AI Field Guide - Cloud-Powered Field Assistance">
-    <meta name="twitter:description" content="Experience the power of Gemma 4 AI online. Fast, private, and powerful AI assistant for survivalists, homesteaders, and off-grid enthusiasts.">
+    <meta name="twitter:description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
-    <link rel="stylesheet" href="offgridai.css?v=6.2">
+    <link rel="stylesheet" href="offgridai.css?v=6.3">
     <script src="/vendor/marked.umd.js"></script>
     <script src="/vendor/purify.min.js"></script>
     <script src="/vendor/qrcode.min.js"></script>
@@ -1281,11 +1281,6 @@
                 </svg>
             </div>
             <h1 class="title">OffGrid AI Field Guide</h1>
-            <span class="online-badge">ONLINE</span>
-        </div>
-        <!-- Customer badge (shown only for /online route) -->
-        <div class="customer-badge customer-only" id="customerBadge" style="position: absolute; left: 50%; transform: translateX(-50%);">
-            <span>You are using OffGrid AI Online</span>
         </div>
         <div class="status">
             <button class="app-theme-toggle" id="appThemeToggle" onclick="toggleAppTheme()" type="button" aria-label="Switch to night mode" title="Day / Night mode">
@@ -1505,14 +1500,13 @@
                     </button>
                     <p class="compass-heading welcome-tagline" id="compassHeading">Tap compass for heading</p>
                     <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI Field Guide</h2>
-                    <span class="online-badge welcome-online-badge">ONLINE</span>
                     <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 No Account History • No Account Required</div>
                     <div class="feature-badges">
                         <div class="feature-badge">👁️ Vision</div>
                         <div class="feature-badge">⚡ Fast</div>
                         <div class="feature-badge">🔒 No Account History</div>
                     </div>
-                    <p>Experience the same AI models from the USB version, now with cloud speed and Gemma 4!</p>
+                    <p>Create practical, prioritized field guidance with cloud speed and multimodal tools.</p>
                     
                     <!-- Centered Input Box (Welcome Screen) -->
                     <div class="welcome-input-area" id="welcomeInputArea">
@@ -1617,7 +1611,7 @@
                         </div>
                         <div class="quick-action" onclick="showInfoContent('benchmarks')">
                             <div class="quick-action-title">📊 Benchmarks</div>
-                            <div class="quick-action-desc">Why Gemma 4</div>
+                            <div class="quick-action-desc">How we test OffGrid AI</div>
                         </div>
                         <div class="quick-action" onclick="showInfoContent('modelSelection')">
                             <div class="quick-action-title">🧠 Models</div>
@@ -1790,7 +1784,7 @@
 
         setAppTheme(getPreferredAppTheme(), false);
         
-        // Single model architecture - always use Gemma 4 26B A4B
+        // Single provider model architecture; customer-facing branding stays model-neutral.
         let selectedModel = 'gemma-4-26b';
         sessionStorage.setItem('offgrid-selected-model', 'gemma-4-26b');
         let isTyping = false;
@@ -1951,9 +1945,9 @@
             }
         }
         
-        // Model display name (single model architecture)
+        // Customer-facing model display name; provider routing remains internal.
         const MODEL_DISPLAY = {
-            'gemma-4-26b': { name: 'Gemma 4 26B A4B', speed: '⚡ Smart' },
+            'gemma-4-26b': { name: 'OffGrid AI', speed: '⚡ Smart' },
         };
         
         // ============================================
@@ -1968,13 +1962,13 @@
                         <h3>⚙️ The Technology Behind OffGrid AI</h3>
                         <p>OffGrid AI ToolKit is a <strong>complete AI system on a USB drive</strong>. No internet, no cloud, no subscriptions. Plug it in, and you have a powerful AI assistant that runs entirely on your computer's hardware.</p>
                         
-                        <h3>🧠 Gemma 4: Google's Latest Open-Source AI</h3>
-                        <p>We chose <strong>Google's Gemma models</strong> after extensive testing against 15+ model families. Now powered by Gemma 4, the system offers the best combination of intelligence, speed, and multimodal capabilities for offline use. This online version runs the same Gemma 4 model.</p>
+                        <h3>🧠 Accuracy and Prioritization</h3>
+                        <p>We evaluated more than 15 model families with field-focused tests, then added specialized instructions that prioritize practical actions, uncertainty, and safety-critical details.</p>
                         
                         <div class="highlight-box">
                             <strong>Technical Stack:</strong>
                             <ul>
-                                <li><strong>AI Models:</strong> Gemma 4 26B A4B + additional models - optimized AI</li>
+                                <li><strong>AI System:</strong> Purpose-tested models with OffGrid AI field instructions</li>
                                 <li><strong>Inference Engine:</strong> Ollama - local AI processing with zero cloud dependency</li>
                                 <li><strong>Interface:</strong> Electron app with dynamic path resolution for any USB drive letter</li>
                                 <li><strong>Web Server:</strong> Caddy - zero-config server enabling mobile access</li>
@@ -1982,7 +1976,7 @@
                         </div>
                         
                         <h3>👁️ Multimodal Vision Capabilities</h3>
-                        <p>Unlike text-only AI, Gemma 4 can <strong>analyze images and video</strong> - identify plants and animals, diagnose vehicle issues from dashboard photos, read technical diagrams, and assess medical conditions from multiple angles.</p>
+                        <p>Unlike text-only assistants, OffGrid AI can <strong>analyze images and video</strong> - identify plants and animals, assess vehicle issues from dashboard photos, read technical diagrams, and provide general educational observations from multiple angles.</p>
                         
                         <h3>🔒 Zero-Installation Privacy</h3>
                         <p>The entire system uses <strong>dynamic environment configuration</strong> - no registry entries, no system files, no traces left behind. When you unplug the USB, it's like the AI was never there.</p>
@@ -2066,7 +2060,7 @@
                 content: `
                     <div class="info-content">
                         <h3>📊 Why We Chose Gemma</h3>
-                        <p>We tested <strong>15+ model families with 300+ survival-focused prompts</strong>. Standard AI benchmarks don't measure what matters for real-world survival situations. So we built our own testing methodology. Gemma 4 builds on these results with even stronger baseline performance.</p>
+                        <p>We tested <strong>15+ model families with 300+ survival-focused prompts</strong>. Standard AI benchmarks don't measure what matters for real-world field situations, so we built our own accuracy, prioritization, and safety-focused testing methodology.</p>
                         
                         <h3>🏆 Survival AI Testing Results</h3>
                         <table class="benchmark-table">
@@ -2099,11 +2093,11 @@
                 `
             },
             modelSelection: {
-                title: "About Gemma 4",
+                title: "About OffGrid AI",
                 content: `
                     <div class="info-content">
-                        <h3>🧠 Gemma 4 26B A4B</h3>
-                        <p>OffGrid AI Online is powered by <strong>Google's Gemma 4 26B A4B</strong>, a Mixture-of-Experts model that activates only 4B parameters per token. This means you get the intelligence of a 26B model at the speed of a much smaller one.</p>
+                        <h3>🧠 OffGrid AI Field Assistance</h3>
+                        <p>OffGrid AI combines a purpose-tested online model with specialized field instructions designed to improve accuracy, prioritize what matters first, and clearly identify uncertainty.</p>
                         
                         <div class="use-case-item">
                             <h4>⚡ Fast & Intelligent</h4>
@@ -2879,7 +2873,7 @@
                 ? 'width: min(100%, 820px); max-width: 820px; height: auto; border-radius: 8px; margin-top: 10px; display: block; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.14);'
                 : 'max-width: 300px; height: auto; border-radius: 8px; margin-top: 8px; display: block;';
             const imageMarkup = IS_PHONE_SURFACE && isGeneratedImage
-                ? `<img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">`
+                ? `<img class="message-image zoomable-image" src="${displayImageUrl}" alt="${imageAlt}" role="button" tabindex="0" aria-label="Open generated image in zoom view" onclick="openImageZoom(this.currentSrc || this.src, this.alt)" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();openImageZoom(this.currentSrc || this.src, this.alt);}" style="${imageStyle}">`
                 : `<a href="${displayImageUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; max-width: 100%;">
                         <img class="message-image" src="${displayImageUrl}" alt="${imageAlt}" style="${imageStyle}">
                     </a>`;
@@ -2888,6 +2882,7 @@
                         <button class="message-image-action save" onclick="downloadOnlineStudioImage()">Save Image</button>
                         <button class="message-image-action guide" onclick="exportOnlineStudioPDF()">Save Guide PDF</button>
                         <button class="message-image-action share" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share</button>
+                        <button class="message-image-action new-guide" onclick="startNewFieldGuide()">New Field Guide</button>
                     </div>`
                 : '';
             
@@ -2945,12 +2940,25 @@
                 return escapeHtml(normalized).replace(/\n/g, '<br>');
             }
 
-            return window.DOMPurify.sanitize(rendered, {
+            const sanitized = window.DOMPurify.sanitize(rendered, {
                 USE_PROFILES: { html: true },
                 ADD_ATTR: ['target', 'rel'],
                 FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'option', 'svg', 'math'],
                 FORBID_ATTR: ['style']
             });
+
+            const template = document.createElement('template');
+            template.innerHTML = sanitized;
+            template.content.querySelectorAll('table').forEach(table => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'markdown-table-scroll';
+                wrapper.setAttribute('role', 'region');
+                wrapper.setAttribute('aria-label', 'Scrollable table');
+                wrapper.tabIndex = 0;
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
+            return template.innerHTML;
         }
         
         // ============================================
@@ -3576,6 +3584,13 @@
                 conversationHistory = [];
                 location.reload();
             }
+        }
+
+        function startNewFieldGuide() {
+            if (!confirm('Start a new field guide? This clears the current conversation. Saved PDFs and images will remain on your phone.')) return;
+            conversationHistory = [];
+            sessionStorage.removeItem('offgrid-image-studio-payload');
+            location.reload();
         }
         
         function returnToHome() {
@@ -4222,7 +4237,7 @@ Mobile app output requirements:
                 if (previewEl) {
                     const displaySrc = onlineStudioState.displayImageUrl || onlineStudioState.image;
                     previewEl.innerHTML = IS_PHONE_SURFACE
-                        ? `<img class="online-studio-result-image" src="${displaySrc}" alt="Generated Image Studio visual" onclick="handleOnlineStudioImageTap(event)" oncontextmenu="openOnlineStudioImageMenu(event)" onpointerdown="startOnlineStudioImagePress(event)" onpointerup="cancelOnlineStudioImagePress()" onpointerleave="cancelOnlineStudioImagePress()" onpointercancel="cancelOnlineStudioImagePress()">`
+                        ? `<img class="online-studio-result-image zoomable-image" src="${displaySrc}" alt="Generated Image Studio visual" role="button" tabindex="0" aria-label="Open generated image in zoom view" onclick="handleOnlineStudioImageTap(event)" onkeydown="if(event.key === 'Enter' || event.key === ' '){event.preventDefault();openImageZoom(this.currentSrc || this.src, this.alt);}" oncontextmenu="openOnlineStudioImageMenu(event)" onpointerdown="startOnlineStudioImagePress(event)" onpointerup="cancelOnlineStudioImagePress()" onpointerleave="cancelOnlineStudioImagePress()" onpointercancel="cancelOnlineStudioImagePress()">`
                         : `<a href="${displaySrc}" target="_blank" rel="noopener noreferrer"><img src="${displaySrc}" alt="Generated Image Studio visual"></a>`;
                 }
                 if (statusEl) statusEl.textContent = IS_PHONE_SURFACE
@@ -4342,6 +4357,142 @@ Mobile app output requirements:
 
         let onlineStudioImagePressTimer = null;
         let onlineStudioImageLongPressTriggered = false;
+        let imageZoomState = null;
+
+        function applyImageZoomTransform() {
+            if (!imageZoomState) return;
+            imageZoomState.image.style.transform = `translate3d(${imageZoomState.x}px, ${imageZoomState.y}px, 0) scale(${imageZoomState.scale})`;
+            imageZoomState.value.textContent = `${Math.round(imageZoomState.scale * 100)}%`;
+        }
+
+        function setImageZoomScale(nextScale) {
+            if (!imageZoomState) return;
+            imageZoomState.scale = Math.max(1, Math.min(5, nextScale));
+            if (imageZoomState.scale === 1) {
+                imageZoomState.x = 0;
+                imageZoomState.y = 0;
+            }
+            applyImageZoomTransform();
+        }
+
+        function resetImageZoom() {
+            if (!imageZoomState) return;
+            imageZoomState.scale = 1;
+            imageZoomState.x = 0;
+            imageZoomState.y = 0;
+            applyImageZoomTransform();
+        }
+
+        function closeImageZoom() {
+            if (!imageZoomState) return;
+            document.removeEventListener('keydown', imageZoomState.keyHandler);
+            imageZoomState.overlay.remove();
+            imageZoomState = null;
+            document.body.classList.remove('image-zoom-active');
+        }
+
+        function openImageZoom(src, alt = 'OffGrid AI field guide image') {
+            if (!src) return;
+            closeImageZoom();
+
+            const overlay = document.createElement('div');
+            overlay.className = 'image-zoom-overlay';
+            overlay.id = 'imageZoomOverlay';
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('aria-label', 'Image zoom view');
+            overlay.innerHTML = `
+                <div class="image-zoom-toolbar">
+                    <button type="button" onclick="setImageZoomScale((imageZoomState?.scale || 1) - 0.5)" aria-label="Zoom out">−</button>
+                    <button class="image-zoom-value" type="button" onclick="resetImageZoom()">100%</button>
+                    <button type="button" onclick="setImageZoomScale((imageZoomState?.scale || 1) + 0.5)" aria-label="Zoom in">+</button>
+                    <button class="image-zoom-close" type="button" onclick="closeImageZoom()">Close</button>
+                </div>
+                <div class="image-zoom-stage">
+                    <img class="image-zoom-image" alt="">
+                </div>`;
+
+            const stage = overlay.querySelector('.image-zoom-stage');
+            const image = overlay.querySelector('.image-zoom-image');
+            const value = overlay.querySelector('.image-zoom-value');
+            image.src = src;
+            image.alt = alt;
+
+            const keyHandler = event => {
+                if (event.key === 'Escape') closeImageZoom();
+                if (event.key === '+' || event.key === '=') setImageZoomScale((imageZoomState?.scale || 1) + 0.5);
+                if (event.key === '-') setImageZoomScale((imageZoomState?.scale || 1) - 0.5);
+            };
+
+            imageZoomState = {
+                overlay,
+                stage,
+                image,
+                value,
+                scale: 1,
+                x: 0,
+                y: 0,
+                pointers: new Map(),
+                startDistance: 0,
+                startScale: 1,
+                lastPoint: null,
+                keyHandler
+            };
+
+            const pointerDistance = () => {
+                const points = Array.from(imageZoomState.pointers.values());
+                return points.length < 2 ? 0 : Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+            };
+
+            stage.addEventListener('pointerdown', event => {
+                event.preventDefault();
+                stage.setPointerCapture?.(event.pointerId);
+                imageZoomState.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+                if (imageZoomState.pointers.size === 2) {
+                    imageZoomState.startDistance = pointerDistance();
+                    imageZoomState.startScale = imageZoomState.scale;
+                } else {
+                    imageZoomState.lastPoint = { x: event.clientX, y: event.clientY };
+                }
+            });
+
+            stage.addEventListener('pointermove', event => {
+                if (!imageZoomState?.pointers.has(event.pointerId)) return;
+                event.preventDefault();
+                imageZoomState.pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+                if (imageZoomState.pointers.size >= 2) {
+                    const distance = pointerDistance();
+                    if (imageZoomState.startDistance > 0) {
+                        setImageZoomScale(imageZoomState.startScale * (distance / imageZoomState.startDistance));
+                    }
+                } else if (imageZoomState.scale > 1 && imageZoomState.lastPoint) {
+                    imageZoomState.x += event.clientX - imageZoomState.lastPoint.x;
+                    imageZoomState.y += event.clientY - imageZoomState.lastPoint.y;
+                    imageZoomState.lastPoint = { x: event.clientX, y: event.clientY };
+                    applyImageZoomTransform();
+                }
+            });
+
+            const endPointer = event => {
+                if (!imageZoomState) return;
+                imageZoomState.pointers.delete(event.pointerId);
+                const remaining = Array.from(imageZoomState.pointers.values())[0];
+                imageZoomState.lastPoint = remaining || null;
+                if (imageZoomState.pointers.size < 2) imageZoomState.startDistance = 0;
+            };
+            stage.addEventListener('pointerup', endPointer);
+            stage.addEventListener('pointercancel', endPointer);
+            stage.addEventListener('dblclick', () => setImageZoomScale(imageZoomState?.scale > 1 ? 1 : 2.5));
+            overlay.addEventListener('click', event => {
+                if (event.target === overlay) closeImageZoom();
+            });
+
+            document.body.appendChild(overlay);
+            document.body.classList.add('image-zoom-active');
+            document.addEventListener('keydown', keyHandler);
+            applyImageZoomTransform();
+            overlay.querySelector('.image-zoom-close')?.focus();
+        }
 
         function getOnlineStudioImageFilename() {
             const source = onlineStudioState?.title || onlineStudioState?.sourcePrompt || 'offgrid-ai-visual';
@@ -4569,7 +4720,8 @@ Mobile app output requirements:
                 onlineStudioImageLongPressTriggered = false;
                 return;
             }
-            downloadOnlineStudioImage();
+            const image = event.currentTarget;
+            openImageZoom(image.currentSrc || image.src, image.alt);
         }
 
         function startOnlineStudioImagePress(event) {
@@ -4657,6 +4809,20 @@ Mobile app output requirements:
                 </div>
             `;
             document.body.appendChild(overlay);
+            overlay.querySelectorAll('.app-pdf-document img').forEach(image => {
+                image.classList.add('zoomable-image');
+                image.setAttribute('role', 'button');
+                image.tabIndex = 0;
+                image.setAttribute('aria-label', 'Open field guide image in zoom view');
+                const openPreviewImage = () => openImageZoom(image.currentSrc || image.src, image.alt || 'Field guide image');
+                image.addEventListener('click', openPreviewImage);
+                image.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openPreviewImage();
+                    }
+                });
+            });
             document.body.classList.add('pdf-preview-active');
         }
 
@@ -4679,6 +4845,7 @@ Mobile app output requirements:
                     filename
                 ));
                 if (result.ok) {
+                    closeAppPdfPreview();
                     showSaveToast('PDF saved', 'Look in Downloads > OffGrid AI.', 'Open PDF', () => openSavedPdfFromPhone(result.uri));
                 } else {
                     showSaveToast('PDF save failed', result.error || 'Could not save the PDF.');
@@ -4930,7 +5097,6 @@ Mobile app output requirements:
             frontmatter += `title: "${title.replace(/"/g, '\\"')}"\n`;
             frontmatter += `date: ${isoDate}\n`;
             frontmatter += `source: online\n`;
-            frontmatter += `model: ${selectedModel}\n`;
             frontmatter += `category: ${category}\n`;
             if (tagsArray.length > 0) {
                 frontmatter += `tags:\n`;
@@ -4949,7 +5115,6 @@ Mobile app output requirements:
             // Build conversation content
             let content = `# ${title}\n\n`;
             content += `*Saved from OffGrid AI Online on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
-            content += `**Model:** ${MODEL_DISPLAY[selectedModel]?.name || selectedModel}  \n`;
             content += `**Category:** ${category}\n\n`;
             content += '---\n\n';
             
@@ -4994,7 +5159,6 @@ Mobile app output requirements:
             frontmatter += `title: "${safeTitle}"\n`;
             frontmatter += `date: ${isoDate}\n`;
             frontmatter += `source: online-image-studio\n`;
-            frontmatter += `model: ${selectedModel}\n`;
             frontmatter += `category: ${category}\n`;
             frontmatter += '---\n\n';
 
@@ -5006,7 +5170,6 @@ Mobile app output requirements:
 
             content += `# ${title}\n\n`;
             content += `*Saved from OffGrid AI Online on ${now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} at ${now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}*\n\n`;
-            content += `**Model:** ${MODEL_DISPLAY[selectedModel]?.name || selectedModel}  \n`;
             content += `**Category:** ${category}\n\n`;
 
             if (answer) {
