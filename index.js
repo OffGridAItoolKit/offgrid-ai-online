@@ -18,6 +18,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const { markdownToHtml } = require('./lib/pdf-markdown');
 
 // License Key & Usage Limit System
 const {
@@ -2267,7 +2268,7 @@ app.post('/api/export-pdf', async (req, res) => {
             margin: 0 auto;
             padding: 40px 30px;
             color: #1a1a1a;
-            line-height: 1.7;
+            line-height: 1.58;
             font-size: 15px;
         }
         
@@ -2341,6 +2342,8 @@ app.post('/api/export-pdf', async (req, res) => {
             overflow-x: auto;
             font-size: 13px;
             line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
         }
         
         pre code {
@@ -2368,6 +2371,8 @@ app.post('/api/export-pdf', async (req, res) => {
             border: 1px solid #d1d5db;
             padding: 8px 12px;
             text-align: left;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         
         th {
@@ -2444,52 +2449,6 @@ app.post('/api/export-pdf', async (req, res) => {
         res.status(500).json({ error: 'Failed to generate PDF export' });
     }
 });
-
-/**
- * Simple Markdown to HTML converter for PDF export.
- * Handles basic markdown syntax without external dependencies.
- */
-function markdownToHtml(md) {
-    // Remove YAML frontmatter
-    md = md.replace(/^---[\s\S]*?---\n*/m, '');
-    
-    let html = md
-        // Code blocks (must be before other replacements)
-        .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
-        // Inline code
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        // Headers
-        .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        // Bold and italic
-        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        // Images (base64 embedded)
-        .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
-        // Links
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
-        // Horizontal rules
-        .replace(/^---$/gm, '<hr>')
-        // Unordered lists
-        .replace(/^[\s]*[-*] (.+)$/gm, '<li>$1</li>')
-        // Ordered lists
-        .replace(/^[\s]*\d+\. (.+)$/gm, '<li>$1</li>')
-        // Blockquotes
-        .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-        // Paragraphs (lines that aren't already HTML)
-        .replace(/^(?!<[a-z])((?!^\s*$).+)$/gm, '<p>$1</p>')
-        // Clean up consecutive list items into ul
-        .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
-        // Clean up empty paragraphs
-        .replace(/<p>\s*<\/p>/g, '')
-        // Clean up consecutive blockquotes
-        .replace(/<\/blockquote>\n<blockquote>/g, '<br>');
-    
-    return html;
-}
 
 // (Subdomain routing moved above express.static — see line ~188)
 

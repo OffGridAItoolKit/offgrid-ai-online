@@ -3634,7 +3634,7 @@ body.command-theme {
     min-height: 100%;
     box-shadow: 0 8px 28px rgba(44, 24, 16, 0.12);
     font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    line-height: 1.7;
+    line-height: 1.58;
 }
 
 .app-pdf-document img {

@@ -23,7 +23,7 @@
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
-    <link rel="stylesheet" href="offgridai.css?v=6.4">
+    <link rel="stylesheet" href="offgridai.css?v=6.5">
     <script src="/vendor/marked.umd.js"></script>
     <script src="/vendor/purify.min.js"></script>
     <script src="/vendor/qrcode.min.js"></script>
@@ -1655,11 +1655,11 @@
                                     <div class="mobile-action-desc">Field-tested questions</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn mobile-action-btn-more" onclick="openMoreActions()">
-                                <div class="mobile-action-icon">🧰</div>
+                            <div class="mobile-action-btn mobile-action-btn-more" onclick="requestOpenSavedGuides()">
+                                <div class="mobile-action-icon">📚</div>
                                 <div class="mobile-action-text">
-                                    <div class="mobile-action-label">More Actions</div>
-                                    <div class="mobile-action-desc">Saved guides, visuals, translate</div>
+                                    <div class="mobile-action-label">Saved Guides</div>
+                                    <div class="mobile-action-desc">Open your offline field guide PDFs</div>
                                 </div>
                             </div>
                         </div>
@@ -1689,11 +1689,11 @@
                                     <div class="mobile-action-desc">Field-tested questions</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn mobile-action-btn-more" onclick="openMoreActions()">
-                                <div class="mobile-action-icon">🧰</div>
+                            <div class="mobile-action-btn mobile-action-btn-more" onclick="requestOpenSavedGuides()">
+                                <div class="mobile-action-icon">📚</div>
                                 <div class="mobile-action-text">
-                                    <div class="mobile-action-label">More Actions</div>
-                                    <div class="mobile-action-desc">Saved guides, visuals, translate</div>
+                                    <div class="mobile-action-label">Saved Guides</div>
+                                    <div class="mobile-action-desc">Open your offline field guide PDFs</div>
                                 </div>
                             </div>
                         </div>
@@ -2505,7 +2505,7 @@
                     navigateToReadyMadePrompts();
                     break;
                 case 'savedGuides':
-                    openSavedGuides();
+                    requestOpenSavedGuides();
                     break;
                 case 'feedback':
                     openFeedback('Plus menu');
@@ -4527,6 +4527,37 @@ Mobile app output requirements:
             window.open(uri, '_blank');
         }
 
+        const SAVED_GUIDE_RECORD_KEY = 'offgrid-ai-has-saved-field-guide';
+
+        function markSavedGuideAvailable() {
+            try {
+                localStorage.setItem(SAVED_GUIDE_RECORD_KEY, 'true');
+            } catch (error) {
+                // Saving the PDF succeeded even if browser storage is unavailable.
+            }
+        }
+
+        function hasSavedGuideRecord() {
+            try {
+                return localStorage.getItem(SAVED_GUIDE_RECORD_KEY) === 'true';
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function requestOpenSavedGuides() {
+            if (!hasSavedGuideRecord()) {
+                showSaveToast(
+                    'No saved guides recorded yet',
+                    'Create a Field Guide and tap Save Field Guide first. If you saved one before clearing app data, you can still check the folder.',
+                    'Check Folder',
+                    openSavedGuides
+                );
+                return false;
+            }
+            return openSavedGuides();
+        }
+
         function openSavedGuides() {
             if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.openSavedGuides === 'function') {
                 const result = parseNativeBridgeResult(window.OffGridNative.openSavedGuides());
@@ -4784,6 +4815,9 @@ Mobile app output requirements:
                 .map(style => style.textContent)
                 .join('\n');
             const bodyHtml = parsed.body ? parsed.body.innerHTML : html;
+            const safeBodyHtml = window.DOMPurify && typeof window.DOMPurify.sanitize === 'function'
+                ? window.DOMPurify.sanitize(bodyHtml, { USE_PROFILES: { html: true } })
+                : bodyHtml;
             const isFieldGuidePreview = payload && payload.type === 'image-studio';
             const saveLabel = isFieldGuidePreview ? 'Save Field Guide' : 'Save / Print PDF';
             const lowerLeftAction = isFieldGuidePreview
@@ -4805,7 +4839,7 @@ Mobile app output requirements:
                 </div>
                 <div class="app-pdf-document" aria-label="${escapeHtml(title || 'OffGrid AI field guide')}">
                     <style>${styles}</style>
-                    ${bodyHtml}
+                    ${safeBodyHtml}
                 </div>
             `;
             document.body.appendChild(overlay);
@@ -4845,6 +4879,7 @@ Mobile app output requirements:
                     filename
                 ));
                 if (result.ok) {
+                    markSavedGuideAvailable();
                     closeAppPdfPreview();
                     showSaveToast('PDF saved', 'Look in Downloads > OffGrid AI.', 'Open PDF', () => openSavedPdfFromPhone(result.uri));
                 } else {

@@ -22,6 +22,12 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.Html;
+import android.text.Layout;
+import android.text.Spanned;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
@@ -551,7 +557,7 @@ public class MainActivity extends BridgeActivity {
             if (answer != null && !answer.trim().isEmpty()) {
                 startPage();
                 drawSection("Field Guide");
-                drawParagraph(markdownToPlainText(answer), 11.5f, false);
+                drawMarkdown(answer, 11.5f);
                 finishPage();
             }
         }
@@ -663,6 +669,64 @@ public class MainActivity extends BridgeActivity {
             }
         }
 
+        private void drawMarkdown(String markdown, float textSize) {
+            String html = markdownToPdfHtml(markdown);
+            Spanned styled = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+            drawStyledText(styled, textSize);
+        }
+
+        private void drawStyledText(CharSequence text, float textSize) {
+            TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setColor(Color.rgb(26, 26, 26));
+            textPaint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
+            textPaint.setTextSize(textSize);
+            int width = PAGE_WIDTH - (MARGIN * 2);
+            int offset = 0;
+
+            while (offset < text.length()) {
+                float availableHeight = PAGE_HEIGHT - MARGIN - y;
+                if (availableHeight < textSize * 2f) {
+                    newPage();
+                    availableHeight = PAGE_HEIGHT - MARGIN - y;
+                }
+
+                CharSequence remaining = text.subSequence(offset, text.length());
+                StaticLayout remainingLayout = createTextLayout(remaining, textPaint, width);
+
+                int fittingLines = 0;
+                for (int line = 0; line < remainingLayout.getLineCount(); line++) {
+                    if (remainingLayout.getLineBottom(line) > availableHeight) break;
+                    fittingLines = line + 1;
+                }
+
+                if (fittingLines == 0) {
+                    newPage();
+                    continue;
+                }
+
+                int chunkEnd = remainingLayout.getLineEnd(fittingLines - 1);
+                CharSequence chunk = remaining.subSequence(0, chunkEnd);
+                StaticLayout chunkLayout = createTextLayout(chunk, textPaint, width);
+
+                canvas.save();
+                canvas.translate(MARGIN, y);
+                chunkLayout.draw(canvas);
+                canvas.restore();
+                y += chunkLayout.getHeight() + 3f;
+                offset += chunkEnd;
+
+                if (offset < text.length()) newPage();
+            }
+        }
+
+        private StaticLayout createTextLayout(CharSequence text, TextPaint textPaint, int width) {
+            return StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, width)
+                .setAlignment(Layout.Alignment.ALIGN_NORMAL)
+                .setIncludePad(false)
+                .setLineSpacing(1.5f, 1f)
+                .build();
+        }
+
         private static List<String> wrapText(String text, Paint paint, float maxWidth) {
             List<String> lines = new ArrayList<>();
             String[] words = safeText(text, "").split("\\s+");
@@ -678,6 +742,64 @@ public class MainActivity extends BridgeActivity {
             }
             if (line.length() > 0) lines.add(line.toString());
             return lines;
+        }
+
+        private static String markdownToPdfHtml(String markdown) {
+            String normalized = safeText(markdown, "")
+                .replaceFirst("(?s)^---\\s*\\n.*?\\n---\\s*\\n?", "")
+                .replaceAll("(?m)^```(?:\\w+)?\\s*$", "");
+            StringBuilder html = new StringBuilder();
+
+            for (String rawLine : normalized.split("\\r?\\n", -1)) {
+                String line = rawLine.trim();
+                if (line.isEmpty()) {
+                    html.append("<br>");
+                    continue;
+                }
+                if (line.matches("^[-*_]{3,}$")) {
+                    html.append("<br>------------------------------<br>");
+                    continue;
+                }
+                if (line.matches("^\\|?(?:\\s*:?-{3,}:?\\s*\\|)+\\s*:?-{3,}:?\\s*\\|?$")) {
+                    continue;
+                }
+
+                String prefix = "";
+                String suffix = "<br>";
+                if (line.matches("^#{1,6}\\s+.*")) {
+                    int level = line.indexOf(' ');
+                    line = line.substring(level + 1).trim();
+                    prefix = level <= 2 ? "<b><big>" : "<b>";
+                    suffix = level <= 2 ? "</big></b><br>" : "</b><br>";
+                } else if (line.matches("^[-*+]\\s+.*")) {
+                    line = line.replaceFirst("^[-*+]\\s+", "");
+                    prefix = "&#8226;&nbsp;&nbsp;";
+                } else if (line.matches("^\\d+[.)]\\s+.*")) {
+                    String marker = line.replaceFirst("^(\\d+[.)]).*$", "$1");
+                    line = line.replaceFirst("^\\d+[.)]\\s+", "");
+                    prefix = TextUtils.htmlEncode(marker) + "&nbsp;&nbsp;";
+                } else if (line.startsWith("> ")) {
+                    line = line.substring(2).trim();
+                    prefix = "&#9656;&nbsp;&nbsp;<i>";
+                    suffix = "</i><br>";
+                } else if (line.contains("|")) {
+                    line = line.replaceFirst("^\\|", "").replaceFirst("\\|$", "").replace("|", "  |  ");
+                    prefix = "<tt>";
+                    suffix = "</tt><br>";
+                }
+
+                String inline = TextUtils.htmlEncode(line)
+                    .replaceAll("!\\[([^\\]]*)\\]\\(([^)]+)\\)", "$1")
+                    .replaceAll("\\[([^\\]]+)\\]\\(([^)]+)\\)", "$1")
+                    .replaceAll("\\*\\*\\*(.+?)\\*\\*\\*", "<b><i>$1</i></b>")
+                    .replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>")
+                    .replaceAll("(?<!\\*)\\*([^*]+)\\*(?!\\*)", "<i>$1</i>")
+                    .replaceAll("`([^`]+)`", "<tt>$1</tt>")
+                    .replaceAll("~~([^~]+)~~", "<s>$1</s>");
+                html.append(prefix).append(inline).append(suffix);
+            }
+
+            return html.toString();
         }
 
         private static String markdownToPlainText(String markdown) {
