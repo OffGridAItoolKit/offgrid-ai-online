@@ -9,6 +9,12 @@ This document provides a reverse-chronological summary of recent development pro
 ### August 2026
 
 **2026-08-07**
+*   **Ready-Made Prompts synchronized with OffGrid AI Intel**
+    *   Replaced the online 114-prompt showcase and visible 285-prompt legacy split with the live Intel catalog: 9 categories, 81 subcategories, and 2,106 prompt entries.
+    *   Preserved the Intel wording, ordering, Starter/Core/Advanced/Image-Based tiers, and intentional repeated placements.
+    *   Added collapsed topic sections so mobile users browse 26-prompt groups without rendering hundreds of cards at once; search and capability filters expand matching topics automatically.
+    *   Preserved local Favorites, Recent prompts, photo handoff, and field-guide handoff. The separate `/command/ready-made-prompts` catalog remains unchanged.
+    *   Added a reproducible Intel sync script, source SHA-256 metadata, and catalog integrity tests.
 *   **Video intake and Saved Guides follow-up**
     *   Raised the local video-selection limit from 50 MB to 200 MB while preserving the 20-second duration limit; only eight compressed frames are sent for analysis, not the source video.
     *   Replaced Android's unreliable folder-view request with a document picker initialized at `Downloads/OffGrid AI`; selecting a saved guide opens its PDF.

@@ -305,11 +305,39 @@
             margin-bottom: 20px;
         }
         .subcategory-title {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border: 1px solid rgba(184, 134, 11, 0.18);
+            border-radius: 9px;
+            background: rgba(184, 134, 11, 0.05);
             font-size: 15px;
             font-weight: 600;
             color: #8b6914;
             margin-bottom: 10px;
-            padding-left: 4px;
+            padding: 10px 12px;
+            text-align: left;
+            cursor: pointer;
+        }
+        .subcategory-title:hover {
+            border-color: rgba(184, 134, 11, 0.45);
+            background: rgba(184, 134, 11, 0.09);
+        }
+        .subcategory-count {
+            margin-left: auto;
+            color: #7b6b56;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .subcategory-toggle {
+            font-size: 12px;
+            transition: transform 0.2s;
+        }
+        .subcategory.collapsed .subcategory-toggle {
+            transform: rotate(-90deg);
         }
         
         /* Prompt cards */
@@ -787,7 +815,7 @@
     <!-- Hero -->
     <div class="hero">
         <h1>💡 Ready-Made Prompts</h1>
-        <p>Field-ready scenarios for priority decisions, preparedness, repairs, photo and video analysis, and practical guides. Choose a prompt and put OffGrid AI to work.</p>
+        <p>Over 2,100 field-tested prompts across survival, homesteading, healthcare, outdoor travel, privacy, education, ministry, and field research. Choose a category, open a topic, and put OffGrid AI to work.</p>
         <div class="hero-badges">
             <span class="hero-badge kb">Practical Scenarios</span>
             <span class="hero-badge privacy">🔒 No Account History</span>
@@ -801,14 +829,9 @@
             <span class="prompt-count" id="promptCount"></span>
         </div>
         <div class="filter-row" id="onlineFilters">
-            <button class="filter-btn collection-btn active" data-collection="showcase" onclick="setCollection('showcase', this)">Showcase</button>
-            <button class="filter-btn collection-btn" data-collection="full" onclick="setCollection('full', this)">Full Library</button>
-            <span class="control-divider" aria-hidden="true"></span>
             <button class="filter-btn active" data-filter="all" onclick="setOnlineFilter('all', this)">All</button>
             <button class="filter-btn" data-filter="image" onclick="setOnlineFilter('image', this)">📷 Photo</button>
-            <button class="filter-btn" data-filter="video" onclick="setOnlineFilter('video', this)">🎥 Video</button>
             <button class="filter-btn" data-filter="guide" onclick="setOnlineFilter('guide', this)">📄 Field Guides</button>
-            <button class="filter-btn" data-filter="visual" onclick="setOnlineFilter('visual', this)">🎨 Create Visual</button>
             <button class="filter-btn" data-filter="favorites" onclick="setOnlineFilter('favorites', this)">★ Favorites</button>
             <button class="filter-btn" data-filter="recent" onclick="setOnlineFilter('recent', this)">🕒 Recent</button>
         </div>
@@ -834,14 +857,14 @@
 
     <!-- Footer -->
     <div class="footer">
-        <p>Showcase prompts are curated for OffGrid AI. The Full Library preserves the previous catalog for reference.</p>
+        <p>Catalog synchronized from OffGrid AI Intel. Critical medical, safety, legal, and field decisions should always be independently verified.</p>
         <p><a href="/online">← Return to OffGrid AI Field Guide</a> · <a href="https://offgridaitoolkit.com" target="_blank">Get the USB Version</a></p>
     </div>
 
     <!-- Toast -->
     <div class="toast" id="toast"></div>
 
-    <script src="/ready-made-prompts-online.js?v=20260710-1"></script>
+    <script src="/ready-made-prompts-online.js?v=20260807-intel1"></script>
     <script>
         // ============================================
         // PROMPT DATA
@@ -1660,11 +1683,11 @@
             if (footerReturnLink) footerReturnLink.href = returnPathFor('/online');
             const badge = document.querySelector('.online-badge');
             if (badge) badge.textContent = 'OffGrid AI';
-            document.querySelector('.footer p').textContent = 'Showcase prompts are curated for OffGrid AI. The Full Library preserves the previous catalog for reference.';
+            document.querySelector('.footer p').textContent = 'Catalog synchronized from OffGrid AI Intel. Critical decisions should always be independently verified.';
         }
 
         if (isPhoneSurface) {
-            document.querySelector('.hero p').textContent = 'Field-ready prompts for practical decisions, image analysis, repairs, planning, and preparedness. Tap any prompt to send it back to OffGrid AI.';
+            document.querySelector('.hero p').textContent = 'Over 2,100 field-tested prompts across nine practical categories. Open a topic, then tap a prompt to send it back to OffGrid AI.';
             const kbBadge = document.querySelector('.hero-badge.kb');
             if (kbBadge) kbBadge.textContent = 'Field Prompts';
         }
@@ -1754,9 +1777,10 @@
         const ONLINE_LIBRARY = window.OFFGRID_ONLINE_PROMPT_LIBRARY || { categories: [], audiences: [], ownerSafetyReviewRules: [] };
         const FAVORITES_STORAGE_KEY = 'offgrid-prompt-favorites-v1';
         const RECENTS_STORAGE_KEY = 'offgrid-prompt-recents-v1';
-        let collectionMode = 'showcase';
+        let collectionMode = 'catalog';
         let activeAudience = 'all';
         let expandedCategoryIds = new Set();
+        let expandedSubcategoryIds = new Set();
         let promptLookup = new Map();
 
         function storedArray(key) {
@@ -1807,7 +1831,7 @@
             ...cat,
             subcategories: cat.subcategories.map(sub => ({
                 ...sub,
-                prompts: sub.prompts.map(p => ({ ...p, source: 'showcase' }))
+                prompts: sub.prompts.map(p => ({ ...p, source: 'catalog' }))
             }))
         }));
 
@@ -1846,23 +1870,24 @@
 
         if (!isCommandContext) {
             ACTIVE_CATEGORIES = showcaseCategories;
-            if (ACTIVE_CATEGORIES[0]) expandedCategoryIds.add(`showcase:${ACTIVE_CATEGORIES[0].id}`);
+            if (ACTIVE_CATEGORIES[0]) expandedCategoryIds.add(`catalog:${ACTIVE_CATEGORIES[0].id}`);
         }
 
         const countPrompts = categories => categories.reduce((total, cat) =>
             total + cat.subcategories.reduce((subTotal, sub) => subTotal + sub.prompts.length, 0), 0);
-        const ownerSafetyReviewCount = legacyOnlineCategories.reduce((total, cat) =>
+        const ownerSafetyReviewCount = showcaseCategories.reduce((total, cat) =>
             total + cat.subcategories.reduce((subTotal, sub) => subTotal + sub.prompts.filter(p => p.ownerSafetyReview).length, 0), 0);
 
         window.__OFFGRID_PROMPT_LIBRARY_STATUS__ = {
             version: ONLINE_LIBRARY.version || 'missing',
-            showcaseCategories: showcaseCategories.length,
-            showcasePrompts: countPrompts(showcaseCategories),
+            catalogCategories: showcaseCategories.length,
+            catalogPrompts: countPrompts(showcaseCategories),
             legacyCategories: legacyOnlineCategories.length,
             legacyPrompts: countPrompts(legacyOnlineCategories),
             ownerSafetyReviewPrompts: ownerSafetyReviewCount
         };
         document.body.dataset.promptLibraryVersion = ONLINE_LIBRARY.version || 'missing';
+        document.body.dataset.catalogPromptCount = String(countPrompts(showcaseCategories));
         document.body.dataset.showcasePromptCount = String(countPrompts(showcaseCategories));
         document.body.dataset.legacyPromptCount = String(countPrompts(legacyOnlineCategories));
         document.body.dataset.ownerSafetyReviewCount = String(ownerSafetyReviewCount);
@@ -1970,7 +1995,7 @@
         }
 
         function currentOnlineCategories() {
-            return collectionMode === 'full' ? legacyOnlineCategories : showcaseCategories;
+            return showcaseCategories;
         }
 
         function promptMatchesOnlineFilters(promptItem, categoryItem, subcategoryTitle, searchTokens) {
@@ -2051,6 +2076,7 @@
             const searchValue = document.getElementById('searchBox').value.toLowerCase().trim();
             const searchTokens = searchValue.split(/\s+/).filter(Boolean);
             const forceExpanded = searchTokens.length > 0 || activeAudience !== 'all' || activeFilter !== 'all';
+            const forceSubcategoryExpanded = searchTokens.length > 0 || ['image', 'guide', 'favorites', 'recent'].includes(activeFilter);
             const categories = currentOnlineCategories();
             promptLookup = new Map();
             let visibleCount = 0;
@@ -2076,12 +2102,20 @@
                 visibleCount += categoryCount;
                 const categoryKey = `${collectionMode}:${categoryItem.id}`;
                 const isExpanded = forceExpanded || expandedCategoryIds.has(categoryKey);
-                const subcategoriesHtml = isExpanded ? renderedSubcategories.map(subcategoryItem => `
-                    <div class="subcategory">
-                        <div class="subcategory-title">${htmlEscape(subcategoryItem.title)}</div>
-                        <div class="prompt-grid">${subcategoryItem.prompts.map(renderOnlinePromptCard).join('')}</div>
-                    </div>
-                `).join('') : '';
+                const subcategoriesHtml = isExpanded ? renderedSubcategories.map(subcategoryItem => {
+                    const subcategoryKey = `${categoryKey}:${slugifyPromptValue(subcategoryItem.title)}`;
+                    const isSubcategoryExpanded = forceSubcategoryExpanded || expandedSubcategoryIds.has(subcategoryKey);
+                    return `
+                        <div class="subcategory${isSubcategoryExpanded ? '' : ' collapsed'}">
+                            <button class="subcategory-title" type="button" onclick="toggleSubcategory('${htmlEscape(subcategoryKey)}')" aria-expanded="${isSubcategoryExpanded}">
+                                <span>${htmlEscape(subcategoryItem.title)}</span>
+                                <span class="subcategory-count">${subcategoryItem.prompts.length} prompts</span>
+                                <span class="subcategory-toggle">▼</span>
+                            </button>
+                            ${isSubcategoryExpanded ? `<div class="prompt-grid">${subcategoryItem.prompts.map(renderOnlinePromptCard).join('')}</div>` : ''}
+                        </div>
+                    `;
+                }).join('') : '';
 
                 html += `
                     <section class="category${isExpanded ? '' : ' collapsed'}" id="category-${htmlEscape(categoryItem.id)}">
@@ -2105,23 +2139,7 @@
                 : activeFilter === 'recent'
                     ? 'No recent prompts yet. Use a prompt and it will appear here.'
                     : 'No prompts found. Try a different search term or filter.';
-            collectionNote.textContent = collectionMode === 'full'
-                ? `Full Library: ${countPrompts(legacyOnlineCategories)} preserved prompts. Prompt wording is unchanged; model-size headings are replaced with OffGrid AI branding.`
-                : `${countPrompts(showcaseCategories)} curated prompts across ${showcaseCategories.length} field-ready categories. Search also matches audiences, capabilities, tags, and follow-up actions.`;
-        }
-
-        function setCollection(mode, btn) {
-            collectionMode = mode === 'full' ? 'full' : 'showcase';
-            document.querySelectorAll('#onlineFilters [data-collection]').forEach(button => button.classList.remove('active'));
-            btn.classList.add('active');
-            activeFilter = 'all';
-            activeAudience = 'all';
-            document.querySelectorAll('#onlineFilters [data-filter]').forEach(button => button.classList.toggle('active', button.dataset.filter === 'all'));
-            document.querySelectorAll('#audienceFilters [data-audience]').forEach(button => button.classList.toggle('active', button.dataset.audience === 'all'));
-            expandedCategoryIds = new Set();
-            const firstCategory = currentOnlineCategories()[0];
-            if (firstCategory) expandedCategoryIds.add(`${collectionMode}:${firstCategory.id}`);
-            renderCategories();
+            collectionNote.textContent = `${countPrompts(showcaseCategories)} prompts across ${showcaseCategories.length} categories, synchronized from OffGrid AI Intel. Search matches prompt text, topics, audiences, and capabilities.`;
         }
 
         function setOnlineFilter(filter, btn) {
@@ -2185,6 +2203,12 @@
             }
             if (expandedCategoryIds.has(catId)) expandedCategoryIds.delete(catId);
             else expandedCategoryIds.add(catId);
+            renderCategories();
+        }
+
+        function toggleSubcategory(subcategoryId) {
+            if (expandedSubcategoryIds.has(subcategoryId)) expandedSubcategoryIds.delete(subcategoryId);
+            else expandedSubcategoryIds.add(subcategoryId);
             renderCategories();
         }
         

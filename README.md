@@ -46,7 +46,7 @@ The Command Center is the premium offering, providing access to advanced feature
     *   **Ranger (Grok 4.1)**: Creative solutions and unconventional thinking.
 *   **Command Mode**: A synthesis mode where the AI Council's responses are reviewed by a "Chairman" AI, which then provides a final, synthesized answer.
 *   **Image Studio**: An AI-assisted image generation tool using Nano Banana Pro (Gemini 3 Pro Image) with features like prompt crafting and visual prompt generation from conversations.
-*   **Ready-Made Prompts**: A library of pre-built prompts for common survival, homesteading, and off-grid scenarios.
+*   **Ready-Made Prompts**: The synchronized OffGrid AI Intel catalog with 2,106 prompt entries across 9 categories and 81 collapsible topics, plus search, local Favorites/Recent history, photo handoff, and field-guide handoff.
 
 ## 3. API Endpoints
 
