@@ -1,12 +1,19 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-08-07
+**Last Updated:** 2026-08-08
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI Field Guide online platform.
 
 ---
 
 ### August 2026
+
+**2026-08-08**
+*   **Mobile first-visit and welcome-screen polish**
+    *   Stopped automatic focus of the welcome composer on phone/app surfaces so the keyboard remains closed until the user taps the input.
+    *   Restyled the required first-run safety and privacy consent screen with the app's charcoal, slate, and gold visual system without changing the disclosure wording or acceptance requirement.
+    *   Removed the redundant green `OffGrid AI` header badge on mobile while preserving the connection indicator and day/night control.
+    *   Renamed the composer shortcut to `Field Prompts`, made it equal width with `Voice Input`, and added modest spacing and padding to the lower mobile action cards.
 
 **2026-08-07**
 *   **Ready-Made Prompts synchronized with OffGrid AI Intel**

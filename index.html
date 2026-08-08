@@ -1591,7 +1591,7 @@
                             </div>
                             <div class="welcome-button-row">
                                 <button class="action-btn prompts-btn" onclick="navigateToReadyMadePrompts()">
-                                    <span class="action-btn-icon">💡</span> Prompts
+                                    <span class="action-btn-icon">💡</span> Field Prompts
                                 </button>
                                 <button class="action-btn voice-btn" onclick="toggleVoiceInput()" title="Voice Input">
                                     <svg class="voice-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
@@ -1747,14 +1747,6 @@
         if (CONFIG.platform) {
             document.body.classList.add(`platform-${CONFIG.platform}`);
         }
-        if (IS_PHONE_SURFACE) {
-            document.querySelectorAll('.header .online-badge').forEach((badge) => {
-                if (badge.textContent.trim().toUpperCase() === 'ONLINE') {
-                    badge.textContent = 'OffGrid AI';
-                }
-            });
-        }
-
         const APP_THEME_STORAGE_KEY = 'offgrid-toolkit-theme';
 
         function haptic(type = 'light') {
@@ -5921,7 +5913,8 @@ Mobile app output requirements:
             console.log('Experience:', CONFIG.experience, '| Customer:', CONFIG.isCustomer);
             
             // Check first run
-            if (!localStorage.getItem('offgrid-online-initialized')) {
+            const needsFirstRunConsent = !localStorage.getItem('offgrid-online-initialized');
+            if (needsFirstRunConsent) {
                 const banner = document.getElementById('firstRunBanner');
                 const checkbox = document.getElementById('acceptTermsBanner');
                 const button = document.getElementById('acceptBannerBtn');
@@ -5941,9 +5934,9 @@ Mobile app output requirements:
             checkConnection();
             setInterval(checkConnection, 10000);
             
-            // Focus the welcome input if it exists
+            // Keep the mobile welcome screen fully visible until the user taps the input.
             const welcomeInput = document.getElementById('welcomeMessageInput');
-            if (welcomeInput && document.getElementById('welcome')) {
+            if (welcomeInput && document.getElementById('welcome') && !IS_PHONE_SURFACE && !needsFirstRunConsent) {
                 welcomeInput.focus();
             }
 
