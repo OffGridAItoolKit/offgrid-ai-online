@@ -28,7 +28,7 @@ The feature utilizes two hidden file inputs: one for standard file selection (`#
 
 When a file is selected, the `handleVideoSelect(event)` function performs initial validation:
 *   **Type Check:** Verifies the file against a list of allowed types or extensions (MP4, WebM, MOV, MPEG).
-*   **Size Limit:** Enforces a hard 50MB file size limit to prevent browser memory exhaustion.
+*   **Size Limit:** Enforces a 200MB file size limit to accommodate short high-resolution phone recordings while retaining a decoder/memory guardrail. The original video remains local; the analysis request contains eight compressed frames rather than the source video.
 
 ### 2.2 DOM Placement and the `<source>` Element Strategy
 

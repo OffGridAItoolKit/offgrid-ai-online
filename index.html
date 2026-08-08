@@ -3202,9 +3202,12 @@
                 return;
             }
 
-            const maxSize = 50 * 1024 * 1024;
+            // The original video remains on the device. Only eight compressed frames are
+            // sent for analysis, so allow short high-resolution phone recordings while
+            // retaining a guardrail for decoder/memory pressure on older devices.
+            const maxSize = 200 * 1024 * 1024;
             if (file.size > maxSize) {
-                alert('Video file is too large. Maximum size is 50MB. Try compressing or trimming your video.');
+                alert('Video file is too large. Maximum size is 200MB. Videos must also be 20 seconds or shorter. Try lowering the recording resolution or trimming the video.');
                 return;
             }
 
@@ -4367,6 +4370,7 @@ Mobile app output requirements:
             if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.openSavedGuides === 'function') {
                 const result = parseNativeBridgeResult(window.OffGridNative.openSavedGuides());
                 if (result.ok) {
+                    if (result.action === 'pick-pdf') return true;
                     showSaveToast('Saved Guides', 'PDFs are in Downloads > OffGrid AI. Images are in Gallery > OffGrid AI.');
                     return true;
                 }

@@ -15,14 +15,18 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 import android.view.Surface;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.FileProvider;
 import com.getcapacitor.BridgeActivity;
 import java.io.File;
@@ -39,10 +43,29 @@ public class MainActivity extends BridgeActivity {
     private float nativeCompassHeading = Float.NaN;
     private int nativeCompassAccuracy = SensorManager.SENSOR_STATUS_UNRELIABLE;
     private long lastCompassEmitMs = 0;
+    private ActivityResultLauncher<Intent> savedGuidePickerLauncher;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        savedGuidePickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() != RESULT_OK || result.getData() == null) return;
+                Uri guideUri = result.getData().getData();
+                if (guideUri == null) return;
+
+                Intent viewIntent = new Intent(Intent.ACTION_VIEW);
+                viewIntent.setDataAndType(guideUri, "application/pdf");
+                viewIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                try {
+                    startActivity(viewIntent);
+                } catch (Exception error) {
+                    Toast.makeText(MainActivity.this, "No PDF viewer found", Toast.LENGTH_LONG).show();
+                }
+            }
+        );
 
         getBridge().getWebView().addJavascriptInterface(new OffGridNativeBridge(), "OffGridNative");
     }
@@ -224,14 +247,17 @@ public class MainActivity extends BridgeActivity {
         public String openSavedGuides() {
             try {
                 Uri folderUri = Uri.parse("content://com.android.externalstorage.documents/document/primary%3ADownload%2FOffGrid%20AI");
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(folderUri, "vnd.android.document/directory");
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                intent.addCategory(Intent.CATEGORY_OPENABLE);
+                intent.setType("application/pdf");
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, folderUri);
+                }
 
                 runOnUiThread(() -> {
                     try {
-                        startActivity(intent);
+                        savedGuidePickerLauncher.launch(intent);
                     } catch (Exception error) {
                         Toast.makeText(
                             MainActivity.this,
@@ -243,6 +269,7 @@ public class MainActivity extends BridgeActivity {
 
                 return new JSONObject()
                     .put("ok", true)
+                    .put("action", "pick-pdf")
                     .put("location", "Downloads/OffGrid AI")
                     .toString();
             } catch (Exception error) {

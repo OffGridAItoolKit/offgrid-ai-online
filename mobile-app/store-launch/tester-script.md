@@ -18,6 +18,7 @@ Thanks for helping test OffGrid AI Field Guide. Please use it like you would in 
 8. Save the image to your phone.
 9. Save a field guide PDF.
 10. Try the Saved Guides button.
+    - On Android, confirm it opens a PDF picker at `Downloads > OffGrid AI` and that selecting a guide opens the PDF.
 11. Try day/night mode.
 12. Long-press an answer and test copy/share/read aloud if available.
 
