@@ -18,7 +18,7 @@ App.xcodeproj
 
 ## App Identity
 
-- App name: OffGrid AI ToolKit
+- App name: OffGrid AI Field Guide
 - Bundle id: com.offgridaitoolkit.app
 - Version: 1.0
 - Build: 1
@@ -77,5 +77,5 @@ Android has a custom `OffGridNative` bridge for phone-specific file, share, PDF,
 ## App Review Note
 
 ```text
-OffGrid AI ToolKit is a free online AI companion app for practical field guidance. It does not require an account, does not include ads, and does not include in-app purchases. Camera, photo library, microphone, and motion permissions are requested only when the user taps related features. The app requires internet access for AI responses.
+OffGrid AI Field Guide is a free online AI companion app for practical field guidance. It does not require an account, does not include ads, and does not include in-app purchases. Camera, photo library, microphone, and motion permissions are requested only when the user taps related features. The app requires internet access for AI responses.
 ```

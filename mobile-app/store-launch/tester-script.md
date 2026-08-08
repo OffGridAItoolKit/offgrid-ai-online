@@ -4,7 +4,7 @@ Send this to early testers after they are added to TestFlight or Google Play tes
 
 ## Short Message
 
-Thanks for helping test OffGrid AI ToolKit. Please use it like you would in a real preparedness, travel, homestead, or outdoor situation. The app is free, online-only for v1, and your feedback will help us make it smoother before public launch.
+Thanks for helping test OffGrid AI Field Guide. Please use it like you would in a real preparedness, travel, homestead, or outdoor situation. The app is free and online-only, and your feedback will help us make it smoother.
 
 ## Test Steps
 

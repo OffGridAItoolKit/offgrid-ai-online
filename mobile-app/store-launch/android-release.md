@@ -3,7 +3,7 @@
 ## One-Time Setup
 
 1. Create or verify the Google Play Console organization account.
-2. Create the app record for `OffGrid AI ToolKit`.
+2. Create or verify the app record for `OffGrid AI Field Guide`.
 3. Confirm package name: `com.offgridaitoolkit.app`.
 4. Generate the upload key outside the repo:
 
@@ -59,5 +59,5 @@ mobile-app\android\app\build\outputs\bundle\release\app-release.aab
 Use this in the Play Console review notes:
 
 ```text
-OffGrid AI ToolKit is a free online AI companion app. It does not require an account, does not include ads, and does not include in-app purchases. Camera, microphone, media, and compass permissions are requested only when the user taps those features. The app requires internet access for AI responses.
+OffGrid AI Field Guide is a free online AI companion app. It does not require an account, does not include ads, and does not include in-app purchases. Camera, microphone, media, and compass permissions are requested only when the user taps those features. The app requires internet access for AI responses.
 ```

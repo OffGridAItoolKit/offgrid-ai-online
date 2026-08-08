@@ -58,7 +58,7 @@ The production submission uses these disclosures:
 ## Plain-Language Disclosure
 
 ```text
-OffGrid AI ToolKit sends prompts and selected media to online AI services only when you use chat, upload, camera, video, voice, or Image Studio features. The app does not require an account, does not include ads, and does not include in-app purchases in v1. Optional feedback is saved only when you submit it, and an AI response is included only when you choose that option.
+OffGrid AI Field Guide sends prompts and selected media to online AI services only when you use chat, upload, camera, video, voice, or Image Studio features. The app does not require an account, does not include ads, and does not include in-app purchases. Optional feedback is saved only when you submit it, and an AI response is included only when you choose that option.
 ```
 
 ## Google Play Health Apps Declaration Update - 2026-07-30

@@ -6,7 +6,7 @@ const serverUrl = process.env.OFFGRID_MOBILE_SERVER_URL || 'https://offgridtoolk
 
 const config: CapacitorConfig = {
   appId: 'com.offgridaitoolkit.app',
-  appName: 'OffGrid AI ToolKit',
+  appName: 'OffGrid AI Field Guide',
   webDir: 'www',
   server: {
     url: serverUrl,

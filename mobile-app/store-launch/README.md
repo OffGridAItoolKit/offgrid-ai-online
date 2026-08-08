@@ -1,4 +1,4 @@
-# OffGrid AI ToolKit App Store Launch Packet
+# OffGrid AI Field Guide App Store Launch Packet
 
 Status: in progress
 Launch target: free online v1 for Google Play and Apple App Store
@@ -22,14 +22,14 @@ App id / bundle id: com.offgridaitoolkit.app
 - [ ] Google Play organization onboarding fully cleared. Identity is approved; website verification is requested and phone verification is waiting behind it.
 - [ ] Apple Developer Program organization account verified.
 - [ ] Tedd invited to App Store Connect with certificate/profile/TestFlight/upload access.
-- [x] Final public developer name confirmed as `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
+- [x] Public app name is `OffGrid AI Field Guide`; public developer brand is `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
 - [x] Support email confirmed as `support@offgridaitoolkit.com`.
 
 ### Product Readiness
 
 - [x] Capacitor app id set to com.offgridaitoolkit.app.
 - [x] Production app URL set to https://offgridtoolkit.ai/online?surface=app.
-- [x] Android app icon uses the OffGrid AI ToolKit compass.
+- [x] Android app icon uses the OffGrid AI compass.
 - [x] iOS 1024x1024 icon exists in the Xcode asset catalog.
 - [x] Native launcher icons and web shortcut artwork use the standalone dark-background compass; source copy is `store-launch/app-icon-source-512.png`.
 - [x] Mobile app surfaces hide Command Center and Knowledge Base purchase/save flows.
@@ -40,7 +40,7 @@ App id / bundle id: com.offgridaitoolkit.app
 - [ ] Final legal/privacy review completed before submission.
 - [x] Backend rate limits, daily anonymous cost ceilings, and media size limits implemented and locally verified.
 - [x] OpenRouter prompt logging, observability broadcast, model-training data use, and prompt publication are disabled.
-- [x] ToolKit app AI requests enforce OpenRouter Zero Data Retention routing per request.
+- [x] Field Guide app AI requests enforce OpenRouter Zero Data Retention routing per request.
 - [x] Render technical request-log fields and 7-day Starter retention are documented for Data Safety.
 - [x] Android cloud backup is disabled for the release manifest.
 - [ ] Store screenshots captured from final release build.

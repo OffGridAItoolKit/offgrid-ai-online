@@ -2,13 +2,17 @@
 
 **Last Updated:** 2026-08-07
 
-This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI ToolKit Online platform.
+This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI Field Guide online platform.
 
 ---
 
 ### August 2026
 
 **2026-08-07**
+*   **Online product rename prepared**
+    *   Updated the online web/app interface, native mobile labels, policy pages, exports, sharing text, and operational metadata to `OffGrid AI Field Guide`.
+    *   Used `by OffGrid AI` for consumer-facing attribution while retaining `OFFGRID AI TOOLKIT, LLC` as the legal entity.
+    *   Preserved explicit `OffGrid AI ToolKit` references that describe the separate offline/USB product.
 *   **Responsive mobile layout prepared (unreleased)**
     *   Prevented flex children and welcome-screen controls from expanding the document beyond compact Android viewports.
     *   Added a two-row action layout for phones at 420 CSS pixels or narrower so Prompts, Voice Input, and Send remain reachable with enlarged display text.

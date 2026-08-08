@@ -9091,7 +9091,7 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0);
                     
-                    const text = 'Image created with OffGrid AI ToolKit - offgridaitoolkit.com';
+                    const text = 'Image created with OffGrid Command Center — by OffGrid AI';
                     const fontSize = Math.max(12, Math.min(15, Math.round(img.width / 110)));
                     const padX = Math.max(10, Math.round(fontSize * 0.8));
                     const padY = Math.max(6, Math.round(fontSize * 0.45));
@@ -9143,7 +9143,7 @@
                 const fileName = `offgrid-image-${slug}-${ts}.png`;
                 const file = new File([blob], fileName, { type: 'image/png' });
                 
-                const shareText = 'Image created with OffGrid AI ToolKit';
+                const shareText = 'Image created with OffGrid Command Center — by OffGrid AI';
                 const shareHashtags = '#OffGridAI #AIArt #ImageStudio';
                 const shareUrl = 'https://offgridaitoolkit.com';
                 

@@ -1,7 +1,7 @@
 {
   "name": "offgrid-ai-online",
   "version": "5.7.3",
-  "description": "OffGrid AI ToolKit Online - priority-first preparedness and field decision support",
+  "description": "OffGrid AI Field Guide - priority-first preparedness and field decision support",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",

@@ -1,5 +1,5 @@
 /**
- * OffGrid AI ToolKit Online - Backend API Server
+ * OffGrid AI Field Guide - Backend API Server
  * 
  * This server acts as a secure proxy between the frontend and OpenRouter API,
  * keeping the API key secure on the server side.
@@ -1140,7 +1140,7 @@ app.get('/api/models', (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
-        service: 'OffGrid AI ToolKit Online',
+        service: 'OffGrid AI Field Guide',
         timestamp: new Date().toISOString()
     });
 });
@@ -2416,7 +2416,7 @@ app.post('/api/export-pdf', async (req, res) => {
 <body>
     ${markdownToHtml(markdown)}
     <div class="footer">
-        OffGrid AI ToolKit Command Center &bull; offgridaitoolkit.com
+        OffGrid AI Field Guide &bull; by OffGrid AI
     </div>
 </body>
 </html>`;
@@ -2572,12 +2572,12 @@ app.get('/command/ready-made-prompts', (req, res) => {
     res.sendFile(path.join(__dirname, 'ready-made-prompts.html'));
 });
 
-// Customer experience - ad-free online toolkit
+// Customer experience - ad-free online Field Guide
 app.get('/online', (req, res) => {
     serveWithExperience(req, res, true);
 });
 
-// Mobile route redirects to the customer online toolkit experience.
+// Mobile route redirects to the customer online Field Guide experience.
 app.get('/mobile', (req, res) => {
     res.redirect(301, '/online');
 });
@@ -2649,7 +2649,7 @@ initializeDatabase()
 app.listen(PORT, '0.0.0.0', () => {
     console.log('');
     console.log('╔═══════════════════════════════════════════════════════════╗');
-    console.log('║       OffGrid AI ToolKit Online - Server Started          ║');
+    console.log('║         OffGrid AI Field Guide - Server Started           ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  Local:   http://localhost:${PORT}                          ║`);
     console.log(`║  Network: http://0.0.0.0:${PORT}                            ║`);
@@ -2669,7 +2669,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`║  API Key: ${OPENROUTER_API_KEY ? '✓ Configured' : '✗ Missing'}                               ║`);
     console.log('║  Routes:                                                  ║');
     console.log('║    /         → Prospect Demo (sales messaging)            ║');
-    console.log('║    /online   → Customer ToolKit (ad-free)                 ║');
+    console.log('║    /online   → OffGrid AI Field Guide (ad-free)           ║');
     console.log('║    /command  → Command Center (premium)                   ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  Database: ${process.env.DATABASE_URL ? '✓ Connected' : '✗ Not configured'}                             ║`);

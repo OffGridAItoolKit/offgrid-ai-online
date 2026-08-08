@@ -2791,7 +2791,7 @@ body.live-compass-enabled .live-compass .welcome-icon {
 
 /* ============================================
    COMMAND CENTER DARK THEME OVERRIDES
-   Scoped under .command-theme to protect free ToolKit
+   Scoped under .command-theme to protect Field Guide
    ============================================ */
 
 body.command-theme {
@@ -3279,7 +3279,7 @@ body.command-theme {
         min-width: 0 !important;
     }
     
-    /* Compass sizing on mobile (free ToolKit only) */
+    /* Compass sizing on mobile (Field Guide only) */
     body:not(.command-theme) .welcome-icon {
         display: block !important;
         width: 22vw !important;
@@ -3389,12 +3389,12 @@ body.command-theme {
         order: 9 !important;
     }
     
-    /* Reduce overall padding on welcome (free ToolKit only) */
+    /* Reduce overall padding on welcome (Field Guide only) */
     body:not(.command-theme) .welcome {
         padding: 5px 4px 10px 4px !important;
     }
     
-    /* Reduce side padding on messages container (free ToolKit only) */
+    /* Reduce side padding on messages container (Field Guide only) */
     body:not(.command-theme) .messages {
         padding-left: 8px !important;
         padding-right: 8px !important;
@@ -3576,7 +3576,7 @@ body.command-theme {
 }
 
 /* ============================================ */
-/* ToolKit Mobile App Theme + Context Actions   */
+/* Field Guide Mobile App Theme + Context Actions */
 /* ============================================ */
 
 .app-theme-toggle {

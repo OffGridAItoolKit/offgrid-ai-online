@@ -2,7 +2,7 @@
 
 **Version 1.1.0** | **Last Updated:** 2026-07-10
 
-This manual provides standard operating procedures (SOPs) for monitoring, troubleshooting, and maintaining the OffGrid AI ToolKit Online platform.
+This manual provides standard operating procedures (SOPs) for monitoring, troubleshooting, and maintaining the OffGrid AI Field Guide online platform.
 
 ---
 
