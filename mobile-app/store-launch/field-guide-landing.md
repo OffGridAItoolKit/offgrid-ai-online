@@ -30,6 +30,17 @@ Namecheap BasicDNS uses an `A` record for each root (`@`) pointing to Render's d
 - Online edition: free, no account, no ads, internet required for AI and visual generation.
 - Offline edition: separate future paid `OffGrid AI ToolKit`, designed to run AI locally and intentionally not presented as the same app.
 
+## Public media library
+
+Landing-page media is stored under `assets/field-guide/` so it is deployed with the existing Render service and can be reused by future website, blog, social, and store-listing work.
+
+- `brand/` preserves both full-quality angled phone PNGs and provides optimized WebP copies. The left-facing version is used on the right side of the landing-page hero so the device points inward toward the headline.
+- `walkthrough/` contains the straight-on, silent walkthrough video and poster. The unchanged generation wait is shortened, Android system bars are cropped, and the recording ends before the notification shade appears.
+- `gallery/original/` preserves the six full-resolution generated PNGs with corrected descriptive filenames.
+- `gallery/web/` and `gallery/thumb/` contain optimized WebP copies used by the responsive gallery and accessible lightbox.
+
+The gallery includes a prominent verification notice because its examples include medical, emergency, mechanical, food-safety, and survival information.
+
 ## Release state - 2026-08-09
 
 - Landing page source, corrected host routing, Apple-version notice, social card, and automated checks are deployed from GitHub `main` at commit `a67db55`.
@@ -37,4 +48,4 @@ Namecheap BasicDNS uses an `A` record for each root (`@`) pointing to Render's d
 - `https://www.offgridai.guide` is verified and configured to redirect permanently to the canonical root domain; its certificate was still propagating across edges at the time of this record.
 - Both root and `www` forms of `https://offgridaifieldguide.com` are verified and redirect permanently to the canonical domain.
 - The Google Play store-listing contact website is published as `https://offgridai.guide`.
-- A gallery will be added after the owner provides approximately eight representative Field Guide images.
+- The landing page now includes an actual app hero render, straight-on workflow video, and six-example responsive gallery with keyboard-accessible lightbox.

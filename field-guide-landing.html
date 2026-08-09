@@ -176,44 +176,13 @@
       background: radial-gradient(circle, rgba(224,170,24,0.20), transparent 67%);
       filter: blur(7px);
     }
-    .phone {
+    .hero-phone {
       position: relative;
-      width: min(100%, 370px);
-      padding: 10px;
-      border: 1px solid rgba(245, 237, 223, 0.22);
-      border-radius: 38px;
-      background: #05080b;
-      box-shadow: 0 36px 90px rgba(0,0,0,0.52), 0 0 0 6px rgba(255,255,255,0.025);
-      transform: rotate(1.5deg);
+      width: min(100%, 500px);
+      max-height: 720px;
+      object-fit: contain;
+      filter: drop-shadow(0 38px 48px rgba(0,0,0,0.54));
     }
-    .phone-screen {
-      min-height: 650px;
-      padding: 26px 20px 22px;
-      overflow: hidden;
-      border-radius: 29px;
-      background: linear-gradient(180deg, #10161d, #0b1015);
-    }
-    .phone-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .phone-brand { display: flex; align-items: center; gap: 8px; color: var(--gold-light); font-size: 0.82rem; font-weight: 900; letter-spacing: 0.04em; }
-    .phone-brand img { width: 32px; height: 32px; }
-    .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
-    .phone-compass { width: 154px; display: block; margin: 34px auto 10px; filter: drop-shadow(0 14px 22px rgba(0,0,0,0.4)); }
-    .phone-kicker { margin: 0 0 23px; color: #d7ad61; font-style: italic; text-align: center; }
-    .ask-card {
-      padding: 18px;
-      border: 1px solid rgba(224,170,24,0.45);
-      border-radius: 18px;
-      background: var(--panel-strong);
-      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
-    }
-    .ask-line { padding: 10px 0 18px; color: #c1c9d2; font-size: 1.03rem; border-bottom: 1px solid rgba(255,255,255,0.09); }
-    .micro-actions { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .micro-action { padding: 10px 8px; border: 1px solid rgba(224,170,24,0.3); border-radius: 9px; color: var(--gold-light); font-size: 0.8rem; font-weight: 800; text-align: center; }
-    .mini-send { grid-column: 1 / -1; padding: 11px; border-radius: 9px; color: #18140a; background: var(--gold); font-weight: 900; text-align: center; }
-    .phone-feature { margin-top: 12px; padding: 14px 15px; display: flex; gap: 12px; align-items: center; border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; background: rgba(255,255,255,0.035); }
-    .phone-feature strong { display: block; font-size: 0.88rem; }
-    .phone-feature span { display: block; color: var(--muted); font-size: 0.76rem; }
-    .phone-feature b { font-size: 1.35rem; }
 
     .trust-strip { border-block: 1px solid var(--line); background: rgba(224,170,24,0.035); }
     .trust-grid { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
@@ -239,6 +208,77 @@
     .step::before { content: "0" counter(guide-step); position: absolute; top: 0; left: 0; color: var(--orange); font-size: 1.95rem; font-weight: 900; }
     .step::after { content: ""; position: absolute; top: 22px; left: 55px; right: 0; height: 1px; background: var(--line); }
     .step h3 { font-size: 1.25rem; }
+
+    .walkthrough-layout { display: grid; grid-template-columns: minmax(0, 0.82fr) minmax(320px, 0.58fr); gap: clamp(42px, 8vw, 110px); align-items: center; }
+    .walkthrough-copy p { color: var(--muted); }
+    .demo-points { display: grid; gap: 12px; margin: 27px 0 0; }
+    .demo-point { display: flex; gap: 11px; align-items: flex-start; color: #d2d8df; }
+    .demo-point::before { content: ""; flex: 0 0 9px; width: 9px; height: 9px; margin-top: 0.48em; border-radius: 50%; background: var(--gold); box-shadow: 0 0 14px rgba(224,170,24,0.5); }
+    .video-device-wrap { display: grid; place-items: center; }
+    .video-device {
+      width: min(100%, 344px);
+      padding: 9px;
+      border: 1px solid rgba(245,237,223,0.24);
+      border-radius: 35px;
+      background: #05080b;
+      box-shadow: 0 34px 85px rgba(0,0,0,0.5), 0 0 0 6px rgba(255,255,255,0.025);
+    }
+    .video-device video { display: block; width: 100%; aspect-ratio: 720 / 1414; border-radius: 27px; background: #fff; object-fit: cover; }
+    .video-note { margin: 14px 0 0; color: var(--muted); font-size: 0.82rem; text-align: center; }
+
+    .gallery-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .gallery-card {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      background: linear-gradient(150deg, rgba(29,38,49,0.94), rgba(16,22,29,0.96));
+      box-shadow: 0 18px 44px rgba(0,0,0,0.2);
+    }
+    .gallery-open { width: 100%; display: block; padding: 0; border: 0; background: transparent; color: inherit; cursor: zoom-in; text-align: left; }
+    .gallery-open:focus-visible { outline: 3px solid var(--gold-light); outline-offset: -3px; }
+    .gallery-image-wrap { aspect-ratio: 4 / 5; overflow: hidden; background: #f3eddf; }
+    .gallery-image-wrap img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: top center; transition: transform 220ms ease; }
+    .gallery-open:hover img { transform: scale(1.025); }
+    .gallery-copy { padding: 18px 19px 20px; }
+    .gallery-category { display: block; margin-bottom: 6px; color: var(--gold-light); font-size: 0.76rem; font-weight: 850; letter-spacing: 0.11em; text-transform: uppercase; }
+    .gallery-copy strong { display: block; font-size: 1.02rem; line-height: 1.3; }
+    .gallery-hint { margin: 24px 0 0; color: var(--muted); font-size: 0.86rem; }
+    .gallery-disclosure { margin: 24px 0 0; padding: 16px 18px; border-left: 3px solid var(--orange); border-radius: 0 10px 10px 0; background: rgba(244,123,32,0.07); color: #c6ced7; font-size: 0.9rem; }
+
+    .lightbox {
+      width: min(1040px, calc(100% - 24px));
+      max-width: none;
+      max-height: calc(100vh - 24px);
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid rgba(241,199,92,0.35);
+      border-radius: 20px;
+      background: #0b1015;
+      color: var(--cream);
+      box-shadow: 0 34px 100px rgba(0,0,0,0.75);
+    }
+    .lightbox::backdrop { background: rgba(2,4,7,0.88); backdrop-filter: blur(8px); }
+    .lightbox-inner { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; max-height: calc(100vh - 24px); }
+    .lightbox-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; border-bottom: 1px solid rgba(255,255,255,0.09); }
+    .lightbox-title { margin: 0; font-size: 0.95rem; font-weight: 800; }
+    .lightbox-close, .lightbox-nav {
+      min-width: 44px;
+      min-height: 44px;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.055);
+      color: var(--cream);
+      cursor: pointer;
+      font: inherit;
+      font-weight: 850;
+    }
+    .lightbox-stage { min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 16px; background: #070b0f; }
+    .lightbox-stage img { min-height: 0; max-height: calc(100vh - 150px); width: 100%; height: 100%; object-fit: contain; }
+    .lightbox-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px 16px; border-top: 1px solid rgba(255,255,255,0.09); color: var(--muted); font-size: 0.86rem; }
+    .lightbox-original { color: var(--gold-light); font-weight: 800; text-decoration: none; }
+    body.lightbox-open { overflow: hidden; }
 
     .split { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(40px, 7vw, 96px); align-items: center; }
     .guide-card { padding: 25px; border: 1px solid rgba(224,170,24,0.38); border-radius: 22px; background: #f3eddf; color: #231c12; box-shadow: 0 25px 70px rgba(0,0,0,0.34); transform: rotate(-1deg); }
@@ -269,14 +309,17 @@
       .hero-copy > p { margin-inline: auto; }
       .eyebrow { justify-content: center; }
       .hero-actions { justify-content: center; }
-      .phone { transform: none; }
+      .hero-phone { max-height: 690px; }
       .trust-grid { grid-template-columns: 1fr 1fr; }
       .trust-item:nth-child(2) { border-right: 0; }
       .trust-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
       .feature-grid { grid-template-columns: 1fr; }
       .feature-card { min-height: auto; }
       .feature-icon { margin-bottom: 24px; }
-      .steps, .split { grid-template-columns: 1fr; }
+      .steps, .split, .walkthrough-layout { grid-template-columns: 1fr; }
+      .walkthrough-copy { text-align: center; }
+      .demo-point { justify-content: center; }
+      .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width: 560px) {
@@ -288,13 +331,16 @@
       h1 { font-size: clamp(2.75rem, 14vw, 4.2rem); }
       .hero-actions { display: grid; }
       .hero-actions .button { width: 100%; }
-      .phone { width: min(100%, 345px); }
-      .phone-screen { min-height: 610px; }
+      .hero-phone { width: min(100%, 390px); max-height: 610px; }
       .trust-grid { grid-template-columns: 1fr; }
       .trust-item { border-right: 0; border-bottom: 1px solid var(--line); }
       .trust-item:last-child { border-bottom: 0; }
       .section { width: min(100% - 24px, var(--max)); padding: 76px 0; }
       .feature-card, .sister-note { padding: 23px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .gallery-image-wrap { aspect-ratio: 4 / 4.65; }
+      .lightbox-stage { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; padding: 9px; }
+      .lightbox-footer { align-items: flex-start; flex-direction: column; }
       footer { flex-direction: column; }
     }
 
@@ -310,6 +356,7 @@
       <a class="brand" href="#top"><img src="/compass-192.png" alt=""><span>OFFGRID AI</span> FIELD GUIDE</a>
       <div class="nav-links">
         <a href="#features">Features</a>
+        <a href="#examples">Examples</a>
         <a href="#how-it-works">How it works</a>
         <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app">Get it on Google Play</a>
       </div>
@@ -329,28 +376,11 @@
         <p class="availability"><strong>Available now on Android.</strong> Apple version on the way.</p>
       </div>
 
-      <div class="phone-wrap" aria-label="OffGrid AI Field Guide app preview">
-        <div class="phone">
-          <div class="phone-screen">
-            <div class="phone-top">
-              <div class="phone-brand"><img src="/compass-192.png" alt=""> OFFGRID AI FIELD GUIDE</div>
-              <span class="status-dot" title="Online"></span>
-            </div>
-            <img class="phone-compass" src="/compass-512.png" alt="OffGrid AI compass">
-            <p class="phone-kicker">Tap compass for heading</p>
-            <div class="ask-card">
-              <div class="ask-line">What should I prepare before a three-day backcountry trip?</div>
-              <div class="micro-actions">
-                <div class="micro-action">Field Prompts</div>
-                <div class="micro-action">Voice Input</div>
-                <div class="mini-send">Build my answer</div>
-              </div>
-            </div>
-            <div class="phone-feature"><b>📷</b><div><strong>Identify a photo</strong><span>Camera, gallery, screenshots</span></div></div>
-            <div class="phone-feature"><b>🎬</b><div><strong>Analyze a short video</strong><span>See motion, changes, and context</span></div></div>
-            <div class="phone-feature"><b>🧭</b><div><strong>Save a Field Guide</strong><span>Keep the useful answer as a PDF</span></div></div>
-          </div>
-        </div>
+      <div class="phone-wrap">
+        <picture>
+          <source srcset="/assets/field-guide/brand/offgrid-field-guide-phone-angle-left.webp" type="image/webp">
+          <img class="hero-phone" src="/assets/field-guide/brand/offgrid-field-guide-phone-angle-left.png" width="667" height="1509" alt="OffGrid AI Field Guide shown on an angled Android phone" fetchpriority="high">
+        </picture>
       </div>
     </section>
 
@@ -365,7 +395,7 @@
 
     <section class="section" id="features">
       <div class="section-head">
-        <p class="eyebrow">One app, four practical tools</p>
+        <p class="eyebrow">One app, six practical tools</p>
         <h2>More useful than another chat window.</h2>
         <p>OffGrid AI Field Guide is designed around what happens after you ask a question: understanding the situation, making the answer visual, and keeping it where you can find it again.</p>
       </div>
@@ -413,6 +443,76 @@
         <article class="step"><h3>Get prioritized guidance</h3><p>Answers lead with what matters first and clearly flag uncertainty or safety concerns.</p></article>
         <article class="step"><h3>Build your own knowledge base</h3><p>Create a visual Field Guide, save the PDF, and keep it available on your phone.</p></article>
       </div>
+    </section>
+
+    <section class="section walkthrough-layout" id="walkthrough">
+      <div class="walkthrough-copy">
+        <p class="eyebrow">See the complete workflow</p>
+        <h2>From a question to a saved Field Guide.</h2>
+        <p>This real phone walkthrough shows the full process: ask a practical question, generate a visual, build the PDF, and open the completed guide saved on the device.</p>
+        <div class="demo-points">
+          <div class="demo-point">Straight-on recording so every tap and label stays legible</div>
+          <div class="demo-point">The unchanged generation wait is shortened for the demonstration</div>
+          <div class="demo-point">No account is required to create and save a guide</div>
+        </div>
+      </div>
+      <div class="video-device-wrap">
+        <div class="video-device">
+          <video controls playsinline muted preload="metadata" poster="/assets/field-guide/walkthrough/create-a-field-guide-poster.jpg" aria-label="Silent walkthrough showing how to create and save a Field Guide">
+            <source src="/assets/field-guide/walkthrough/create-a-field-guide-walkthrough.mp4" type="video/mp4">
+            Your browser does not support this walkthrough video.
+          </video>
+        </div>
+        <p class="video-note">44-second silent demonstration</p>
+      </div>
+    </section>
+
+    <section class="section" id="examples">
+      <div class="section-head">
+        <p class="eyebrow">Made in the app</p>
+        <h2>Real Field Guide visuals across real-world categories.</h2>
+        <p>These examples were created with OffGrid AI Image Studio. Tap any card to inspect the full visual.</p>
+      </div>
+      <div class="gallery-grid">
+        <article class="gallery-card">
+          <button class="gallery-open" type="button" data-title="ABC Priority Sequence" data-category="Emergency response" data-full="/assets/field-guide/gallery/web/abc-priority-sequence.webp" data-original="/assets/field-guide/gallery/original/abc-priority-sequence.png" aria-label="Open ABC Priority Sequence example">
+            <div class="gallery-image-wrap"><img src="/assets/field-guide/gallery/thumb/abc-priority-sequence.webp" width="520" height="920" loading="lazy" decoding="async" alt="Visual Field Guide for checking airway, breathing, and circulation"></div>
+            <div class="gallery-copy"><span class="gallery-category">Emergency response</span><strong>ABC Priority Sequence</strong></div>
+          </button>
+        </article>
+        <article class="gallery-card">
+          <button class="gallery-open" type="button" data-title="4Runner Repair &amp; Recovery Kit" data-category="Vehicle preparedness" data-full="/assets/field-guide/gallery/web/toyota-4runner-repair-recovery-kit.webp" data-original="/assets/field-guide/gallery/original/toyota-4runner-repair-recovery-kit.png" aria-label="Open 4Runner repair and recovery kit example">
+            <div class="gallery-image-wrap"><img src="/assets/field-guide/gallery/thumb/toyota-4runner-repair-recovery-kit.webp" width="520" height="920" loading="lazy" decoding="async" alt="Visual Field Guide for a Toyota 4Runner trail repair and recovery kit"></div>
+            <div class="gallery-copy"><span class="gallery-category">Vehicle preparedness</span><strong>4Runner Repair &amp; Recovery Kit</strong></div>
+          </button>
+        </article>
+        <article class="gallery-card">
+          <button class="gallery-open" type="button" data-title="DIY Floating Needle Compass" data-category="Navigation" data-full="/assets/field-guide/gallery/web/floating-needle-compass.webp" data-original="/assets/field-guide/gallery/original/floating-needle-compass.png" aria-label="Open DIY floating needle compass example">
+            <div class="gallery-image-wrap"><img src="/assets/field-guide/gallery/thumb/floating-needle-compass.webp" width="520" height="920" loading="lazy" decoding="async" alt="Visual Field Guide for making a floating needle compass"></div>
+            <div class="gallery-copy"><span class="gallery-category">Navigation</span><strong>DIY Floating Needle Compass</strong></div>
+          </button>
+        </article>
+        <article class="gallery-card">
+          <button class="gallery-open" type="button" data-title="Five Fire-Starting Methods" data-category="Fire &amp; warmth" data-full="/assets/field-guide/gallery/web/five-fire-starting-methods.webp" data-original="/assets/field-guide/gallery/original/five-fire-starting-methods.png" aria-label="Open five fire-starting methods example">
+            <div class="gallery-image-wrap"><img src="/assets/field-guide/gallery/thumb/five-fire-starting-methods.webp" width="520" height="920" loading="lazy" decoding="async" alt="Visual Field Guide showing five ways to start a fire without matches or a lighter"></div>
+            <div class="gallery-copy"><span class="gallery-category">Fire &amp; warmth</span><strong>Five Fire-Starting Methods</strong></div>
+          </button>
+        </article>
+        <article class="gallery-card">
+          <button class="gallery-open" type="button" data-title="Deer Field Dressing Guide" data-category="Hunting &amp; food processing" data-full="/assets/field-guide/gallery/web/deer-field-dressing-guide.webp" data-original="/assets/field-guide/gallery/original/deer-field-dressing-guide.png" aria-label="Open deer field dressing example">
+            <div class="gallery-image-wrap"><img src="/assets/field-guide/gallery/thumb/deer-field-dressing-guide.webp" width="520" height="920" loading="lazy" decoding="async" alt="Visual Field Guide showing deer field dressing steps"></div>
+            <div class="gallery-copy"><span class="gallery-category">Hunting &amp; food processing</span><strong>Deer Field Dressing Guide</strong></div>
+          </button>
+        </article>
+        <article class="gallery-card">
+          <button class="gallery-open" type="button" data-title="Low-Cost Raised Bed Methods" data-category="Homestead &amp; gardening" data-full="/assets/field-guide/gallery/web/low-cost-raised-bed-methods.webp" data-original="/assets/field-guide/gallery/original/low-cost-raised-bed-methods.png" aria-label="Open low-cost raised bed methods example">
+            <div class="gallery-image-wrap"><img src="/assets/field-guide/gallery/thumb/low-cost-raised-bed-methods.webp" width="520" height="920" loading="lazy" decoding="async" alt="Visual Field Guide showing low-cost raised garden bed methods"></div>
+            <div class="gallery-copy"><span class="gallery-category">Homestead &amp; gardening</span><strong>Low-Cost Raised Bed Methods</strong></div>
+          </button>
+        </article>
+      </div>
+      <p class="gallery-hint">Tap an example to enlarge it. Full-resolution PNG files are available from the expanded view.</p>
+      <p class="gallery-disclosure"><strong>Important:</strong> AI-generated visuals can contain mistakes. Verify critical medical, emergency, legal, mechanical, food-safety, and survival information with qualified or authoritative sources before acting. These examples are educational and are not professional medical advice.</p>
     </section>
 
     <section class="section split">
@@ -465,5 +565,66 @@
       <a href="mailto:support@offgridaitoolkit.com">Support</a>
     </nav>
   </footer>
+
+  <dialog class="lightbox" id="gallery-lightbox" aria-labelledby="lightbox-title">
+    <div class="lightbox-inner">
+      <div class="lightbox-bar">
+        <p class="lightbox-title" id="lightbox-title"></p>
+        <button class="lightbox-close" type="button" aria-label="Close enlarged image">Close</button>
+      </div>
+      <div class="lightbox-stage">
+        <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous example">&#8592;</button>
+        <img id="lightbox-image" src="" alt="">
+        <button class="lightbox-nav lightbox-next" type="button" aria-label="Next example">&#8594;</button>
+      </div>
+      <div class="lightbox-footer">
+        <span id="lightbox-category"></span>
+        <a class="lightbox-original" id="lightbox-original" href="#" target="_blank" rel="noopener">Open full-resolution PNG</a>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+    (() => {
+      const items = Array.from(document.querySelectorAll('.gallery-open'));
+      const dialog = document.getElementById('gallery-lightbox');
+      const image = document.getElementById('lightbox-image');
+      const title = document.getElementById('lightbox-title');
+      const category = document.getElementById('lightbox-category');
+      const original = document.getElementById('lightbox-original');
+      let activeIndex = 0;
+
+      const showItem = (index) => {
+        activeIndex = (index + items.length) % items.length;
+        const item = items[activeIndex];
+        image.src = item.dataset.full;
+        image.alt = item.querySelector('img').alt;
+        title.textContent = item.dataset.title;
+        category.textContent = item.dataset.category;
+        original.href = item.dataset.original;
+      };
+
+      items.forEach((item, index) => item.addEventListener('click', () => {
+        showItem(index);
+        dialog.showModal();
+        document.body.classList.add('lightbox-open');
+      }));
+
+      dialog.querySelector('.lightbox-close').addEventListener('click', () => dialog.close());
+      dialog.querySelector('.lightbox-prev').addEventListener('click', () => showItem(activeIndex - 1));
+      dialog.querySelector('.lightbox-next').addEventListener('click', () => showItem(activeIndex + 1));
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+      dialog.addEventListener('close', () => {
+        document.body.classList.remove('lightbox-open');
+        image.src = '';
+      });
+      dialog.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') showItem(activeIndex - 1);
+        if (event.key === 'ArrowRight') showItem(activeIndex + 1);
+      });
+    })();
+  </script>
 </body>
 </html>

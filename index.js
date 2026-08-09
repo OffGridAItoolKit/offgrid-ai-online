@@ -529,7 +529,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     if (!isFieldGuideLandingHost(req)) return next();
     if (req.path.startsWith('/api/')) return next();
-    if (req.path.match(/\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff|woff2|ttf|eot|map)$/i)) return next();
+      if (req.path.match(/\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff|woff2|ttf|eot|map|mp4|webm)$/i)) return next();
     return res.sendFile(path.join(__dirname, 'field-guide-landing.html'));
 });
 

@@ -30,6 +30,16 @@ async function verify() {
         throw new Error(`Primary landing response was unexpected (${primary.status}).`);
     }
 
+    const video = await fetch(`http://127.0.0.1:${port}/assets/field-guide/walkthrough/create-a-field-guide-walkthrough.mp4`, {
+        headers: {
+            'X-Forwarded-Host': 'offgridai.guide',
+            Range: 'bytes=0-31'
+        }
+    });
+    if (video.status !== 206 || !String(video.headers.get('content-type')).startsWith('video/mp4')) {
+        throw new Error(`Landing video asset response was unexpected (${video.status}, ${video.headers.get('content-type')}).`);
+    }
+
     const redirect = await fetch(`http://127.0.0.1:${port}/features`, {
         headers: { 'X-Forwarded-Host': 'offgridaifieldguide.com' },
         redirect: 'manual'
@@ -38,7 +48,7 @@ async function verify() {
         throw new Error(`Redirect response was unexpected (${redirect.status}, ${redirect.headers.get('location')}).`);
     }
 
-    finish(0, 'Landing host smoke checks passed (2/2).');
+    finish(0, 'Landing host smoke checks passed (3/3).');
 }
 
 child.stdout.on('data', (chunk) => {
