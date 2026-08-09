@@ -2807,8 +2807,14 @@
             return `<div class="message-followup-actions">
                         <button class="message-followup-action primary" onclick="createVisualFromMessageAction(this, 'field-guide')">Make Field Guide</button>
                         <button class="message-followup-action" onclick="createVisualFromMessageAction(this, 'visual')">Create Visual</button>
-                        <button class="message-followup-action" onclick="exportAsPDF()">Save PDF</button>
+                        <button class="message-followup-action" data-read-aloud-action onclick="readMessageAloudFromAction(this)">Read Aloud</button>
                     </div>`;
+        }
+
+        function readMessageAloudFromAction(button) {
+            const message = button?.closest('.message.assistant');
+            const messageText = message ? getAssistantMessageText(message) : '';
+            toggleToolkitReadAloud(messageText);
         }
 
         function attachMessageFollowupActions(messageDiv) {
@@ -5714,11 +5720,45 @@ Mobile app output requirements:
         let toolkitTtsWatchdog = null;
         let toolkitTtsVoice = null;
 
+        function prepareTextForToolkitTTS(text) {
+            return String(text || '')
+                .replace(/```(?:[^\n]*)\n?([\s\S]*?)```/g, ' Code example. $1 ')
+                .replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1. ')
+                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+                .split(/\r?\n/)
+                .map(line => {
+                    const trimmed = line.trim();
+                    if (!trimmed) return '';
+                    if (/^\|?\s*:?-{3,}/.test(trimmed)) return '';
+
+                    let spoken = trimmed
+                        .replace(/^#{1,6}\s+/, '')
+                        .replace(/^>\s*/, '')
+                        .replace(/^[-*+•●▪◦]\s+/, 'Item. ')
+                        .replace(/^(\d+)[.)]\s+/, 'Step $1. ')
+                        .replace(/[|\t]+/g, '. ')
+                        .replace(/`([^`]+)`/g, '$1')
+                        .replace(/[*_~]/g, '')
+                        .replace(/<[^>]+>/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+
+                    if (spoken && !/[.!?;:]$/.test(spoken)) spoken += '.';
+                    return spoken;
+                })
+                .filter(Boolean)
+                .join(' ')
+                .replace(/\s+([,.;:!?])/g, '$1')
+                .replace(/([.!?]){2,}/g, '$1')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
         function splitTextForToolkitTTS(text) {
             const isAndroidChrome = /android/i.test(navigator.userAgent) && /chrome/i.test(navigator.userAgent);
-            const maxChunk = isAndroidChrome ? 80 : 220;
+            const maxChunk = isAndroidChrome ? 120 : 220;
             const chunks = [];
-            const sentences = text.match(/[^.!?]+(?:[.!?]+(?:\s|$))?/g) || [text];
+            const sentences = text.match(/[^.!?;:]+(?:[.!?]+|[;:])?(?:\s|$)/g) || [text];
             let current = '';
 
             for (const sentence of sentences) {
@@ -5744,6 +5784,13 @@ Mobile app output requirements:
 
             if (current.trim()) chunks.push(current.trim());
             return chunks.length ? chunks : [text.slice(0, maxChunk)];
+        }
+
+        function updateToolkitTTSActionLabels() {
+            document.querySelectorAll('[data-read-aloud-action]').forEach(button => {
+                button.textContent = toolkitTtsActive ? 'Stop Reading' : 'Read Aloud';
+                button.setAttribute('aria-pressed', toolkitTtsActive ? 'true' : 'false');
+            });
         }
 
         function showToolkitTTSIndicator() {
@@ -5779,7 +5826,10 @@ Mobile app output requirements:
             const utterance = new SpeechSynthesisUtterance(chunk);
             utterance.rate = 1;
             utterance.pitch = 1;
-            if (toolkitTtsVoice) utterance.voice = toolkitTtsVoice;
+            if (toolkitTtsVoice) {
+                utterance.voice = toolkitTtsVoice;
+                utterance.lang = toolkitTtsVoice.lang;
+            }
             let handled = false;
 
             const advance = (delay = 250) => {
@@ -5790,7 +5840,11 @@ Mobile app output requirements:
                 setTimeout(speakNextToolkitChunk, delay);
             };
 
-            utterance.onend = () => advance(/[.!?]$/.test(chunk.trim()) ? 450 : 180);
+            utterance.onend = () => {
+                const ending = chunk.trim();
+                const pause = /[.!?]$/.test(ending) ? 320 : /[;:]$/.test(ending) ? 200 : 120;
+                advance(pause);
+            };
             utterance.onerror = (event) => {
                 if (event.error === 'canceled') {
                     stopToolkitReadAloud();
@@ -5821,23 +5875,23 @@ Mobile app output requirements:
                 return;
             }
 
-            const cleanText = cleanTextForSharing(text)
-                .replace(/^\d+\.\s+/gm, '')
-                .replace(/^[-*]\s+/gm, '')
-                .replace(/\s+/g, ' ')
-                .trim();
+            const cleanText = prepareTextForToolkitTTS(text);
             if (!cleanText) {
                 showSaveToast('Nothing to read');
                 return;
             }
 
             const voices = window.speechSynthesis.getVoices();
-            toolkitTtsVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google'))
-                || voices.find(v => v.lang.startsWith('en'))
+            const englishVoices = voices.filter(v => /^en(?:-|_)/i.test(v.lang || ''));
+            toolkitTtsVoice = englishVoices.find(v => v.localService && /google|samsung|natural/i.test(v.name))
+                || englishVoices.find(v => v.localService)
+                || englishVoices.find(v => /google|samsung|natural/i.test(v.name))
+                || englishVoices[0]
                 || null;
             toolkitTtsChunks = splitTextForToolkitTTS(cleanText);
             toolkitTtsIndex = 0;
             toolkitTtsActive = true;
+            updateToolkitTTSActionLabels();
             showToolkitTTSIndicator();
             speakNextToolkitChunk();
         }
@@ -5850,6 +5904,7 @@ Mobile app output requirements:
             if (toolkitTtsWatchdog) clearTimeout(toolkitTtsWatchdog);
             toolkitTtsWatchdog = null;
             dismissToolkitTTSIndicator();
+            updateToolkitTTSActionLabels();
         }
 
         let toolkitChatSearchMatches = [];

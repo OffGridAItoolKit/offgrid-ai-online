@@ -12,6 +12,8 @@ const androidBridge = fs.readFileSync(
 
 const checks = [
     ['Make Field Guide is the primary follow-up', html.includes('message-followup-action primary" onclick="createVisualFromMessageAction(this, \'field-guide\')">Make Field Guide')],
+    ['post-answer action offers Read Aloud', html.includes('data-read-aloud-action onclick="readMessageAloudFromAction(this)">Read Aloud') && !html.includes('onclick="exportAsPDF()">Save PDF</button>\n                    </div>')],
+    ['Read Aloud prepares structured text and prefers local voices', html.includes('function prepareTextForToolkitTTS(text)') && html.includes("'Step $1. '") && html.includes('v.localService')],
     ['Make Field Guide requests automatic preview', html.includes("autoOpenFieldGuide: mode === 'field-guide'")],
     ['generated image advances to PDF assembly', html.includes('await exportOnlineStudioPDF({ automatic: true });')],
     ['top preview action says Save Field Guide', html.includes("const saveLabel = isFieldGuidePreview ? 'Save Field Guide'")],
