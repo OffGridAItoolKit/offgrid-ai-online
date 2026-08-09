@@ -32,6 +32,6 @@ After Render supplies the DNS targets, configure those exact records at the doma
 
 ## Release state - 2026-08-09
 
-- Landing page source, host routing, social card, and automated checks are prepared.
-- Deployment through GitHub `main` to the existing Render service is pending the corresponding commit.
+- Landing page source, host routing, social card, and automated checks are deployed from GitHub `main` at commit `8fdfc52`.
+- The deployed Render origin returned HTTP 200 for the new landing-page asset and contained the expected title and Google Play link.
 - Domain attachment and registrar DNS changes remain required before either new domain resolves to the landing page.
