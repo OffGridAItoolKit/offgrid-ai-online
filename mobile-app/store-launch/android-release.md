@@ -30,6 +30,8 @@ The release build used a temporary `mobile-app/android/key.properties`. It was d
 
 ## Build
 
+Current candidate: version name `1.1.0`, version code `2`. Debug builds use the separate `com.offgridaitoolkit.app.dev` package so they can be installed beside the Play production app without replacing it.
+
 ```powershell
 cd "C:\Users\prian\Documents\New project\mobile-app"
 npm run build

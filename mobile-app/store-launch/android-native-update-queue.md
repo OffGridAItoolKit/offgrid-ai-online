@@ -15,7 +15,7 @@ This file tracks changes that cannot reach installed users through the hosted `h
 
 - Proposed version name: `1.1.0`
 - Required version code: `2` or higher
-- Status: source prepared; Android build, device validation, signed AAB, internal test, and Play submission pending
+- Status: version `1.1.0` / code `2` set; side-by-side physical-device validation in progress; original upload keystore, signed AAB, Play internal test, and submission pending
 
 ### Native changes waiting for this release
 
