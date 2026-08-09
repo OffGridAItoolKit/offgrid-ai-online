@@ -11,8 +11,8 @@
 keytool -genkeypair -v -keystore C:\OffGridAI\ReleaseKeys\offgrid-ai-toolkit-upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias offgrid-ai-toolkit-upload
 ```
 
-5. Copy `mobile-app/android/key.properties.example` to `mobile-app/android/key.properties`.
-6. Point `storeFile` to the real upload key path and fill in passwords.
+5. Keep the password protected outside the repository. On the authorized build computer, decrypt it only into process-scoped environment variables.
+6. Set `OFFGRID_ANDROID_KEYSTORE_PATH`, `OFFGRID_ANDROID_KEY_ALIAS`, `OFFGRID_ANDROID_STORE_PASSWORD`, and `OFFGRID_ANDROID_KEY_PASSWORD` only for the release-build process. A gitignored `key.properties` remains supported for recovery compatibility but is not the preferred workflow.
 
 ## Current v1 Release State - 2026-07-10
 
@@ -26,7 +26,7 @@ keytool -genkeypair -v -keystore C:\OffGridAI\ReleaseKeys\offgrid-ai-toolkit-upl
 - AAB SHA-256: `BD6E2A82D4E609EB55FA5E17FD53A18497E5F900FC4E3FB6F2A512A5D1525549`
 - Signing fingerprint: `84:E1:49:F6:2D:D9:56:9A:20:B3:A0:9B:8C:6F:A4:D2:9D:8F:A1:47:C8:F3:A0:1E:67:6A:F8:50:5E:27:AC:8A`
 
-The release build used a temporary `mobile-app/android/key.properties`. It was deleted immediately after signing so the plaintext password is not left in the workspace.
+The original release build used a temporary `mobile-app/android/key.properties`. Current builds use process-scoped environment variables so the plaintext password is never written to the workspace.
 
 ## Build
 
@@ -45,6 +45,18 @@ Expected output:
 ```text
 mobile-app\android\app\build\outputs\bundle\release\app-release.aab
 ```
+
+## Version 1.1.0 Signed Candidate - 2026-08-08
+
+- Package: `com.offgridaitoolkit.app`
+- Version name: `1.1.0`
+- Version code: `2`
+- Release artifact: `C:\OffGridAI\ReleaseBuilds\Play\1.1.0\offgrid-ai-field-guide-1.1.0.aab`
+- AAB SHA-256: `D343F4183F862891EB51ABA32D0C770C4AAFA28955386D6D39A4399FDB88FF8D`
+- Upload certificate SHA-256: `84:E1:49:F6:2D:D9:56:9A:20:B3:A0:9B:8C:6F:A4:D2:9D:8F:A1:47:C8:F3:A0:1E:67:6A:F8:50:5E:27:AC:8A`
+- `jarsigner` verification: passed with no unsigned-entry or invalid-signature warnings; the expected self-signed upload-certificate warning remains.
+- Signing secret handling: ASUS DPAPI-protected password decrypted only into process-scoped environment variables; no plaintext `key.properties` was created.
+- Release state: ready for Google Play Internal testing; not uploaded or published yet.
 
 ## Play Console Submission
 

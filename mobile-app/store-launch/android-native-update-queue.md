@@ -15,7 +15,7 @@ This file tracks changes that cannot reach installed users through the hosted `h
 
 - Proposed version name: `1.1.0`
 - Required version code: `2` or higher
-- Status: version `1.1.0` / code `2` set; side-by-side physical-device validation in progress; original upload keystore, signed AAB, Play internal test, and submission pending
+- Status: version `1.1.0` / code `2` set; side-by-side physical-device validation passed; original upload key recovered and verified on the ASUS; signed AAB prepared; Play internal test and production submission pending
 
 ### Native changes waiting for this release
 
