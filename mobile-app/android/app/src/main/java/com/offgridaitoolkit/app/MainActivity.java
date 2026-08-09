@@ -26,10 +26,12 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.text.Html;
 import android.text.Layout;
+import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.style.LeadingMarginSpan;
 import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
@@ -669,9 +671,9 @@ public class MainActivity extends BridgeActivity {
     }
 
     private static class PdfWriter {
-        private static final int PAGE_WIDTH = 612;
-        private static final int PAGE_HEIGHT = 792;
-        private static final int MARGIN = 42;
+        private static final int PAGE_WIDTH = 540;
+        private static final int PAGE_HEIGHT = 900;
+        private static final int MARGIN = 34;
         private final PdfDocument document;
         private Canvas canvas;
         private int pageNumber = 0;
@@ -690,7 +692,7 @@ public class MainActivity extends BridgeActivity {
             if (answer != null && !answer.trim().isEmpty()) {
                 startPage();
                 drawSection("Field Guide");
-                drawMarkdown(answer, 11.5f);
+                drawMarkdown(answer, 15.2f);
                 finishPage();
             }
         }
@@ -769,17 +771,17 @@ public class MainActivity extends BridgeActivity {
         }
 
         private void drawSection(String section) {
-            ensureSpace(42f);
+            ensureSpace(52f);
             paint.setStyle(Paint.Style.FILL);
             paint.setColor(Color.rgb(250, 245, 235));
-            canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + 30f, paint);
+            canvas.drawRect(MARGIN, y, PAGE_WIDTH - MARGIN, y + 38f, paint);
             paint.setColor(Color.rgb(184, 134, 11));
-            canvas.drawRect(MARGIN, y, MARGIN + 4f, y + 30f, paint);
+            canvas.drawRect(MARGIN, y, MARGIN + 5f, y + 38f, paint);
             paint.setColor(Color.rgb(44, 24, 16));
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            paint.setTextSize(15f);
-            canvas.drawText(section, MARGIN + 12f, y + 21f, paint);
-            y += 42f;
+            paint.setTextSize(18.5f);
+            canvas.drawText(section, MARGIN + 14f, y + 26f, paint);
+            y += 52f;
         }
 
         private void drawParagraph(String text, float textSize, boolean bold) {
@@ -805,7 +807,27 @@ public class MainActivity extends BridgeActivity {
         private void drawMarkdown(String markdown, float textSize) {
             String html = markdownToPdfHtml(markdown);
             Spanned styled = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
-            drawStyledText(styled, textSize);
+            drawStyledText(applyMobileListIndents(styled), textSize);
+        }
+
+        private CharSequence applyMobileListIndents(Spanned styled) {
+            SpannableStringBuilder indented = new SpannableStringBuilder(styled);
+            int lineStart = 0;
+            while (lineStart < indented.length()) {
+                int lineEnd = TextUtils.indexOf(indented, '\n', lineStart);
+                if (lineEnd < 0) lineEnd = indented.length();
+                String line = indented.subSequence(lineStart, lineEnd).toString().trim();
+                if (line.startsWith("•") || line.matches("^\\d+[.)].*")) {
+                    indented.setSpan(
+                        new LeadingMarginSpan.Standard(16, 38),
+                        lineStart,
+                        lineEnd,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    );
+                }
+                lineStart = lineEnd + 1;
+            }
+            return indented;
         }
 
         private void drawStyledText(CharSequence text, float textSize) {
@@ -856,7 +878,7 @@ public class MainActivity extends BridgeActivity {
             return StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, width)
                 .setAlignment(Layout.Alignment.ALIGN_NORMAL)
                 .setIncludePad(false)
-                .setLineSpacing(1.5f, 1f)
+                .setLineSpacing(2.5f, 1.08f)
                 .build();
         }
 
