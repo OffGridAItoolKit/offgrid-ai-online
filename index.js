@@ -518,7 +518,7 @@ function isFieldGuideLandingHost(req) {
 
 function isFieldGuideRedirectHost(req) {
     const host = requestHost(req);
-    return host === 'offgridaifieldguides.com' || host === 'www.offgridaifieldguides.com';
+    return host === 'offgridaifieldguide.com' || host === 'www.offgridaifieldguide.com';
 }
 
 app.use((req, res, next) => {

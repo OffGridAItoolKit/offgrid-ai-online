@@ -31,7 +31,7 @@ async function verify() {
     }
 
     const redirect = await fetch(`http://127.0.0.1:${port}/features`, {
-        headers: { 'X-Forwarded-Host': 'offgridaifieldguides.com' },
+        headers: { 'X-Forwarded-Host': 'offgridaifieldguide.com' },
         redirect: 'manual'
     });
     if (redirect.status !== 301 || redirect.headers.get('location') !== 'https://offgridai.guide/features') {

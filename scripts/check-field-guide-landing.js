@@ -13,8 +13,8 @@ const checks = [
     ['online/offline product distinction', html.includes('Field Guide is online. ToolKit is built for offline use.')],
     ['primary domain routing', server.includes("host === 'offgridai.guide'")],
     ['www primary domain routing', server.includes("host === 'www.offgridai.guide'")],
-    ['long domain redirect', server.includes("host === 'offgridaifieldguides.com'")],
-    ['www long domain redirect', server.includes("host === 'www.offgridaifieldguides.com'")],
+    ['long domain redirect', server.includes("host === 'offgridaifieldguide.com'")],
+    ['www long domain redirect', server.includes("host === 'www.offgridaifieldguide.com'")],
     ['canonical redirect target', server.includes('https://offgridai.guide${req.originalUrl')]
 ];
 

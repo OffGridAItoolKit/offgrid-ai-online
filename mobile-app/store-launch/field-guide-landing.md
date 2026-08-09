@@ -3,11 +3,11 @@
 ## Domain plan
 
 - Canonical domain: `https://offgridai.guide`
-- Redirect domain: `https://offgridaifieldguides.com`
+- Redirect domain: `https://offgridaifieldguide.com`
 - Product: online `OffGrid AI Field Guide`
 - Google Play package: `com.offgridaitoolkit.app`
 
-`offgridai.guide` is the primary address because it is short, memorable, and matches the singular product name. Both root and `www` forms of `offgridaifieldguides.com` should redirect permanently to the corresponding path on `offgridai.guide`.
+`offgridai.guide` is the primary address because it is short, memorable, and matches the product name. Both root and `www` forms of `offgridaifieldguide.com` should redirect permanently to the corresponding path on `offgridai.guide`.
 
 ## Hosting behavior
 
@@ -17,8 +17,8 @@ Required Render custom domains:
 
 - `offgridai.guide`
 - `www.offgridai.guide`
-- `offgridaifieldguides.com`
-- `www.offgridaifieldguides.com`
+- `offgridaifieldguide.com`
+- `www.offgridaifieldguide.com`
 
 After Render supplies the DNS targets, configure those exact records at the domain registrar. Do not replace existing `offgridtoolkit.ai` records.
 
