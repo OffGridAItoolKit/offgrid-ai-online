@@ -60,6 +60,15 @@ mobile-app\android\app\build\outputs\bundle\release\app-release.aab
 - Internal-test opt-in URL: `https://play.google.com/apps/internaltest/4701601831150090903`
 - Next gate: install the Play-delivered update over production v1.0, complete the physical-device release checklist, then promote this same AAB to Production.
 
+## Version 1.1.0 Production Submission - 2026-08-09
+
+- Both authorized owner testers confirmed that all internal-release tests passed.
+- The exact internally tested version code `2` AAB was added from the Play artifact library; it was not rebuilt or replaced.
+- Production rollout: 100% in all currently targeted countries/regions.
+- Device support change: zero phones, tablets, TVs, cars, Chromebooks, or Android XR devices removed.
+- Google Play validation: no errors; only the existing deobfuscation and native debug-symbol advisories.
+- Submission state: `1.1.0 - Field Guide improvements` sent to Google for Production review. Managed publishing is off, so approval should publish the rollout automatically.
+
 ## Play Console Submission
 
 - Upload the `.aab`.

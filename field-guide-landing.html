@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OffGrid AI Field Guide | Practical guidance you can save</title>
+  <meta name="description" content="Ask practical questions, identify photos and short videos, and turn useful answers into visual field guides you can save to your phone.">
+  <link rel="canonical" href="https://offgridai.guide/">
+  <meta name="theme-color" content="#0c1116">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://offgridai.guide/">
+  <meta property="og:title" content="OffGrid AI Field Guide">
+  <meta property="og:description" content="Practical answers, photo and video identification, and field guides you can save for later.">
+  <meta property="og:image" content="https://offgridai.guide/field-guide-og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="OffGrid AI Field Guide">
+  <meta name="twitter:description" content="Turn questions, photos, and short videos into practical field guides.">
+  <meta name="twitter:image" content="https://offgridai.guide/field-guide-og.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --night: #0c1116;
+      --night-soft: #131a22;
+      --panel: rgba(24, 31, 40, 0.88);
+      --panel-strong: #18202a;
+      --gold: #e0aa18;
+      --gold-light: #f1c75c;
+      --orange: #f47b20;
+      --cream: #f5eddf;
+      --muted: #aab3bf;
+      --line: rgba(224, 170, 24, 0.25);
+      --green: #22c78a;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 78% 4%, rgba(244, 123, 32, 0.10), transparent 28rem),
+        radial-gradient(circle at 6% 18%, rgba(224, 170, 24, 0.08), transparent 24rem),
+        var(--night);
+      color: var(--cream);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    a { color: inherit; }
+    img { max-width: 100%; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9, 13, 18, 0.88);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      width: min(var(--max), calc(100% - 32px));
+      min-height: 72px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      color: var(--cream);
+      text-decoration: none;
+      font-weight: 850;
+      letter-spacing: 0.015em;
+    }
+
+    .brand img { width: 38px; height: 38px; }
+    .brand span { color: var(--gold-light); }
+
+    .nav-links { display: flex; align-items: center; gap: 24px; }
+    .nav-links > a:not(.button) {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.94rem;
+      font-weight: 650;
+    }
+    .nav-links > a:hover { color: var(--cream); }
+
+    .button {
+      min-height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid rgba(241, 199, 92, 0.62);
+      border-radius: 12px;
+      padding: 0 21px;
+      background: linear-gradient(135deg, var(--gold), #f0bb1d);
+      color: #18140a;
+      font-weight: 850;
+      text-decoration: none;
+      box-shadow: 0 12px 35px rgba(224, 170, 24, 0.16);
+      transition: transform 160ms ease, filter 160ms ease, border-color 160ms ease;
+    }
+    .button:hover { transform: translateY(-2px); filter: brightness(1.06); }
+    .button:focus-visible { outline: 3px solid rgba(241, 199, 92, 0.4); outline-offset: 3px; }
+    .button.secondary {
+      background: rgba(255,255,255,0.035);
+      color: var(--cream);
+      border-color: rgba(245, 237, 223, 0.22);
+      box-shadow: none;
+    }
+
+    main { overflow: hidden; }
+    .hero {
+      width: min(var(--max), calc(100% - 32px));
+      min-height: calc(100vh - 72px);
+      margin: 0 auto;
+      padding: 72px 0 78px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) minmax(340px, 0.86fr);
+      align-items: center;
+      gap: clamp(48px, 7vw, 96px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 20px;
+      color: var(--gold-light);
+      font-size: 0.82rem;
+      font-weight: 850;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 28px; height: 2px; background: var(--orange); }
+
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 780px;
+      margin-bottom: 24px;
+      font-size: clamp(3rem, 6.6vw, 6.2rem);
+      line-height: 0.98;
+      letter-spacing: -0.055em;
+    }
+    h1 .warm { color: var(--gold-light); }
+    .hero-copy > p {
+      max-width: 660px;
+      margin-bottom: 30px;
+      color: #c6ced7;
+      font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+    }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .availability {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .availability strong { color: var(--green); }
+
+    .phone-wrap { position: relative; display: grid; place-items: center; }
+    .phone-wrap::before {
+      content: "";
+      position: absolute;
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(224,170,24,0.20), transparent 67%);
+      filter: blur(7px);
+    }
+    .phone {
+      position: relative;
+      width: min(100%, 370px);
+      padding: 10px;
+      border: 1px solid rgba(245, 237, 223, 0.22);
+      border-radius: 38px;
+      background: #05080b;
+      box-shadow: 0 36px 90px rgba(0,0,0,0.52), 0 0 0 6px rgba(255,255,255,0.025);
+      transform: rotate(1.5deg);
+    }
+    .phone-screen {
+      min-height: 650px;
+      padding: 26px 20px 22px;
+      overflow: hidden;
+      border-radius: 29px;
+      background: linear-gradient(180deg, #10161d, #0b1015);
+    }
+    .phone-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .phone-brand { display: flex; align-items: center; gap: 8px; color: var(--gold-light); font-size: 0.82rem; font-weight: 900; letter-spacing: 0.04em; }
+    .phone-brand img { width: 32px; height: 32px; }
+    .status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 18px var(--green); }
+    .phone-compass { width: 154px; display: block; margin: 34px auto 10px; filter: drop-shadow(0 14px 22px rgba(0,0,0,0.4)); }
+    .phone-kicker { margin: 0 0 23px; color: #d7ad61; font-style: italic; text-align: center; }
+    .ask-card {
+      padding: 18px;
+      border: 1px solid rgba(224,170,24,0.45);
+      border-radius: 18px;
+      background: var(--panel-strong);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+    }
+    .ask-line { padding: 10px 0 18px; color: #c1c9d2; font-size: 1.03rem; border-bottom: 1px solid rgba(255,255,255,0.09); }
+    .micro-actions { margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .micro-action { padding: 10px 8px; border: 1px solid rgba(224,170,24,0.3); border-radius: 9px; color: var(--gold-light); font-size: 0.8rem; font-weight: 800; text-align: center; }
+    .mini-send { grid-column: 1 / -1; padding: 11px; border-radius: 9px; color: #18140a; background: var(--gold); font-weight: 900; text-align: center; }
+    .phone-feature { margin-top: 12px; padding: 14px 15px; display: flex; gap: 12px; align-items: center; border: 1px solid rgba(255,255,255,0.09); border-radius: 14px; background: rgba(255,255,255,0.035); }
+    .phone-feature strong { display: block; font-size: 0.88rem; }
+    .phone-feature span { display: block; color: var(--muted); font-size: 0.76rem; }
+    .phone-feature b { font-size: 1.35rem; }
+
+    .trust-strip { border-block: 1px solid var(--line); background: rgba(224,170,24,0.035); }
+    .trust-grid { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+    .trust-item { padding: 25px 18px; text-align: center; border-right: 1px solid var(--line); }
+    .trust-item:last-child { border-right: 0; }
+    .trust-item strong { display: block; margin-bottom: 3px; color: var(--cream); }
+    .trust-item span { color: var(--muted); font-size: 0.86rem; }
+
+    .section { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; padding: 104px 0; }
+    .section-head { max-width: 760px; margin-bottom: 48px; }
+    h2 { margin-bottom: 17px; font-size: clamp(2.1rem, 4.2vw, 3.9rem); line-height: 1.04; letter-spacing: -0.045em; }
+    .section-head p, .feature-card p, .step p, .split-copy p { color: var(--muted); }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .feature-card { min-height: 270px; padding: 28px; border: 1px solid rgba(255,255,255,0.09); border-radius: 20px; background: linear-gradient(150deg, rgba(29,38,49,0.92), rgba(16,22,29,0.92)); }
+    .feature-card.primary { border-color: rgba(224,170,24,0.42); background: linear-gradient(150deg, rgba(56,43,18,0.62), rgba(20,25,31,0.96)); }
+    .feature-icon { margin-bottom: 38px; color: var(--gold-light); font-size: 1.9rem; }
+    .feature-card h3 { margin-bottom: 10px; font-size: 1.35rem; }
+    .feature-card p { margin-bottom: 0; }
+
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; counter-reset: guide-step; }
+    .step { position: relative; padding-top: 66px; counter-increment: guide-step; }
+    .step::before { content: "0" counter(guide-step); position: absolute; top: 0; left: 0; color: var(--orange); font-size: 1.95rem; font-weight: 900; }
+    .step::after { content: ""; position: absolute; top: 22px; left: 55px; right: 0; height: 1px; background: var(--line); }
+    .step h3 { font-size: 1.25rem; }
+
+    .split { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: clamp(40px, 7vw, 96px); align-items: center; }
+    .guide-card { padding: 25px; border: 1px solid rgba(224,170,24,0.38); border-radius: 22px; background: #f3eddf; color: #231c12; box-shadow: 0 25px 70px rgba(0,0,0,0.34); transform: rotate(-1deg); }
+    .guide-card h3 { padding-bottom: 12px; border-bottom: 4px solid #b7860b; font-size: 1.4rem; }
+    .guide-card ol { margin: 0; padding-left: 23px; }
+    .guide-card li { margin: 12px 0; padding-left: 5px; }
+    .guide-warning { margin: 20px 0 0; padding: 13px 15px; border-left: 4px solid #c84f25; background: rgba(200,79,37,0.09); font-weight: 750; }
+    .checks { display: grid; gap: 13px; margin: 28px 0 0; }
+    .check { display: flex; align-items: flex-start; gap: 11px; color: #d2d8df; }
+    .check::before { content: "✓"; color: var(--green); font-weight: 950; }
+
+    .sister-note { padding: 38px; border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; background: rgba(255,255,255,0.03); }
+    .sister-note strong { color: var(--gold-light); }
+
+    .final-cta { text-align: center; }
+    .final-cta .cta-panel { padding: clamp(42px, 7vw, 78px); border: 1px solid rgba(224,170,24,0.40); border-radius: 26px; background: linear-gradient(145deg, rgba(53,39,15,0.7), rgba(20,27,35,0.92)); }
+    .final-cta p { max-width: 680px; margin: 0 auto 28px; color: var(--muted); font-size: 1.08rem; }
+
+    footer { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; padding: 34px 0 48px; display: flex; justify-content: space-between; gap: 22px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--muted); font-size: 0.86rem; }
+    footer nav { display: flex; flex-wrap: wrap; gap: 18px; }
+    footer a { text-decoration: none; }
+    footer a:hover { color: var(--cream); }
+
+    @media (max-width: 900px) {
+      .nav-links > a:not(.button) { display: none; }
+      .hero { min-height: auto; grid-template-columns: 1fr; padding-top: 58px; }
+      .hero-copy { text-align: center; }
+      .hero-copy > p { margin-inline: auto; }
+      .eyebrow { justify-content: center; }
+      .hero-actions { justify-content: center; }
+      .phone { transform: none; }
+      .trust-grid { grid-template-columns: 1fr 1fr; }
+      .trust-item:nth-child(2) { border-right: 0; }
+      .trust-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: auto; }
+      .feature-icon { margin-bottom: 24px; }
+      .steps, .split { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .nav { min-height: 64px; }
+      .brand { font-size: 0.9rem; }
+      .brand img { width: 32px; height: 32px; }
+      .nav .button { min-height: 42px; padding-inline: 14px; font-size: 0.84rem; }
+      .hero { width: min(100% - 24px, var(--max)); padding-top: 45px; }
+      h1 { font-size: clamp(2.75rem, 14vw, 4.2rem); }
+      .hero-actions { display: grid; }
+      .hero-actions .button { width: 100%; }
+      .phone { width: min(100%, 345px); }
+      .phone-screen { min-height: 610px; }
+      .trust-grid { grid-template-columns: 1fr; }
+      .trust-item { border-right: 0; border-bottom: 1px solid var(--line); }
+      .trust-item:last-child { border-bottom: 0; }
+      .section { width: min(100% - 24px, var(--max)); padding: 76px 0; }
+      .feature-card, .sister-note { padding: 23px; }
+      footer { flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand" href="#top"><img src="/compass-192.png" alt=""><span>OFFGRID AI</span> FIELD GUIDE</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app">Get it on Google Play</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Built for real-world decisions</p>
+        <h1>Turn questions into <span class="warm">field guides.</span></h1>
+        <p>Ask what to do, identify what you see, and turn practical answers into visual guides you can save to your phone for the trail, the road, the homestead, or the unexpected.</p>
+        <div class="hero-actions">
+          <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app" aria-label="Download OffGrid AI Field Guide from Google Play">Get the Android app</a>
+          <a class="button secondary" href="https://offgridtoolkit.ai/online">Try it on the web</a>
+        </div>
+        <p class="availability"><strong>Available now on Android.</strong> iPhone version in development.</p>
+      </div>
+
+      <div class="phone-wrap" aria-label="OffGrid AI Field Guide app preview">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="phone-top">
+              <div class="phone-brand"><img src="/compass-192.png" alt=""> OFFGRID AI FIELD GUIDE</div>
+              <span class="status-dot" title="Online"></span>
+            </div>
+            <img class="phone-compass" src="/compass-512.png" alt="OffGrid AI compass">
+            <p class="phone-kicker">Tap compass for heading</p>
+            <div class="ask-card">
+              <div class="ask-line">What should I prepare before a three-day backcountry trip?</div>
+              <div class="micro-actions">
+                <div class="micro-action">Field Prompts</div>
+                <div class="micro-action">Voice Input</div>
+                <div class="mini-send">Build my answer</div>
+              </div>
+            </div>
+            <div class="phone-feature"><b>📷</b><div><strong>Identify a photo</strong><span>Camera, gallery, screenshots</span></div></div>
+            <div class="phone-feature"><b>🎬</b><div><strong>Analyze a short video</strong><span>See motion, changes, and context</span></div></div>
+            <div class="phone-feature"><b>🧭</b><div><strong>Save a Field Guide</strong><span>Keep the useful answer as a PDF</span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="trust-strip" aria-label="Product promises">
+      <div class="trust-grid">
+        <div class="trust-item"><strong>No account required</strong><span>Open the app and get to work</span></div>
+        <div class="trust-item"><strong>No ads</strong><span>Focused, uncluttered help</span></div>
+        <div class="trust-item"><strong>Save locally</strong><span>Keep guides on your phone</span></div>
+        <div class="trust-item"><strong>Free online app</strong><span>Internet required for AI</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="features">
+      <div class="section-head">
+        <p class="eyebrow">One app, four practical tools</p>
+        <h2>More useful than another chat window.</h2>
+        <p>OffGrid AI Field Guide is designed around what happens after you ask a question: understanding the situation, making the answer visual, and keeping it where you can find it again.</p>
+      </div>
+      <div class="feature-grid">
+        <article class="feature-card primary">
+          <div class="feature-icon">▤</div>
+          <h3>Create Field Guides</h3>
+          <p>Turn an answer into a visual reference and save the complete guide as a mobile-friendly PDF.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">◎</div>
+          <h3>Identify Photos</h3>
+          <p>Use your camera, gallery, or screenshots to get a practical assessment of what is visible.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">▶</div>
+          <h3>Analyze Short Videos</h3>
+          <p>Add motion and changing context when one still image does not tell the whole story.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">◉</div>
+          <h3>Generate Visuals</h3>
+          <p>Create diagrams, checklists, identification cards, and field-ready visual references.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">◖</div>
+          <h3>Read Aloud</h3>
+          <p>Listen to answers through your phone when your hands or attention need to stay on the task.</p>
+        </article>
+        <article class="feature-card">
+          <div class="feature-icon">✦</div>
+          <h3>Start with Field Prompts</h3>
+          <p>Browse ready-made questions for preparedness, travel, homesteading, emergencies, and more.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="section-head">
+        <p class="eyebrow">From uncertainty to something useful</p>
+        <h2>Ask. Make it practical. Save it.</h2>
+      </div>
+      <div class="steps">
+        <article class="step"><h3>Describe or show the situation</h3><p>Type, speak, take a photo, upload an image, or add a short video.</p></article>
+        <article class="step"><h3>Get prioritized guidance</h3><p>Answers lead with what matters first and clearly flag uncertainty or safety concerns.</p></article>
+        <article class="step"><h3>Build your own knowledge base</h3><p>Create a visual Field Guide, save the PDF, and keep it available on your phone.</p></article>
+      </div>
+    </section>
+
+    <section class="section split">
+      <div class="guide-card" aria-label="Example field guide">
+        <h3>FIELD GUIDE: Sudden Weather Change</h3>
+        <ol>
+          <li><strong>Check exposure first.</strong> Move away from ridgelines, isolated trees, and open water.</li>
+          <li><strong>Protect core temperature.</strong> Add a dry layer before you become chilled.</li>
+          <li><strong>Reassess the route.</strong> Turn back early if visibility, footing, or timing deteriorates.</li>
+          <li><strong>Save battery.</strong> Record your position and reduce unnecessary phone use.</li>
+        </ol>
+        <p class="guide-warning">Verify local conditions and use professional or emergency help when the situation requires it.</p>
+      </div>
+      <div class="split-copy">
+        <p class="eyebrow">The feature at the center</p>
+        <h2>Your useful answers should not disappear in a chat.</h2>
+        <p>A Field Guide combines the original guidance with an optional generated visual, then packages it into a readable PDF. Save guides for trips, equipment, locations, skills, emergency plans, and the scenarios you want to prepare for ahead of time.</p>
+        <div class="checks">
+          <div class="check">Mobile-friendly PDF layout</div>
+          <div class="check">Local Saved Guides folder</div>
+          <div class="check">Share the image or the complete guide</div>
+          <div class="check">Open previously saved PDFs without an internet connection</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="sister-note">
+        <p class="eyebrow">Two connected products, two clear jobs</p>
+        <h2>Field Guide is online. ToolKit is built for offline use.</h2>
+        <p><strong>OffGrid AI Field Guide</strong> is the free online app with photo identification, short-video analysis, visual generation, and downloadable Field Guides. The upcoming paid <strong>OffGrid AI ToolKit</strong> is a separate companion designed to run its AI locally when internet access is unavailable.</p>
+      </div>
+    </section>
+
+    <section class="section final-cta">
+      <div class="cta-panel">
+        <p class="eyebrow">Take useful knowledge with you</p>
+        <h2>Build your next Field Guide.</h2>
+        <p>Free on Google Play, with no account, ads, or in-app purchases. Internet access is required for AI responses and visual generation.</p>
+        <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app">Download OffGrid AI Field Guide</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>© 2026 OffGrid AI ToolKit LLC</span>
+    <nav aria-label="Legal and support">
+      <a href="https://offgridtoolkit.ai/privacy">Privacy</a>
+      <a href="https://offgridaitoolkit.com/pages/terms-and-conditions">Terms</a>
+      <a href="mailto:support@offgridaitoolkit.com">Support</a>
+    </nav>
+  </footer>
+</body>
+</html>

@@ -500,6 +500,40 @@ app.use('/api/command/', commandLimiter);
 app.use('/api/image-studio/', commandLimiter);
 
 // =============================================================================
+// DOMAIN ROUTING: OffGrid AI Field Guide landing page
+// =============================================================================
+
+function requestHost(req) {
+    return String(req.headers['x-forwarded-host'] || req.headers.host || req.hostname || '')
+        .split(',')[0]
+        .trim()
+        .split(':')[0]
+        .toLowerCase();
+}
+
+function isFieldGuideLandingHost(req) {
+    const host = requestHost(req);
+    return host === 'offgridai.guide' || host === 'www.offgridai.guide';
+}
+
+function isFieldGuideRedirectHost(req) {
+    const host = requestHost(req);
+    return host === 'offgridaifieldguides.com' || host === 'www.offgridaifieldguides.com';
+}
+
+app.use((req, res, next) => {
+    if (!isFieldGuideRedirectHost(req)) return next();
+    return res.redirect(301, `https://offgridai.guide${req.originalUrl || '/'}`);
+});
+
+app.use((req, res, next) => {
+    if (!isFieldGuideLandingHost(req)) return next();
+    if (req.path.startsWith('/api/')) return next();
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff|woff2|ttf|eot|map)$/i)) return next();
+    return res.sendFile(path.join(__dirname, 'field-guide-landing.html'));
+});
+
+// =============================================================================
 // SUBDOMAIN ROUTING: imagestudio.offgridtoolkit.ai
 // =============================================================================
 // MUST be placed BEFORE express.static so it intercepts root page requests

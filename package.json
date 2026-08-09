@@ -9,7 +9,8 @@
     "test:prompts": "node scripts/check-ready-made-prompts.js",
     "test:health-disclosure": "node scripts/check-health-disclosure.js",
     "test:field-guide": "node scripts/check-field-guide-flow.js",
-    "test:pdf-markdown": "node scripts/check-pdf-markdown.js"
+    "test:pdf-markdown": "node scripts/check-pdf-markdown.js",
+    "test:landing": "node scripts/check-field-guide-landing.js && node scripts/smoke-field-guide-hosts.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
