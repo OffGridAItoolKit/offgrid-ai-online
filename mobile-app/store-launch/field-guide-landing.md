@@ -34,7 +34,7 @@ Namecheap BasicDNS uses an `A` record for each root (`@`) pointing to Render's d
 
 - Landing page source, corrected host routing, Apple-version notice, social card, and automated checks are deployed from GitHub `main` at commit `a67db55`.
 - `https://offgridai.guide` is verified in Render, has a TLS certificate, and returns HTTP 200 with the expected title and Google Play link.
-- `https://www.offgridai.guide` redirects permanently to the canonical root domain.
-- `https://offgridaifieldguide.com` is verified in Render and redirects permanently to the canonical domain; its `www` certificate was still completing at the time of this record.
+- `https://www.offgridai.guide` is verified and configured to redirect permanently to the canonical root domain; its certificate was still propagating across edges at the time of this record.
+- Both root and `www` forms of `https://offgridaifieldguide.com` are verified and redirect permanently to the canonical domain.
 - The Google Play store-listing contact website is published as `https://offgridai.guide`.
 - A gallery will be added after the owner provides approximately eight representative Field Guide images.
