@@ -56,7 +56,9 @@ mobile-app\android\app\build\outputs\bundle\release\app-release.aab
 - Upload certificate SHA-256: `84:E1:49:F6:2D:D9:56:9A:20:B3:A0:9B:8C:6F:A4:D2:9D:8F:A1:47:C8:F3:A0:1E:67:6A:F8:50:5E:27:AC:8A`
 - `jarsigner` verification: passed with no unsigned-entry or invalid-signature warnings; the expected self-signed upload-certificate warning remains.
 - Signing secret handling: ASUS DPAPI-protected password decrypted only into process-scoped environment variables; no plaintext `key.properties` was created.
-- Release state: uploaded and accepted in Google Play Internal testing draft `1.1.0 - Field Guide improvements`. Play reported no errors and three warnings: no configured testers, no deobfuscation file while minification is disabled, and no native debug-symbol archive for bundled third-party native code. Tester-list configuration is the remaining gate before activating the internal release.
+- Release state: active in Google Play Internal testing as `1.1.0 - Field Guide improvements`, released 2026-08-08 at 8:41 PM. The `Owners - Internal Test` list contains two authorized owner testers. Play reported no errors; the remaining advisories are the expected missing deobfuscation file while minification is disabled and missing native debug-symbol archive for bundled third-party native code.
+- Internal-test opt-in URL: `https://play.google.com/apps/internaltest/4701601831150090903`
+- Next gate: install the Play-delivered update over production v1.0, complete the physical-device release checklist, then promote this same AAB to Production.
 
 ## Play Console Submission
 

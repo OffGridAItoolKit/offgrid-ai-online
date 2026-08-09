@@ -15,7 +15,7 @@ This file tracks changes that cannot reach installed users through the hosted `h
 
 - Proposed version name: `1.1.0`
 - Required version code: `2` or higher
-- Status: version `1.1.0` / code `2` set; side-by-side physical-device validation passed; original upload key recovered and verified on the ASUS; signed AAB accepted by Play in an Internal testing draft; tester-list configuration and internal release activation pending
+- Status: version `1.1.0` / code `2` is active in Google Play Internal testing for two authorized owner testers; side-by-side Dev validation passed; Play-delivered upgrade validation and Production promotion remain pending
 
 ### Native changes waiting for this release
 
@@ -47,6 +47,8 @@ The owner reports that the current hosted Saved Guides experience already opens 
 7. Verify chat, image/video, automatic Make Field Guide, Save Field Guide, attached-PDF Share, Saved Guides, compass, permissions, launcher name/icon, and offline access to previously saved PDFs.
 8. Upload/promote the same tested AAB to Production, add release notes, submit for review, and monitor status.
 9. After approval and rollout, verify that Google Play offers `Update` to a version-code-1 installation.
+
+Internal-test opt-in URL: `https://play.google.com/apps/internaltest/4701601831150090903`
 
 ## Completion record
 
