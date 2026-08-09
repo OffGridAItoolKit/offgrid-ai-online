@@ -43,7 +43,7 @@ The gallery includes a prominent verification notice because its examples includ
 
 ## Release state - 2026-08-09
 
-- Landing page source, corrected host routing, Apple-version notice, social card, and automated checks are deployed from GitHub `main` at commit `a67db55`.
+- The initial landing page, corrected host routing, Apple-version notice, social card, and automated checks were deployed at `a67db55`; the owner-supplied media showcase and reusable asset library were deployed at `1ca6f15`.
 - `https://offgridai.guide` is verified in Render, has a TLS certificate, and returns HTTP 200 with the expected title and Google Play link.
 - `https://www.offgridai.guide` is verified and configured to redirect permanently to the canonical root domain; its certificate was still propagating across edges at the time of this record.
 - Both root and `www` forms of `https://offgridaifieldguide.com` are verified and redirect permanently to the canonical domain.
