@@ -7,7 +7,7 @@
 - Product: online `OffGrid AI Field Guide`
 - Google Play package: `com.offgridaitoolkit.app`
 
-`offgridai.guide` is the primary address because it is short, memorable, and matches the product name. Both root and `www` forms of `offgridaifieldguide.com` should redirect permanently to the corresponding path on `offgridai.guide`.
+`offgridai.guide` is the primary address because it is short, memorable, and matches the product name. Both root and `www` forms of `offgridaifieldguide.com` redirect permanently to the corresponding path on `offgridai.guide`.
 
 ## Hosting behavior
 
@@ -20,7 +20,7 @@ Required Render custom domains:
 - `offgridaifieldguide.com`
 - `www.offgridaifieldguide.com`
 
-After Render supplies the DNS targets, configure those exact records at the domain registrar. Do not replace existing `offgridtoolkit.ai` records.
+Namecheap BasicDNS uses an `A` record for each root (`@`) pointing to Render's documented address and a `CNAME` for each `www` host pointing to `offgrid-ai-online.onrender.com`. Existing `offgridtoolkit.ai` records were not changed.
 
 ## Product positioning
 
@@ -32,6 +32,9 @@ After Render supplies the DNS targets, configure those exact records at the doma
 
 ## Release state - 2026-08-09
 
-- Landing page source, host routing, social card, and automated checks are deployed from GitHub `main` at commit `8fdfc52`.
-- The deployed Render origin returned HTTP 200 for the new landing-page asset and contained the expected title and Google Play link.
-- Domain attachment and registrar DNS changes remain required before either new domain resolves to the landing page.
+- Landing page source, corrected host routing, Apple-version notice, social card, and automated checks are deployed from GitHub `main` at commit `a67db55`.
+- `https://offgridai.guide` is verified in Render, has a TLS certificate, and returns HTTP 200 with the expected title and Google Play link.
+- `https://www.offgridai.guide` redirects permanently to the canonical root domain.
+- `https://offgridaifieldguide.com` is verified in Render and redirects permanently to the canonical domain; its `www` certificate was still completing at the time of this record.
+- The Google Play store-listing contact website is published as `https://offgridai.guide`.
+- A gallery will be added after the owner provides approximately eight representative Field Guide images.
