@@ -41,6 +41,10 @@ Landing-page media is stored under `assets/field-guide/` so it is deployed with 
 
 The gallery includes a prominent verification notice because its examples include medical, emergency, mechanical, food-safety, and survival information.
 
+## Mobile presentation
+
+The landing page is mobile-first for the expected audience. On phone-width screens it uses a shorter hero render, compact Google Play header action, 2-by-2 trust summary, denser feature cards, reduced section spacing, smaller straight-on video frame, and a horizontally swipeable gallery instead of stacking six large images. Very narrow screens switch the feature cards to a readable single-column horizontal layout.
+
 ## Release state - 2026-08-09
 
 - The initial landing page, corrected host routing, Apple-version notice, social card, and automated checks were deployed at `a67db55`; the owner-supplied media showcase and reusable asset library were deployed at `1ca6f15`.

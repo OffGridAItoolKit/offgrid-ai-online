@@ -92,6 +92,7 @@
       font-weight: 650;
     }
     .nav-links > a:hover { color: var(--cream); }
+    .nav-cta-short { display: none; }
 
     .button {
       min-height: 48px;
@@ -323,25 +324,86 @@
     }
 
     @media (max-width: 560px) {
-      .nav { min-height: 64px; }
-      .brand { font-size: 0.9rem; }
-      .brand img { width: 32px; height: 32px; }
-      .nav .button { min-height: 42px; padding-inline: 14px; font-size: 0.84rem; }
-      .hero { width: min(100% - 24px, var(--max)); padding-top: 45px; }
-      h1 { font-size: clamp(2.75rem, 14vw, 4.2rem); }
+      .nav { width: min(var(--max), calc(100% - 24px)); min-height: 60px; gap: 10px; }
+      .brand { min-width: 0; gap: 7px; font-size: 0.76rem; white-space: nowrap; }
+      .brand img { width: 29px; height: 29px; }
+      .nav .button { min-height: 40px; padding-inline: 13px; font-size: 0.8rem; white-space: nowrap; }
+      .nav-cta-long { display: none; }
+      .nav-cta-short { display: inline; }
+      .hero { width: min(100% - 24px, var(--max)); gap: 28px; padding: 40px 0 48px; }
+      .eyebrow { margin-bottom: 13px; font-size: 0.72rem; letter-spacing: 0.13em; }
+      h1 { margin-bottom: 18px; font-size: clamp(2.55rem, 13vw, 3.5rem); line-height: 0.99; }
+      h2 { margin-bottom: 13px; font-size: clamp(2rem, 10vw, 2.55rem); line-height: 1.05; }
+      .hero-copy > p { margin-bottom: 22px; font-size: 1rem; line-height: 1.48; }
       .hero-actions { display: grid; }
       .hero-actions .button { width: 100%; }
-      .hero-phone { width: min(100%, 390px); max-height: 610px; }
-      .trust-grid { grid-template-columns: 1fr; }
-      .trust-item { border-right: 0; border-bottom: 1px solid var(--line); }
-      .trust-item:last-child { border-bottom: 0; }
-      .section { width: min(100% - 24px, var(--max)); padding: 76px 0; }
-      .feature-card, .sister-note { padding: 23px; }
-      .gallery-grid { grid-template-columns: 1fr; }
-      .gallery-image-wrap { aspect-ratio: 4 / 4.65; }
+      .availability { margin-top: 14px; }
+      .hero-phone { width: min(100%, 300px); max-height: 465px; }
+      .phone-wrap::before { width: 270px; height: 270px; }
+      .trust-grid { grid-template-columns: 1fr 1fr; }
+      .trust-item { padding: 17px 9px; border: 0; }
+      .trust-item:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .trust-item:nth-child(odd) { border-right: 1px solid var(--line); }
+      .trust-item strong { font-size: 0.88rem; }
+      .trust-item span { font-size: 0.74rem; line-height: 1.35; }
+      .section { width: min(100% - 24px, var(--max)); padding: 54px 0; }
+      .section-head { margin-bottom: 28px; }
+      .section-head p, .split-copy p { font-size: 0.94rem; }
+      .feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+      .feature-card { min-height: 205px; padding: 18px 16px; border-radius: 16px; }
+      .feature-icon { margin-bottom: 12px; font-size: 1.45rem; }
+      .feature-card h3 { margin-bottom: 7px; font-size: 1.03rem; line-height: 1.2; }
+      .feature-card p { font-size: 0.82rem; line-height: 1.42; }
+      .steps { gap: 22px; }
+      .step { padding-top: 46px; }
+      .step::before { font-size: 1.55rem; }
+      .step::after { top: 17px; left: 45px; }
+      .step h3 { margin-bottom: 6px; font-size: 1.08rem; }
+      .step p { margin-bottom: 0; font-size: 0.9rem; }
+      .walkthrough-layout { gap: 30px; }
+      .demo-points { gap: 9px; margin-top: 20px; }
+      .demo-point { justify-content: flex-start; font-size: 0.88rem; text-align: left; }
+      .video-device { width: min(100%, 250px); padding: 7px; border-radius: 28px; }
+      .video-device video { border-radius: 21px; }
+      .gallery-grid {
+        width: calc(100% + 24px);
+        display: flex;
+        gap: 12px;
+        margin-inline: -12px;
+        padding: 0 12px 10px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: 12px;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: none;
+      }
+      .gallery-grid::-webkit-scrollbar { display: none; }
+      .gallery-card { flex: 0 0 min(78vw, 304px); scroll-snap-align: start; }
+      .gallery-image-wrap { aspect-ratio: 4 / 4.8; }
+      .gallery-copy { padding: 15px 16px 17px; }
+      .gallery-hint { margin-top: 14px; }
+      .gallery-disclosure { margin-top: 18px; padding: 14px 15px; font-size: 0.82rem; }
+      .split { gap: 28px; }
+      .guide-card { padding: 19px; border-radius: 17px; transform: none; font-size: 0.88rem; }
+      .guide-card h3 { font-size: 1.12rem; }
+      .guide-card li { margin: 9px 0; }
+      .guide-warning { margin-top: 15px; }
+      .checks { gap: 9px; margin-top: 20px; font-size: 0.9rem; }
+      .sister-note { padding: 21px; border-radius: 17px; }
+      .final-cta .cta-panel { padding: 32px 20px; border-radius: 20px; }
+      .final-cta p { margin-bottom: 22px; font-size: 0.95rem; }
       .lightbox-stage { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; padding: 9px; }
       .lightbox-footer { align-items: flex-start; flex-direction: column; }
-      footer { flex-direction: column; }
+      footer { padding: 28px 0 34px; flex-direction: column; gap: 14px; }
+    }
+
+    @media (max-width: 370px) {
+      .brand { font-size: 0.69rem; }
+      .nav .button { padding-inline: 10px; }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature-card { min-height: 0; display: grid; grid-template-columns: 38px 1fr; column-gap: 10px; padding: 16px; }
+      .feature-icon { grid-row: 1 / 3; margin: 1px 0 0; }
+      .feature-card h3, .feature-card p { grid-column: 2; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -358,7 +420,7 @@
         <a href="#features">Features</a>
         <a href="#examples">Examples</a>
         <a href="#how-it-works">How it works</a>
-        <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app">Get it on Google Play</a>
+        <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app"><span class="nav-cta-long">Get it on Google Play</span><span class="nav-cta-short">Get the app</span></a>
       </div>
     </nav>
   </header>
@@ -511,7 +573,7 @@
           </button>
         </article>
       </div>
-      <p class="gallery-hint">Tap an example to enlarge it. Full-resolution PNG files are available from the expanded view.</p>
+      <p class="gallery-hint">Swipe through the examples and tap one to enlarge it. Full-resolution PNG files are available from the expanded view.</p>
       <p class="gallery-disclosure"><strong>Important:</strong> AI-generated visuals can contain mistakes. Verify critical medical, emergency, legal, mechanical, food-safety, and survival information with qualified or authoritative sources before acting. These examples are educational and are not professional medical advice.</p>
     </section>
 
