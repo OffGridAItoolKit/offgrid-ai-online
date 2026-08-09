@@ -692,7 +692,7 @@ public class MainActivity extends BridgeActivity {
             if (answer != null && !answer.trim().isEmpty()) {
                 startPage();
                 drawSection("Field Guide");
-                drawMarkdown(answer, 15.2f);
+                drawMarkdown(answer, 16.5f);
                 finishPage();
             }
         }
@@ -779,7 +779,7 @@ public class MainActivity extends BridgeActivity {
             canvas.drawRect(MARGIN, y, MARGIN + 5f, y + 38f, paint);
             paint.setColor(Color.rgb(44, 24, 16));
             paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            paint.setTextSize(18.5f);
+            paint.setTextSize(19.5f);
             canvas.drawText(section, MARGIN + 14f, y + 26f, paint);
             y += 52f;
         }
