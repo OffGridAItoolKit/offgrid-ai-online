@@ -9,10 +9,15 @@ This document provides a reverse-chronological summary of recent development pro
 ### August 2026
 
 **2026-08-08**
+*   **Native Read Aloud and field-guide sharing follow-up**
+    *   Added an Android system Text-to-Speech bridge because the installed WebView does not expose browser `speechSynthesis`; speech uses the phone's configured local voice and preserves structured pauses.
+    *   Preserved the original assistant Markdown when handing an answer to Field Guide creation so preview and native PDFs retain headings, emphasis, bullets, numbered steps, and tables.
+    *   Renamed the PDF-preview action to `Share PDF` and the generated-image actions to `Share Image` and `Share Field Guide`; the native PDF share sheet remains scheduled for the next Android binary.
+    *   Added an approximately one-minute expectation to Image Studio generation messaging and updated shared-image attribution to `Made with OffGrid AI Image Studio`.
 *   **Field Guide becomes the primary answer-to-offline workflow**
     *   Promoted `Make Field Guide` to the first, primary follow-up action while keeping `Create Visual` immediately available beside it.
     *   Changed `Make Field Guide` into one automated sequence: generate the supporting visual, assemble it with the answer, and open the final field-guide preview without requiring an intermediate Image Studio save action.
-    *   Renamed the preview's top save action to `Save Field Guide`; the persistent lower actions are now `Share` and `Save PDF`.
+    *   Renamed the preview's top save action to `Save Field Guide`; the persistent lower actions are now `Share PDF` and `Save PDF`.
     *   Added an Android native `shareFieldGuidePdf` bridge that creates the same complete PDF in cache and opens the Android share sheet with the PDF attached. This native capability requires the next Android binary release.
     *   Older installed builds receive explicit guidance to save the PDF and share it from `Files > Downloads > OffGrid AI`.
 *   **Mobile first-visit and welcome-screen polish**

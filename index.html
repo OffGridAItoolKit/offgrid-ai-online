@@ -2778,6 +2778,7 @@
                     role: 'assistant',
                     content: fullResponse
                 });
+                messageDiv.dataset.sourceMarkdown = fullResponse;
                 if (IS_PHONE_SURFACE && fullResponse.trim()) {
                     attachMessageFollowupActions(messageDiv);
                 }
@@ -2811,9 +2812,17 @@
                     </div>`;
         }
 
+        function getMessageSourceText(message) {
+            if (!message) return '';
+            if (message.dataset && message.dataset.sourceMarkdown) {
+                return message.dataset.sourceMarkdown.trim();
+            }
+            return getAssistantMessageText(message);
+        }
+
         function readMessageAloudFromAction(button) {
             const message = button?.closest('.message.assistant');
-            const messageText = message ? getAssistantMessageText(message) : '';
+            const messageText = getMessageSourceText(message);
             toggleToolkitReadAloud(messageText);
         }
 
@@ -2864,6 +2873,9 @@
             `;
             
             messagesDiv.appendChild(messageDiv);
+            if (sender === 'assistant' && !isError) {
+                messageDiv.dataset.sourceMarkdown = String(text || '');
+            }
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
         
@@ -2886,8 +2898,8 @@
             const imageActions = IS_PHONE_SURFACE && isGeneratedImage
                 ? `<div class="message-image-actions">
                         <button class="message-image-action save" onclick="downloadOnlineStudioImage()">Save Image</button>
-                        <button class="message-image-action guide" onclick="exportOnlineStudioPDF()">Save Guide PDF</button>
-                        <button class="message-image-action share" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share</button>
+                        <button class="message-image-action guide" onclick="shareOnlineStudioFieldGuide()">Share Field Guide</button>
+                        <button class="message-image-action share" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())">Share Image</button>
                         <button class="message-image-action new-guide" onclick="startNewFieldGuide()">New Field Guide</button>
                     </div>`
                 : '';
@@ -3981,8 +3993,7 @@
         function createVisualFromMessageAction(button, mode = 'visual') {
             haptic('medium');
             const messageEl = button.closest('.message');
-            const textEl = messageEl ? messageEl.querySelector('.message-text') : null;
-            const answerText = textEl ? textEl.innerText.trim() : '';
+            const answerText = getMessageSourceText(messageEl);
             if (!answerText) {
                 handleCreateVisual();
                 return;
@@ -4093,7 +4104,7 @@
                     <div class="online-studio-preview" id="onlineStudioPreview">
                         <div class="online-studio-loading">
                             <div class="online-studio-spinner"></div>
-                            <div>${isFieldGuideBuild ? 'Creating the visual, then assembling your field guide automatically...' : 'Creating a field-ready visual from the answer...'}</div>
+                            <div>${isFieldGuideBuild ? 'Creating the visual, then assembling your field guide automatically. This usually takes about one minute. Keep the app open...' : 'Creating a field-ready visual from the answer. This usually takes about one minute. Keep the app open...'}</div>
                         </div>
                     </div>
                     <div id="onlineStudioError"></div>
@@ -4142,7 +4153,7 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-                        const text = 'Created with OffGrid AI Field Guide — by OffGrid AI';
+                        const text = 'Made with OffGrid AI Image Studio';
                         const fontSize = Math.max(12, Math.min(15, Math.round(canvas.width / 110)));
                         const padX = Math.max(10, Math.round(fontSize * 0.8));
                         const padY = Math.max(6, Math.round(fontSize * 0.45));
@@ -4220,7 +4231,7 @@ Mobile app output requirements:
 
                 const imagePrompt = enhanceVisualPromptForApp(promptData.prompt);
                 onlineStudioState.prompt = imagePrompt;
-                if (statusEl) statusEl.textContent = 'Generating image...';
+                if (statusEl) statusEl.textContent = 'Generating image - usually about 60 seconds...';
 
                 const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
                     method: 'POST',
@@ -4726,14 +4737,14 @@ Mobile app output requirements:
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
                             title: 'OffGrid AI Visual',
-                            text: 'Created with OffGrid AI Field Guide — by OffGrid AI.',
+                            text: 'Made with OffGrid AI Image Studio.',
                             files: [file]
                         }).catch(() => {});
                         return true;
                     }
                     navigator.share({
                         title: 'OffGrid AI Visual',
-                        text: 'Created with OffGrid AI Field Guide — by OffGrid AI. Save the image, then share it from your phone gallery.'
+                        text: 'Made with OffGrid AI Image Studio. Save the image, then share it from your phone gallery.'
                     }).catch(() => {});
                     return true;
                 } catch (error) {
@@ -4827,7 +4838,7 @@ Mobile app output requirements:
             const isFieldGuidePreview = payload && payload.type === 'image-studio';
             const saveLabel = isFieldGuidePreview ? 'Save Field Guide' : 'Save / Print PDF';
             const lowerLeftAction = isFieldGuidePreview
-                ? '<button class="app-pdf-btn secondary" onclick="shareAppPdfPreview()">Share</button>'
+                ? '<button class="app-pdf-btn secondary" onclick="shareAppPdfPreview()">Share PDF</button>'
                 : '<button class="app-pdf-btn secondary" onclick="closeAppPdfPreview()">Return to App</button>';
             const lowerSaveLabel = isFieldGuidePreview ? 'Save PDF' : saveLabel;
 
@@ -4920,8 +4931,8 @@ Mobile app output requirements:
             }
 
             showSaveToast(
-                'Save PDF, then share',
-                'This installed version cannot attach the PDF directly yet. Tap Save PDF, then share it from Files > Downloads > OffGrid AI.'
+                'App update required for direct sharing',
+                'For now, tap Save PDF and share it from Files > Downloads > OffGrid AI. Direct Share PDF will work after the next app update.'
             );
         }
         
@@ -5367,6 +5378,40 @@ Mobile app output requirements:
             );
         }
 
+        function shareOnlineStudioFieldGuide() {
+            if (!onlineStudioState || !onlineStudioState.image) {
+                showSaveToast('Field guide is not ready', 'Create a field guide before sharing it.');
+                return;
+            }
+
+            const payload = {
+                type: 'image-studio',
+                title: onlineStudioState.title || 'OffGrid AI Field Guide',
+                image: onlineStudioState.image,
+                question: onlineStudioState.sourcePrompt || onlineStudioState.title || '',
+                answer: onlineStudioState.answer || ''
+            };
+            const filename = generateFilename(payload.title).replace(/\.md$/i, '.pdf');
+
+            if (window.OffGridNative && typeof window.OffGridNative.shareFieldGuidePdf === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.shareFieldGuidePdf(
+                    payload.image,
+                    payload.title,
+                    payload.question,
+                    payload.answer,
+                    filename
+                ));
+                if (result.ok) {
+                    showSaveToast('Field guide ready to share', 'Choose an app or contact from the Android share sheet.');
+                } else {
+                    showSaveToast('PDF share failed', result.error || 'Could not prepare the field guide for sharing.');
+                }
+                return;
+            }
+
+            exportOnlineStudioPDF({ shareAfterPreview: true });
+        }
+
         async function exportOnlineStudioPDF(options = {}) {
             if (!onlineStudioState || !onlineStudioState.image) {
                 showSaveToast('Image not ready yet', 'Please wait for Image Studio to finish generating.');
@@ -5413,7 +5458,11 @@ Mobile app output requirements:
                             question: onlineStudioState.sourcePrompt || onlineStudioState.title || '',
                             answer: onlineStudioState.answer || ''
                         });
-                        showSaveToast('Field guide ready', 'Tap Save Field Guide to keep it in Downloads > OffGrid AI, or Share to send the PDF.');
+                        if (options.shareAfterPreview) {
+                            shareAppPdfPreview();
+                        } else {
+                            showSaveToast('Field guide ready', 'Tap Save Field Guide to keep it in Downloads > OffGrid AI, or Share PDF to send it.');
+                        }
                     });
                 } else {
                     const printWindow = window.open('', '_blank');
@@ -5719,6 +5768,7 @@ Mobile app output requirements:
         let toolkitTtsActive = false;
         let toolkitTtsWatchdog = null;
         let toolkitTtsVoice = null;
+        let toolkitTtsUsingNative = false;
 
         function prepareTextForToolkitTTS(text) {
             return String(text || '')
@@ -5866,10 +5916,6 @@ Mobile app output requirements:
         }
 
         function toggleToolkitReadAloud(text) {
-            if (!window.speechSynthesis) {
-                showSaveToast('Read aloud unavailable', 'This browser does not support speech output.');
-                return;
-            }
             if (toolkitTtsActive) {
                 stopToolkitReadAloud();
                 return;
@@ -5878,6 +5924,27 @@ Mobile app output requirements:
             const cleanText = prepareTextForToolkitTTS(text);
             if (!cleanText) {
                 showSaveToast('Nothing to read');
+                return;
+            }
+
+            if (window.OffGridNative && typeof window.OffGridNative.speakText === 'function') {
+                const result = parseNativeBridgeResult(window.OffGridNative.speakText(cleanText));
+                if (!result.ok) {
+                    showSaveToast('Phone voice is not ready', result.error || 'Check the phone text-to-speech settings and try again.');
+                    return;
+                }
+                toolkitTtsUsingNative = true;
+                toolkitTtsActive = true;
+                updateToolkitTTSActionLabels();
+                showToolkitTTSIndicator();
+                return;
+            }
+
+            if (!window.speechSynthesis) {
+                showSaveToast(
+                    'App update required for Read Aloud',
+                    'This installed version does not include the new phone voice connection yet.'
+                );
                 return;
             }
 
@@ -5897,14 +5964,23 @@ Mobile app output requirements:
         }
 
         function stopToolkitReadAloud(cancelSpeech = true) {
+            if (cancelSpeech && toolkitTtsUsingNative && window.OffGridNative && typeof window.OffGridNative.stopSpeaking === 'function') {
+                window.OffGridNative.stopSpeaking();
+            }
             toolkitTtsActive = false;
             if (cancelSpeech && window.speechSynthesis) window.speechSynthesis.cancel();
+            toolkitTtsUsingNative = false;
             toolkitTtsChunks = [];
             toolkitTtsIndex = 0;
             if (toolkitTtsWatchdog) clearTimeout(toolkitTtsWatchdog);
             toolkitTtsWatchdog = null;
             dismissToolkitTTSIndicator();
             updateToolkitTTSActionLabels();
+        }
+
+        function handleNativeToolkitTTSFinished() {
+            if (!toolkitTtsUsingNative) return;
+            stopToolkitReadAloud(false);
         }
 
         let toolkitChatSearchMatches = [];

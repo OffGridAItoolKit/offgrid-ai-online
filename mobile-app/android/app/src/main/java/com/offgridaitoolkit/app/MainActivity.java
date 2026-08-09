@@ -22,6 +22,8 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.text.Html;
 import android.text.Layout;
 import android.text.Spanned;
@@ -41,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.json.JSONObject;
 
 public class MainActivity extends BridgeActivity {
@@ -51,6 +54,8 @@ public class MainActivity extends BridgeActivity {
     private int nativeCompassAccuracy = SensorManager.SENSOR_STATUS_UNRELIABLE;
     private long lastCompassEmitMs = 0;
     private ActivityResultLauncher<Intent> savedGuidePickerLauncher;
+    private TextToSpeech nativeTextToSpeech;
+    private volatile boolean nativeTtsReady = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,12 +80,91 @@ public class MainActivity extends BridgeActivity {
         );
 
         getBridge().getWebView().addJavascriptInterface(new OffGridNativeBridge(), "OffGridNative");
+        initializeNativeTextToSpeech();
     }
 
     @Override
     public void onPause() {
         stopNativeCompass();
         super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (nativeTextToSpeech != null) {
+            nativeTextToSpeech.stop();
+            nativeTextToSpeech.shutdown();
+            nativeTextToSpeech = null;
+        }
+        nativeTtsReady = false;
+        super.onDestroy();
+    }
+
+    private void initializeNativeTextToSpeech() {
+        nativeTextToSpeech = new TextToSpeech(getApplicationContext(), status -> {
+            if (status != TextToSpeech.SUCCESS || nativeTextToSpeech == null) {
+                nativeTtsReady = false;
+                return;
+            }
+
+            int languageResult = nativeTextToSpeech.setLanguage(Locale.getDefault());
+            if (languageResult == TextToSpeech.LANG_MISSING_DATA || languageResult == TextToSpeech.LANG_NOT_SUPPORTED) {
+                languageResult = nativeTextToSpeech.setLanguage(Locale.US);
+            }
+            nativeTextToSpeech.setSpeechRate(0.96f);
+            nativeTtsReady = languageResult != TextToSpeech.LANG_MISSING_DATA
+                && languageResult != TextToSpeech.LANG_NOT_SUPPORTED;
+            nativeTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    if (utteranceId != null && utteranceId.endsWith("-last")) {
+                        notifyNativeSpeechFinished();
+                    }
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    notifyNativeSpeechFinished();
+                }
+            });
+        });
+    }
+
+    private void notifyNativeSpeechFinished() {
+        runOnUiThread(() -> {
+            if (getBridge() == null || getBridge().getWebView() == null) return;
+            getBridge().getWebView().evaluateJavascript(
+                "if(window.handleNativeToolkitTTSFinished){window.handleNativeToolkitTTSFinished();}",
+                null
+            );
+        });
+    }
+
+    private static List<String> chunkTextForNativeSpeech(String text) {
+        List<String> chunks = new ArrayList<>();
+        String remaining = text == null ? "" : text.trim();
+        int maxLength = Math.min(3000, TextToSpeech.getMaxSpeechInputLength() - 100);
+
+        while (remaining.length() > maxLength) {
+            int splitAt = -1;
+            for (char boundary : new char[] {'.', '!', '?', ';', ':', '\n'}) {
+                splitAt = Math.max(splitAt, remaining.lastIndexOf(boundary, maxLength));
+            }
+            if (splitAt < maxLength / 2) {
+                splitAt = remaining.lastIndexOf(' ', maxLength);
+            }
+            if (splitAt <= 0) splitAt = maxLength;
+            else splitAt += 1;
+
+            chunks.add(remaining.substring(0, splitAt).trim());
+            remaining = remaining.substring(splitAt).trim();
+        }
+        if (!remaining.isEmpty()) chunks.add(remaining);
+        return chunks;
     }
 
     private class OffGridNativeBridge {
@@ -91,6 +175,53 @@ public class MainActivity extends BridgeActivity {
                 intent.setData(Uri.parse("package:" + getPackageName()));
                 startActivity(intent);
             });
+        }
+
+        @JavascriptInterface
+        public String speakText(String text) {
+            try {
+                String spokenText = text == null ? "" : text.trim();
+                if (spokenText.isEmpty()) {
+                    throw new IllegalArgumentException("There is no text to read.");
+                }
+                if (!nativeTtsReady || nativeTextToSpeech == null) {
+                    throw new IllegalStateException("The phone text-to-speech voice is still starting or is unavailable.");
+                }
+
+                List<String> chunks = chunkTextForNativeSpeech(spokenText);
+                runOnUiThread(() -> {
+                    nativeTextToSpeech.stop();
+                    String sessionId = "offgrid-tts-" + System.currentTimeMillis();
+                    for (int index = 0; index < chunks.size(); index++) {
+                        String utteranceId = sessionId + (index == chunks.size() - 1 ? "-last" : "-" + index);
+                        nativeTextToSpeech.speak(
+                            chunks.get(index),
+                            index == 0 ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD,
+                            null,
+                            utteranceId
+                        );
+                    }
+                });
+
+                return new JSONObject()
+                    .put("ok", true)
+                    .put("chunks", chunks.size())
+                    .toString();
+            } catch (Exception error) {
+                return nativeError(error);
+            }
+        }
+
+        @JavascriptInterface
+        public String stopSpeaking() {
+            try {
+                if (nativeTextToSpeech != null) {
+                    runOnUiThread(() -> nativeTextToSpeech.stop());
+                }
+                return new JSONObject().put("ok", true).toString();
+            } catch (Exception error) {
+                return nativeError(error);
+            }
         }
 
         @JavascriptInterface
@@ -157,6 +288,8 @@ public class MainActivity extends BridgeActivity {
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType(payload.mimeType);
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+                shareIntent.putExtra(Intent.EXTRA_TEXT, "Made with OffGrid AI Image Studio.");
+                shareIntent.setClipData(ClipData.newRawUri("OffGrid AI Image Studio visual", uri));
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 runOnUiThread(() -> startActivity(Intent.createChooser(shareIntent, "Share OffGrid AI visual")));
