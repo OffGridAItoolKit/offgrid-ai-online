@@ -392,8 +392,8 @@ public class MainActivity extends BridgeActivity {
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("application/pdf");
                 shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, title == null || title.trim().isEmpty() ? "OffGrid AI Field Guide" : title.trim());
-                shareIntent.setClipData(ClipData.newRawUri("OffGrid AI Field Guide", uri));
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, title == null || title.trim().isEmpty() ? "OffGrid AI FieldGuide" : title.trim());
+                shareIntent.setClipData(ClipData.newRawUri("OffGrid AI FieldGuide", uri));
                 shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                 runOnUiThread(() -> startActivity(Intent.createChooser(shareIntent, "Share field guide PDF")));

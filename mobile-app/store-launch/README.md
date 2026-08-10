@@ -1,4 +1,4 @@
-# OffGrid AI Field Guide App Store Launch Packet
+# OffGrid AI FieldGuide App Store Launch Packet
 
 Status: in progress
 Launch target: free online v1 for Google Play and Apple App Store
@@ -24,7 +24,7 @@ App id / bundle id: com.offgridaitoolkit.app
 - [ ] Google Play organization onboarding fully cleared. Identity is approved; website verification is requested and phone verification is waiting behind it.
 - [ ] Apple Developer Program organization account verified.
 - [ ] Tedd invited to App Store Connect with certificate/profile/TestFlight/upload access.
-- [x] Public app name is `OffGrid AI Field Guide`; public developer brand is `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
+- [x] Public app name is `OffGrid AI FieldGuide`; public developer brand is `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
 - [x] Support email confirmed as `support@offgridaitoolkit.com`.
 
 ### Product Readiness

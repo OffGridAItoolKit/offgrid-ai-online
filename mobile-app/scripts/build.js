@@ -10,7 +10,7 @@ const html = `<!doctype html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#2c1810">
-    <title>OffGrid AI Field Guide</title>
+    <title>OffGrid AI FieldGuide</title>
     <style>
       html, body {
         height: 100%;
@@ -59,7 +59,7 @@ const html = `<!doctype html>
           <circle cx="50" cy="50" r="35" fill="none" stroke="#8b4513" stroke-width="1" opacity="0.5"/>
           <circle cx="50" cy="50" r="6" fill="#8b4513"/>
         </svg>
-        <div class="title">OffGrid AI Field Guide</div>
+        <div class="title">OffGrid AI FieldGuide</div>
         <div class="copy" style="margin-bottom: 8px;">by OffGrid AI</div>
         <div class="copy">Connect to the internet to use the online mobile app.</div>
       </div>

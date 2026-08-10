@@ -26,7 +26,7 @@ This file tracks changes that cannot reach installed users through the hosted `h
 | Preserve Markdown structure and styling in native saved/shared Field Guide PDFs | Implemented after `49d6f96`; physical test confirmed formatting restoration. Candidate now uses a taller/narrower mobile page, 16.5-point body text, earlier wrapping, and hanging list indents | Rebuild/reinstall Dev candidate and visually inspect short, long, list-heavy, and multi-page PDFs; reconfirm from Play internal test |
 | Read answers through Android system Text-to-Speech when WebView speech is unavailable | Implemented after `50daea1`; default voice, punctuation, long-answer playback, and Stop Reading confirmed working well on Samsung SM-S938U1 in `1.1.0-dev` | Reconfirm from the Play-signed internal-test upgrade |
 | Share generated images with `Made with OffGrid AI Image Studio` attribution | Implemented after `50daea1`; attribution and share workflow confirmed working in the side-by-side physical-device candidate | Reconfirm from the Play-signed internal-test upgrade and one additional recipient app if practical |
-| Installed launcher label and icon use `OffGrid AI Field Guide` branding | Present in current source after Play v1 | Confirm launcher label, adaptive icon, and upgrade preservation |
+| Installed launcher label and icon use `OffGrid AI FieldGuide` branding | Present in current source after Play v1 | Confirm launcher label, adaptive icon, and upgrade preservation |
 
 The owner reports that the current hosted Saved Guides experience already opens the useful location on the test phone. That does not prove the updated native picker is present in Play v1; retain it in this queue until version code `2` is installed and verified.
 

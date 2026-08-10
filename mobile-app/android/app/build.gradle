@@ -43,8 +43,8 @@ android {
         debug {
             applicationIdSuffix ".dev"
             versionNameSuffix "-dev"
-            resValue "string", "app_name", "OffGrid AI Field Guide Dev"
-            resValue "string", "title_activity_main", "OffGrid AI Field Guide Dev"
+            resValue "string", "app_name", "OffGrid AI FieldGuide Dev"
+            resValue "string", "title_activity_main", "OffGrid AI FieldGuide Dev"
         }
         release {
             if (hasReleaseKeystore) {

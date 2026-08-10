@@ -1,12 +1,19 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-08-08
+**Last Updated:** 2026-08-10
 
-This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI Field Guide online platform.
+This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
 
 ### August 2026
+
+**2026-08-10**
+*   **FieldGuide branding and landing-page discovery**
+    *   Standardized the online product name as `OffGrid AI FieldGuide` across the hosted app, native labels, policy pages, sharing text, store-launch material, and operational documentation while retaining two-word `field guide` wording for the content itself.
+    *   Added a new 1200-by-630 social share card using the actual app phone screen and updated Open Graph and Twitter metadata.
+    *   Added crawl directives, a root sitemap, `SoftwareApplication` structured data, and an AI-readable `llms.txt`; the landing content remains server-rendered HTML and does not require a separate prerendering service.
+    *   Highlighted the ability to open previously saved PDFs without an internet connection while preserving the clear statement that AI features require internet access.
 
 **2026-08-08**
 *   **Native Read Aloud and field-guide sharing follow-up**
@@ -38,7 +45,7 @@ This document provides a reverse-chronological summary of recent development pro
     *   Replaced Android's unreliable folder-view request with a document picker initialized at `Downloads/OffGrid AI`; selecting a saved guide opens its PDF.
     *   The video limit is deployed through the hosted app. The Saved Guides native picker requires the next Android binary release.
 *   **Online product rename deployed**
-    *   Updated the online web/app interface, native mobile labels, policy pages, exports, sharing text, and operational metadata to `OffGrid AI Field Guide`.
+    *   Updated the online web/app interface, native mobile labels, policy pages, exports, sharing text, and operational metadata to `OffGrid AI FieldGuide`.
     *   Used `by OffGrid AI` for consumer-facing attribution while retaining `OFFGRID AI TOOLKIT, LLC` as the legal entity.
     *   Preserved explicit `OffGrid AI ToolKit` references that describe the separate offline/USB product.
 *   **Responsive mobile layout deployed**

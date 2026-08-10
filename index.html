@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OffGrid AI Field Guide - Cloud-Powered Field Assistance</title>
+    <title>OffGrid AI FieldGuide - Cloud-Powered Field Assistance</title>
     <meta name="description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     
     <!-- Open Graph / Social Sharing Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://offgridtoolkit.ai/">
-    <meta property="og:title" content="OffGrid AI Field Guide - Cloud-Powered Field Assistance">
+    <meta property="og:title" content="OffGrid AI FieldGuide - Cloud-Powered Field Assistance">
     <meta property="og:description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     <meta property="og:image" content="https://offgridtoolkit.ai/og-image.png">
     <meta property="og:image:width" content="1200">
@@ -18,7 +18,7 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://offgridtoolkit.ai/">
-    <meta name="twitter:title" content="OffGrid AI Field Guide - Cloud-Powered Field Assistance">
+    <meta name="twitter:title" content="OffGrid AI FieldGuide - Cloud-Powered Field Assistance">
     <meta name="twitter:description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
@@ -1237,15 +1237,15 @@
                         <circle cx="50" cy="50" r="7" fill="#8b4513"/>
                     </svg>
                 </span>
-                <span>OffGrid AI Field Guide</span>
+                <span>OffGrid AI FieldGuide</span>
             </div>
             <div class="first-run-tagline">No account history. Phone-native tools. Field-ready help.</div>
             <div class="first-run-message">
-                <p><strong>Welcome to OffGrid AI Field Guide.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
+                <p><strong>Welcome to OffGrid AI FieldGuide.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
                 <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
                 <p>Photos, videos, and prompts are sent to the online AI service only when you choose to use those features.</p>
                 <p>Chats are not saved to an OffGrid AI account or personal cloud history. Online providers process requests under their own privacy policies; no account is required for v1.</p>
-                <p><strong>Health information:</strong> OffGrid AI Field Guide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
+                <p><strong>Health information:</strong> OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
                 <p>AI can make mistakes. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services. Verify other important survival, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
@@ -1280,7 +1280,7 @@
                     <circle cx="50" cy="50" r="7" fill="#8b4513"/>
                 </svg>
             </div>
-            <h1 class="title">OffGrid AI Field Guide</h1>
+            <h1 class="title">OffGrid AI FieldGuide</h1>
         </div>
         <div class="status">
             <button class="app-theme-toggle" id="appThemeToggle" onclick="toggleAppTheme()" type="button" aria-label="Switch to night mode" title="Day / Night mode">
@@ -1499,7 +1499,7 @@
                         </svg>
                     </button>
                     <p class="compass-heading welcome-tagline" id="compassHeading">Tap compass for heading</p>
-                    <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI Field Guide</h2>
+                    <h2><span class="desktop-only-inline">Welcome to </span>OffGrid AI FieldGuide</h2>
                     <div class="welcome-subtitle">⚡ Cloud-Powered • 🔒 No Account History • No Account Required</div>
                     <div class="feature-badges">
                         <div class="feature-badge">👁️ Vision</div>
@@ -3798,7 +3798,7 @@
 
         function showMicrophonePermissionHelp() {
             if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.openAppSettings === 'function') {
-                const openSettings = confirm('Microphone access is blocked for OffGrid AI Field Guide. Open app settings now so you can allow Microphone access?');
+                const openSettings = confirm('Microphone access is blocked for OffGrid AI FieldGuide. Open app settings now so you can allow Microphone access?');
                 if (openSettings) {
                     window.OffGridNative.openAppSettings();
                 }
@@ -4609,7 +4609,7 @@ Mobile app output requirements:
                 <section class="feedback-sheet" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
                     <div class="feedback-sheet-header">
                         <div>
-                            <div class="feedback-eyebrow">OffGrid AI Field Guide · by OffGrid AI</div>
+                            <div class="feedback-eyebrow">OffGrid AI FieldGuide · by OffGrid AI</div>
                             <h2 id="feedbackTitle">${reportedContent ? 'Report this response' : 'Send feedback'}</h2>
                         </div>
                         <button class="feedback-close" type="button" onclick="closeFeedback()" aria-label="Close feedback">&times;</button>
@@ -4887,10 +4887,10 @@ Mobile app output requirements:
         function printAppPdfPreview() {
             if (!document.getElementById('appPdfPreview')) return;
             if (appPdfPreviewPayload && appPdfPreviewPayload.type === 'image-studio' && window.OffGridNative && typeof window.OffGridNative.saveFieldGuidePdf === 'function') {
-                const filename = generateFilename(appPdfPreviewPayload.title || 'OffGrid AI Field Guide').replace(/\.md$/i, '.pdf');
+                const filename = generateFilename(appPdfPreviewPayload.title || 'OffGrid AI FieldGuide').replace(/\.md$/i, '.pdf');
                 const result = parseNativeBridgeResult(window.OffGridNative.saveFieldGuidePdf(
                     appPdfPreviewPayload.image,
-                    appPdfPreviewPayload.title || 'OffGrid AI Field Guide',
+                    appPdfPreviewPayload.title || 'OffGrid AI FieldGuide',
                     appPdfPreviewPayload.question || '',
                     appPdfPreviewPayload.answer || '',
                     filename
@@ -4913,11 +4913,11 @@ Mobile app output requirements:
                 return;
             }
 
-            const filename = generateFilename(appPdfPreviewPayload.title || 'OffGrid AI Field Guide').replace(/\.md$/i, '.pdf');
+            const filename = generateFilename(appPdfPreviewPayload.title || 'OffGrid AI FieldGuide').replace(/\.md$/i, '.pdf');
             if (window.OffGridNative && typeof window.OffGridNative.shareFieldGuidePdf === 'function') {
                 const result = parseNativeBridgeResult(window.OffGridNative.shareFieldGuidePdf(
                     appPdfPreviewPayload.image,
-                    appPdfPreviewPayload.title || 'OffGrid AI Field Guide',
+                    appPdfPreviewPayload.title || 'OffGrid AI FieldGuide',
                     appPdfPreviewPayload.question || '',
                     appPdfPreviewPayload.answer || '',
                     filename
@@ -5386,7 +5386,7 @@ Mobile app output requirements:
 
             const payload = {
                 type: 'image-studio',
-                title: onlineStudioState.title || 'OffGrid AI Field Guide',
+                title: onlineStudioState.title || 'OffGrid AI FieldGuide',
                 image: onlineStudioState.image,
                 question: onlineStudioState.sourcePrompt || onlineStudioState.title || '',
                 answer: onlineStudioState.answer || ''
@@ -5752,10 +5752,10 @@ Mobile app output requirements:
 
         function shareToolkitText(text) {
             const cleanText = cleanTextForSharing(text);
-            const shareText = `${cleanText}\n\n---\nOffGrid AI Field Guide · by OffGrid AI`;
+            const shareText = `${cleanText}\n\n---\nOffGrid AI FieldGuide · by OffGrid AI`;
             if (navigator.share) {
                 navigator.share({
-                    title: 'OffGrid AI Field Guide',
+                    title: 'OffGrid AI FieldGuide',
                     text: shareText
                 }).catch(() => copyTextToClipboardReliable(cleanText));
             } else {
@@ -6099,7 +6099,7 @@ Mobile app output requirements:
 
             const now = new Date();
             const date = now.toISOString().slice(0, 10);
-            let markdown = `# OffGrid AI Field Guide Chat Export\n\n`;
+            let markdown = `# OffGrid AI FieldGuide Chat Export\n\n`;
             markdown += `Saved on ${now.toLocaleDateString()} at ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}\n\n---\n\n`;
             conversationHistory.forEach(msg => {
                 const role = msg.role === 'user' ? 'User' : 'OffGrid AI';
@@ -6108,7 +6108,7 @@ Mobile app output requirements:
                 markdown += `## ${role}\n\n${content}\n\n`;
                 if (msg.image) markdown += `*[Image attached or generated]*\n\n`;
             });
-            markdown += `---\n\nOffGrid AI Field Guide · by OffGrid AI\n`;
+            markdown += `---\n\nOffGrid AI FieldGuide · by OffGrid AI\n`;
 
             const blob = new Blob([markdown], { type: 'text/markdown;charset=utf-8' });
             const url = URL.createObjectURL(blob);
@@ -6137,7 +6137,7 @@ Mobile app output requirements:
 
         function promptToolkitAddToHomeScreen() {
             if (IS_APP_SURFACE) {
-                showSaveToast('Already installed', 'You are using the OffGrid AI Field Guide app.');
+                showSaveToast('Already installed', 'You are using the OffGrid AI FieldGuide app.');
             } else {
                 showSaveToast('Add to Home Screen', 'Use your browser menu, then choose Install App or Add to Home screen.');
             }
@@ -6290,7 +6290,7 @@ Mobile app output requirements:
         // ============================================
         
         document.addEventListener('DOMContentLoaded', async () => {
-            console.log('OffGrid AI Field Guide - Initializing...');
+            console.log('OffGrid AI FieldGuide - Initializing...');
             console.log('Experience:', CONFIG.experience, '| Customer:', CONFIG.isCustomer);
             
             // Check first run
@@ -6449,7 +6449,7 @@ Mobile app output requirements:
                 }
             }
 
-            console.log('OffGrid AI Field Guide - Ready!');
+            console.log('OffGrid AI FieldGuide - Ready!');
         });
     </script>
 </body>

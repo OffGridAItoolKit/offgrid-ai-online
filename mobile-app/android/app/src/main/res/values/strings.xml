@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">OffGrid AI Field Guide</string>
-    <string name="title_activity_main">OffGrid AI Field Guide</string>
+    <string name="app_name">OffGrid AI FieldGuide</string>
+    <string name="title_activity_main">OffGrid AI FieldGuide</string>
     <string name="package_name">com.offgridaitoolkit.app</string>
     <string name="custom_url_scheme">com.offgridaitoolkit.app</string>
 </resources>

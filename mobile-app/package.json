@@ -2,7 +2,7 @@
   "name": "offgrid-ai-toolkit-mobile",
   "version": "0.1.0",
   "private": true,
-  "description": "Capacitor shell for the OffGrid AI Field Guide mobile app.",
+  "description": "Capacitor shell for the OffGrid AI FieldGuide mobile app.",
   "scripts": {
     "build": "node scripts/build.js",
     "sync": "npx cap sync",

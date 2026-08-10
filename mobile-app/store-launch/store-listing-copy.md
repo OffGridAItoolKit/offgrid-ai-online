@@ -2,7 +2,7 @@
 
 ## App Name
 
-OffGrid AI Field Guide
+OffGrid AI FieldGuide
 
 ## Subtitle / Short Description
 
@@ -10,7 +10,7 @@ Identify photos, analyze videos, and create practical visual field guides.
 
 ## Full Description
 
-OffGrid AI Field Guide is a practical AI companion for preparedness, homesteading, hiking, RV travel, van life, and hard decisions in the field.
+OffGrid AI FieldGuide is a practical AI companion for preparedness, homesteading, hiking, RV travel, van life, and hard decisions in the field.
 
 Ask questions, upload photos or videos, create field-ready visuals, save guides to your phone, and use the built-in compass when you need a quick heading.
 
@@ -28,11 +28,11 @@ Features:
 - Day/night mode
 - Tap-to-enable compass heading
 
-OffGrid AI Field Guide is online-only. Internet access is required for AI responses. The physical OffGrid AI ToolKit flash-drive product is available separately for offline use and emergency preparedness.
+OffGrid AI FieldGuide is online-only. Internet access is required for AI responses. The physical OffGrid AI ToolKit flash-drive product is available separately for offline use and emergency preparedness.
 
 No account is required. No ads. No in-app purchases.
 
-OffGrid AI Field Guide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. AI can make mistakes. Verify important survival, medical, legal, financial, or safety information before acting. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services.
+OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. AI can make mistakes. Verify important survival, medical, legal, financial, or safety information before acting. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services.
 
 ## Keywords
 

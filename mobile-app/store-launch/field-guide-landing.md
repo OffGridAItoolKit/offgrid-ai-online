@@ -1,10 +1,10 @@
-# OffGrid AI Field Guide Landing Page
+# OffGrid AI FieldGuide Landing Page
 
 ## Domain plan
 
 - Canonical domain: `https://offgridai.guide`
 - Redirect domain: `https://offgridaifieldguide.com`
-- Product: online `OffGrid AI Field Guide`
+- Product: online `OffGrid AI FieldGuide`
 - Google Play package: `com.offgridaitoolkit.app`
 
 `offgridai.guide` is the primary address because it is short, memorable, and matches the product name. Both root and `www` forms of `offgridaifieldguide.com` redirect permanently to the corresponding path on `offgridai.guide`.

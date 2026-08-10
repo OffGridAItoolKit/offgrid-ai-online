@@ -1,8 +1,8 @@
-# OffGrid AI Field Guide - Technical Overview
+# OffGrid AI FieldGuide - Technical Overview
 
 **Version 5.7.2** | **Last Updated:** 2026-07-10
 
-This document provides a comprehensive technical overview of the OffGrid AI Field Guide online platform and the separately branded premium Command Center. It is intended for developers, administrators, and technical staff.
+This document provides a comprehensive technical overview of the OffGrid AI FieldGuide online platform and the separately branded premium Command Center. It is intended for developers, administrators, and technical staff.
 
 ---
 
@@ -10,7 +10,7 @@ This document provides a comprehensive technical overview of the OffGrid AI Fiel
 
 The platform is built on a simple and robust technical stack, prioritizing maintainability, security, and privacy.
 
-**Frontend**: Vanilla HTML, CSS, and JavaScript. The frontend is a single-page application for OffGrid AI Field Guide and a separate one for the Command Center. No complex build step is required, allowing for simple static file serving.
+**Frontend**: Vanilla HTML, CSS, and JavaScript. The frontend is a single-page application for OffGrid AI FieldGuide and a separate one for the Command Center. No complex build step is required, allowing for simple static file serving.
 
 **Backend**: A Node.js server using the Express framework. The backend serves three primary functions:
 1.  **Static File Server**: Serves the HTML, CSS, and JS files for the frontend.
@@ -23,11 +23,11 @@ The platform is built on a simple and robust technical stack, prioritizing maint
 
 ## 2. Core Features
 
-The online platform is divided into two main products: the free OffGrid AI Field Guide and the premium Command Center.
+The online platform is divided into two main products: the free OffGrid AI FieldGuide and the premium Command Center.
 
-### 2.1. OffGrid AI Field Guide (Free)
+### 2.1. OffGrid AI FieldGuide (Free)
 
-OffGrid AI Field Guide provides the core online OffGrid AI experience while the separate paid ToolKit product is designed for offline use.
+OffGrid AI FieldGuide provides the core online OffGrid AI experience while the separate paid ToolKit product is designed for offline use.
 
 *   **Gemma 4 26B A4B**: Single model architecture with system prompt for decision-oriented responses.
 *   **Multimodal Input**: Supports image uploads for visual analysis.

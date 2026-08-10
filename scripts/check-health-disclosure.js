@@ -8,7 +8,7 @@ const css = fs.readFileSync(path.join(root, 'offgridai.css'), 'utf8');
 const checks = [
     {
         label: 'first-run medical-device disclosure',
-        ok: html.includes('OffGrid AI Field Guide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition.')
+        ok: html.includes('OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition.')
     },
     {
         label: 'first-run professional-care guidance',

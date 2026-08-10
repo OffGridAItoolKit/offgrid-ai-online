@@ -26,7 +26,7 @@ async function verify() {
         headers: { 'X-Forwarded-Host': 'offgridai.guide' }
     });
     const primaryHtml = await primary.text();
-    if (primary.status !== 200 || !primaryHtml.includes('<title>OffGrid AI Field Guide')) {
+    if (primary.status !== 200 || !primaryHtml.includes('<title>OffGrid AI FieldGuide')) {
         throw new Error(`Primary landing response was unexpected (${primary.status}).`);
     }
 
@@ -40,6 +40,30 @@ async function verify() {
         throw new Error(`Landing video asset response was unexpected (${video.status}, ${video.headers.get('content-type')}).`);
     }
 
+    const robots = await fetch(`http://127.0.0.1:${port}/robots.txt`, {
+        headers: { 'X-Forwarded-Host': 'offgridai.guide' }
+    });
+    const robotsText = await robots.text();
+    if (robots.status !== 200 || !robotsText.includes('Sitemap: https://offgridai.guide/sitemap.xml')) {
+        throw new Error(`robots.txt response was unexpected (${robots.status}).`);
+    }
+
+    const sitemap = await fetch(`http://127.0.0.1:${port}/sitemap.xml`, {
+        headers: { 'X-Forwarded-Host': 'offgridai.guide' }
+    });
+    const sitemapText = await sitemap.text();
+    if (sitemap.status !== 200 || !sitemapText.includes('<loc>https://offgridai.guide/</loc>')) {
+        throw new Error(`sitemap.xml response was unexpected (${sitemap.status}).`);
+    }
+
+    const llms = await fetch(`http://127.0.0.1:${port}/llms.txt`, {
+        headers: { 'X-Forwarded-Host': 'offgridai.guide' }
+    });
+    const llmsText = await llms.text();
+    if (llms.status !== 200 || !llmsText.includes('# OffGrid AI FieldGuide')) {
+        throw new Error(`llms.txt response was unexpected (${llms.status}).`);
+    }
+
     const redirect = await fetch(`http://127.0.0.1:${port}/features`, {
         headers: { 'X-Forwarded-Host': 'offgridaifieldguide.com' },
         redirect: 'manual'
@@ -48,7 +72,7 @@ async function verify() {
         throw new Error(`Redirect response was unexpected (${redirect.status}, ${redirect.headers.get('location')}).`);
     }
 
-    finish(0, 'Landing host smoke checks passed (3/3).');
+    finish(0, 'Landing host smoke checks passed (6/6).');
 }
 
 child.stdout.on('data', (chunk) => {

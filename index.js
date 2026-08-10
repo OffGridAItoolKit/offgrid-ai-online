@@ -1,5 +1,5 @@
 /**
- * OffGrid AI Field Guide - Backend API Server
+ * OffGrid AI FieldGuide - Backend API Server
  * 
  * This server acts as a secure proxy between the frontend and OpenRouter API,
  * keeping the API key secure on the server side.
@@ -500,7 +500,7 @@ app.use('/api/command/', commandLimiter);
 app.use('/api/image-studio/', commandLimiter);
 
 // =============================================================================
-// DOMAIN ROUTING: OffGrid AI Field Guide landing page
+// DOMAIN ROUTING: OffGrid AI FieldGuide landing page
 // =============================================================================
 
 function requestHost(req) {
@@ -529,7 +529,7 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
     if (!isFieldGuideLandingHost(req)) return next();
     if (req.path.startsWith('/api/')) return next();
-      if (req.path.match(/\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff|woff2|ttf|eot|map|mp4|webm)$/i)) return next();
+    if (req.path.match(/\.(css|js|png|jpg|jpeg|webp|gif|svg|ico|woff|woff2|ttf|eot|map|mp4|webm|txt|xml)$/i)) return next();
     return res.sendFile(path.join(__dirname, 'field-guide-landing.html'));
 });
 
@@ -1175,7 +1175,7 @@ app.get('/api/models', (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
-        service: 'OffGrid AI Field Guide',
+        service: 'OffGrid AI FieldGuide',
         timestamp: new Date().toISOString()
     });
 });
@@ -2457,7 +2457,7 @@ app.post('/api/export-pdf', async (req, res) => {
 <body>
     ${markdownToHtml(markdown)}
     <div class="footer">
-        OffGrid AI Field Guide &bull; by OffGrid AI
+        OffGrid AI FieldGuide &bull; by OffGrid AI
     </div>
 </body>
 </html>`;
@@ -2644,7 +2644,7 @@ initializeDatabase()
 app.listen(PORT, '0.0.0.0', () => {
     console.log('');
     console.log('╔═══════════════════════════════════════════════════════════╗');
-    console.log('║         OffGrid AI Field Guide - Server Started           ║');
+    console.log('║         OffGrid AI FieldGuide - Server Started           ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  Local:   http://localhost:${PORT}                          ║`);
     console.log(`║  Network: http://0.0.0.0:${PORT}                            ║`);
@@ -2664,7 +2664,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`║  API Key: ${OPENROUTER_API_KEY ? '✓ Configured' : '✗ Missing'}                               ║`);
     console.log('║  Routes:                                                  ║');
     console.log('║    /         → Prospect Demo (sales messaging)            ║');
-    console.log('║    /online   → OffGrid AI Field Guide (ad-free)           ║');
+    console.log('║    /online   → OffGrid AI FieldGuide (ad-free)           ║');
     console.log('║    /command  → Command Center (premium)                   ║');
     console.log('╠═══════════════════════════════════════════════════════════╣');
     console.log(`║  Database: ${process.env.DATABASE_URL ? '✓ Connected' : '✗ Not configured'}                             ║`);
