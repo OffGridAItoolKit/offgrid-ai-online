@@ -11,8 +11,8 @@ This document provides a reverse-chronological summary of recent development pro
 **2026-08-10**
 *   **FieldGuide branding and landing-page discovery**
     *   Standardized the online product name as `OffGrid AI FieldGuide` across the hosted app, native labels, policy pages, sharing text, store-launch material, and operational documentation while retaining two-word `field guide` wording for the content itself.
-    *   Added a new 1200-by-630 social share card using the actual app phone screen and updated Open Graph and Twitter metadata.
-    *   Added crawl directives, a root sitemap, `SoftwareApplication` structured data, and an AI-readable `llms.txt`; the landing content remains server-rendered HTML and does not require a separate prerendering service.
+    *   Added a new 1200-by-630 social share card using the actual app phone screen, published it under the descriptive `offgrid-ai-fieldguide-social-share.png` filename, and updated Open Graph and Twitter metadata.
+    *   Added crawl directives, a root sitemap, `SoftwareApplication` structured data, an AI-readable `llms.txt`, and Google Search Console ownership verification; the landing content remains server-rendered HTML and does not require a separate prerendering service.
     *   Highlighted the ability to open previously saved PDFs without an internet connection while preserving the clear statement that AI features require internet access.
 
 **2026-08-08**

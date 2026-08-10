@@ -4,6 +4,7 @@ const path = require('path');
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'field-guide-landing.html'), 'utf8');
 const server = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
+const imageTags = html.match(/<img\b[^>]*>/g) || [];
 
 const checks = [
     ['canonical domain', html.includes('https://offgridai.guide/')],
@@ -14,8 +15,10 @@ const checks = [
     ['walkthrough video', html.includes('/assets/field-guide/walkthrough/create-a-field-guide-walkthrough.mp4')],
     ['video assets bypass landing HTML routing', server.includes('|mp4|webm|txt|xml)')],
     ['FieldGuide product branding', html.includes('<title>OffGrid AI FieldGuide') && !html.includes('OffGrid AI Field Guide')],
-    ['Open Graph share image', html.includes('https://offgridai.guide/fieldguide-og.png') && html.includes('og:image:width')],
+    ['Open Graph share image', html.includes('https://offgridai.guide/offgrid-ai-fieldguide-social-share.png') && html.includes('og:image:width')],
     ['search indexing metadata', html.includes('name="robots" content="index,follow') && html.includes('rel="sitemap"')],
+    ['Google Search Console verification', html.includes('google-site-verification') && html.includes('uydIXA-jb4R04Xf5o3ieMwHhzEs_ZPfbloO_FehdA9Q')],
+    ['all landing images declare alt text', imageTags.length > 0 && imageTags.every((tag) => /\balt="[^"]*"/.test(tag))],
     ['software application structured data', html.includes('"@type": "SoftwareApplication"') && html.includes('"name": "OffGrid AI FieldGuide"')],
     ['offline PDF message highlight', html.includes('class="check offline-highlight"')],
     ['six gallery examples', (html.match(/class="gallery-card"/g) || []).length === 6],
