@@ -1,12 +1,18 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-08-10
+**Last Updated:** 2026-08-11
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
 
 ### August 2026
+
+**2026-08-11**
+*   **Google Play privacy-policy clarification**
+    *   Added explicit Data Retention and Data Deletion sections that distinguish transient AI request content, 31-day anonymous usage counters, optional support records, third-party technical metadata, and user-saved local files.
+    *   Added a direct deletion-request procedure and strengthened the standalone data-deletion page without changing the app's underlying data practices.
+    *   Added an automated privacy-policy compliance check to prevent the required disclosures from being removed accidentally.
 
 **2026-08-10**
 *   **FieldGuide branding and landing-page discovery**
@@ -84,8 +90,8 @@ This document provides a reverse-chronological summary of recent development pro
     *   **Consolidated cleanup:** All video element cleanup (revoke blob URL + remove from DOM) now handled by a single `cleanupVideoEl()` helper used in all code paths.
     *   **Conservative timeout:** Safety timeout increased to `duration + 8 seconds` (assumes 1x playback as worst case).
 
-*   **Hybrid Video Frame Extraction — iOS rVFC + Android Seek (v5.6.2)**
-    *   **Complete rewrite of video frame extraction** using a platform-adaptive hybrid approach. iOS Safari's `currentTime` seeking is fundamentally unreliable — even with play/pause buffering and timeout fallbacks, it only captures frame 1.
+*   **Hybrid Video Frame Extraction â€” iOS rVFC + Android Seek (v5.6.2)**
+    *   **Complete rewrite of video frame extraction** using a platform-adaptive hybrid approach. iOS Safari's `currentTime` seeking is fundamentally unreliable â€” even with play/pause buffering and timeout fallbacks, it only captures frame 1.
     *   **iOS/Safari (Method A):** Uses `requestVideoFrameCallback` (rVFC) to play the video at 4x speed and capture frames as the system actually renders them. Includes a progress bar, safety timeout, and graceful fallback. Requires iOS 15.4+ (supported on all modern iPhones).
     *   **Android/Desktop (Method B):** Retains the proven seek-based approach (`currentTime` + `onseeked` event) which works reliably on non-iOS platforms.
     *   **Shared utilities:** `drawFrameToCanvas()`, `isValidFrame()`, and `completeVideoSetup()` are now shared between both methods, reducing code duplication.
@@ -93,15 +99,15 @@ This document provides a reverse-chronological summary of recent development pro
     *   **Older iOS fallback:** Devices without rVFC support get a clear error message directing them to update or use desktop.
 
 *   **iOS Video Upload Fix & Command Center Token Overflow Fix (v5.6.1)**
-    *   **iOS video frame extraction rewritten** — Fixed video upload getting stuck on iPhone/iOS Safari. Root cause: iOS requires `playsinline` attribute, `loadeddata` event (not `loadedmetadata`), and a play→pause buffer cycle before seeking works. Added 3-second timeout fallback per frame seek — if `onseeked` doesn't fire, attempts to draw anyway and skips blank frames. Also added pixel-check validation to avoid capturing duplicate/black frames.
-    *   **Base64 token overflow prevention** — Fixed follow-up messages after image generation causing 555,000+ token errors. Generated images were stored as full base64 data URLs in conversation history and sent as text tokens on follow-up. Added `stripBase64FromContent()` utility that replaces base64 image data with placeholder text before API calls. Applied to both `command.html` and `arena.html` (stream and council endpoints).
-    *   **Memory cleanup** — Added `URL.revokeObjectURL()` calls after video processing completes to prevent memory leaks on mobile devices.
+    *   **iOS video frame extraction rewritten** â€” Fixed video upload getting stuck on iPhone/iOS Safari. Root cause: iOS requires `playsinline` attribute, `loadeddata` event (not `loadedmetadata`), and a playâ†’pause buffer cycle before seeking works. Added 3-second timeout fallback per frame seek â€” if `onseeked` doesn't fire, attempts to draw anyway and skips blank frames. Also added pixel-check validation to avoid capturing duplicate/black frames.
+    *   **Base64 token overflow prevention** â€” Fixed follow-up messages after image generation causing 555,000+ token errors. Generated images were stored as full base64 data URLs in conversation history and sent as text tokens on follow-up. Added `stripBase64FromContent()` utility that replaces base64 image data with placeholder text before API calls. Applied to both `command.html` and `arena.html` (stream and council endpoints).
+    *   **Memory cleanup** â€” Added `URL.revokeObjectURL()` calls after video processing completes to prevent memory leaks on mobile devices.
 
 **2026-04-20**
 *   **Weak-Signal Performance: Edge Caching & Cache-Control Headers (v5.6.0)**
-    *   **Render Edge Caching enabled** — Static assets (CSS, JS, images, fonts) are now served from Render's global CDN edge nodes. Users on weak or distant connections receive cached assets from the nearest edge location instead of hitting the origin server. Cache purges automatically on every redeploy.
-    *   **Cache-Control headers added** — CSS/JS/fonts cached for 24 hours (`max-age=86400`), images cached for 7 days (`max-age=604800`), HTML pages revalidate on every browser request but are cached at the edge for 1 hour (`s-maxage=3600`). These headers tell both the browser and Render's CDN how long to cache each asset type.
-    *   **No Express compression middleware needed** — Confirmed that Render's native runtime already applies automatic Brotli and gzip compression at the infrastructure layer. Adding Express `compression` would cause double-compression.
+    *   **Render Edge Caching enabled** â€” Static assets (CSS, JS, images, fonts) are now served from Render's global CDN edge nodes. Users on weak or distant connections receive cached assets from the nearest edge location instead of hitting the origin server. Cache purges automatically on every redeploy.
+    *   **Cache-Control headers added** â€” CSS/JS/fonts cached for 24 hours (`max-age=86400`), images cached for 7 days (`max-age=604800`), HTML pages revalidate on every browser request but are cached at the edge for 1 hour (`s-maxage=3600`). These headers tell both the browser and Render's CDN how long to cache each asset type.
+    *   **No Express compression middleware needed** â€” Confirmed that Render's native runtime already applies automatic Brotli and gzip compression at the infrastructure layer. Adding Express `compression` would cause double-compression.
 
 **2026-04-19**
 *   **PDF Typography & Readability Improvements (v5.5.2)**
@@ -111,31 +117,31 @@ This document provides a reverse-chronological summary of recent development pro
     *   **Supporting elements** (code, pre, tables) bumped from 12px to 13px. List item and paragraph spacing slightly increased.
 
 *   **Vision System Prompt, PDF Layout, Video Frames & Terms Modal (v5.5.1)**
-    *   **Vision-specific system prompt** — Added "Image and video analysis" section to `OFFGRID_SYSTEM_PROMPT`. Instructs the AI to always provide its best assessment even when uncertain, offer a short list of possibilities with reasoning, keep disclaimers concise, and suggest additional images or video uploads for better identification.
-    *   **PDF image layout fix** — Added `max-height: 45vh` and `page-break-inside: avoid` to images in the PDF export template. Prevents tall uploaded images from pushing to a new page and leaving a blank first page.
-    *   **Video frame limit bump** — Increased server-side frame limit from 5 to 8 evenly-spaced frames sent to the AI. Longer videos now provide better visual coverage for analysis.
-    *   **Terms modal mobile fix** — Made the first-run terms/disclaimer modal scrollable on small mobile screens. The banner now uses `overflow-y: auto` with compact spacing so the accept button is always reachable regardless of screen size.
+    *   **Vision-specific system prompt** â€” Added "Image and video analysis" section to `OFFGRID_SYSTEM_PROMPT`. Instructs the AI to always provide its best assessment even when uncertain, offer a short list of possibilities with reasoning, keep disclaimers concise, and suggest additional images or video uploads for better identification.
+    *   **PDF image layout fix** â€” Added `max-height: 45vh` and `page-break-inside: avoid` to images in the PDF export template. Prevents tall uploaded images from pushing to a new page and leaving a blank first page.
+    *   **Video frame limit bump** â€” Increased server-side frame limit from 5 to 8 evenly-spaced frames sent to the AI. Longer videos now provide better visual coverage for analysis.
+    *   **Terms modal mobile fix** â€” Made the first-run terms/disclaimer modal scrollable on small mobile screens. The banner now uses `overflow-y: auto` with compact spacing so the accept button is always reachable regardless of screen size.
 
 *   **Mobile Save Redesign, PDF Naming & Image Upload UX (v5.5.0)**
-    *   **PDF filename fix** — Added `<title>` tag to export-pdf HTML template. Browser now uses the conversation title for the PDF filename instead of "about_blank."
-    *   **Keyboard dismiss after image/video upload** — On mobile, keyboard now automatically dismisses after selecting an image or video so users can see the upload preview confirmation.
-    *   **Mobile Save modal redesign** — Mobile users (both demo and customer) now see a streamlined "Save Conversation" modal with title field and a prominent "Save as PDF" button. Category, tags, and .md save remain available on desktop for USB drive users.
-    *   **Demo mobile Save** — Demo users on mobile now get PDF save functionality with a soft upsell to the USB version, instead of a full-screen upsell-only modal that blocked saving entirely.
+    *   **PDF filename fix** â€” Added `<title>` tag to export-pdf HTML template. Browser now uses the conversation title for the PDF filename instead of "about_blank."
+    *   **Keyboard dismiss after image/video upload** â€” On mobile, keyboard now automatically dismisses after selecting an image or video so users can see the upload preview confirmation.
+    *   **Mobile Save modal redesign** â€” Mobile users (both demo and customer) now see a streamlined "Save Conversation" modal with title field and a prominent "Save as PDF" button. Category, tags, and .md save remain available on desktop for USB drive users.
+    *   **Demo mobile Save** â€” Demo users on mobile now get PDF save functionality with a soft upsell to the USB version, instead of a full-screen upsell-only modal that blocked saving entirely.
     *   Video upload also dismisses keyboard on mobile after frame extraction completes.
 
 **2026-04-18**
 *   **Mobile UX Fixes (v5.4.1)**
-    *   **Fixed tagline visibility on mobile** — added explicit `display: block !important` to override the paragraph-hide rule. "Built for weak signals and hard decisions." now shows on all screen sizes.
+    *   **Fixed tagline visibility on mobile** â€” added explicit `display: block !important` to override the paragraph-hide rule. "Built for weak signals and hard decisions." now shows on all screen sizes.
     *   **Enlarged compass** back to 22vw / 150px max for better visual presence on mobile.
-    *   **Fixed voice input text transfer** — was looking for wrong textarea ID (`welcomeInput` instead of `welcomeMessageInput`). Voice transcription now correctly populates the input field.
-    *   **Fixed textarea auto-resize for ready-made prompts** — `autoResizeWelcome()` now called after prompt text is injected. Increased max-height to 160px on mobile (~6 lines) before scrollbar appears.
-    *   **Keyboard stays dismissed after AI response** — removed auto-focus on mobile after stream completes. Desktop still auto-focuses. User taps input when ready to type again.
+    *   **Fixed voice input text transfer** â€” was looking for wrong textarea ID (`welcomeInput` instead of `welcomeMessageInput`). Voice transcription now correctly populates the input field.
+    *   **Fixed textarea auto-resize for ready-made prompts** â€” `autoResizeWelcome()` now called after prompt text is injected. Increased max-height to 160px on mobile (~6 lines) before scrollbar appears.
+    *   **Keyboard stays dismissed after AI response** â€” removed auto-focus on mobile after stream completes. Desktop still auto-focuses. User taps input when ready to type again.
     *   Reduced line-height to 1.35 on both welcome and chat textareas for tighter text display.
 
 *   **Welcome Screen Polish, Voice Input & Keyboard UX (v5.4.0)**
     *   Added tagline "Built for weak signals and hard decisions." below compass icon on welcome screen.
     *   Added **Voice Input** button (SVG microphone icon) to both welcome screen and chat view button rows. Uses Web Speech API for native browser speech-to-text. Button pulses red when actively listening.
-    *   Added `welcome-content` wrapper div for proper CSS flex ordering on mobile — fixes duplicate quick action buttons issue.
+    *   Added `welcome-content` wrapper div for proper CSS flex ordering on mobile â€” fixes duplicate quick action buttons issue.
     *   **Keyboard dismiss on send:** Input field now blurs after sending a message, automatically dismissing the mobile keyboard so users can see the AI response streaming in (matching ChatGPT/Claude behavior).
     *   Reduced compass icon to 18vw (from 25vw) with 120px max to prevent header overlap on mobile.
     *   Hidden hamburger menu on all experiences (was only hidden for customers).
@@ -146,22 +152,22 @@ This document provides a reverse-chronological summary of recent development pro
 *   **Mobile UI Overhaul & Branding Cleanup (v5.3.0)**
     *   Enlarged compass icon on mobile using viewport-relative units (25vw) for proportional scaling across all phone sizes.
     *   Replaced model label in bottom bar with contextual action buttons: **Ready-Made Prompts** on welcome screen, **Clear** and **Save** in chat view.
-    *   Improved textarea auto-expansion — input box now grows up to ~6 lines on mobile before scrolling (matching ChatGPT/Claude behavior).
+    *   Improved textarea auto-expansion â€” input box now grows up to ~6 lines on mobile before scrolling (matching ChatGPT/Claude behavior).
     *   Reduced textarea line-height from 1.5 to 1.4 for tighter, more readable text.
     *   Removed "New!" tooltips from video and image upload buttons for cleaner UI.
     *   Removed model name and response time footer from AI messages (no longer needed with single model).
-    *   Shortened privacy microcopy to "Ephemeral · No data stored" for mobile space efficiency.
+    *   Shortened privacy microcopy to "Ephemeral Â· No data stored" for mobile space efficiency.
     *   Added privacy microcopy to welcome screen input area.
-    *   Removed Gemma model branding from chat interface — OffGrid AI is now the primary identity.
+    *   Removed Gemma model branding from chat interface â€” OffGrid AI is now the primary identity.
 
 **2026-04-16**
 *   **Gemma 4 Migration & System Prompt (v5.2.0)**
     *   Migrated free tier from multi-model Gemma 3 architecture to single-model **Gemma 4 26B A4B**.
-    *   Implemented **OffGrid AI system prompt** — a pre-inference behavioral conditioning layer that provides decision-oriented, practical, safety-aware guidance. The AI now identifies as "OffGrid AI" with a calm, authoritative field-expert persona.
+    *   Implemented **OffGrid AI system prompt** â€” a pre-inference behavioral conditioning layer that provides decision-oriented, practical, safety-aware guidance. The AI now identifies as "OffGrid AI" with a calm, authoritative field-expert persona.
     *   Removed all deprecated models: Gemma 3 4B, Gemma 3 12B, Gemma 4 31B (testing), and MedGemma 3 4B.
     *   Replaced model dropdown (welcome screen and chat view) with a static model label.
     *   Updated the "Model Selection" info panel to "About Gemma 4" with Decision Intelligence messaging.
-    *   Fixed video analysis prompt — frames are now described as sequential video frames instead of unrelated images.
+    *   Fixed video analysis prompt â€” frames are now described as sequential video frames instead of unrelated images.
     *   Updated all meta tags, Open Graph tags, info panels, and marketing copy from Gemma 3 to Gemma 4.
     *   Updated ready-made prompts page badges from "All Models" / "12B+" to "Gemma 4".
     *   Updated Homepage_Redesign_v2.html, README.md, and package.json.
@@ -226,3 +232,4 @@ This document provides a reverse-chronological summary of recent development pro
 ---
 
 *This changelog is a high-level summary. For detailed technical information, please refer to the **Technical Overview**, **Command Center Developer Documentation**, and **Operations & Troubleshooting Manual**.*
+
