@@ -8,6 +8,7 @@
     "dev": "node index.js",
     "test:prompts": "node scripts/check-ready-made-prompts.js",
     "test:health-disclosure": "node scripts/check-health-disclosure.js",
+    "test:privacy-policy": "node scripts/check-privacy-policy.js",
     "test:field-guide": "node scripts/check-field-guide-flow.js",
     "test:pdf-markdown": "node scripts/check-pdf-markdown.js",
     "test:landing": "node scripts/check-field-guide-landing.js && node scripts/smoke-field-guide-hosts.js"
@@ -27,3 +28,4 @@
   "license": "Proprietary",
   "homepage": "https://offgridtoolkit.ai"
 }
+
