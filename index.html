@@ -1634,28 +1634,28 @@
                     <!-- Mobile quick actions (Prospect) -->
                     <div class="mobile-quick-actions prospect-only">
                         <div class="mobile-action-grid">
-                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="openPhotoImageActions()">
+                            <div class="mobile-action-btn mobile-action-btn-featured" data-home-action="images" onclick="openPhotoImageActions()">
                                 <div class="mobile-action-icon">📷</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Take Photo / Upload Image</div>
                                     <div class="mobile-action-desc">Camera, gallery, screenshots</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="openVideoActions()">
+                            <div class="mobile-action-btn" data-home-action="video" onclick="openVideoActions()">
                                 <div class="mobile-action-icon">🎬</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Record Video / Upload Video</div>
                                     <div class="mobile-action-desc">Analyze short clips</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="navigateToReadyMadePrompts()">
+                            <div class="mobile-action-btn" data-home-action="prompts" onclick="navigateToReadyMadePrompts()">
                                 <div class="mobile-action-icon">💡</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Ready-Made Prompts</div>
                                     <div class="mobile-action-desc">Field-tested questions</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn mobile-action-btn-more" onclick="requestOpenSavedGuides()">
+                            <div class="mobile-action-btn mobile-action-btn-more" data-home-action="saved" onclick="requestOpenSavedGuides()">
                                 <div class="mobile-action-icon">📚</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Saved Guides</div>
@@ -1668,28 +1668,28 @@
                     <!-- Mobile quick actions (Customer) -->
                     <div class="mobile-quick-actions customer-only">
                         <div class="mobile-action-grid">
-                            <div class="mobile-action-btn mobile-action-btn-featured" onclick="openPhotoImageActions()">
+                            <div class="mobile-action-btn mobile-action-btn-featured" data-home-action="images" onclick="openPhotoImageActions()">
                                 <div class="mobile-action-icon">📷</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Take Photo / Upload Image</div>
                                     <div class="mobile-action-desc">Camera, gallery, screenshots</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="openVideoActions()">
+                            <div class="mobile-action-btn" data-home-action="video" onclick="openVideoActions()">
                                 <div class="mobile-action-icon">🎬</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Record Video / Upload Video</div>
                                     <div class="mobile-action-desc">Analyze short clips</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn" onclick="navigateToReadyMadePrompts()">
+                            <div class="mobile-action-btn" data-home-action="prompts" onclick="navigateToReadyMadePrompts()">
                                 <div class="mobile-action-icon">💡</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Ready-Made Prompts</div>
                                     <div class="mobile-action-desc">Field-tested questions</div>
                                 </div>
                             </div>
-                            <div class="mobile-action-btn mobile-action-btn-more" onclick="requestOpenSavedGuides()">
+                            <div class="mobile-action-btn mobile-action-btn-more" data-home-action="saved" onclick="requestOpenSavedGuides()">
                                 <div class="mobile-action-icon">📚</div>
                                 <div class="mobile-action-text">
                                     <div class="mobile-action-label">Saved Guides</div>
@@ -1731,12 +1731,29 @@
         const IS_APP_SURFACE = CONFIG.surface === 'app';
         const IS_MOBILE_VIEW = window.matchMedia ? window.matchMedia('(max-width: 768px)').matches : window.innerWidth <= 768;
         const IS_PHONE_SURFACE = IS_APP_SURFACE || IS_MOBILE_VIEW;
+        const MULTI_IMAGE_PREVIEW_ENABLED = CONFIG.features?.multiImagePreview === true;
+        const MAX_SELECTED_IMAGES = MULTI_IMAGE_PREVIEW_ENABLED ? 4 : 1;
         
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
         document.body.classList.add(IS_APP_SURFACE ? 'is-app-surface' : 'is-web-surface');
         if (IS_PHONE_SURFACE) {
             document.body.classList.add('is-phone-surface');
+        }
+        if (MULTI_IMAGE_PREVIEW_ENABLED) {
+            document.body.classList.add('is-multi-image-preview');
+            document.querySelectorAll('[data-home-action="prompts"]').forEach(card => {
+                card.classList.add('mobile-action-btn-featured');
+                const description = card.querySelector('.mobile-action-desc');
+                if (description) description.textContent = 'Browse field-tested questions by category';
+            });
+            document.querySelectorAll('[data-home-action="images"]').forEach(card => {
+                card.classList.remove('mobile-action-btn-featured');
+                const label = card.querySelector('.mobile-action-label');
+                const description = card.querySelector('.mobile-action-desc');
+                if (label) label.textContent = 'Take Photo / Upload Images';
+                if (description) description.textContent = 'Identify one or multiple photos';
+            });
         }
         if (CONFIG.platform) {
             document.body.classList.add(`platform-${CONFIG.platform}`);
@@ -1788,7 +1805,7 @@
         let selectedModel = 'gemma-4-26b';
         sessionStorage.setItem('offgrid-selected-model', 'gemma-4-26b');
         let isTyping = false;
-        let selectedImage = null;
+        let selectedImages = [];
         let selectedVideo = null;
         let conversationHistory = [];
         let voiceRecognition = null;
@@ -2277,7 +2294,7 @@
         function sendWelcomeMessage() {
             const welcomeInput = document.getElementById('welcomeMessageInput');
             const message = welcomeInput.value.trim();
-            if (!message && !selectedImage) return;
+            if (!message && !selectedImages.length) return;
             
             // Transition: inject bottom bar, hide welcome
             transitionToChat();
@@ -2296,13 +2313,21 @@
             <div class="input-area slide-in" id="bottomInputArea">
                 <div class="input-container">
                     <div class="image-preview" id="imagePreview">
-                        <img class="preview-image" id="previewImg" src="" alt="Preview">
-                        <div class="preview-info"><div class="preview-filename" id="previewFilename"></div></div>
-                        <button class="remove-image" onclick="removeImage()">Remove</button>
+                        ${MULTI_IMAGE_PREVIEW_ENABLED ? `
+                            <div class="image-preview-header">
+                                <span id="imagePreviewCount"></span>
+                                <button class="remove-image" onclick="removeImage()">Remove all</button>
+                            </div>
+                            <div class="image-preview-grid" id="imagePreviewGrid"></div>
+                        ` : `
+                            <img class="preview-image" id="previewImg" src="" alt="Preview">
+                            <div class="preview-info"><div class="preview-filename" id="previewFilename"></div></div>
+                            <button class="remove-image" onclick="removeImage()">Remove</button>
+                        `}
                     </div>
                     <input type="file" id="imageInput" class="image-upload-input" accept="image/*" capture="environment" onchange="handleImageSelect(event)">
-                    <input type="file" id="galleryInput" class="image-upload-input" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.heic,.heif" onchange="handleImageSelect(event)">
-                    <input type="file" id="imageFileInput" class="image-upload-input" accept="*/*" onchange="handleImageSelect(event)">
+                    <input type="file" id="galleryInput" class="image-upload-input" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.heic,.heif" ${MULTI_IMAGE_PREVIEW_ENABLED ? 'multiple' : ''} onchange="handleImageSelect(event)">
+                    <input type="file" id="imageFileInput" class="image-upload-input" accept="*/*" ${MULTI_IMAGE_PREVIEW_ENABLED ? 'multiple' : ''} onchange="handleImageSelect(event)">
                     <input type="file" id="videoInput" class="image-upload-input" accept="video/*" onchange="handleVideoSelect(event)">
                     <input type="file" id="videoRecordInput" class="image-upload-input" accept="video/*" capture="environment" onchange="handleVideoSelect(event)">
                     <div class="video-preview" id="videoPreview">
@@ -2626,7 +2651,7 @@
             const message = input.value.trim();
             const requestStartTime = Date.now();
             
-            if ((!message && !selectedImage && !selectedVideo) || isTyping) return;
+            if ((!message && !selectedImages.length && !selectedVideo) || isTyping) return;
             
             const isConnected = await checkConnection();
             if (!isConnected) {
@@ -2645,14 +2670,14 @@
             let userMessage = message;
             if (!userMessage && selectedVideo) {
                 userMessage = "What's happening in this video?";
-            } else if (!userMessage && selectedImage) {
-                userMessage = "What's in this image?";
+            } else if (!userMessage && selectedImages.length) {
+                userMessage = selectedImages.length > 1 ? "What do these photos show?" : "What's in this image?";
             }
             
             if (selectedVideo) {
                 addMessageWithVideo(userMessage, selectedVideo.thumbnailUrl, selectedVideo.name, selectedVideo.duration, 'user');
-            } else if (selectedImage) {
-                addMessageWithImage(userMessage, selectedImage.dataUrl, 'user');
+            } else if (selectedImages.length) {
+                addMessageWithImages(userMessage, selectedImages, 'user');
             } else {
                 addMessage(userMessage, 'user');
             }
@@ -2664,8 +2689,9 @@
             };
             if (selectedVideo) {
                 historyEntry.videoFrames = selectedVideo.frames;
-            } else if (selectedImage) {
-                historyEntry.image = selectedImage.dataUrl;
+            } else if (selectedImages.length) {
+                if (MULTI_IMAGE_PREVIEW_ENABLED) historyEntry.images = selectedImages.map(image => image.dataUrl);
+                else historyEntry.image = selectedImages[0].dataUrl;
             }
             conversationHistory.push(historyEntry);
             
@@ -2673,7 +2699,6 @@
             input.value = '';
             input.blur();
             autoResize(input);
-            const imageToSend = selectedImage;
             const videoToSend = selectedVideo;
             removeImage();
             removeVideo();
@@ -2690,6 +2715,7 @@
                     role: msg.role,
                     content: msg.content,
                     image: msg.image,
+                    images: msg.images,
                     videoFrames: msg.videoFrames
                 }));
                 
@@ -2917,6 +2943,34 @@
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+
+        function addMessageWithImages(text, images, sender) {
+            if (!Array.isArray(images) || images.length <= 1) {
+                const image = images?.[0];
+                if (image) addMessageWithImage(text, image.dataUrl, sender);
+                return;
+            }
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const gallery = images.map((image, index) => `
+                <figure class="message-uploaded-photo">
+                    <img src="${image.dataUrl}" alt="Uploaded photo ${index + 1}">
+                    <figcaption>Photo ${index + 1}</figcaption>
+                </figure>
+            `).join('');
+            messageDiv.innerHTML = `
+                <div class="message-avatar">U</div>
+                <div class="message-content">
+                    <div class="message-text">${escapeHtml(text)}</div>
+                    <div class="message-uploaded-gallery">${gallery}</div>
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
         
         function showTyping() {
             const messagesDiv = document.getElementById('messages');
@@ -3056,39 +3110,55 @@
             if (input) input.click();
         }
         
-        function handleImageSelect(event) {
-            const file = event.target.files[0];
-            if (file && file.type.startsWith('image/')) {
+        async function handleImageSelect(event) {
+            const chosenFiles = Array.from(event.target.files || []);
+            const imageFiles = chosenFiles.filter(file => file.type.startsWith('image/'));
+            if (imageFiles.length) {
                 if (window.innerWidth <= 768) {
                     const indicator = document.getElementById('uploadIndicator');
                     indicator.classList.add('active');
                     setTimeout(() => indicator.classList.remove('active'), 2000);
                 }
                 
-                resizeImage(file, 1024, 1024, function(resizedDataUrl) {
-                    selectedImage = {
-                        base64: resizedDataUrl.split(',')[1],
-                        name: file.name,
-                        dataUrl: resizedDataUrl
-                    };
-                    showImagePreview();
-                    
-                    if (window.innerWidth <= 768) {
-                        setTimeout(() => {
-                            const newInput = document.getElementById('messageInput');
-                            if (newInput) {
-                                newInput.focus();
-                                autoResize(newInput);
-                            }
-                        }, 120);
-                    }
-                });
-            } else if (file) {
+                const availableSlots = Math.max(0, MAX_SELECTED_IMAGES - selectedImages.length);
+                const filesToAdd = imageFiles.slice(0, availableSlots);
+                if (!filesToAdd.length) {
+                    showSaveToast('Photo limit reached', `You can attach up to ${MAX_SELECTED_IMAGES} photos to one request.`);
+                    event.target.value = '';
+                    return;
+                }
+                const resizedImages = await Promise.all(filesToAdd.map(file => resizeImageAsync(file, 1024, 1024)));
+                selectedImages.push(...resizedImages.map((resizedDataUrl, index) => ({
+                    base64: resizedDataUrl.split(',')[1],
+                    name: filesToAdd[index].name,
+                    dataUrl: resizedDataUrl
+                })));
+                showImagePreview();
+                if (imageFiles.length > availableSlots) {
+                    showSaveToast('Some photos were not added', `A maximum of ${MAX_SELECTED_IMAGES} photos can be analyzed together.`);
+                }
+                event.target.value = '';
+                if (window.innerWidth <= 768) {
+                    setTimeout(() => {
+                        const newInput = document.getElementById('messageInput');
+                        if (newInput) {
+                            newInput.focus();
+                            autoResize(newInput);
+                        }
+                    }, 120);
+                }
+            } else if (chosenFiles.length) {
                 showSaveToast('Please choose an image file', 'Screenshots, downloads, PNG, JPG, WEBP, HEIC, and similar image files are supported.');
             }
         }
+
+        function resizeImageAsync(file, maxWidth, maxHeight) {
+            return new Promise((resolve, reject) => {
+                resizeImage(file, maxWidth, maxHeight, resolve, reject);
+            });
+        }
         
-        function resizeImage(file, maxWidth, maxHeight, callback) {
+        function resizeImage(file, maxWidth, maxHeight, callback, onError = () => {}) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
@@ -3109,29 +3179,56 @@
                     ctx.drawImage(img, 0, 0, width, height);
                     callback(canvas.toDataURL('image/jpeg', 0.85));
                 };
+                img.onerror = onError;
                 img.src = e.target.result;
             };
+            reader.onerror = onError;
             reader.readAsDataURL(file);
         }
         
         function showImagePreview() {
             const preview = document.getElementById('imagePreview');
-            const previewImg = document.getElementById('previewImg');
-            const previewFilename = document.getElementById('previewFilename');
-            
-            if (preview && previewImg && previewFilename && selectedImage) {
-                previewImg.src = selectedImage.dataUrl;
-                previewFilename.textContent = selectedImage.name;
+            const previewGrid = document.getElementById('imagePreviewGrid');
+            const previewCount = document.getElementById('imagePreviewCount');
+            const legacyPreviewImg = document.getElementById('previewImg');
+            const legacyPreviewFilename = document.getElementById('previewFilename');
+            if (preview && legacyPreviewImg && legacyPreviewFilename && selectedImages.length) {
+                legacyPreviewImg.src = selectedImages[0].dataUrl;
+                legacyPreviewFilename.textContent = selectedImages[0].name;
+                preview.classList.add('active');
+                updateInputAttachmentState();
+                refreshActiveInputSize();
+            } else if (preview && previewGrid && previewCount && selectedImages.length) {
+                previewGrid.replaceChildren();
+                selectedImages.forEach((image, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'image-preview-item';
+                    const img = document.createElement('img');
+                    img.className = 'preview-image';
+                    img.src = image.dataUrl;
+                    img.alt = `Selected photo ${index + 1}`;
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'remove-preview-image';
+                    remove.textContent = '×';
+                    remove.setAttribute('aria-label', `Remove photo ${index + 1}`);
+                    remove.onclick = () => removeImage(index);
+                    item.append(img, remove);
+                    previewGrid.appendChild(item);
+                });
+                previewCount.textContent = `${selectedImages.length} of ${MAX_SELECTED_IMAGES} photos selected`;
                 preview.classList.add('active');
                 updateInputAttachmentState();
                 refreshActiveInputSize();
             }
         }
         
-        function removeImage() {
-            selectedImage = null;
+        function removeImage(index = null) {
+            if (Number.isInteger(index)) selectedImages.splice(index, 1);
+            else selectedImages = [];
             const preview = document.getElementById('imagePreview');
-            if (preview) preview.classList.remove('active');
+            if (selectedImages.length) showImagePreview();
+            else if (preview) preview.classList.remove('active');
             const imageInput = document.getElementById('imageInput');
             const galleryInput = document.getElementById('galleryInput');
             const imageFileInput = document.getElementById('imageFileInput');
@@ -3662,7 +3759,7 @@
             const inputArea = document.getElementById('bottomInputArea');
             const container = inputArea ? inputArea.querySelector('.input-container') : null;
             if (!container) return;
-            const hasAttachment = !!(selectedImage || selectedVideo);
+            const hasAttachment = !!(selectedImages.length || selectedVideo);
             container.classList.toggle('has-attachment', hasAttachment);
         }
 

@@ -8,6 +8,11 @@ This document provides a reverse-chronological summary of recent development pro
 
 ### August 2026
 
+**2026-08-11 — private preview**
+*   **Multi-photo identification and home-action prioritization**
+    *   Added an opt-in `preview=multi-image` experience that accepts up to four related photos, presents removable thumbnails, and instructs the vision model to compare the photos as one evidence set.
+    *   Prioritized the positively received Ready-Made Prompts card above image, video, and Saved Guides actions while leaving the public experience unchanged during phone testing.
+
 **2026-08-11**
 *   **Google Play privacy-policy clarification**
     *   Added explicit Data Retention and Data Deletion sections that distinguish transient AI request content, 31-day anonymous usage counters, optional support records, third-party technical metadata, and user-saved local files.

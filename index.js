@@ -665,6 +665,27 @@ function buildOpenRouterMessages(messages, multimodal = true) {
                 content: content
             };
         }
+        if (Array.isArray(msg.images) && msg.images.length && multimodal) {
+            const images = msg.images.slice(0, 4);
+            const userText = msg.content && msg.content.trim()
+                ? msg.content
+                : 'Identify and analyze what you see in these photos.';
+            const photoInstruction = images.length > 1
+                ? `The user supplied ${images.length} related photos. Treat them as one evidence set, compare details and angles across all photos, and refer to them as Photo 1 through Photo ${images.length} when useful. Do not assume they show different subjects unless the visual evidence supports that.`
+                : 'The user supplied one photo for identification or analysis.';
+            return {
+                role: msg.role,
+                content: [
+                    { type: 'text', text: `${photoInstruction}\n\nUser request: ${userText}` },
+                    ...images.map(image => ({
+                        type: 'image_url',
+                        image_url: {
+                            url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`
+                        }
+                    }))
+                ]
+            };
+        }
         if (msg.image && multimodal) {
             return {
                 role: msg.role,
@@ -2543,13 +2564,18 @@ function serveWithExperience(req, res, isCustomer) {
         const surface = req.query.surface === 'app' ? 'app' : 'web';
         const platform = ['ios', 'android'].includes(req.query.platform) ? req.query.platform : 'web';
         const apiBase = req.query.apiBase === 'production' ? 'https://offgridtoolkit.ai' : '';
+        const multiImagePreview = req.query.preview === 'multi-image';
         // Inject the experience config right before </head>
         const configScript = `<script>window.OFFGRID_CONFIG = ${JSON.stringify({
             isCustomer,
             experience: isCustomer ? 'online' : 'demo',
             surface,
             platform,
-            apiBase
+            apiBase,
+            features: {
+                multiImagePreview,
+                prioritizedPrompts: multiImagePreview
+            }
         })};</script>`;
         const injectedHtml = html.replace('</head>', configScript + '\n</head>');
         res.setHeader('Content-Type', 'text/html');
