@@ -1,12 +1,19 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-08-11
+**Last Updated:** 2026-08-12
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
 
 ### August 2026
+
+**2026-08-12**
+*   **Multi-photo rollout and mobile presentation polish**
+    *   Promoted the tested four-photo identification flow and Ready-Made Prompts-first home order to the normal app, with a temporary `preview=single-image` rollback available during rollout.
+    *   Routed Upload Image(s) through the Android image/gallery picker instead of the generic any-file chooser while keeping camera capture as a separate action.
+    *   Promoted `Save Field Guide` to the first and strongest Image Studio action, removed the redundant `PDF` label there, and aligned related action menus.
+    *   Preserved the gold Android status bar, exposed Light Mode/Dark Mode labels at 390 CSS pixels and wider, and added a slightly warmer off-white light-mode canvas for clearer card separation.
 
 **2026-08-11 — private preview**
 *   **Multi-photo identification and home-action prioritization**

@@ -2564,7 +2564,9 @@ function serveWithExperience(req, res, isCustomer) {
         const surface = req.query.surface === 'app' ? 'app' : 'web';
         const platform = ['ios', 'android'].includes(req.query.platform) ? req.query.platform : 'web';
         const apiBase = req.query.apiBase === 'production' ? 'https://offgridtoolkit.ai' : '';
-        const multiImagePreview = req.query.preview === 'multi-image';
+        // Multi-photo analysis passed device testing and is now the default.
+        // Keep a query-string rollback available while the rollout settles.
+        const multiImagePreview = req.query.preview !== 'single-image';
         // Inject the experience config right before </head>
         const configScript = `<script>window.OFFGRID_CONFIG = ${JSON.stringify({
             isCustomer,

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#c58b00">
     <title>OffGrid AI FieldGuide - Cloud-Powered Field Assistance</title>
     <meta name="description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
     
@@ -23,7 +24,7 @@
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
-    <link rel="stylesheet" href="offgridai.css?v=6.5">
+    <link rel="stylesheet" href="offgridai.css?v=6.6">
     <script src="/vendor/marked.umd.js"></script>
     <script src="/vendor/purify.min.js"></script>
     <script src="/vendor/qrcode.min.js"></script>
@@ -312,9 +313,10 @@
             color: #111827;
         }
         .online-studio-btn.pdf {
-            background: rgba(148, 163, 184, 0.12);
-            border-color: rgba(148, 163, 184, 0.28);
-            color: #d7dee8;
+            background: linear-gradient(135deg, #d39a00 0%, #f0bd22 100%);
+            border-color: #f0bd22;
+            color: #201305;
+            box-shadow: 0 7px 22px rgba(211, 154, 0, 0.28);
         }
         .online-studio-btn.download {
             background: rgba(16, 185, 129, 0.14);
@@ -1733,6 +1735,19 @@
         const IS_PHONE_SURFACE = IS_APP_SURFACE || IS_MOBILE_VIEW;
         const MULTI_IMAGE_PREVIEW_ENABLED = CONFIG.features?.multiImagePreview === true;
         const MAX_SELECTED_IMAGES = MULTI_IMAGE_PREVIEW_ENABLED ? 4 : 1;
+
+        // Keep the app's system status bar aligned with its gold field-guide branding.
+        async function applyBrandedStatusBar() {
+            const statusBar = window.Capacitor?.Plugins?.StatusBar;
+            if (!IS_APP_SURFACE || !statusBar) return;
+            try {
+                await statusBar.setBackgroundColor({ color: '#c58b00' });
+                await statusBar.setStyle({ style: 'DARK' });
+            } catch (_) {
+                // Browser and older WebView surfaces safely fall back to theme-color.
+            }
+        }
+        applyBrandedStatusBar();
         
         // Apply body class based on experience
         document.body.classList.add(CONFIG.isCustomer ? 'is-customer' : 'is-prospect');
@@ -2606,7 +2621,7 @@
         function openPhotoImageActions() {
             openMobileActionSheet('Photo / Image', [
                 { icon: '📷', label: 'Take Photo', desc: 'Use your camera', action: 'camera' },
-                { icon: '🖼️', label: 'Upload Image', desc: 'Gallery, screenshots, downloads', action: 'upload' }
+                { icon: '🖼️', label: MULTI_IMAGE_PREVIEW_ENABLED ? 'Upload Image(s)' : 'Upload Image', desc: MULTI_IMAGE_PREVIEW_ENABLED ? 'Gallery or Files · select up to 4' : 'Gallery, screenshots, downloads', action: 'upload' }
             ], 'Health-related image analysis provides general information only—not diagnosis or medical advice. Seek professional care for medical concerns and emergency services for urgent situations.');
         }
 
@@ -3086,7 +3101,10 @@
         }
 
         function triggerGalleryUpload() {
-            const uploadInputId = IS_PHONE_SURFACE ? 'imageFileInput' : 'galleryInput';
+            // Keep camera capture in the dedicated Take Photo action. The image
+            // picker can offer Gallery/photo sources and Files without duplicate
+            // camera entries from Android's generic any-file chooser.
+            const uploadInputId = 'galleryInput';
             let input = document.getElementById(uploadInputId);
             if (!input) {
                 // Save any existing text from welcome input before transitioning
@@ -4210,14 +4228,14 @@
                         ${IS_PHONE_SURFACE
                             ? (isFieldGuideBuild
                                 ? 'The completed guide will open automatically with the generated visual and answer together.'
-                                : 'Use <strong>Save Image</strong> for just the graphic, <strong>Save Field Guide PDF</strong> to keep the image and answer together, or <strong>Share Image</strong> from your phone.')
+                                : 'Use <strong>Save Field Guide</strong> to keep the image and answer together, <strong>Save Image</strong> for just the graphic, or <strong>Share Image</strong> from your phone.')
                             : 'Click <strong>Save to Knowledge Base</strong>, then choose your OffGrid AI drive folder: <strong>This PC > OffGrid AI (D: or E:) > Saved Knowledge Base > category folder</strong>. If Windows asks for permission, click <strong>Allow</strong>. A backup is also added to this online session below.'}
                     </div>
                     <div class="online-studio-actions">
-                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">${IS_PHONE_SURFACE ? 'Done / Back to Chat' : 'Cancel'}</button>
+                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>${IS_PHONE_SURFACE ? 'Save Field Guide' : 'Save PDF'}</button>
                         ${IS_PHONE_SURFACE ? '<button class="online-studio-btn download" id="onlineStudioImageBtn" onclick="downloadOnlineStudioImage()" disabled>Save Image</button>' : ''}
-                        <button class="online-studio-btn pdf" id="onlineStudioPdfBtn" onclick="exportOnlineStudioPDF()" disabled>${IS_PHONE_SURFACE ? 'Save Field Guide PDF' : 'Save PDF'}</button>
                         ${IS_PHONE_SURFACE ? '<button class="online-studio-btn share" id="onlineStudioShareBtn" onclick="shareImageDataUrlFromPhone(onlineStudioState?.image, getOnlineStudioImageFilename())" disabled>Share Image</button>' : '<button class="online-studio-btn primary" id="onlineStudioSaveBtn" onclick="saveOnlineStudioToKnowledgeBase()" disabled>Save to Knowledge Base</button>'}
+                        <button class="online-studio-btn" onclick="closeOnlineImageStudio()">${IS_PHONE_SURFACE ? 'Done / Back to Chat' : 'Cancel'}</button>
                     </div>
                     <div class="online-studio-note">Images are generated on demand and are not saved to an OffGrid AI account history. Online provider processing applies.</div>
                 </div>
@@ -4902,7 +4920,7 @@ Mobile app output requirements:
                     <div class="online-studio-menu-title">OffGrid AI Visual</div>
                     <button onclick="downloadOnlineStudioImage(); closeOnlineStudioImageMenu();">Save to Gallery</button>
                     <button onclick="shareImageDataUrlFromPhone(onlineStudioState.image, getOnlineStudioImageFilename()); closeOnlineStudioImageMenu();">Share Image</button>
-                    <button onclick="exportOnlineStudioPDF(); closeOnlineStudioImageMenu();">Save Field Guide PDF</button>
+                    <button onclick="exportOnlineStudioPDF(); closeOnlineStudioImageMenu();">Save Field Guide</button>
                     <button class="secondary" onclick="closeOnlineStudioImageMenu();">Cancel</button>
                 </div>
             `;
@@ -5589,7 +5607,7 @@ Mobile app output requirements:
             } finally {
                 if (pdfBtn) {
                     pdfBtn.disabled = false;
-                    pdfBtn.textContent = IS_PHONE_SURFACE ? 'Save Field Guide PDF' : 'Save PDF';
+                    pdfBtn.textContent = IS_PHONE_SURFACE ? 'Save Field Guide' : 'Save PDF';
                 }
                 if (statusEl) statusEl.textContent = IS_PHONE_SURFACE
                     ? 'Visual ready - save to phone or continue in chat.'
@@ -6277,7 +6295,7 @@ Mobile app output requirements:
                 items.push(
                     { icon: '🖼️', label: 'Save Image', action: () => saveImageDataUrlToPhone(imageSrc, getOnlineStudioImageFilename()) },
                     { icon: '📤', label: 'Share Image', action: () => shareImageDataUrlFromPhone(imageSrc, getOnlineStudioImageFilename()) },
-                    { icon: '📄', label: 'Save Field Guide PDF', action: () => onlineStudioState?.image ? exportOnlineStudioPDF() : exportAsPDF() },
+                    { icon: '📄', label: 'Save Field Guide', action: () => onlineStudioState?.image ? exportOnlineStudioPDF() : exportAsPDF() },
                     { divider: true }
                 );
             }
