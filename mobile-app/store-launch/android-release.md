@@ -82,6 +82,8 @@ mobile-app\android\app\build\outputs\bundle\release\app-release.aab
 - Automated validation: 38/38 Field Guide checks, 6/6 health-disclosure checks, and 9/9 privacy checks passed.
 - Scope: Android system-bar branding and contrast only. No permission, data-safety, account, or policy behavior changed.
 - Signing secret handling: DPAPI-protected password decrypted only into process-scoped environment variables; no plaintext signing configuration was written to the workspace.
+- Google Play validation: version code `3` accepted with zero errors and no reduction in supported devices. The two non-blocking advisories are the existing missing deobfuscation map while shrinking is disabled and missing debug symbols for bundled third-party native code.
+- Production submission: 100% rollout saved and sent to Google for review on 2026-08-16. Managed publishing remains off, so approval should publish the update automatically.
 
 ## Play Console Submission
 
