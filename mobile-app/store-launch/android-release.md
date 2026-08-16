@@ -30,7 +30,7 @@ The original release build used a temporary `mobile-app/android/key.properties`.
 
 ## Build
 
-Current candidate: version name `1.1.0`, version code `2`. Debug builds use the separate `com.offgridaitoolkit.app.dev` package so they can be installed beside the Play production app without replacing it.
+Current candidate: version name `1.2.0`, version code `3`. Debug builds use the separate `com.offgridaitoolkit.app.dev` package so they can be installed beside the Play production app without replacing it.
 
 ```powershell
 cd "C:\Users\prian\Documents\New project\mobile-app"
@@ -68,6 +68,20 @@ mobile-app\android\app\build\outputs\bundle\release\app-release.aab
 - Device support change: zero phones, tablets, TVs, cars, Chromebooks, or Android XR devices removed.
 - Google Play validation: no errors; only the existing deobfuscation and native debug-symbol advisories.
 - Submission state: `1.1.0 - Field Guide improvements` sent to Google for Production review. Managed publishing is off, so approval should publish the rollout automatically.
+
+## Version 1.2.0 Signed Candidate - 2026-08-16
+
+- Package: `com.offgridaitoolkit.app`
+- Version name: `1.2.0`
+- Version code: `3`
+- Release artifact: `C:\OffGridAI\ReleaseBuilds\Play\1.2.0\offgrid-ai-fieldguide-1.2.0.aab`
+- AAB SHA-256: `D96943AE07F60B7F345F74F904939142E964D3D797234A6929C06737FD42F953`
+- Upload certificate SHA-256: `84:E1:49:F6:2D:D9:56:9A:20:B3:A0:9B:8C:6F:A4:D2:9D:8F:A1:47:C8:F3:A0:1E:67:6A:F8:50:5E:27:AC:8A`
+- Release build: passed Gradle `bundleRelease`, release lint, and signing validation.
+- Physical-device validation: passed on Samsung `SM_S938U1` using the separate development package. The status bar is OffGrid gold with dark, readable indicators; the navigation bar is dark brown with light native controls; app content remains unobstructed.
+- Automated validation: 38/38 Field Guide checks, 6/6 health-disclosure checks, and 9/9 privacy checks passed.
+- Scope: Android system-bar branding and contrast only. No permission, data-safety, account, or policy behavior changed.
+- Signing secret handling: DPAPI-protected password decrypted only into process-scoped environment variables; no plaintext signing configuration was written to the workspace.
 
 ## Play Console Submission
 
