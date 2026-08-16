@@ -17,6 +17,9 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
+# Source-size device renders are retained locally; optimized WebP versions ship on the site.
+assets/field-guide/device-renders/*.png
+
 # IDE
 .vscode/
 .idea/

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OffGrid AI FieldGuide | Practical guidance you can save</title>
-  <meta name="description" content="Ask practical questions, identify photos and short videos, and turn useful answers into visual field guides you can save to your phone.">
+  <meta name="description" content="Ask practical questions, compare one or multiple photos, analyze short videos, and turn useful answers into visual field guides you can save to your phone.">
   <meta name="google-site-verification" content="uydIXA-jb4R04Xf5o3ieMwHhzEs_ZPfbloO_FehdA9Q">
   <link rel="canonical" href="https://offgridai.guide/">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
@@ -32,11 +32,25 @@
     "name": "OffGrid AI FieldGuide",
     "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "Android",
-    "description": "Ask practical questions, identify photos and short videos, and turn useful answers into visual field guides you can save to your phone.",
+    "description": "Ask practical questions, compare one or multiple photos, analyze short videos, and turn useful answers into visual field guides you can save to your phone.",
     "url": "https://offgridai.guide/",
     "downloadUrl": "https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app",
     "image": "https://offgridai.guide/offgrid-ai-fieldguide-social-share.png",
-    "screenshot": "https://offgridai.guide/assets/field-guide/brand/offgrid-field-guide-phone-angle-left.png",
+    "screenshot": [
+      "https://offgridai.guide/assets/field-guide/device-renders/01-offgrid-ai-fieldguide-home-phone.webp",
+      "https://offgridai.guide/assets/field-guide/device-renders/03-offgrid-ai-fieldguide-multiple-photo-analysis-phone.webp",
+      "https://offgridai.guide/assets/field-guide/device-renders/06-offgrid-ai-fieldguide-save-field-guide-pdf-phone.webp",
+      "https://offgridai.guide/assets/field-guide/device-renders/08-offgrid-ai-fieldguide-saved-guides-offline-phone.webp"
+    ],
+    "featureList": [
+      "Ready-made field prompts",
+      "Single and multi-photo analysis",
+      "Short-video analysis",
+      "Visual field guide generation",
+      "Mobile-friendly PDF saving and sharing",
+      "Read aloud",
+      "Offline access to previously saved PDFs"
+    ],
     "publisher": {
       "@type": "Organization",
       "name": "OffGrid AI ToolKit LLC",
@@ -231,9 +245,71 @@
     .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
     .feature-card { min-height: 270px; padding: 28px; border: 1px solid rgba(255,255,255,0.09); border-radius: 20px; background: linear-gradient(150deg, rgba(29,38,49,0.92), rgba(16,22,29,0.92)); }
     .feature-card.primary { border-color: rgba(224,170,24,0.42); background: linear-gradient(150deg, rgba(56,43,18,0.62), rgba(20,25,31,0.96)); }
+    .feature-card { transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease; }
+    .feature-card:hover { transform: translateY(-5px); border-color: rgba(241,199,92,0.32); box-shadow: 0 18px 44px rgba(0,0,0,0.24); }
     .feature-icon { margin-bottom: 38px; color: var(--gold-light); font-size: 1.9rem; }
     .feature-card h3 { margin-bottom: 10px; font-size: 1.35rem; }
     .feature-card p { margin-bottom: 0; }
+
+    .app-tour-shell {
+      position: relative;
+      width: min(1380px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 104px 0;
+    }
+    .app-tour-head { width: min(var(--max), 100%); margin: 0 auto 42px; display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+    .app-tour-head .section-head { margin: 0; }
+    .tour-controls { display: flex; gap: 10px; }
+    .tour-button {
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(241,199,92,0.35);
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      color: var(--cream);
+      cursor: pointer;
+      font: inherit;
+      font-size: 1.2rem;
+      transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+    }
+    .tour-button:hover { transform: translateY(-2px); border-color: var(--gold-light); background: rgba(224,170,24,0.11); }
+    .tour-button:focus-visible { outline: 3px solid rgba(241,199,92,0.4); outline-offset: 3px; }
+    .app-tour-track {
+      display: flex;
+      gap: 22px;
+      padding: 10px max(16px, calc((100vw - min(1160px, calc(100vw - 32px))) / 2)) 26px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: max(16px, calc((100vw - min(1160px, calc(100vw - 32px))) / 2));
+      overscroll-behavior-inline: contain;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(224,170,24,0.48) rgba(255,255,255,0.04);
+    }
+    .app-tour-card {
+      flex: 0 0 clamp(250px, 27vw, 340px);
+      scroll-snap-align: start;
+      margin: 0;
+      padding: 18px 18px 20px;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 24px;
+      background: linear-gradient(155deg, rgba(26,34,44,0.92), rgba(12,17,22,0.94));
+      box-shadow: 0 20px 54px rgba(0,0,0,0.28);
+      transition: transform 220ms ease, border-color 220ms ease;
+    }
+    .app-tour-card:hover { transform: translateY(-6px); border-color: rgba(241,199,92,0.34); }
+    .app-tour-card img { display: block; width: 100%; height: auto; filter: drop-shadow(0 20px 24px rgba(0,0,0,0.34)); }
+    .app-tour-card figcaption { padding: 14px 4px 0; }
+    .app-tour-card strong { display: block; margin-bottom: 5px; color: var(--cream); font-size: 1.03rem; }
+    .app-tour-card span { display: block; color: var(--muted); font-size: 0.88rem; line-height: 1.45; }
+    .tour-hint { width: min(var(--max), calc(100% - 32px)); margin: 12px auto 0; color: var(--muted); font-size: 0.86rem; }
+
+    @keyframes phone-float {
+      0%, 100% { transform: translateY(0) rotate(0.01deg); }
+      50% { transform: translateY(-10px) rotate(0.01deg); }
+    }
+    .hero-phone { animation: phone-float 7s ease-in-out infinite; }
+    .motion-ready .reveal-block { opacity: 0; transform: translateY(24px); transition: opacity 640ms ease, transform 640ms ease; }
+    .motion-ready .reveal-block.is-visible { opacity: 1; transform: translateY(0); }
 
     .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; counter-reset: guide-step; }
     .step { position: relative; padding-top: 66px; counter-increment: guide-step; }
@@ -363,6 +439,7 @@
       .walkthrough-copy { text-align: center; }
       .demo-point { justify-content: center; }
       .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .app-tour-head { align-items: flex-start; }
     }
 
     @media (max-width: 560px) {
@@ -396,6 +473,14 @@
       .feature-icon { margin-bottom: 12px; font-size: 1.45rem; }
       .feature-card h3 { margin-bottom: 7px; font-size: 1.03rem; line-height: 1.2; }
       .feature-card p { font-size: 0.82rem; line-height: 1.42; }
+      .app-tour-shell { width: 100%; padding: 54px 0; }
+      .app-tour-head { width: calc(100% - 24px); margin-bottom: 22px; }
+      .tour-controls { display: none; }
+      .app-tour-track { gap: 12px; padding: 8px 12px 18px; scroll-padding-inline: 12px; scrollbar-width: none; }
+      .app-tour-track::-webkit-scrollbar { display: none; }
+      .app-tour-card { flex-basis: min(78vw, 300px); padding: 13px 13px 17px; border-radius: 20px; }
+      .app-tour-card figcaption { padding-top: 11px; }
+      .tour-hint { width: calc(100% - 24px); margin-top: 6px; }
       .steps { gap: 22px; }
       .step { padding-top: 46px; }
       .step::before { font-size: 1.55rem; }
@@ -450,7 +535,8 @@
 
     @media (prefers-reduced-motion: reduce) {
       html { scroll-behavior: auto; }
-      *, *::before, *::after { transition-duration: 0.01ms !important; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      .motion-ready .reveal-block { opacity: 1; transform: none; }
     }
   </style>
 </head>
@@ -460,6 +546,7 @@
       <a class="brand" href="#top"><img src="/compass-192.png" alt=""><span>OFFGRID AI</span> FIELDGUIDE</a>
       <div class="nav-links">
         <a href="#features">Features</a>
+        <a href="#app-tour">App tour</a>
         <a href="#examples">Examples</a>
         <a href="#how-it-works">How it works</a>
         <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app"><span class="nav-cta-long">Get it on Google Play</span><span class="nav-cta-short">Get the app</span></a>
@@ -472,7 +559,7 @@
       <div class="hero-copy">
         <p class="eyebrow">Built for real-world decisions</p>
         <h1>Turn questions into <span class="warm">field guides.</span></h1>
-        <p>Ask what to do, identify what you see, and turn practical answers into visual guides you can save to your phone for the trail, the road, the homestead, or the unexpected.</p>
+        <p>Ask what to do, compare one or multiple photos, analyze short videos, and turn practical answers into visual guides you can save to your phone for the trail, the road, the homestead, or the unexpected.</p>
         <div class="hero-actions">
           <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app" aria-label="Download OffGrid AI FieldGuide from Google Play">Get the Android app</a>
           <a class="button secondary" href="https://offgridtoolkit.ai/online">Try it on the web</a>
@@ -510,9 +597,14 @@
           <p>Turn an answer into a visual reference and save the complete guide as a mobile-friendly PDF.</p>
         </article>
         <article class="feature-card">
+          <div class="feature-icon">✦</div>
+          <h3>Start with Field Prompts</h3>
+          <p>Browse ready-made questions for preparedness, travel, homesteading, emergencies, and more.</p>
+        </article>
+        <article class="feature-card">
           <div class="feature-icon">◎</div>
-          <h3>Identify Photos</h3>
-          <p>Use your camera, gallery, or screenshots to get a practical assessment of what is visible.</p>
+          <h3>Compare Multiple Photos</h3>
+          <p>Select one or several related images so the app can compare angles, details, and context together.</p>
         </article>
         <article class="feature-card">
           <div class="feature-icon">▶</div>
@@ -529,12 +621,56 @@
           <h3>Read Aloud</h3>
           <p>Listen to answers through your phone when your hands or attention need to stay on the task.</p>
         </article>
-        <article class="feature-card">
-          <div class="feature-icon">✦</div>
-          <h3>Start with Field Prompts</h3>
-          <p>Browse ready-made questions for preparedness, travel, homesteading, emergencies, and more.</p>
-        </article>
       </div>
+    </section>
+
+    <section class="app-tour-shell" id="app-tour" aria-labelledby="app-tour-title">
+      <div class="app-tour-head">
+        <div class="section-head">
+          <p class="eyebrow">The real app, start to finish</p>
+          <h2 id="app-tour-title">See what FieldGuide can do on your phone.</h2>
+          <p>These are real screens from the current Android app—from ready-made prompts and multi-photo analysis to visual creation, read aloud, and saved guides.</p>
+        </div>
+        <div class="tour-controls" aria-label="App tour controls">
+          <button class="tour-button tour-prev" type="button" aria-label="Show previous app screen">←</button>
+          <button class="tour-button tour-next" type="button" aria-label="Show next app screen">→</button>
+        </div>
+      </div>
+      <div class="app-tour-track" tabindex="0" aria-label="OffGrid AI FieldGuide app screens">
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/01-offgrid-ai-fieldguide-home-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="OffGrid AI FieldGuide home screen with Field Prompts, photo, video, and Saved Guides actions">
+          <figcaption><strong>Everything starts in one place</strong><span>Ask, speak, browse prompts, add media, or open previously saved guides.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/02-offgrid-ai-fieldguide-ready-made-prompts-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="Ready-Made Prompts screen in OffGrid AI FieldGuide">
+          <figcaption><strong>Browse ready-made prompts</strong><span>Start with field-tested questions organized by practical category.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/03-offgrid-ai-fieldguide-multiple-photo-analysis-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="OffGrid AI FieldGuide comparing three photos of a plant">
+          <figcaption><strong>Compare multiple photos</strong><span>Use several angles and details as one evidence set for a more useful assessment.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/04-offgrid-ai-fieldguide-video-analysis-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="Short-video analysis result in OffGrid AI FieldGuide">
+          <figcaption><strong>Analyze short videos</strong><span>Add motion and changing context when a still image is not enough.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/05-offgrid-ai-fieldguide-create-visual-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="A visual reference created in OffGrid AI FieldGuide Image Studio">
+          <figcaption><strong>Create a field-ready visual</strong><span>Turn useful guidance into a diagram, checklist, or mobile reference card.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/06-offgrid-ai-fieldguide-save-field-guide-pdf-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="Save Field Guide PDF preview in OffGrid AI FieldGuide">
+          <figcaption><strong>Save the complete Field Guide</strong><span>Keep the visual and written guidance together in a readable PDF.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/07-offgrid-ai-fieldguide-read-aloud-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="Read Aloud controls in OffGrid AI FieldGuide">
+          <figcaption><strong>Listen with Read Aloud</strong><span>Hear the guidance through your phone when your hands need to stay on the task.</span></figcaption>
+        </figure>
+        <figure class="app-tour-card">
+          <img src="/assets/field-guide/device-renders/08-offgrid-ai-fieldguide-saved-guides-offline-phone.webp" width="1157" height="2260" loading="lazy" decoding="async" alt="Previously saved OffGrid AI FieldGuide PDF files on an Android phone">
+          <figcaption><strong>Open saved guides offline</strong><span>Previously saved PDFs remain available from the device without internet access.</span></figcaption>
+        </figure>
+      </div>
+      <p class="tour-hint">Swipe on mobile, use the arrow buttons, or scroll horizontally to explore all eight screens.</p>
     </section>
 
     <section class="section" id="how-it-works">
@@ -543,7 +679,7 @@
         <h2>Ask. Make it practical. Save it.</h2>
       </div>
       <div class="steps">
-        <article class="step"><h3>Describe or show the situation</h3><p>Type, speak, take a photo, upload an image, or add a short video.</p></article>
+        <article class="step"><h3>Describe or show the situation</h3><p>Type, speak, choose a ready-made prompt, add one or multiple photos, or upload a short video.</p></article>
         <article class="step"><h3>Get prioritized guidance</h3><p>Answers lead with what matters first and clearly flag uncertainty or safety concerns.</p></article>
         <article class="step"><h3>Build your own knowledge base</h3><p>Create a visual Field Guide, save the PDF, and keep it available on your phone.</p></article>
       </div>
@@ -689,6 +825,41 @@
   </dialog>
 
   <script>
+    (() => {
+      const track = document.querySelector('.app-tour-track');
+      const previous = document.querySelector('.tour-prev');
+      const next = document.querySelector('.tour-next');
+
+      const moveTour = (direction) => {
+        if (!track) return;
+        const card = track.querySelector('.app-tour-card');
+        const gap = parseFloat(getComputedStyle(track).gap) || 0;
+        const distance = card ? card.getBoundingClientRect().width + gap : track.clientWidth * 0.8;
+        track.scrollBy({ left: direction * distance, behavior: 'smooth' });
+      };
+
+      previous?.addEventListener('click', () => moveTour(-1));
+      next?.addEventListener('click', () => moveTour(1));
+
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduceMotion && 'IntersectionObserver' in window) {
+        document.documentElement.classList.add('motion-ready');
+        const blocks = document.querySelectorAll('.section, .app-tour-shell, .trust-strip');
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          });
+        }, { threshold: 0.08, rootMargin: '0px 0px -7% 0px' });
+
+        blocks.forEach((block) => {
+          block.classList.add('reveal-block');
+          observer.observe(block);
+        });
+      }
+    })();
+
     (() => {
       const items = Array.from(document.querySelectorAll('.gallery-open'));
       const dialog = document.getElementById('gallery-lightbox');
