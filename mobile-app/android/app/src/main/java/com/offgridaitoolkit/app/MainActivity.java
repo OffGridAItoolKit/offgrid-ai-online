@@ -36,9 +36,19 @@ import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.widget.Toast;
 import android.view.Surface;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.FrameLayout;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.graphics.Insets;
 import androidx.core.content.FileProvider;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,6 +59,8 @@ import java.util.Locale;
 import org.json.JSONObject;
 
 public class MainActivity extends BridgeActivity {
+    private static final int OFFGRID_GOLD = Color.rgb(197, 139, 0);
+    private static final int OFFGRID_DARK_BROWN = Color.rgb(44, 24, 16);
     private SensorManager sensorManager;
     private Sensor nativeCompassSensor;
     private SensorEventListener nativeCompassListener;
@@ -62,6 +74,8 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        configureBrandedSystemBars();
 
         savedGuidePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -83,6 +97,69 @@ public class MainActivity extends BridgeActivity {
 
         getBridge().getWebView().addJavascriptInterface(new OffGridNativeBridge(), "OffGridNative");
         initializeNativeTextToSpeech();
+    }
+
+    /**
+     * Keeps Android's system controls visible while giving them the FieldGuide palette.
+     * Android 15+ forces edge-to-edge and ignores direct opaque system-bar colors, so
+     * those versions receive non-interactive protection views sized from live insets.
+     */
+    @SuppressWarnings("deprecation")
+    private void configureBrandedSystemBars() {
+        Window window = getWindow();
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(
+            window,
+            window.getDecorView()
+        );
+
+        // Gold is light enough for dark status indicators; brown needs light controls.
+        controller.setAppearanceLightStatusBars(true);
+        controller.setAppearanceLightNavigationBars(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.setNavigationBarContrastEnforced(false);
+        }
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            window.setStatusBarColor(OFFGRID_GOLD);
+            window.setNavigationBarColor(OFFGRID_DARK_BROWN);
+            return;
+        }
+
+        ViewGroup decor = (ViewGroup) window.getDecorView();
+        addSystemBarProtection(decor, true, OFFGRID_GOLD);
+        addSystemBarProtection(decor, false, OFFGRID_DARK_BROWN);
+    }
+
+    private void addSystemBarProtection(ViewGroup decor, boolean statusBar, int color) {
+        View protection = new View(this);
+        protection.setBackgroundColor(color);
+        protection.setClickable(false);
+        protection.setFocusable(false);
+        protection.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO_HIDE_DESCENDANTS);
+
+        FrameLayout.LayoutParams initial = new FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            0,
+            statusBar ? Gravity.TOP : Gravity.BOTTOM
+        );
+        decor.addView(protection, initial);
+
+        ViewCompat.setOnApplyWindowInsetsListener(protection, (view, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(
+                statusBar
+                    ? WindowInsetsCompat.Type.statusBars()
+                    : WindowInsetsCompat.Type.navigationBars()
+            );
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) view.getLayoutParams();
+            int height = statusBar ? insets.top : insets.bottom;
+            if (params.height != height) {
+                params.height = height;
+                view.setLayoutParams(params);
+            }
+            return windowInsets;
+        });
+        ViewCompat.requestApplyInsets(protection);
     }
 
     @Override

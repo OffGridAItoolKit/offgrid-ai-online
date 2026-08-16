@@ -13,6 +13,10 @@ const androidManifest = fs.readFileSync(
     path.join(root, 'mobile-app', 'android', 'app', 'src', 'main', 'AndroidManifest.xml'),
     'utf8'
 );
+const androidStyles = fs.readFileSync(
+    path.join(root, 'mobile-app', 'android', 'app', 'src', 'main', 'res', 'values', 'styles.xml'),
+    'utf8'
+);
 
 const checks = [
     ['Make Field Guide is the primary follow-up', html.includes('message-followup-action primary" onclick="createVisualFromMessageAction(this, \'field-guide\')">Make Field Guide')],
@@ -25,6 +29,8 @@ const checks = [
     ['bottom preview actions are Share PDF and Save PDF', html.includes('onclick="shareAppPdfPreview()">Share PDF</button>') && html.includes("const lowerSaveLabel = isFieldGuidePreview ? 'Save PDF'")],
     ['web bridge invokes PDF sharing', html.includes('window.OffGridNative.shareFieldGuidePdf(')],
     ['Android exposes PDF sharing', androidBridge.includes('public String shareFieldGuidePdf(')],
+    ['Android system bars use accessible FieldGuide colors', androidBridge.includes('configureBrandedSystemBars()') && androidBridge.includes('controller.setAppearanceLightStatusBars(true)') && androidBridge.includes('controller.setAppearanceLightNavigationBars(false)') && androidStyles.includes('#C58B00') && androidStyles.includes('#2C1810')],
+    ['Android 15+ draws branded protection behind transparent system bars', androidBridge.includes('Build.VERSION_CODES.VANILLA_ICE_CREAM') && androidBridge.includes('addSystemBarProtection(decor, true, OFFGRID_GOLD)') && androidBridge.includes('addSystemBarProtection(decor, false, OFFGRID_DARK_BROWN)') && androidBridge.includes('WindowInsetsCompat.Type.statusBars()') && androidBridge.includes('WindowInsetsCompat.Type.navigationBars()')],
     ['Android shares a PDF attachment', androidBridge.includes('shareIntent.setType("application/pdf")') && androidBridge.includes('Intent.EXTRA_STREAM')],
     ['generated-image actions share image and whole field guide', html.includes('onclick="shareOnlineStudioFieldGuide()">Share Field Guide</button>') && html.includes('>Share Image</button>')],
     ['image generation communicates expected wait', html.includes('This usually takes about one minute. Keep the app open') && html.includes('Generating image - usually about 60 seconds')],

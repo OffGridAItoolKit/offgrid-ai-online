@@ -1,12 +1,18 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-08-12
+**Last Updated:** 2026-08-16
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
 
 ### August 2026
+
+**2026-08-16**
+*   **Branded Android system bars**
+    *   Added an accessible gold status-bar treatment with dark indicators and a dark-brown navigation bar with light controls while preserving Android's native usability.
+    *   Added Android 15+ inset-sized protection views because modern edge-to-edge Android versions ignore direct opaque system-bar colors.
+    *   Kept legacy system-bar colors for Android 14 and earlier and added automated regression checks for both paths.
 
 **2026-08-12**
 *   **Multi-photo rollout and mobile presentation polish**

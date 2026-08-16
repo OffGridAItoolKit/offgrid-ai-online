@@ -20,7 +20,8 @@ const config: CapacitorConfig = {
       showSpinner: false
     },
     StatusBar: {
-      style: 'DARK',
+      // Capacitor names this for the bar background: LIGHT produces dark indicators.
+      style: 'LIGHT',
       backgroundColor: '#c58b00',
       overlaysWebView: false
     }

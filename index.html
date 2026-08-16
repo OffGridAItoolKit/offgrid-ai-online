@@ -1742,7 +1742,8 @@
             if (!IS_APP_SURFACE || !statusBar) return;
             try {
                 await statusBar.setBackgroundColor({ color: '#c58b00' });
-                await statusBar.setStyle({ style: 'DARK' });
+                // Capacitor's LIGHT style renders dark indicators on the gold bar.
+                await statusBar.setStyle({ style: 'LIGHT' });
             } catch (_) {
                 // Browser and older WebView surfaces safely fall back to theme-color.
             }
