@@ -10,7 +10,8 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     url: serverUrl,
-    cleartext: serverUrl.startsWith('http://')
+    cleartext: serverUrl.startsWith('http://'),
+    allowNavigation: ['offgridtoolkit.ai']
   },
   plugins: {
     SplashScreen: {

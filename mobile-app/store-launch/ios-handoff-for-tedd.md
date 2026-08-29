@@ -1,81 +1,66 @@
-# iOS Handoff For Tedd
+# iOS Release Record
 
 ## Goal
 
-Archive and upload the Capacitor iOS app for TestFlight and App Store review.
+Archive and upload the Capacitor iOS app for TestFlight and App Store review from the Mac mini.
 
 ## Project
 
 ```text
-C:\Users\prian\Documents\New project\mobile-app\ios\App
-```
-
-On Mac, open:
-
-```text
-App.xcodeproj
+/Users/davidprian/Developer/OffGridAI/offgrid-ai-online/mobile-app/ios/App/App.xcodeproj
 ```
 
 ## App Identity
 
 - App name: OffGrid AI FieldGuide
-- Bundle id: com.offgridaitoolkit.app
-- Version: 1.0
-- Build: 1
+- Bundle ID: `com.offgridaitoolkit.app`
+- Version: `1.0`
+- Build: `1`
+- Device family: iPhone
+- Orientation: portrait
 - Price: free
 - Accounts: none
 - In-app purchases: none
 - Ads: none
-- Production URL: https://offgridtoolkit.ai/online?surface=app
+- Production URL: `https://offgridtoolkit.ai/online?surface=app`
+- Xcode: 26.6
+- Signing team selected in Xcode: `Inspired Marketing & Design LLC` (`3X9J4MHTK3`)
 
-## Permission Strings Already Added
+## Completed Physical iPhone Proof
 
-- Camera: take pictures or record video for online AI analysis.
-- Microphone: voice input and video recording.
-- Photo Library: choose media to upload.
-- Photo Library Add: save generated visuals/guides.
-- Motion: tap-to-enable compass heading.
+Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 
-## Tedd Checklist
+- Fresh launch, day/night mode, and safe areas.
+- Chat streaming and post-answer actions.
+- Camera, multi-photo upload, and short-video analysis.
+- Voice input and microphone permission flow.
+- Tap-to-enable compass.
+- Image Studio generation and image save/share.
+- Field Guide PDF preview, native PDF generation, unique filenames, single-file save, and native sharing.
+- `OffGrid AI Field Guides` folder creation and Saved Guides browsing.
+- Ready-Made Prompts returns the selected prompt to the installed app.
+- No account, advertising, in-app purchase, or external checkout flow.
 
-- [ ] Confirm Apple Developer organization team.
-- [ ] Confirm bundle id exists in Certificates, Identifiers & Profiles.
-- [ ] Confirm signing/provisioning in Xcode.
-- [ ] Build on a physical iPhone.
-- [ ] Verify first-run screen, camera, photo upload, video, microphone, Image Studio, share sheet, Saved Guides, and compass fallback.
-- [ ] Archive release build.
-- [ ] Upload to App Store Connect.
-- [ ] Add build to TestFlight internal testing.
-- [ ] Send Codex/user screenshots or notes for any iOS-specific UI issues.
+## Remaining Release Steps
 
-## Required TestFlight Parity Matrix
-
-Codex can prepare, inspect, and fix the shared web/Capacitor code, but cannot sign or upload a TestFlight build from Windows. Tedd must perform the Xcode archive/upload and the physical-iPhone checks below. Send the build number, iPhone model, iOS version, and pass/fail notes back to Codex for any repairs.
-
-- [ ] Fresh install opens in Night mode and the theme toggle reaches Light mode.
-- [ ] First-run privacy/setup sheet fits, links work, and acceptance persists.
-- [ ] Chat streams a complete answer and then shows Create Visual, Make Field Guide, and Save PDF.
-- [ ] Take Photo and Upload Image request permissions only when tapped.
-- [ ] Gallery picker includes screenshots and downloads where iOS exposes them.
-- [ ] Record Video and Upload Video complete a short-clip analysis.
-- [ ] Microphone accept, deny, and Settings recovery paths are understandable.
-- [ ] Compass starts only after tap, reports a plausible heading, and degrades cleanly when unavailable.
-- [ ] Generated visual can save to Photos and open the native share sheet.
-- [ ] Field Guide PDF is created, can be opened, and remains discoverable in Files.
-- [ ] Saved Guides opens the expected iOS location or gives accurate fallback instructions.
-- [ ] Ready-Made Prompts preserves theme, sends a prompt back to chat, and has no USB purchase link.
-- [ ] Long-press answer menu supports Copy, Share, Read Aloud, Search, Export, Select Text, and Report Issue.
-- [ ] Report Issue submits in-app and shows confirmation without leaving for Mail.
-- [ ] No Command Center, Knowledge Base save, upgrade, or external checkout control is visible.
-- [ ] Airplane mode/no-network launch and request failures show a useful recovery message.
-- [ ] Safe areas, keyboard, status bar, rotation lock, and small/large iPhone layouts have no clipped controls.
-
-## Current iOS Risk To Prove
-
-Android has a custom `OffGridNative` bridge for phone-specific file, share, PDF, Saved Guides, and compass behavior. iOS currently depends on browser/Capacitor fallbacks unless equivalent Swift handlers are added. TestFlight parity is therefore a required proof step, not an assumption. Any failed native action should be returned to Codex with a screen recording and Xcode console excerpt.
+- [ ] Confirm whether the public seller should be the current Apple team, `Inspired Marketing & Design LLC`, or a separate `OFFGRID AI TOOLKIT, LLC` Apple Developer organization.
+- [x] Create and validate the App Store archive.
+- [x] Export a distribution-signed App Store IPA.
+- [ ] Sign in to App Store Connect and create or confirm the app record.
+- [ ] Upload build `1.0 (1)`.
+- [ ] Complete App Privacy, age rating, availability, and pricing forms.
+- [ ] Add the final screenshots and review notes.
+- [ ] Optionally run a short internal TestFlight smoke test.
+- [ ] Submit for App Review using manual release.
 
 ## App Review Note
 
 ```text
-OffGrid AI FieldGuide is a free online AI companion app for practical field guidance. It does not require an account, does not include ads, and does not include in-app purchases. Camera, photo library, microphone, and motion permissions are requested only when the user taps related features. The app requires internet access for AI responses.
+OffGrid AI FieldGuide is a free online AI companion for practical field guidance. No account or review credentials are required. The app has no ads and no in-app purchases.
+
+The reviewer can start on the main screen and submit a question, tap Take Photo / Upload Images, tap Record Video / Upload Video, or open Ready-Made Prompts. Camera, photo library, microphone, and motion permissions are requested only after the reviewer taps the related feature.
+
+After an AI response, the reviewer can create a visual or make a Field Guide. Save Field Guide generates a native PDF, creates the app's OffGrid AI Field Guides folder in Files, and opens the saved guide. Saved Guides opens that same folder. Image Studio visuals can be saved to Photos or shared with the native share sheet.
+
+An internet connection is required for AI responses. Health, first-aid, survival, and safety responses are general educational information only; the app is not a medical device and does not provide professional diagnosis or treatment.
 ```

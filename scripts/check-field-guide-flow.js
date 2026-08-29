@@ -17,6 +17,22 @@ const androidStyles = fs.readFileSync(
     path.join(root, 'mobile-app', 'android', 'app', 'src', 'main', 'res', 'values', 'styles.xml'),
     'utf8'
 );
+const iosBridge = fs.readFileSync(
+    path.join(root, 'mobile-app', 'ios', 'App', 'App', 'AppDelegate.swift'),
+    'utf8'
+);
+const iosStoryboard = fs.readFileSync(
+    path.join(root, 'mobile-app', 'ios', 'App', 'App', 'Base.lproj', 'Main.storyboard'),
+    'utf8'
+);
+const iosInfoPlist = fs.readFileSync(
+    path.join(root, 'mobile-app', 'ios', 'App', 'App', 'Info.plist'),
+    'utf8'
+);
+const mobileConfig = fs.readFileSync(
+    path.join(root, 'mobile-app', 'capacitor.config.ts'),
+    'utf8'
+);
 
 const checks = [
     ['Make Field Guide is the primary follow-up', html.includes('message-followup-action primary" onclick="createVisualFromMessageAction(this, \'field-guide\')">Make Field Guide')],
@@ -32,6 +48,20 @@ const checks = [
     ['Android system bars use accessible FieldGuide colors', androidBridge.includes('configureBrandedSystemBars()') && androidBridge.includes('controller.setAppearanceLightStatusBars(true)') && androidBridge.includes('controller.setAppearanceLightNavigationBars(false)') && androidStyles.includes('#C58B00') && androidStyles.includes('#2C1810')],
     ['Android 15+ draws branded protection behind transparent system bars', androidBridge.includes('Build.VERSION_CODES.VANILLA_ICE_CREAM') && androidBridge.includes('addSystemBarProtection(decor, true, OFFGRID_GOLD)') && androidBridge.includes('addSystemBarProtection(decor, false, OFFGRID_DARK_BROWN)') && androidBridge.includes('WindowInsetsCompat.Type.statusBars()') && androidBridge.includes('WindowInsetsCompat.Type.navigationBars()')],
     ['Android shares a PDF attachment', androidBridge.includes('shareIntent.setType("application/pdf")') && androidBridge.includes('Intent.EXTRA_STREAM')],
+    ['iOS exposes native PDF save and sharing', iosBridge.includes('saveFieldGuidePdf') && iosBridge.includes('shareFieldGuidePdf') && iosBridge.includes('try data.write(to: outputURL') && iosBridge.includes('UIActivityViewController(')],
+    ['iOS saves one automatic app-folder copy', iosBridge.includes('notificationOccurred(.success)') && !iosBridge.includes('UIDocumentPickerViewController(forExporting:')],
+    ['iOS PDF names use the prompt and a unique timestamp', iosBridge.includes('uniquePdfFilename(question, title, filename)') && iosBridge.includes('now.getMilliseconds()')],
+    ['iOS waits for WebKit content before rendering PDFs', iosBridge.includes('OffGridHTMLPDFRenderJob') && iosBridge.includes('await Promise.all(images.map') && iosBridge.includes('document.fonts.ready') && iosBridge.includes('webView.viewPrintFormatter()') && !iosBridge.includes('UIMarkupTextPrintFormatter')],
+    ['iOS rejects suspiciously blank PDF output', iosBridge.includes('data.count > 4_096') && iosBridge.includes('rendered without its content')],
+    ['iOS PDF uses larger mobile-friendly type and tighter margins', iosBridge.includes('font-size: 18px !important') && iosBridge.includes('max-height: 736px !important') && iosBridge.includes('CGRect(x: 24, y: 24, width: 564, height: 744)')],
+    ['iOS keeps and previews Saved Field Guides', iosBridge.includes('openSavedGuides') && iosBridge.includes('Field Guides') && iosBridge.includes('QLPreviewController')],
+    ['iOS Saved Guides opens its managed folder directly', iosBridge.includes('presentFilesBrowser(startingAt: directory)') && iosBridge.includes('picker.directoryURL = directory') && iosBridge.includes('picker.delegate = self')],
+    ['iOS creates its Field Guides folder during app startup', iosBridge.includes('override func capacitorDidLoad()') && iosBridge.includes('prepareFieldGuidesDirectory()')],
+    ['iOS uses the custom Capacitor bridge controller', iosStoryboard.includes('customClass="OffGridBridgeViewController"') && iosStoryboard.includes('customModule="App"')],
+    ['iOS installs the bridge after Capacitor assigns its content controller', iosBridge.includes('override func webView(with frame: CGRect, configuration: WKWebViewConfiguration)') && !iosBridge.includes('override func webViewConfiguration(')],
+    ['iOS keeps the app header below the system status bar after reloads', iosBridge.includes('setOverlaysWebView({ overlay: true })') && iosBridge.includes('setOverlaysWebView({ overlay: false })') && iosBridge.includes("window.addEventListener('pageshow', applyIosStatusBarLayout)") && html.includes('setOverlaysWebView({ overlay: true })') && html.includes('setOverlaysWebView({ overlay: false })')],
+    ['iOS exposes app documents in Files', iosInfoPlist.includes('<key>UIFileSharingEnabled</key>') && iosInfoPlist.includes('<key>LSSupportsOpeningDocumentsInPlace</key>')],
+    ['app navigation keeps OffGrid prompt pages inside Capacitor', mobileConfig.includes("allowNavigation: ['offgridtoolkit.ai']")],
     ['generated-image actions share image and whole field guide', html.includes('onclick="shareOnlineStudioFieldGuide()">Share Field Guide</button>') && html.includes('>Share Image</button>')],
     ['image generation communicates expected wait', html.includes('This usually takes about one minute. Keep the app open') && html.includes('Generating image - usually about 60 seconds')],
     ['field-guide creation preserves source Markdown', html.includes('messageDiv.dataset.sourceMarkdown = fullResponse') && html.includes('const answerText = getMessageSourceText(messageEl)')],

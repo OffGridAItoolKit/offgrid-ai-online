@@ -18,6 +18,7 @@ mobile-app/android/key.properties
 # Logs
 *.log
 npm-debug.log*
+/tmp/
 
 # OS files
 .DS_Store

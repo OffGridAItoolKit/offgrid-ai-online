@@ -22,7 +22,7 @@ App id / bundle id: com.offgridaitoolkit.app
 ### Accounts
 
 - [ ] Google Play organization onboarding fully cleared. Identity is approved; website verification is requested and phone verification is waiting behind it.
-- [ ] Apple Developer Program organization account verified.
+- [ ] Confirm the intended App Store seller. Xcode currently signs with `Inspired Marketing & Design LLC` (team `3X9J4MHTK3`), while the launch packet names `OFFGRID AI TOOLKIT, LLC`.
 - [ ] Tedd invited to App Store Connect with certificate/profile/TestFlight/upload access.
 - [x] Public app name is `OffGrid AI FieldGuide`; public developer brand is `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
 - [x] Support email confirmed as `support@offgridaitoolkit.com`.
@@ -45,7 +45,7 @@ App id / bundle id: com.offgridaitoolkit.app
 - [x] Field Guide app AI requests enforce OpenRouter Zero Data Retention routing per request.
 - [x] Render technical request-log fields and 7-day Starter retention are documented for Data Safety.
 - [x] Android cloud backup is disabled for the release manifest.
-- [ ] Store screenshots captured from final release build.
+- [x] Store screenshots captured from the final iPhone release flow on 2026-08-29.
 
 ### Android
 
@@ -60,17 +60,20 @@ App id / bundle id: com.offgridaitoolkit.app
 ### iOS
 
 - [x] iOS permission strings added to Info.plist.
-- [ ] Tedd confirms Xcode version and Apple team.
-- [ ] Tedd archives and uploads the app to App Store Connect.
-- [ ] TestFlight internal testing completed.
+- [x] Xcode 26.6 and Apple team `3X9J4MHTK3` confirmed on the Mac mini.
+- [x] Physical iPhone 14 Plus testing completed for chat, photos, video, voice, Image Studio, native PDF save/share, Saved Guides, Ready-Made Prompts, compass, and safe areas.
+- [x] Release target narrowed to iPhone portrait for v1; untested iPad support is not advertised.
+- [x] App Store archive and distribution-signed IPA created and validated for `1.0 (1)`.
+- [ ] Distribution-signed IPA uploaded to App Store Connect.
+- [x] Direct physical-device release testing completed; optional TestFlight smoke test remains after upload.
 - [ ] App privacy labels completed.
 - [ ] App Review submitted.
 
-### TestFlight Ownership
+### iOS Release Ownership
 
-- Codex owns shared code fixes, test criteria, release notes, and diagnosis.
-- Tedd owns macOS/Xcode signing, archive, App Store Connect upload, and TestFlight build assignment.
-- A physical iPhone tester owns final permission, file-save, share, compass, and safe-area proof.
+- Codex prepares and validates the shared code, iOS archive, listing metadata, screenshots, and review notes.
+- The Apple Account holder confirms the intended legal seller, signs in to App Store Connect, and accepts any Apple agreements.
+- A physical iPhone tester provides final permission, file-save, share, compass, and safe-area proof.
 
 ## External Sources To Recheck Before Submission
 

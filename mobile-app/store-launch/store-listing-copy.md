@@ -6,7 +6,11 @@ OffGrid AI FieldGuide
 
 ## Subtitle / Short Description
 
-Identify photos, analyze videos, and create practical visual field guides.
+Practical AI field guides
+
+## Promotional Text
+
+Ask practical questions, analyze photos and videos, create visual field guides, and save useful answers as PDFs—no account, ads, or in-app purchases.
 
 ## Full Description
 
@@ -36,20 +40,18 @@ OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure
 
 ## Keywords
 
-preparedness, survival, homestead, off grid, hiking, camping, RV, van life, emergency, AI, field guide, compass
+preparedness,survival,homestead,hiking,camping,RV,emergency,AI,field guide,compass,first aid
 
 ## Category
 
-Primary: Productivity or Lifestyle
-Secondary consideration: Reference / Utilities, depending on store fit
+Primary: Reference
+Secondary: Utilities
 
 ## Screenshot Set
 
-1. Dashboard in dark mode.
-2. Compass heading enabled.
-3. Upload image answer.
-4. Record/upload video flow.
-5. Image Studio visual.
-6. Save Guide PDF / Saved Guides.
-7. Ready-Made Prompts.
-8. Share/export long-press menu.
+1. Practical AI chat response.
+2. Multi-photo analysis.
+3. Image Studio visual.
+4. Field Guide PDF preview.
+5. Ready-Made Prompts.
+6. Saved Field Guide PDF.
