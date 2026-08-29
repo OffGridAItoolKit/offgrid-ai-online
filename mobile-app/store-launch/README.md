@@ -22,9 +22,9 @@ App id / bundle id: com.offgridaitoolkit.app
 ### Accounts
 
 - [ ] Google Play organization onboarding fully cleared. Identity is approved; website verification is requested and phone verification is waiting behind it.
-- [ ] Confirm the intended App Store seller. Xcode currently signs with `Inspired Marketing & Design LLC` (team `3X9J4MHTK3`), while the launch packet names `OFFGRID AI TOOLKIT, LLC`.
+- [x] Intended App Store seller confirmed as `INSPIRED MARKETING & DESIGN, LLC` (team `3X9J4MHTK3`).
 - [ ] Tedd invited to App Store Connect with certificate/profile/TestFlight/upload access.
-- [x] Public app name is `OffGrid AI FieldGuide`; public developer brand is `OffGrid AI ToolKit`; verified legal organization is `OFFGRID AI TOOLKIT, LLC`.
+- [x] Public app name is `OffGrid AI FieldGuide`; public developer brand is `OffGrid AI ToolKit`; Apple public seller is `INSPIRED MARKETING & DESIGN, LLC`.
 - [x] Support email confirmed as `support@offgridaitoolkit.com`.
 
 ### Product Readiness
@@ -64,9 +64,11 @@ App id / bundle id: com.offgridaitoolkit.app
 - [x] Physical iPhone 14 Plus testing completed for chat, photos, video, voice, Image Studio, native PDF save/share, Saved Guides, Ready-Made Prompts, compass, and safe areas.
 - [x] Release target narrowed to iPhone portrait for v1; untested iPad support is not advertised.
 - [x] App Store archive and distribution-signed IPA created and validated for `1.0 (1)`.
-- [ ] Distribution-signed IPA uploaded to App Store Connect.
+- [x] Distribution-signed IPA uploaded to App Store Connect and build `1.0 (1)` attached to Apple ID `6806680581`.
 - [x] Direct physical-device release testing completed; optional TestFlight smoke test remains after upload.
-- [ ] App privacy labels completed.
+- [x] App privacy label data types, purposes, linkage, no-tracking answers, privacy policy URL, and user privacy choices URL configured; owner publish attestation remains.
+- [x] App Store price set to free, public distribution selected, and availability set to all 175 storefronts.
+- [x] Age-rating questionnaire completed with a calculated 13+ rating.
 - [ ] App Review submitted.
 
 ### iOS Release Ownership

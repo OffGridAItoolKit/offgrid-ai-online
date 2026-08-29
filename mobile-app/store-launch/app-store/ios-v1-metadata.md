@@ -9,10 +9,12 @@ Prepared: 2026-08-29
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
 - Build: `1`
-- SKU proposal: `offgrid-ai-fieldguide-ios`
+- Apple ID: `6806680581`
+- SKU: `offgrid-ai-fieldguide-ios`
 - Price: Free
 - Primary language: English (U.S.)
-- Copyright: confirm after selecting the intended Apple seller account
+- Public seller: `INSPIRED MARKETING & DESIGN, LLC`
+- Copyright: `2026 INSPIRED MARKETING & DESIGN, LLC`
 
 ## Listing
 
@@ -63,9 +65,9 @@ Initial iPhone release of OffGrid AI FieldGuide, including practical AI chat, ph
 - Notes: use the review note in `../ios-handoff-for-tedd.md`
 - Release method: Manual release after approval
 
-## Age Rating Draft
+## Age Rating
 
-Expected rating: 13+ in the current Apple rating system, subject to App Store Connect's generated regional results.
+App Store Connect calculated 13+ from the completed questionnaire on 2026-08-29.
 
 - User-generated content distributed to other users: No
 - User-to-user messaging or social media: No
@@ -75,17 +77,19 @@ Expected rating: 13+ in the current Apple rating system, subject to App Store Co
 - Realistic violence, weapons, or fear themes: Infrequent at most because users may request emergency, first-aid, or preparedness guidance
 - Sexual content or nudity: None as an intended app experience
 
-## App Privacy Working Answers
+## App Privacy Answers
 
-Use the current App Store Connect form and the verified facts in `../privacy-data-safety-worksheet.md`. The conservative v1 working disclosure is:
+The following conservative disclosure was configured in App Store Connect on 2026-08-29 from the verified facts in `../privacy-data-safety-worksheet.md`:
 
-- Other User Content: optional feedback retained only when the user submits it; App Functionality and Product Personalization/Support as applicable; not used for tracking.
-- Product Interaction: anonymous request type/date/count retained for up to 31 days for App Functionality, Analytics, and Security/Fraud Prevention; not used for tracking.
-- Diagnostics: short-lived hosting request/error/timing logs retained up to 7 days for App Functionality and Analytics; not used for tracking.
-- Other Data: network address in hosting logs plus a one-way HMAC abuse identifier for Security/Fraud Prevention; not used for tracking.
+- Other User Content: App Functionality; not linked to identity; not used for tracking.
+- Product Interaction: App Functionality; linked conservatively because short-lived operational logs can include a network address; not used for tracking.
+- Performance Data: App Functionality; linked conservatively because short-lived operational logs can include a network address; not used for tracking.
+- Other Diagnostic Data: App Functionality; linked conservatively because short-lived operational logs can include a network address; not used for tracking.
+- Other Data Types: App Functionality; linked conservatively because hosting logs can briefly contain a network address; not used for tracking.
 - Text prompts, selected images, selected video frames, voice input, and generated-image requests are processed for the user-requested operation and are not retained as account history. Re-check Apple's real-time processing exception while completing the live form.
-- Data linked to user identity: No account exists; answer each data-type linkage question conservatively based on Apple's live definitions.
 - Tracking: No.
+
+The privacy policy URL is `https://offgridtoolkit.ai/privacy`; the user privacy choices URL is `https://offgridtoolkit.ai/data-deletion`. The disclosure is configured but awaits the account holder's legal publish confirmation.
 
 ## Export Compliance
 
@@ -93,7 +97,7 @@ Use the current App Store Connect form and the verified facts in `../privacy-dat
 
 ## Screenshot Order
 
-The prepared iPhone 6.9-inch portrait files are under `screenshots/iphone-6.9/`:
+The App Store Connect form for this app requests 6.5-inch portrait files. The upload-ready 1284×2778 files are under `screenshots/iphone-6.5/`. A matching 6.9-inch source set is retained under `screenshots/iphone-6.9/`.
 
 1. `01-practical-ai-chat.jpg`
 2. `02-multi-photo-analysis.jpg`

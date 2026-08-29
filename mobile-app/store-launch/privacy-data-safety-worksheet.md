@@ -61,6 +61,19 @@ The production submission uses these disclosures:
 OffGrid AI FieldGuide sends prompts and selected media to online AI services only when you use chat, upload, camera, video, voice, or Image Studio features. The app does not require an account, does not include ads, and does not include in-app purchases. Optional feedback is saved only when you submit it, and an AI response is included only when you choose that option.
 ```
 
+## Apple App Privacy Configured - 2026-08-29
+
+The conservative v1 label is configured with no tracking:
+
+- Other User Content: App Functionality; not linked to identity.
+- Product Interaction: App Functionality; linked conservatively because short-lived operational logs can include a network address.
+- Performance Data: App Functionality; linked conservatively because short-lived operational logs can include a network address.
+- Other Diagnostic Data: App Functionality; linked conservatively because short-lived operational logs can include a network address.
+- Other Data Types: App Functionality; linked conservatively because hosting logs can briefly contain a network address.
+- Real-time prompts and selected media are not disclosed as collected under Apple's definition because neither OffGrid nor its third-party partners retain them longer than necessary to service the request.
+
+The label remains unpublished until the account holder confirms Apple's accuracy-and-compliance attestation.
+
 ## Google Play Health Apps Declaration Update - 2026-07-30
 
 Selected categories:

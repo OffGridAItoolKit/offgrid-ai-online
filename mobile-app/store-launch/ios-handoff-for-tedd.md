@@ -24,7 +24,7 @@ Archive and upload the Capacitor iOS app for TestFlight and App Store review fro
 - Ads: none
 - Production URL: `https://offgridtoolkit.ai/online?surface=app`
 - Xcode: 26.6
-- Signing team selected in Xcode: `Inspired Marketing & Design LLC` (`3X9J4MHTK3`)
+- Signing team and App Store public seller: `INSPIRED MARKETING & DESIGN, LLC` (`3X9J4MHTK3`)
 
 ## Completed Physical iPhone Proof
 
@@ -43,13 +43,17 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 
 ## Remaining Release Steps
 
-- [ ] Confirm whether the public seller should be the current Apple team, `Inspired Marketing & Design LLC`, or a separate `OFFGRID AI TOOLKIT, LLC` Apple Developer organization.
+- [x] Public seller confirmed as the current Apple team, `INSPIRED MARKETING & DESIGN, LLC`.
 - [x] Create and validate the App Store archive.
 - [x] Export a distribution-signed App Store IPA.
-- [ ] Sign in to App Store Connect and create or confirm the app record.
-- [ ] Upload build `1.0 (1)`.
-- [ ] Complete App Privacy, age rating, availability, and pricing forms.
-- [ ] Add the final screenshots and review notes.
+- [x] Create the App Store Connect record (`6806680581`).
+- [x] Upload and attach build `1.0 (1)`.
+- [x] Complete the age rating (13+), worldwide availability, and free pricing forms.
+- [x] Configure the App Privacy label and URLs; owner publish attestation remains.
+- [ ] Upload the final screenshots; Chrome file-upload permission is required.
+- [x] Add the review notes.
+- [ ] Add the review contact information.
+- [ ] Confirm the Content Rights answer and EU Digital Services Act trader information.
 - [ ] Optionally run a short internal TestFlight smoke test.
 - [ ] Submit for App Review using manual release.
 

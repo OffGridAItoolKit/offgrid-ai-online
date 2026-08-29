@@ -2,13 +2,13 @@
 
 ## Before Submission
 
-- [ ] Verify production app URL loads.
-- [ ] Verify `/privacy` is deployed and publicly reachable.
+- [x] Verify production app URL loads.
+- [x] Verify `/privacy` is deployed and publicly reachable.
 - [ ] Verify no mobile/app Command Center or Knowledge Base save controls are visible.
 - [ ] Verify Image Studio save/share/PDF on Android release build.
 - [ ] Verify iOS TestFlight build with Tedd.
-- [ ] Capture final screenshots from release-like builds.
-- [ ] Fill privacy/data forms from verified facts.
+- [x] Capture final screenshots from release-like builds.
+- [x] Fill privacy/data forms from verified facts; owner publish attestation remains.
 
 ## Production Rollout
 
