@@ -23,8 +23,8 @@ Prepared: 2026-08-29
 - Keywords (92/100 UTF-8 bytes): `preparedness,survival,homestead,hiking,camping,RV,emergency,AI,field guide,compass,first aid`
 - Primary category: Reference
 - Secondary category: Utilities
-- Support URL: `https://offgridtoolkit.ai/`
-- Marketing URL: `https://offgridtoolkit.ai/`
+- Support URL: `https://offgridai.guide`
+- Marketing URL: `https://offgridai.guide`
 - Privacy Policy URL: `https://offgridtoolkit.ai/privacy`
 
 ## Description
