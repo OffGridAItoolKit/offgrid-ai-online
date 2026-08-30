@@ -112,4 +112,4 @@ The six files were uploaded individually on 2026-08-29 so App Store Connect reta
 
 ## Submission Status
 
-On 2026-08-29, Apple verified the approved EU Digital Services Act trader phone and email and marked the compliance record Active. Version `1.0 (1)` was then added to the App Review draft and reached Apple's final **Submit for Review** step. Manual release remains selected.
+On 2026-08-29, Apple verified the approved EU Digital Services Act trader phone and email and marked the compliance record Active. Version `1.0 (1)` was submitted to App Review and entered **Waiting for Review** status. Manual release remains selected.

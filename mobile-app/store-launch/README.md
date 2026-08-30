@@ -74,7 +74,7 @@ App id / bundle id: com.offgridaitoolkit.app
 - [x] App Review contact and review notes saved.
 - [x] EU DSA trader status and public business contact information verified; Apple reports the compliance record as Active.
 - [x] Version `1.0 (1)` added to the App Review draft and marked ready to submit.
-- [ ] App Review submitted.
+- [x] Version `1.0 (1)` submitted to App Review on 2026-08-29; status: Waiting for Review.
 
 ### iOS Release Ownership
 

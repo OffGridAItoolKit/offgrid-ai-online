@@ -57,7 +57,7 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Complete EU Digital Services Act trader contact verification; Apple reports the compliance record as Active.
 - [ ] Optionally run a short internal TestFlight smoke test.
 - [x] Add version `1.0 (1)` to the App Review draft; it is ready to submit.
-- [ ] Submit for App Review using manual release.
+- [x] Submit version `1.0 (1)` for App Review using manual release; status: Waiting for Review on 2026-08-29.
 
 ## App Review Note
 
