@@ -49,12 +49,14 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Create the App Store Connect record (`6806680581`).
 - [x] Upload and attach build `1.0 (1)`.
 - [x] Complete the age rating (13+), worldwide availability, and free pricing forms.
-- [x] Configure the App Privacy label and URLs; owner publish attestation remains.
-- [ ] Upload the final screenshots; Chrome file-upload permission is required.
+- [x] Configure and publish the App Privacy label and URLs after owner approval.
+- [x] Upload the final screenshots in the intended storefront order.
 - [x] Add the review notes.
-- [ ] Add the review contact information.
-- [ ] Confirm the Content Rights answer and EU Digital Services Act trader information.
+- [x] Add the review contact information.
+- [x] Confirm and save the Content Rights answer.
+- [x] Complete EU Digital Services Act trader contact verification; Apple reports the compliance record as Active.
 - [ ] Optionally run a short internal TestFlight smoke test.
+- [x] Add version `1.0 (1)` to the App Review draft; it is ready to submit.
 - [ ] Submit for App Review using manual release.
 
 ## App Review Note

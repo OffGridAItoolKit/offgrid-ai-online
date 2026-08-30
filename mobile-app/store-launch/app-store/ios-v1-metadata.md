@@ -89,7 +89,7 @@ The following conservative disclosure was configured in App Store Connect on 202
 - Text prompts, selected images, selected video frames, voice input, and generated-image requests are processed for the user-requested operation and are not retained as account history. Re-check Apple's real-time processing exception while completing the live form.
 - Tracking: No.
 
-The privacy policy URL is `https://offgridtoolkit.ai/privacy`; the user privacy choices URL is `https://offgridtoolkit.ai/data-deletion`. The disclosure is configured but awaits the account holder's legal publish confirmation.
+The privacy policy URL is `https://offgridtoolkit.ai/privacy`; the user privacy choices URL is `https://offgridtoolkit.ai/data-deletion`. The account holder approved and published the disclosure on 2026-08-29.
 
 ## Export Compliance
 
@@ -107,3 +107,9 @@ The App Store Connect form for this app requests 6.5-inch portrait files. The up
 6. `06-saved-field-guide.jpg`
 
 Do not use the older screenshot that shows the iOS status bar overlapping the app header.
+
+The six files were uploaded individually on 2026-08-29 so App Store Connect retained the intended storefront order.
+
+## Submission Status
+
+On 2026-08-29, Apple verified the approved EU Digital Services Act trader phone and email and marked the compliance record Active. Version `1.0 (1)` was then added to the App Review draft and reached Apple's final **Submit for Review** step. Manual release remains selected.

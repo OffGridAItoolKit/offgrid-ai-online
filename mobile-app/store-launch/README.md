@@ -66,9 +66,14 @@ App id / bundle id: com.offgridaitoolkit.app
 - [x] App Store archive and distribution-signed IPA created and validated for `1.0 (1)`.
 - [x] Distribution-signed IPA uploaded to App Store Connect and build `1.0 (1)` attached to Apple ID `6806680581`.
 - [x] Direct physical-device release testing completed; optional TestFlight smoke test remains after upload.
-- [x] App privacy label data types, purposes, linkage, no-tracking answers, privacy policy URL, and user privacy choices URL configured; owner publish attestation remains.
+- [x] App privacy label data types, purposes, linkage, no-tracking answers, privacy policy URL, and user privacy choices URL published.
 - [x] App Store price set to free, public distribution selected, and availability set to all 175 storefronts.
 - [x] Age-rating questionnaire completed with a calculated 13+ rating.
+- [x] Content Rights declaration completed with the owner-confirmed necessary-rights answer.
+- [x] Six final 6.5-inch screenshots uploaded in the intended storefront order.
+- [x] App Review contact and review notes saved.
+- [x] EU DSA trader status and public business contact information verified; Apple reports the compliance record as Active.
+- [x] Version `1.0 (1)` added to the App Review draft and marked ready to submit.
 - [ ] App Review submitted.
 
 ### iOS Release Ownership

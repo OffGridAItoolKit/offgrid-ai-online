@@ -72,7 +72,7 @@ The conservative v1 label is configured with no tracking:
 - Other Data Types: App Functionality; linked conservatively because hosting logs can briefly contain a network address.
 - Real-time prompts and selected media are not disclosed as collected under Apple's definition because neither OffGrid nor its third-party partners retain them longer than necessary to service the request.
 
-The label remains unpublished until the account holder confirms Apple's accuracy-and-compliance attestation.
+The account holder confirmed Apple's accuracy-and-compliance attestation, and the label was published on 2026-08-29.
 
 ## Google Play Health Apps Declaration Update - 2026-07-30
 
