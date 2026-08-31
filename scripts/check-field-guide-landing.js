@@ -35,6 +35,8 @@ const checks = [
     ['dedicated Formspree support endpoint', html.includes('action="https://formspree.io/f/xqpkevea"') && !html.includes('/f/xzebpnoz')],
     ['accessible support form status', html.includes('id="support-form"') && html.includes('aria-live="polite"') && html.includes('role="status"')],
     ['support contact and privacy guidance', html.includes('support@offgridaitoolkit.com') && html.includes('Please do not include passwords')],
+    ['support form autofill guard', html.includes("formData.get('email')") && html.includes('autofill suggestion without adding it to the form')],
+    ['Formspree rejection details surfaced', html.includes('payload?.errors') && html.includes('Formspree rejected the request.')],
     ['primary domain routing', server.includes("host === 'offgridai.guide'")],
     ['www primary domain routing', server.includes("host === 'www.offgridai.guide'")],
     ['long domain redirect', server.includes("host === 'offgridaifieldguide.com'")],

@@ -56,7 +56,7 @@ The landing page is mobile-first for the expected audience. On phone-width scree
 
 The landing page uses a dependency-free AJAX form with accessible labels and status messages, browser validation, a honeypot field, topic/platform context, a warning not to send sensitive information, and a direct-email fallback. The Formspree endpoint is a public form identifier, not a secret. Formspree account credentials and email-verification links must never be committed.
 
-As of 2026-08-31, Formspree has sent the verification message for `support@offgridaitoolkit.com`. Until that linked address is verified and selected in the form settings, delivery remains on the existing verified account inbox; changing the notification address will not change the public endpoint or require a site redeploy.
+As of 2026-08-31, `support@offgridaitoolkit.com` is verified and selected as the Formspree notification address. A direct production-origin diagnostic returned HTTP 200 and appeared in the Formspree submissions inbox, confirming that the endpoint, allowed domain, and delivery workflow are active. The landing page also guards against browser autofill overlays that look populated but provide an empty email value, and it surfaces Formspree's rejection details when available.
 
 ## Release state - 2026-08-09
 
