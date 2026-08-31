@@ -412,6 +412,77 @@
     .sister-note { padding: 38px; border: 1px solid rgba(255,255,255,0.1); border-radius: 22px; background: rgba(255,255,255,0.03); }
     .sister-note strong { color: var(--gold-light); }
 
+    .contact-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+      gap: clamp(34px, 7vw, 88px);
+      align-items: start;
+    }
+    .contact-copy { position: sticky; top: 112px; }
+    .contact-copy > p:not(.eyebrow) { max-width: 560px; color: var(--muted); font-size: 1.04rem; }
+    .contact-details { display: grid; gap: 12px; margin-top: 28px; }
+    .contact-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 15px 16px;
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.025);
+      color: #d7dce2;
+    }
+    .contact-detail::before { color: var(--gold-light); font-weight: 950; }
+    .contact-detail:first-child::before { content: "01"; }
+    .contact-detail:last-child::before { content: "02"; }
+    .contact-detail strong { display: block; color: var(--cream); }
+    .contact-detail span { display: block; color: var(--muted); font-size: 0.88rem; }
+
+    .support-form {
+      padding: clamp(24px, 4vw, 38px);
+      border: 1px solid rgba(224,170,24,0.34);
+      border-radius: 24px;
+      background: linear-gradient(145deg, rgba(30,38,48,0.95), rgba(18,24,31,0.96));
+      box-shadow: 0 28px 70px rgba(0,0,0,0.26);
+    }
+    .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .form-field { display: grid; gap: 7px; }
+    .form-field.full { grid-column: 1 / -1; }
+    .form-field label { color: #e6e1d7; font-size: 0.9rem; font-weight: 760; }
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      min-height: 50px;
+      border: 1px solid rgba(245,237,223,0.17);
+      border-radius: 11px;
+      padding: 12px 14px;
+      background: rgba(7,11,15,0.58);
+      color: var(--cream);
+      font: inherit;
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+    .form-field textarea { min-height: 150px; resize: vertical; }
+    .form-field select { cursor: pointer; }
+    .form-field input::placeholder,
+    .form-field textarea::placeholder { color: #77818d; }
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      outline: 0;
+      border-color: rgba(241,199,92,0.78);
+      background: rgba(7,11,15,0.8);
+      box-shadow: 0 0 0 3px rgba(224,170,24,0.12);
+    }
+    .form-note { margin: 15px 0 0; color: var(--muted); font-size: 0.82rem; }
+    .form-note a { color: var(--gold-light); }
+    .form-actions { display: flex; align-items: center; gap: 16px; margin-top: 22px; }
+    .form-actions .button { border: 0; cursor: pointer; }
+    .form-actions .button:disabled { cursor: wait; filter: grayscale(0.25); opacity: 0.72; transform: none; }
+    .form-status { min-height: 24px; margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .form-status[data-state="success"] { color: #7ee2bb; }
+    .form-status[data-state="error"] { color: #ffad91; }
+    .form-honeypot { position: absolute !important; left: -9999px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+
     .final-cta { text-align: center; }
     .final-cta .cta-panel { padding: clamp(42px, 7vw, 78px); border: 1px solid rgba(224,170,24,0.40); border-radius: 26px; background: linear-gradient(145deg, rgba(53,39,15,0.7), rgba(20,27,35,0.92)); }
     .final-cta p { max-width: 680px; margin: 0 auto 28px; color: var(--muted); font-size: 1.08rem; }
@@ -436,6 +507,8 @@
       .feature-card { min-height: auto; }
       .feature-icon { margin-bottom: 24px; }
       .steps, .split, .walkthrough-layout { grid-template-columns: 1fr; }
+      .contact-layout { grid-template-columns: 1fr; }
+      .contact-copy { position: static; }
       .walkthrough-copy { text-align: center; }
       .demo-point { justify-content: center; }
       .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -517,6 +590,15 @@
       .guide-warning { margin-top: 15px; }
       .checks { gap: 9px; margin-top: 20px; font-size: 0.9rem; }
       .sister-note { padding: 21px; border-radius: 17px; }
+      .contact-layout { gap: 26px; }
+      .contact-copy > p:not(.eyebrow) { font-size: 0.94rem; }
+      .contact-details { margin-top: 20px; }
+      .support-form { padding: 21px; border-radius: 18px; }
+      .form-grid { grid-template-columns: 1fr; gap: 15px; }
+      .form-field.full { grid-column: auto; }
+      .form-actions { align-items: stretch; flex-direction: column; }
+      .form-actions .button { width: 100%; }
+      .form-status { text-align: center; }
       .final-cta .cta-panel { padding: 32px 20px; border-radius: 20px; }
       .final-cta p { margin-bottom: 22px; font-size: 0.95rem; }
       .lightbox-stage { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; padding: 9px; }
@@ -549,6 +631,7 @@
         <a href="#app-tour">App tour</a>
         <a href="#examples">Examples</a>
         <a href="#how-it-works">How it works</a>
+        <a href="#contact">Contact</a>
         <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app"><span class="nav-cta-long">Get it on Google Play</span><span class="nav-cta-short">Get the app</span></a>
       </div>
     </nav>
@@ -787,6 +870,73 @@
       </div>
     </section>
 
+    <section class="section contact-layout" id="contact" aria-labelledby="contact-title">
+      <div class="contact-copy">
+        <p class="eyebrow">Support &amp; feedback</p>
+        <h2 id="contact-title">How can we help?</h2>
+        <p>Tell us what happened, what device you are using, and what you expected to see. Clear details help us respond faster and improve FieldGuide for everyone.</p>
+        <div class="contact-details" aria-label="Support information">
+          <div class="contact-detail"><div><strong>App and website support</strong><span>Questions, troubleshooting, privacy, and accessibility.</span></div></div>
+          <div class="contact-detail"><div><strong>Usually answered by email</strong><span>You can also write directly to support@offgridaitoolkit.com.</span></div></div>
+        </div>
+      </div>
+
+      <form class="support-form" id="support-form" action="https://formspree.io/f/xqpkevea" method="POST">
+        <input type="hidden" name="_subject" value="OffGrid AI FieldGuide website support request">
+        <div class="form-honeypot" aria-hidden="true">
+          <label for="support-website">Leave this field empty</label>
+          <input id="support-website" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+        </div>
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="support-name">Name</label>
+            <input id="support-name" name="name" type="text" autocomplete="name" placeholder="Your name" required>
+          </div>
+          <div class="form-field">
+            <label for="support-email">Email</label>
+            <input id="support-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
+          </div>
+          <div class="form-field">
+            <label for="support-topic">What can we help with?</label>
+            <select id="support-topic" name="topic" required>
+              <option value="" selected disabled>Choose a topic</option>
+              <option>App support</option>
+              <option>Field Guide or PDF</option>
+              <option>Photo or video analysis</option>
+              <option>Feature feedback</option>
+              <option>Privacy or data question</option>
+              <option>Website support</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="support-platform">Platform</label>
+            <select id="support-platform" name="platform" required>
+              <option value="" selected disabled>Choose a platform</option>
+              <option>Android app</option>
+              <option>iPhone or iPad app</option>
+              <option>Web app</option>
+              <option>Website</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-field full">
+            <label for="support-device">Device and app version <span aria-hidden="true">(optional)</span></label>
+            <input id="support-device" name="device_and_version" type="text" placeholder="Example: Galaxy S25, app version 2.0">
+          </div>
+          <div class="form-field full">
+            <label for="support-message">Message</label>
+            <textarea id="support-message" name="message" placeholder="Describe what happened and any steps that reproduce it." required></textarea>
+          </div>
+        </div>
+        <p class="form-note">Please do not include passwords, payment details, medical records, or other sensitive personal information. See our <a href="https://offgridtoolkit.ai/privacy">Privacy Policy</a>.</p>
+        <div class="form-actions">
+          <button class="button" type="submit">Send support request</button>
+          <p class="form-status" id="support-form-status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+
     <section class="section final-cta">
       <div class="cta-panel">
         <p class="eyebrow">Take useful knowledge with you</p>
@@ -802,7 +952,7 @@
     <nav aria-label="Legal and support">
       <a href="https://offgridtoolkit.ai/privacy">Privacy</a>
       <a href="https://offgridaitoolkit.com/pages/terms-and-conditions">Terms</a>
-      <a href="mailto:support@offgridaitoolkit.com">Support</a>
+      <a href="#contact">Support</a>
     </nav>
   </footer>
 
@@ -898,6 +1048,47 @@
       dialog.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowLeft') showItem(activeIndex - 1);
         if (event.key === 'ArrowRight') showItem(activeIndex + 1);
+      });
+    })();
+
+    (() => {
+      const form = document.getElementById('support-form');
+      const status = document.getElementById('support-form-status');
+      const submit = form?.querySelector('button[type="submit"]');
+      if (!form || !status || !submit) return;
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        status.textContent = '';
+        status.dataset.state = '';
+
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        submit.disabled = true;
+        submit.textContent = 'Sending…';
+        status.textContent = 'Sending your request…';
+
+        try {
+          const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' }
+          });
+
+          if (!response.ok) throw new Error('Submission failed');
+          form.reset();
+          status.dataset.state = 'success';
+          status.textContent = 'Thank you. Your support request was sent.';
+        } catch (error) {
+          status.dataset.state = 'error';
+          status.innerHTML = 'We could not send that request. Please email <a href="mailto:support@offgridaitoolkit.com">support@offgridaitoolkit.com</a>.';
+        } finally {
+          submit.disabled = false;
+          submit.textContent = 'Send support request';
+        }
       });
     })();
   </script>

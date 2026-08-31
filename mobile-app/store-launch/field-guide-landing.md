@@ -45,6 +45,19 @@ The gallery includes a prominent verification notice because its examples includ
 
 The landing page is mobile-first for the expected audience. On phone-width screens it uses a shorter hero render, compact Google Play header action, 2-by-2 trust summary, denser feature cards, reduced section spacing, smaller straight-on video frame, and a horizontally swipeable gallery instead of stacking six large images. Very narrow screens switch the feature cards to a readable single-column horizontal layout.
 
+## Website support form
+
+- Formspree team: `Inspired`
+- Project: `OffGrid AI FieldGuide`
+- Form: `Website Support`
+- Public endpoint: `https://formspree.io/f/xqpkevea`
+- Allowed submission domain: `offgridai.guide` and its subdomains
+- Intended notification address: `support@offgridaitoolkit.com`
+
+The landing page uses a dependency-free AJAX form with accessible labels and status messages, browser validation, a honeypot field, topic/platform context, a warning not to send sensitive information, and a direct-email fallback. The Formspree endpoint is a public form identifier, not a secret. Formspree account credentials and email-verification links must never be committed.
+
+As of 2026-08-31, Formspree has sent the verification message for `support@offgridaitoolkit.com`. Until that linked address is verified and selected in the form settings, delivery remains on the existing verified account inbox; changing the notification address will not change the public endpoint or require a site redeploy.
+
 ## Release state - 2026-08-09
 
 - The initial landing page, corrected host routing, Apple-version notice, social card, and automated checks were deployed at `a67db55`; the owner-supplied media showcase and reusable asset library were deployed at `1ca6f15`.
