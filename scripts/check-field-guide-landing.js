@@ -37,6 +37,7 @@ const checks = [
     ['support contact and privacy guidance', html.includes('support@offgridaitoolkit.com') && html.includes('Please do not include passwords')],
     ['support form autofill guard', html.includes("formData.get('email')") && html.includes('autofill suggestion without adding it to the form')],
     ['Formspree rejection details surfaced', html.includes('payload?.errors') && html.includes('Formspree rejected the request.')],
+    ['Formspree allowed by content security policy', server.includes("connect-src 'self' https://offgridtoolkit.ai https://*.offgridtoolkit.ai https://formspree.io")],
     ['primary domain routing', server.includes("host === 'offgridai.guide'")],
     ['www primary domain routing', server.includes("host === 'www.offgridai.guide'")],
     ['long domain redirect', server.includes("host === 'offgridaifieldguide.com'")],
