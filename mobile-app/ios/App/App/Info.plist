@@ -28,6 +28,8 @@
 	<string>OffGrid AI FieldGuide uses the camera only when you take a picture or record a video to analyze with the online AI service.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>OffGrid AI FieldGuide uses the microphone only when you record video or use voice input.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>OffGrid AI FieldGuide converts speech to text only when you tap Voice Input so you can dictate a question.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>OffGrid AI FieldGuide lets you choose photos and videos to upload for online AI analysis.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

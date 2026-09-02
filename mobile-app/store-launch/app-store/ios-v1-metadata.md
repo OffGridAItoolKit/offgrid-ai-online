@@ -8,7 +8,8 @@ Prepared: 2026-08-29
 - App name (21/30): `OffGrid AI FieldGuide`
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
-- Build: `1`
+- Candidate build: `2`
+- First submitted build: `1`
 - Apple ID: `6806680581`
 - SKU: `offgrid-ai-fieldguide-ios`
 - Price: Free
@@ -112,4 +113,6 @@ The six files were uploaded individually on 2026-08-29 so App Store Connect reta
 
 ## Submission Status
 
-On 2026-08-29, Apple verified the approved EU Digital Services Act trader phone and email and marked the compliance record Active. Version `1.0 (1)` was submitted to App Review and entered **Waiting for Review** status. Manual release remains selected.
+On 2026-08-29, Apple verified the approved EU Digital Services Act trader phone and email and marked the compliance record Active. Version `1.0 (1)` was submitted with manual release selected and was later returned under Guideline 2.1 for additional information and physical-device video evidence.
+
+Build `1.0 (2)` adds native Apple Speech recognition for Voice Input and the required Speech Recognition permission description. It must pass the physical iPhone retest, be archived and uploaded, and be used for the final App Review recording before resubmission.

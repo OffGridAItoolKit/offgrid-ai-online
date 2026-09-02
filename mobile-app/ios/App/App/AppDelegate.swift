@@ -1,6 +1,8 @@
 import UIKit
 import Capacitor
+import AVFoundation
 import QuickLook
+import Speech
 import UniformTypeIdentifiers
 import WebKit
 
@@ -64,7 +66,9 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
                 forMainFrameOnly: true
             )
         )
-        return super.webView(with: frame, configuration: configuration)
+        let webView = super.webView(with: frame, configuration: configuration)
+        offGridNativeHandler.webView = webView
+        return webView
     }
 
     override func capacitorDidLoad() {
@@ -119,8 +123,118 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
         openPdf(uri) {
           send('openPdf', [uri]);
           return success({ uri });
+        },
+        startVoiceInput() {
+          send('startVoiceInput', []);
+          return success({ status: 'requesting-permission' });
+        },
+        stopVoiceInput() {
+          send('stopVoiceInput', []);
+          return success({ status: 'stopping' });
+        },
+        openAppSettings() {
+          send('openAppSettings', []);
+          return success({ action: 'open-settings' });
         }
       });
+
+      const patchIosVoiceInput = () => {
+        if (window.__offgridIosVoicePatched) return;
+        window.__offgridIosVoicePatched = true;
+
+        const state = { active: false, input: null, recording: null };
+        const setVisualState = active => {
+          document.querySelectorAll('.voice-btn').forEach(button => {
+            button.classList.toggle('voice-active', active);
+          });
+          if (state.recording) state.recording.classList.toggle('active', active);
+        };
+        const finish = () => {
+          const input = state.input;
+          state.active = false;
+          setVisualState(false);
+          state.input = null;
+          state.recording = null;
+          if (input) input.focus();
+        };
+        const resizeInput = input => {
+          if (!input) return;
+          if (input.id === 'welcomeMessageInput' && typeof window.autoResizeWelcome === 'function') {
+            window.autoResizeWelcome(input);
+          } else if (typeof window.autoResize === 'function') {
+            window.autoResize(input);
+          }
+        };
+        const start = moveToChat => {
+          if (state.active) {
+            window.OffGridNative.stopVoiceInput();
+            finish();
+            return;
+          }
+          if (moveToChat && document.getElementById('welcome') && typeof window.transitionToChat === 'function') {
+            window.transitionToChat();
+          }
+          const input = document.getElementById('messageInput') || document.getElementById('welcomeMessageInput');
+          if (!input) {
+            alert('Voice input could not find the message box. Please reopen the app and try again.');
+            return;
+          }
+          state.active = true;
+          state.input = input;
+          state.recording = document.getElementById('voiceRecording');
+          setVisualState(true);
+          window.OffGridNative.startVoiceInput();
+        };
+
+        window.addEventListener('offgrid-native-voice-result', event => {
+          const detail = event.detail || {};
+          if (!state.active || !state.input || typeof detail.transcript !== 'string') return;
+          state.input.value = detail.transcript;
+          resizeInput(state.input);
+        });
+        window.addEventListener('offgrid-native-voice-state', event => {
+          const status = event.detail && event.detail.status;
+          if (status === 'stopped') finish();
+        });
+        window.addEventListener('offgrid-native-voice-error', event => {
+          const detail = event.detail || {};
+          const message = detail.message || 'Voice input could not start. Please try again.';
+          finish();
+          if (detail.canOpenSettings) {
+            const openSettings = confirm(`${message}\n\nOpen OffGrid AI FieldGuide settings now?`);
+            if (openSettings) window.OffGridNative.openAppSettings();
+          } else {
+            alert(message);
+          }
+        });
+
+        window.toggleVoiceInput = () => start(false);
+        window.startVoiceInputWithButton = () => start(false);
+        window.startVoiceInput = () => start(true);
+        window.stopVoiceInput = () => {
+          if (!state.active) return;
+          window.OffGridNative.stopVoiceInput();
+          finish();
+        };
+
+        const restoreVoiceCard = () => {
+          const voiceCard = document.getElementById('voiceInputCard');
+          if (!voiceCard) return;
+          voiceCard.style.opacity = '';
+          voiceCard.style.pointerEvents = '';
+          voiceCard.removeAttribute('aria-disabled');
+          const description = voiceCard.querySelector('.quick-action-desc');
+          if (description && /not supported/i.test(description.textContent || '')) {
+            description.textContent = 'Speak your question';
+          }
+          voiceCard.onclick = window.startVoiceInput;
+        };
+        restoreVoiceCard();
+        // The hosted page performs its Web Speech support check later in the same
+        // load event. Restore the native iOS action after that check finishes.
+        setTimeout(restoreVoiceCard, 0);
+        window.addEventListener('pageshow', restoreVoiceCard);
+      };
 
       const patchIosSaveMessages = () => {
         const original = window.showSaveToast;
@@ -156,6 +270,7 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
       };
       document.addEventListener('DOMContentLoaded', () => {
         patchIosSaveMessages();
+        patchIosVoiceInput();
         applyIosStatusBarLayout().then(applied => {
           if (!applied) setTimeout(applyIosStatusBarLayout, 400);
         });
@@ -167,8 +282,16 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
 
 private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandler, QLPreviewControllerDataSource, UIDocumentPickerDelegate {
     weak var presenter: UIViewController?
+    weak var webView: WKWebView?
     private var previewURL: URL?
     private var pdfRenderJobs: [UUID: OffGridHTMLPDFRenderJob] = [:]
+    private let audioEngine = AVAudioEngine()
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+    private var speechRequest: SFSpeechAudioBufferRecognitionRequest?
+    private var speechTask: SFSpeechRecognitionTask?
+    private var speechSessionActive = false
+    private var speechTapInstalled = false
+    private var voiceStartRequested = false
 
     func prepareFieldGuidesDirectory() {
         _ = try? fieldGuidesDirectory()
@@ -199,6 +322,12 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
                     self.presentSavedGuides()
                 case "openPdf":
                     try self.openPDF(uri: self.stringArg(args, 0))
+                case "startVoiceInput":
+                    self.requestVoicePermissionsAndStart()
+                case "stopVoiceInput":
+                    self.stopVoiceInput(notifyWebView: true)
+                case "openAppSettings":
+                    self.openAppSettings()
                 default:
                     break
                 }
@@ -206,6 +335,202 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
                 self.presentError(error.localizedDescription)
             }
         }
+    }
+
+    private func requestVoicePermissionsAndStart() {
+        guard !speechSessionActive, !voiceStartRequested else { return }
+        voiceStartRequested = true
+        emitVoiceEvent("offgrid-native-voice-state", details: ["status": "requesting-permission"])
+
+        SFSpeechRecognizer.requestAuthorization { [weak self] status in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                guard self.voiceStartRequested else { return }
+                guard status == .authorized else {
+                    self.voiceStartRequested = false
+                    self.emitVoicePermissionError(for: status)
+                    return
+                }
+                self.requestMicrophonePermission()
+            }
+        }
+    }
+
+    private func requestMicrophonePermission() {
+        let completion: (Bool) -> Void = { [weak self] allowed in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                guard self.voiceStartRequested else { return }
+                guard allowed else {
+                    self.voiceStartRequested = false
+                    self.emitVoiceEvent(
+                        "offgrid-native-voice-error",
+                        details: [
+                            "code": "microphone-permission-denied",
+                            "message": "Microphone access is required for Voice Input.",
+                            "canOpenSettings": true
+                        ]
+                    )
+                    return
+                }
+                self.startVoiceInput()
+            }
+        }
+
+        if #available(iOS 17.0, *) {
+            AVAudioApplication.requestRecordPermission(completionHandler: completion)
+        } else {
+            AVAudioSession.sharedInstance().requestRecordPermission(completion)
+        }
+    }
+
+    private func startVoiceInput() {
+        guard voiceStartRequested else { return }
+        guard let speechRecognizer, speechRecognizer.isAvailable else {
+            voiceStartRequested = false
+            emitVoiceEvent(
+                "offgrid-native-voice-error",
+                details: [
+                    "code": "speech-recognizer-unavailable",
+                    "message": "Speech Recognition is temporarily unavailable. Check your connection and try again.",
+                    "canOpenSettings": false
+                ]
+            )
+            return
+        }
+
+        stopVoiceInput(notifyWebView: false)
+
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.record, mode: .measurement, options: [.duckOthers])
+            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+
+            let request = SFSpeechAudioBufferRecognitionRequest()
+            request.shouldReportPartialResults = true
+            speechRequest = request
+            speechSessionActive = true
+
+            let inputNode = audioEngine.inputNode
+            let format = inputNode.outputFormat(forBus: 0)
+            guard format.sampleRate > 0, format.channelCount > 0 else {
+                throw OffGridNativeError(message: "The iPhone microphone did not provide a usable audio format.")
+            }
+            inputNode.installTap(onBus: 0, bufferSize: 1_024, format: format) { [weak self] buffer, _ in
+                self?.speechRequest?.append(buffer)
+            }
+            speechTapInstalled = true
+
+            speechTask = speechRecognizer.recognitionTask(with: request) { [weak self] result, error in
+                DispatchQueue.main.async {
+                    guard let self, self.speechSessionActive else { return }
+                    if let result {
+                        self.emitVoiceEvent(
+                            "offgrid-native-voice-result",
+                            details: [
+                                "transcript": result.bestTranscription.formattedString,
+                                "isFinal": result.isFinal
+                            ]
+                        )
+                        if result.isFinal {
+                            self.stopVoiceInput(notifyWebView: true)
+                            return
+                        }
+                    }
+                    if let error {
+                        self.stopVoiceInput(notifyWebView: false)
+                        self.emitVoiceEvent(
+                            "offgrid-native-voice-error",
+                            details: [
+                                "code": "recognition-failed",
+                                "message": "Voice Input stopped: \(error.localizedDescription)",
+                                "canOpenSettings": false
+                            ]
+                        )
+                    }
+                }
+            }
+
+            audioEngine.prepare()
+            try audioEngine.start()
+            emitVoiceEvent("offgrid-native-voice-state", details: ["status": "listening"])
+        } catch {
+            stopVoiceInput(notifyWebView: false)
+            emitVoiceEvent(
+                "offgrid-native-voice-error",
+                details: [
+                    "code": "audio-start-failed",
+                    "message": "Voice Input could not start: \(error.localizedDescription)",
+                    "canOpenSettings": false
+                ]
+            )
+        }
+    }
+
+    private func stopVoiceInput(notifyWebView: Bool) {
+        let wasActive = speechSessionActive || audioEngine.isRunning
+        voiceStartRequested = false
+        speechSessionActive = false
+
+        if audioEngine.isRunning { audioEngine.stop() }
+        if speechTapInstalled {
+            audioEngine.inputNode.removeTap(onBus: 0)
+            speechTapInstalled = false
+        }
+        speechRequest?.endAudio()
+        speechTask?.cancel()
+        speechTask = nil
+        speechRequest = nil
+        try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+
+        if notifyWebView && wasActive {
+            emitVoiceEvent("offgrid-native-voice-state", details: ["status": "stopped"])
+        }
+    }
+
+    private func emitVoicePermissionError(for status: SFSpeechRecognizerAuthorizationStatus) {
+        let message: String
+        switch status {
+        case .restricted:
+            message = "Speech Recognition is restricted on this iPhone."
+        case .denied:
+            message = "Speech Recognition access is required for Voice Input."
+        case .notDetermined:
+            message = "Speech Recognition permission was not completed. Please try again."
+        case .authorized:
+            return
+        @unknown default:
+            message = "Speech Recognition permission is unavailable."
+        }
+        emitVoiceEvent(
+            "offgrid-native-voice-error",
+            details: [
+                "code": "speech-permission-denied",
+                "message": message,
+                "canOpenSettings": status == .denied
+            ]
+        )
+    }
+
+    private func emitVoiceEvent(_ name: String, details: [String: Any]) {
+        guard
+            JSONSerialization.isValidJSONObject(details),
+            let data = try? JSONSerialization.data(withJSONObject: details),
+            let json = String(data: data, encoding: .utf8),
+            let nameData = try? JSONSerialization.data(withJSONObject: [name]),
+            let nameArray = String(data: nameData, encoding: .utf8)
+        else { return }
+
+        let encodedName = String(nameArray.dropFirst().dropLast())
+        let script = "window.dispatchEvent(new CustomEvent(\(encodedName), { detail: \(json) }));"
+        webView?.evaluateJavaScript(script) { _, error in
+            if let error { NSLog("OffGrid voice bridge event failed: %@", error.localizedDescription) }
+        }
+    }
+
+    private func openAppSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        UIApplication.shared.open(url)
     }
 
     private func createFieldGuidePDF(

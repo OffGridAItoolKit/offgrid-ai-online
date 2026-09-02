@@ -15,7 +15,8 @@ Archive and upload the Capacitor iOS app for TestFlight and App Store review fro
 - App name: OffGrid AI FieldGuide
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
-- Build: `1`
+- Working build: `2`
+- First submitted build: `1`
 - Device family: iPhone
 - Orientation: portrait
 - Price: free
@@ -33,7 +34,6 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - Fresh launch, day/night mode, and safe areas.
 - Chat streaming and post-answer actions.
 - Camera, multi-photo upload, and short-video analysis.
-- Voice input and microphone permission flow.
 - Tap-to-enable compass.
 - Image Studio generation and image save/share.
 - Field Guide PDF preview, native PDF generation, unique filenames, single-file save, and native sharing.
@@ -55,9 +55,14 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Add the review contact information.
 - [x] Confirm and save the Content Rights answer.
 - [x] Complete EU Digital Services Act trader contact verification; Apple reports the compliance record as Active.
-- [ ] Optionally run a short internal TestFlight smoke test.
-- [x] Add version `1.0 (1)` to the App Review draft; it is ready to submit.
-- [x] Submit version `1.0 (1)` for App Review using manual release; status: Waiting for Review on 2026-08-29.
+- [x] First submission `1.0 (1)` returned under Guideline 2.1 for additional review information and physical-device video evidence.
+- [x] Replace unsupported Web Speech usage in the iOS shell with native Apple Speech recognition and add the Speech Recognition permission description.
+- [x] Build, sign with David Prian's Apple Development certificate, and install development build `1.0 (2)` on the physical iPhone 14 Plus.
+- [ ] Complete the physical Voice Input and permission-flow retest on build `1.0 (2)`.
+- [ ] Archive and upload distribution build `1.0 (2)` after the physical retest passes.
+- [ ] Run a short internal TestFlight smoke test using the uploaded build.
+- [ ] Record the requested physical-device review video using the exact TestFlight build selected for review.
+- [ ] Attach the video and complete reviewer answers in App Store Connect, then resubmit version `1.0` using build `2`.
 
 ## App Review Note
 
