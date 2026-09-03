@@ -65,7 +65,7 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [ ] Record the requested physical-device review video using the exact TestFlight build selected for review.
 - [ ] Attach the video and complete reviewer answers in App Store Connect, then resubmit version `1.0` using build `2`.
 
-The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully and entered App Store Connect processing on 2026-09-03. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
+The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully on 2026-09-03, passed App Store Connect processing, and is listed in TestFlight as `Ready to Submit`. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
 
 ## App Review Note
 
