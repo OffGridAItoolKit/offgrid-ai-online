@@ -39,6 +39,7 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - Field Guide PDF preview, native PDF generation, unique filenames, single-file save, and native sharing.
 - `OffGrid AI Field Guides` folder creation and Saved Guides browsing.
 - Ready-Made Prompts returns the selected prompt to the installed app.
+- Native Voice Input requests microphone and Speech Recognition access on first use, transcribes speech, and returns the text to the question field.
 - No account, advertising, in-app purchase, or external checkout flow.
 
 ## Remaining Release Steps
@@ -58,11 +59,13 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] First submission `1.0 (1)` returned under Guideline 2.1 for additional review information and physical-device video evidence.
 - [x] Replace unsupported Web Speech usage in the iOS shell with native Apple Speech recognition and add the Speech Recognition permission description.
 - [x] Build, sign with David Prian's Apple Development certificate, and install development build `1.0 (2)` on the physical iPhone 14 Plus.
-- [ ] Complete the physical Voice Input and permission-flow retest on build `1.0 (2)`.
-- [ ] Archive and upload distribution build `1.0 (2)` after the physical retest passes.
+- [x] Complete the physical Voice Input and permission-flow retest on build `1.0 (2)`.
+- [x] Archive build `1.0 (2)`, export a company-signed App Store IPA, validate its signature and entitlements, and upload it to App Store Connect on 2026-09-03.
 - [ ] Run a short internal TestFlight smoke test using the uploaded build.
 - [ ] Record the requested physical-device review video using the exact TestFlight build selected for review.
 - [ ] Attach the video and complete reviewer answers in App Store Connect, then resubmit version `1.0` using build `2`.
+
+The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully and entered App Store Connect processing on 2026-09-03. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
 
 ## App Review Note
 
