@@ -61,6 +61,7 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Build, sign with David Prian's Apple Development certificate, and install development build `1.0 (2)` on the physical iPhone 14 Plus.
 - [x] Complete the physical Voice Input and permission-flow retest on build `1.0 (2)`.
 - [x] Archive build `1.0 (2)`, export a company-signed App Store IPA, validate its signature and entitlements, and upload it to App Store Connect on 2026-09-03.
+- [x] Create the `Internal QA` TestFlight group with automatic distribution and add David Prian's App Store Connect account as an internal tester.
 - [ ] Run a short internal TestFlight smoke test using the uploaded build.
 - [ ] Record the requested physical-device review video using the exact TestFlight build selected for review.
 - [ ] Attach the video and complete reviewer answers in App Store Connect, then resubmit version `1.0` using build `2`.
