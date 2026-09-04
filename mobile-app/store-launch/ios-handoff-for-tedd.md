@@ -67,8 +67,8 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Reproduce the build `2` 4K video-selection failure and replace WKWebView video decoding with native PhotosUI and AVFoundation extraction in build `3`.
 - [x] Complete the physical 4K video selection and attachment retest on development build `1.0 (3)`.
 - [x] Archive build `1.0 (3)`, export and validate the distribution-signed IPA, and upload it to App Store Connect on 2026-09-04.
-- [ ] Run a short internal TestFlight smoke test using build `1.0 (3)`.
-- [ ] Record the requested physical-device review video using the exact TestFlight build selected for review.
+- [x] Run a complete internal TestFlight smoke test using build `1.0 (3)` on the physical iPhone 14 Plus.
+- [x] Record the requested physical-device review video using the exact TestFlight build selected for review.
 - [ ] Attach the video and complete reviewer answers in App Store Connect, then resubmit version `1.0` using build `3`.
 
 The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully on 2026-09-03, passed App Store Connect processing, and is listed in TestFlight as `Ready to Submit`. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
@@ -76,6 +76,8 @@ The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKE
 Build `3` moves iPhone video selection and frame extraction to PhotosUI and AVFoundation. It was physically verified on 2026-09-04 with the same 4K/60-fps clip that failed in build `2`. The browser/Android fallback remains unchanged except that it now permits reselecting the same clip after a cancelled or failed attempt.
 
 The build `3` archive is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-3/OffGrid-AI-FieldGuide-1.0-3.xcarchive`. The exported IPA is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-3/export/App.ipa` and has SHA-256 `c9dfeb73a3714a0cbb09ab982b25534e92101c32c8bfc7fdfbd3a9ff7bad22c4`. The exported app is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`, has `get-task-allow = false` and `beta-reports-active = true`, and the App Store Connect upload completed successfully at 2026-09-04 07:14 MST. Apple then began normal package processing.
+
+The exact TestFlight build `1.0 (3)` was installed fresh and recorded on the physical iPhone 14 Plus on 2026-09-04. The 17:46 full-resolution master is stored at `/Users/davidprian/Developer/OffGridAI/Releases/App-Review/OffGrid-AI-FieldGuide-1.0-3-App-Review.mov`. An edited 9:21 full-resolution master is stored alongside it as `OffGrid-AI-FieldGuide-1.0-3-App-Review-Edited.mov`. The upload-ready H.264/AAC review copy is `OffGrid-AI-FieldGuide-1.0-3-App-Review-Upload.m4v`; it is 500×1080 portrait, 119 MB, and has SHA-256 `4d3e18eea841822d7743b922a133c94ca7054b2ff3d4956d43d3f4b91263f6af`. The edited timeline was visually checked from the Home Screen through Terms & Safety, text, Voice Input, photo upload, camera, video upload, compass, Ready-Made Prompts, Image Studio, Field Guide generation, PDF saving, and native preview/share.
 
 ## App Review Note
 
