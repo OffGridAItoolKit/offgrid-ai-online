@@ -26,7 +26,7 @@ Thank you for the guidance. We have uploaded version 1.0, build 3 and provided t
 
 1. **Physical-device screen recording**
 
-Video URL: `[ADD PUBLICLY ACCESSIBLE VIDEO URL]`
+Video URL: `https://drive.google.com/file/d/1q96781-qZbh_5ZXmV1RxS_ArAF0avL2O/view?usp=sharing`
 
 The recording was captured on the physical device and operating system listed below using the exact TestFlight build submitted for review. It begins with launching the app and demonstrates the typical flow through the core features and the applicable Apple permission prompts.
 

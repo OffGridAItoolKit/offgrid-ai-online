@@ -79,6 +79,8 @@ The build `3` archive is stored at `/Users/davidprian/Developer/OffGridAI/Releas
 
 The exact TestFlight build `1.0 (3)` was installed fresh and recorded on the physical iPhone 14 Plus on 2026-09-04. The 17:46 full-resolution master is stored at `/Users/davidprian/Developer/OffGridAI/Releases/App-Review/OffGrid-AI-FieldGuide-1.0-3-App-Review.mov`. An edited 9:21 full-resolution master is stored alongside it as `OffGrid-AI-FieldGuide-1.0-3-App-Review-Edited.mov`. The upload-ready H.264/AAC review copy is `OffGrid-AI-FieldGuide-1.0-3-App-Review-Upload.m4v`; it is 500×1080 portrait, 119 MB, and has SHA-256 `4d3e18eea841822d7743b922a133c94ca7054b2ff3d4956d43d3f4b91263f6af`. The edited timeline was visually checked from the Home Screen through Terms & Safety, text, Voice Input, photo upload, camera, video upload, compass, Ready-Made Prompts, Image Studio, Field Guide generation, PDF saving, and native preview/share.
 
+The public App Review delivery is a tighter 7:20 cut stored locally as `OffGrid-AI-FieldGuide-1.0-3-App-Review-Upload-7m20.m4v`. It retains the same workflows at 500×1080 H.264/AAC, is exactly 101,296,500 bytes, and has SHA-256 `bbfe60fb48c0186e0a1c31a3c30a72d30b48699471b9890b2c183c93c873ae7b`. It is uploaded to Google Drive at `https://drive.google.com/file/d/1q96781-qZbh_5ZXmV1RxS_ArAF0avL2O/view?usp=sharing`. Anonymous byte-range retrieval returned HTTP `206` with the correct filename, size, and content range, confirming that App Review can access it without a Google login.
+
 ## App Review Note
 
 ```text
