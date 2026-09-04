@@ -66,7 +66,7 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Create the `Internal QA` TestFlight group with automatic distribution and add David Prian's App Store Connect account as an internal tester.
 - [x] Reproduce the build `2` 4K video-selection failure and replace WKWebView video decoding with native PhotosUI and AVFoundation extraction in build `3`.
 - [x] Complete the physical 4K video selection and attachment retest on development build `1.0 (3)`.
-- [ ] Archive, distribution-sign, validate, and upload build `1.0 (3)`.
+- [x] Archive build `1.0 (3)`, export and validate the distribution-signed IPA, and upload it to App Store Connect on 2026-09-04.
 - [ ] Run a short internal TestFlight smoke test using build `1.0 (3)`.
 - [ ] Record the requested physical-device review video using the exact TestFlight build selected for review.
 - [ ] Attach the video and complete reviewer answers in App Store Connect, then resubmit version `1.0` using build `3`.
@@ -74,6 +74,8 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully on 2026-09-03, passed App Store Connect processing, and is listed in TestFlight as `Ready to Submit`. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
 
 Build `3` moves iPhone video selection and frame extraction to PhotosUI and AVFoundation. It was physically verified on 2026-09-04 with the same 4K/60-fps clip that failed in build `2`. The browser/Android fallback remains unchanged except that it now permits reselecting the same clip after a cancelled or failed attempt.
+
+The build `3` archive is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-3/OffGrid-AI-FieldGuide-1.0-3.xcarchive`. The exported IPA is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-3/export/App.ipa` and has SHA-256 `c9dfeb73a3714a0cbb09ab982b25534e92101c32c8bfc7fdfbd3a9ff7bad22c4`. The exported app is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`, has `get-task-allow = false` and `beta-reports-active = true`, and the App Store Connect upload completed successfully at 2026-09-04 07:14 MST. Apple then began normal package processing.
 
 ## App Review Note
 
