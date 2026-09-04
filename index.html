@@ -3290,7 +3290,11 @@
                     }
                 }
             }
-            if (input) input.click();
+            if (input) {
+                // Allow the same clip to be chosen again after a failed/cancelled attempt.
+                input.value = '';
+                input.click();
+            }
         }
 
         function triggerVideoRecord() {
@@ -3323,7 +3327,48 @@
                     }
                 }
             }
-            if (input) input.click();
+            if (input) {
+                // Allow another recording to be selected even when iOS reuses its filename.
+                input.value = '';
+                input.click();
+            }
+        }
+
+        // Native iOS builds extract frames with AVFoundation so large 4K phone
+        // videos do not have to be decoded inside WKWebView. The native bridge
+        // returns the same selectedVideo shape used by the browser fallback.
+        function acceptNativeVideoSelection(details) {
+            if (!details || !Array.isArray(details.frames) || details.frames.length === 0) {
+                throw new Error('Native video selection did not return any frames.');
+            }
+
+            if (!document.getElementById('videoPreview')) {
+                const welcomeInput = document.getElementById('welcomeMessageInput');
+                const savedText = welcomeInput ? welcomeInput.value : '';
+                transitionToChat();
+                const welcome = document.getElementById('welcome');
+                if (welcome) welcome.remove();
+                const messageInput = document.getElementById('messageInput');
+                if (messageInput && savedText) {
+                    messageInput.value = savedText;
+                    autoResize(messageInput);
+                }
+            }
+
+            selectedVideo = {
+                frames: details.frames,
+                name: details.name || 'video.mov',
+                size: Number(details.size) || 0,
+                duration: Number(details.duration) || 0,
+                thumbnailUrl: details.thumbnailUrl || details.frames[0],
+                frameCount: details.frames.length,
+                mimeType: details.mimeType || 'video/quicktime'
+            };
+
+            removeImage();
+            showVideoPreview();
+            if (window.innerWidth <= 768 && document.activeElement) document.activeElement.blur();
+            return true;
         }
 
         // iOS Safari does not reliably fire loadeddata for blob-backed videos.

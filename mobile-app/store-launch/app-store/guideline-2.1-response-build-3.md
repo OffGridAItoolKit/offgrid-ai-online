@@ -1,10 +1,10 @@
-# Guideline 2.1 Response — Version 1.0 (Build 2)
+# Guideline 2.1 Response — Version 1.0 (Build 3)
 
-Use this draft only after the exact TestFlight build `1.0 (2)` has passed the final physical-device smoke test and the video URL has been added. Put the same material in the App Review Information Notes field for this submission and future submissions.
+Use this draft only after the exact TestFlight build `1.0 (3)` has passed the final physical-device smoke test and the video URL has been added. Put the same material in the App Review Information Notes field for this submission and future submissions.
 
 ## Video Recording Checklist
 
-Record the exact TestFlight build on the physical iPhone 14 Plus running iOS 26.5.2. Start from a fresh installation so the real Apple permission prompts appear. Begin with the Home Screen, launch OffGrid AI FieldGuide, and show:
+Record the exact TestFlight build `1.0 (3)` on the physical iPhone 14 Plus running iOS 26.5.2. Start from a fresh installation so the real Apple permission prompts appear. Begin with the Home Screen, launch OffGrid AI FieldGuide, and show:
 
 1. The app launching to the main screen without a login.
 2. A normal text question and the streamed AI response.
@@ -22,7 +22,7 @@ There are no registration, login, account-deletion, paid-content, purchase, subs
 
 Hello App Review,
 
-Thank you for the guidance. We have uploaded version 1.0, build 2 and provided the requested information below.
+Thank you for the guidance. We have uploaded version 1.0, build 3 and provided the requested information below.
 
 1. **Physical-device screen recording**
 

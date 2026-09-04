@@ -2,6 +2,7 @@ import UIKit
 import Capacitor
 import AVFoundation
 import QuickLook
+import PhotosUI
 import Speech
 import UniformTypeIdentifiers
 import WebKit
@@ -135,6 +136,10 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
         openAppSettings() {
           send('openAppSettings', []);
           return success({ action: 'open-settings' });
+        },
+        pickVideo(source = 'library') {
+          send('pickVideo', [source]);
+          return success({ action: 'pick-video', source });
         }
       });
 
@@ -253,6 +258,94 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
           window.requestOpenSavedGuides = () => window.openSavedGuides();
         }
       };
+      const patchIosVideoInput = () => {
+        if (window.__offgridIosVideoPatched) return;
+        window.__offgridIosVideoPatched = true;
+
+        const prepareVideoChat = () => {
+          if (document.getElementById('videoPreview')) return;
+          const welcomeInput = document.getElementById('welcomeMessageInput');
+          const savedText = welcomeInput ? welcomeInput.value : '';
+          if (typeof window.transitionToChat === 'function') window.transitionToChat();
+          const welcome = document.getElementById('welcome');
+          if (welcome) welcome.remove();
+          if (savedText) {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+              messageInput.value = savedText;
+              if (typeof window.autoResize === 'function') window.autoResize(messageInput);
+            }
+          }
+        };
+
+        // Keep the native bridge self-contained so a newly installed iOS build
+        // can use native video extraction before the hosted UI is deployed.
+        if (typeof window.acceptNativeVideoSelection !== 'function') {
+          window.acceptNativeVideoSelection = details => {
+            if (!details || !Array.isArray(details.frames) || details.frames.length === 0) {
+              throw new Error('Native video selection did not return any frames.');
+            }
+            selectedVideo = {
+              frames: details.frames,
+              name: details.name || 'video.mov',
+              size: Number(details.size) || 0,
+              duration: Number(details.duration) || 0,
+              thumbnailUrl: details.thumbnailUrl || details.frames[0],
+              frameCount: details.frames.length,
+              mimeType: details.mimeType || 'video/quicktime'
+            };
+            prepareVideoChat();
+            removeImage();
+            showVideoPreview();
+            if (window.innerWidth <= 768 && document.activeElement) document.activeElement.blur();
+            return true;
+          };
+        }
+
+        const removeIndicator = () => {
+          const indicator = document.getElementById('offgridNativeVideoProgress');
+          if (indicator) indicator.remove();
+        };
+        const showIndicator = () => {
+          removeIndicator();
+          const indicator = document.createElement('div');
+          indicator.id = 'offgridNativeVideoProgress';
+          indicator.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(44,24,16,0.94);color:white;padding:20px 30px;border-radius:14px;z-index:2000;text-align:center;border:1px solid rgba(184,134,11,0.5);box-shadow:0 8px 30px rgba(0,0,0,0.3);';
+          indicator.innerHTML = '<div style="text-align:center"><div style="font-size:24px;margin-bottom:8px">Video</div>Processing video frames...<br><small>Preparing video for AI analysis</small></div>';
+          document.body.appendChild(indicator);
+        };
+
+        window.addEventListener('offgrid-native-video-state', event => {
+          const status = event.detail && event.detail.status;
+          if (status === 'processing') showIndicator();
+          if (status === 'cancelled') removeIndicator();
+        });
+        window.addEventListener('offgrid-native-video-ready', event => {
+          removeIndicator();
+          try {
+            if (typeof window.acceptNativeVideoSelection !== 'function') {
+              throw new Error('The video interface is not ready. Please reopen the app and try again.');
+            }
+            window.acceptNativeVideoSelection(event.detail || {});
+          } catch (error) {
+            alert(error && error.message ? error.message : 'The selected video could not be prepared.');
+          }
+        });
+        window.addEventListener('offgrid-native-video-error', event => {
+          removeIndicator();
+          const detail = event.detail || {};
+          alert(detail.message || 'The selected video could not be prepared. Please try a shorter clip.');
+        });
+
+        window.triggerVideoUpload = () => {
+          prepareVideoChat();
+          window.OffGridNative.pickVideo('library');
+        };
+        window.triggerVideoRecord = () => {
+          prepareVideoChat();
+          window.OffGridNative.pickVideo('camera');
+        };
+      };
       const applyIosStatusBarLayout = async () => {
         const statusBar = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.StatusBar;
         if (!statusBar) return false;
@@ -271,16 +364,18 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
       document.addEventListener('DOMContentLoaded', () => {
         patchIosSaveMessages();
         patchIosVoiceInput();
+        patchIosVideoInput();
         applyIosStatusBarLayout().then(applied => {
           if (!applied) setTimeout(applyIosStatusBarLayout, 400);
         });
       }, { once: true });
+      window.addEventListener('pageshow', patchIosVideoInput);
       window.addEventListener('pageshow', applyIosStatusBarLayout);
     })();
     """
 }
 
-private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandler, QLPreviewControllerDataSource, UIDocumentPickerDelegate {
+private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandler, QLPreviewControllerDataSource, UIDocumentPickerDelegate, PHPickerViewControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     weak var presenter: UIViewController?
     weak var webView: WKWebView?
     private var previewURL: URL?
@@ -328,6 +423,8 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
                     self.stopVoiceInput(notifyWebView: true)
                 case "openAppSettings":
                     self.openAppSettings()
+                case "pickVideo":
+                    self.presentVideoPicker(source: self.stringArg(args, 0))
                 default:
                     break
                 }
@@ -513,6 +610,14 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
     }
 
     private func emitVoiceEvent(_ name: String, details: [String: Any]) {
+        emitWebEvent(name, details: details)
+    }
+
+    private func emitVideoEvent(_ name: String, details: [String: Any]) {
+        emitWebEvent(name, details: details)
+    }
+
+    private func emitWebEvent(_ name: String, details: [String: Any]) {
         guard
             JSONSerialization.isValidJSONObject(details),
             let data = try? JSONSerialization.data(withJSONObject: details),
@@ -523,8 +628,166 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
 
         let encodedName = String(nameArray.dropFirst().dropLast())
         let script = "window.dispatchEvent(new CustomEvent(\(encodedName), { detail: \(json) }));"
-        webView?.evaluateJavaScript(script) { _, error in
-            if let error { NSLog("OffGrid voice bridge event failed: %@", error.localizedDescription) }
+        DispatchQueue.main.async { [weak self] in
+            self?.webView?.evaluateJavaScript(script) { _, error in
+                if let error { NSLog("OffGrid native bridge event failed: %@", error.localizedDescription) }
+            }
+        }
+    }
+
+    private func presentVideoPicker(source: String) {
+        guard topPresenter()?.presentedViewController == nil else {
+            emitVideoError("Close the current screen before choosing a video.")
+            return
+        }
+
+        if source == "camera" {
+            guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
+                emitVideoError("Video recording is not available on this device.")
+                return
+            }
+            let picker = UIImagePickerController()
+            picker.sourceType = .camera
+            picker.mediaTypes = [UTType.movie.identifier]
+            picker.cameraCaptureMode = .video
+            picker.videoMaximumDuration = 20
+            picker.videoQuality = .typeMedium
+            picker.delegate = self
+            picker.modalPresentationStyle = .fullScreen
+            topPresenter()?.present(picker, animated: true)
+            return
+        }
+
+        var configuration = PHPickerConfiguration(photoLibrary: .shared())
+        configuration.filter = .videos
+        configuration.selectionLimit = 1
+        configuration.preferredAssetRepresentationMode = .current
+        let picker = PHPickerViewController(configuration: configuration)
+        picker.delegate = self
+        picker.modalPresentationStyle = .fullScreen
+        topPresenter()?.present(picker, animated: true)
+    }
+
+    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
+        picker.dismiss(animated: true)
+        guard let result = results.first else {
+            emitVideoEvent("offgrid-native-video-state", details: ["status": "cancelled"])
+            return
+        }
+
+        emitVideoEvent("offgrid-native-video-state", details: ["status": "processing"])
+        let provider = result.itemProvider
+        guard provider.hasItemConformingToTypeIdentifier(UTType.movie.identifier) else {
+            emitVideoError("Please choose a video file.")
+            return
+        }
+
+        provider.loadFileRepresentation(forTypeIdentifier: UTType.movie.identifier) { [weak self] url, error in
+            guard let self else { return }
+            if let error {
+                self.emitVideoError("The selected video could not be opened: \(error.localizedDescription)")
+                return
+            }
+            guard let url else {
+                self.emitVideoError("The selected video could not be opened.")
+                return
+            }
+
+            do {
+                let ext = url.pathExtension.isEmpty ? "mov" : url.pathExtension
+                let copyURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("offgrid-video-\(UUID().uuidString)")
+                    .appendingPathExtension(ext)
+                try FileManager.default.copyItem(at: url, to: copyURL)
+                let suggestedName = provider.suggestedName.map { name in
+                    (name as NSString).pathExtension.isEmpty ? "\(name).\(ext)" : name
+                } ?? "video.\(ext)"
+                self.processVideo(at: copyURL, displayName: suggestedName)
+            } catch {
+                self.emitVideoError("The selected video could not be copied for analysis: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true)
+        emitVideoEvent("offgrid-native-video-state", details: ["status": "cancelled"])
+    }
+
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
+        picker.dismiss(animated: true)
+        guard let url = info[.mediaURL] as? URL else {
+            emitVideoError("The recorded video could not be opened.")
+            return
+        }
+        emitVideoEvent("offgrid-native-video-state", details: ["status": "processing"])
+        processVideo(at: url, displayName: url.lastPathComponent)
+    }
+
+    private func processVideo(at url: URL, displayName: String) {
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            defer { try? FileManager.default.removeItem(at: url) }
+
+            do {
+                let fileSize = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+                guard fileSize <= 200 * 1_024 * 1_024 else {
+                    throw OffGridNativeError(message: "Video file is too large. Maximum size is 200 MB.")
+                }
+
+                let asset = AVURLAsset(url: url)
+                let duration = CMTimeGetSeconds(asset.duration)
+                guard duration.isFinite, duration > 0 else {
+                    throw OffGridNativeError(message: "The selected video does not have a usable duration.")
+                }
+                guard duration <= 20.05 else {
+                    throw OffGridNativeError(message: "Video is too long (\(Int(duration.rounded())) seconds). Maximum duration is 20 seconds for AI analysis.")
+                }
+
+                let generator = AVAssetImageGenerator(asset: asset)
+                generator.appliesPreferredTrackTransform = true
+                generator.maximumSize = CGSize(width: 512, height: 384)
+                generator.requestedTimeToleranceBefore = CMTime(seconds: 0.08, preferredTimescale: 600)
+                generator.requestedTimeToleranceAfter = CMTime(seconds: 0.08, preferredTimescale: 600)
+
+                let targetFrameCount = 8
+                var frames: [String] = []
+                for index in 0..<targetFrameCount {
+                    let second = min(max(0, duration - 0.05), (Double(index) + 0.5) / Double(targetFrameCount) * duration)
+                    let image = try generator.copyCGImage(
+                        at: CMTime(seconds: second, preferredTimescale: 600),
+                        actualTime: nil
+                    )
+                    guard let jpeg = UIImage(cgImage: image).jpegData(compressionQuality: 0.62) else { continue }
+                    frames.append("data:image/jpeg;base64,\(jpeg.base64EncodedString())")
+                }
+
+                guard !frames.isEmpty else {
+                    throw OffGridNativeError(message: "No frames could be extracted from the selected video.")
+                }
+
+                let ext = url.pathExtension.lowercased()
+                let mimeType = ext == "mp4" || ext == "m4v" ? "video/mp4" : "video/quicktime"
+                self.emitVideoEvent(
+                    "offgrid-native-video-ready",
+                    details: [
+                        "frames": frames,
+                        "thumbnailUrl": frames[0],
+                        "name": displayName,
+                        "size": fileSize,
+                        "duration": duration,
+                        "mimeType": mimeType
+                    ]
+                )
+            } catch {
+                self.emitVideoError(error.localizedDescription)
+            }
+        }
+    }
+
+    private func emitVideoError(_ message: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.emitVideoEvent("offgrid-native-video-error", details: ["message": message])
         }
     }
 
