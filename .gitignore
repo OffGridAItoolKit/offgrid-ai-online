@@ -4,6 +4,12 @@ mobile-app/node_modules/
 
 # Environment variables (contains API keys)
 .env
+.env.*
+!.env.example
+__pycache__/
+.venv/
+test-results/
+.arena-pilot-*
 *.jks
 *.keystore
 key.properties
