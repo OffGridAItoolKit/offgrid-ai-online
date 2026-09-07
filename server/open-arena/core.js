@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const { OFFGRID_PROMPT, PROMPT_VERSION } = require('./prompt');
 const VERSION = 'gemma4-matched-v1';
 const RUBRIC_VERSION = 'contextual-risk-2-2-1-v1';
+const VALIDATION_VERSION = 'substantive-reviews-v2';
 const WEIGHTS = Object.freeze({
     accuracy: 2,
     prioritization: 2,
@@ -178,7 +179,10 @@ function validateReview(raw, mapping) {
             const reason = review?.reasons?.[label]?.[criterion];
             if (
                 typeof reason !== 'string' ||
-                !reason.trim() ||
+                reason.trim().length < 12 ||
+                /^(?:[a-d]|n\/?a|not applicable|none|unknown|todo|tbd|\.{2,})[.\s]*$/i.test(
+                    reason.trim(),
+                ) ||
                 reason.length > 2400
             )
                 throw new Error('Missing or invalid ranking explanation.');
@@ -265,6 +269,7 @@ async function runComparison(
         schemaVersion: 2,
         rosterVersion: VERSION,
         rubricVersion: RUBRIC_VERSION,
+        validationVersion: VALIDATION_VERSION,
         promptVersion: PROMPT_VERSION,
         promptDigest: digest(OFFGRID_PROMPT),
         rubricDigest: digest(GRADER_PROMPT),
@@ -384,6 +389,7 @@ async function runComparison(
 module.exports = {
     VERSION,
     RUBRIC_VERSION,
+    VALIDATION_VERSION,
     WEIGHTS,
     MODEL_26B,
     E4B_DIGEST,

@@ -186,6 +186,18 @@ test('identical answers cannot receive different grades', () => {
         validateReview(review([['A', 'B', 'C', 'D']]), identical),
     );
 });
+
+test('label-only and placeholder reasons cannot become valid reviews', () => {
+    for (const placeholder of ['A', 'D', '...', 'N/A', 'Not applicable', 'TBD']) {
+        const result = review();
+        result.reasons.A.accuracy = placeholder;
+        assert.throws(() => validateReview(result), /explanation/);
+    }
+    const result = review();
+    result.reasons.A.actionability =
+        'No procedure requested; the visual description is sufficient.';
+    assert.doesNotThrow(() => validateReview(result));
+});
 test('successful run preserves raw answers with no synthesis call', async () => {
     let calls = 0,
         judges = 0;

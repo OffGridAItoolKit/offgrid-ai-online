@@ -67,6 +67,7 @@
             );
         return JSON.stringify([
             run.rosterVersion,
+            run.validationVersion || 'initial-validation',
             run.rubricDigest,
             run.promptDigest,
             run.settings,
@@ -259,7 +260,7 @@
                 html += `<div class="reason"><strong>${escape(names[key])} (anonymous ${escape(label)})</strong>${criteria.map((c) => `<p><b>${capitalize(c)}:</b> ${escape(review.reasons[label][c])}</p>`).join('')}</div>`;
             html += `<details><summary>Anonymous rankings and provider record</summary><pre>${escape(JSON.stringify({ rankings: review.rankings, labelMap: review.labelMap, metadata: review.metadata }, null, 2))}</pre></details>`;
         }
-        html += `<details><summary>Run and model records</summary><pre>${escape(JSON.stringify({ id: run.id, seed: run.seed, promptVersion: run.promptVersion, promptDigest: run.promptDigest, rubricVersion: run.rubricVersion, rubricDigest: run.rubricDigest, answers: run.answers.map((a) => ({ key: a.key, finishReason: a.finishReason, metadata: a.metadata })), errors: run.errors }, null, 2))}</pre></details>`;
+        html += `<details><summary>Run and model records</summary><pre>${escape(JSON.stringify({ id: run.id, seed: run.seed, promptVersion: run.promptVersion, promptDigest: run.promptDigest, rubricVersion: run.rubricVersion, rubricDigest: run.rubricDigest, validationVersion: run.validationVersion || 'initial-validation', answers: run.answers.map((a) => ({ key: a.key, finishReason: a.finishReason, metadata: a.metadata })), errors: run.errors }, null, 2))}</pre></details>`;
         $('report-content').innerHTML = html;
         $('report-dialog').showModal();
     }

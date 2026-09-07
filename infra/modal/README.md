@@ -95,6 +95,8 @@ node --env-file=.env.arena scripts/pilot-open-arena.js image
 node --env-file=.env.arena scripts/pilot-open-arena.js e4b-review
 node --env-file=.env.arena scripts/pilot-open-arena.js judge
 node --env-file=.env.arena scripts/pilot-open-arena.js council
+node --env-file=.env.arena scripts/pilot-open-arena.js judge-image
+node --env-file=.env.arena scripts/pilot-open-arena.js council-image
 ```
 
 These scripts save local probe records under ignored `test-results/`. Direct technical probes do not reserve the website's monthly run counter; they still use the provider usage caps. Do not run them in an unattended loop. A nonzero exit means an invalid/incomplete probe, not a model losing a benchmark.
@@ -104,12 +106,18 @@ These scripts save local probe records under ignored `test-results/`. Direct tec
 - Automatic flash attention timed out on tested Ollama 0.21.0 and 0.33.3 configurations. Explicitly disabling it allowed text and image responses. This is a measured configuration result, not a proven root-cause diagnosis.
 - Final 0.33.3 text probe: Optimized cold 102.1 seconds, baseline warm 3.2 seconds. Image probe: Optimized 6.5 seconds, baseline 4.5 seconds. Small technical samples, not throughput guarantees.
 - E4B returned valid JSON review responses, but twice ranked byte-identical answers separately despite explaining that they were equivalent. The new semantic validator rejects such a review; no winner is awarded. Council quality needs further calibration. This is separate from response-generation quality.
-- No new four-way live GPT-5.2 or Council comparison has yet been completed with the dedicated key. No new benchmark win-rate claim is supported.
+- The dedicated OpenRouter key is connected locally and its $25 monthly allowance was verified through the API. Modal's $10 usage cap remains unchanged. Local enable/budget-confirmed flags are true; the public website and Render settings remain unchanged.
+- Full four-way text comparisons completed with GPT-5.2 (131.5s, including a cold E4B worker) and Council (73.6s). All candidate/reviewer identities were verified: Modal E4B, pinned Google 26B, pinned OpenAI GPT-5.2.
+- Full four-way compass-image comparison completed with GPT-5.2 (42.1s). The first Council-image attempt was incomplete (49.1s): one incomplete E4B review, another with label-only explanations, one 26B review with placeholder explanations, and a Google HTTP 429. No winner was produced. One controlled Council-image retest passed (116.2s); it does not erase the first failure or establish reliability.
+- Review validation `substantive-reviews-v2` now rejects reasons shorter than 12 trimmed characters and standalone placeholders. It is a structural floor, not a factual or semantic quality guarantee. Validation-version changes start separate statistics configurations. Candidate instructions, grader wording and 2:2:1 weights were not changed by this fix.
+- A real browser/SSE/export run completed in 49.1s, correctly showed a top-place tie and all four originals, and exported no credentials. The local usage count survived restart. Temporary browser-test access was removed; the configured private access key is required.
+- These are technical integration probes, not a held-out benchmark. Wins, losses, ties and incomplete attempts are retained locally. The same simple prompts were reused with fresh generations/seeds, so they do not isolate judge-mode effects or support a win-rate claim.
+- End-of-test billing snapshots: OpenRouter $0.04077435 used against $25/month; Modal $0.77 total usage, covered by credits, with a $10 workspace cap. Provider reporting is asynchronous; these are not final invoices or per-run price guarantees.
 - GPT-5.2 remains the default outside judge. Council uses four calls but two foundation families without OffGrid candidate instructions during review; the votes are not independent experts.
 
 ## Release and Rollback Gates
 
-Before changing the live route: verify the budgeted OpenRouter key, both pinned provider identities, text and image four-way runs, GPT judgment validity, Council failure behavior, large-context/truncation behavior, PostgreSQL integration, and measured cost/latency. Obtain approval to merge/deploy.
+Budget-key, provider-identity, small text/image four-way and real local UI checks are complete. Before changing the live route: calibrate Council judgment reliability, test large-context/truncation behavior against real providers, verify the production PostgreSQL guard and Render behavior, and review cold-start latency/costs. Obtain approval to merge/deploy. No production database or Render configuration was changed by the local pilot.
 
 Rollback the web experience by setting `OPEN_ARENA_MATCHED_ENABLED=false` and restarting the web service. Legacy files and storage keys are preserved. Stop all E4B pilot availability with:
 

@@ -14,8 +14,16 @@ const {
     createProviders,
 } = require('../server/open-arena/providers');
 const command = process.argv[2];
-if (!['e4b', 'image', 'e4b-review', 'judge', 'council'].includes(command))
-    throw new Error('Choose e4b, image, e4b-review, judge or council.');
+if (
+    !['e4b', 'image', 'e4b-review', 'judge', 'council', 'judge-image', 'council-image'].includes(command)
+)
+    throw new Error(
+        'Choose e4b, image, e4b-review, judge, council, judge-image or council-image.',
+    );
+const imageProbe = command === 'image' || command.endsWith('-image');
+const fullComparison = ['judge', 'council', 'judge-image', 'council-image'].includes(
+    command,
+);
 const config = configuration();
 if (!config.promptReady)
     throw new Error(
@@ -24,27 +32,31 @@ if (!config.promptReady)
 const adapters = createProviders(config);
 const input = {
     prompt:
-        command === 'image'
+        imageProbe
             ? 'Describe the visible object in this image, including its colors and shape. Be concise.'
             : 'In three brief steps, how would you organize a small campsite so essential supplies can be found quickly in the dark?',
     image:
-        command === 'image'
+        imageProbe
             ? `data:image/png;base64,${fs.readFileSync(path.resolve(__dirname, '../compass-192.png')).toString('base64')}`
             : null,
-    mode: command === 'council' ? 'council' : 'judge',
+    mode: command.startsWith('council') ? 'council' : 'judge',
 };
 (async () => {
-    if (['judge', 'council'].includes(command)) {
+    if (fullComparison) {
         if (!config.apiKey)
             throw new Error('Dedicated OpenRouter key is not set.');
         const response = await fetch('https://openrouter.ai/api/v1/key', {
             headers: { Authorization: `Bearer ${config.apiKey}` },
+            signal: AbortSignal.timeout(20000),
+            redirect: 'error',
         });
         if (!response.ok) throw new Error('OpenRouter key validation failed.');
         const { data } = await response.json();
         if (
-            typeof data.limit !== 'number' ||
+            !Number.isFinite(data.limit) ||
+            data.limit <= 0 ||
             data.limit > 25 ||
+            !Number.isFinite(data.limit_remaining) ||
             data.limit_remaining <= 0 ||
             data.limit_reset !== 'monthly'
         ) {
@@ -138,6 +150,8 @@ const input = {
         result = await runComparison(input, adapters, {
             onProgress: (progress) => console.log(progress.message),
         });
+        result.technicalProbe = true;
+        result.purpose = 'Bounded integration test, not a held-out benchmark.';
         console.log(
             JSON.stringify({
                 status: result.status,
