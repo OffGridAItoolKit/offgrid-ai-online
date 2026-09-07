@@ -14,10 +14,10 @@ const {
 } = require('../server/open-arena/core');
 const app = express();
 app.use(express.json({ limit: '3mb' }));
-app.get('/arena-open', (req, res) =>
+app.get('/open-arena', (req, res) =>
     res.sendFile(path.resolve(__dirname, '../arena-open-matched.html')),
 );
-app.get('/api/arena-open/config', (req, res) =>
+app.get('/api/open-arena/config', (req, res) =>
     res.json({
         roster: ROSTER,
         ready: true,
@@ -27,7 +27,7 @@ app.get('/api/arena-open/config', (req, res) =>
         privacy: 'LOCAL UI FIXTURES ONLY. No AI providers receive this data.',
     }),
 );
-app.post('/api/arena-open/run', async (req, res) => {
+app.post('/api/open-arena/run', async (req, res) => {
     const groups = req.body.prompt.includes('tie')
         ? [['A', 'B', 'C', 'D']]
         : [['A'], ['B'], ['C'], ['D']];
@@ -116,6 +116,6 @@ app.get('/compass-192.png', (req, res) =>
 );
 app.listen(3108, '127.0.0.1', () =>
     console.log(
-        'UI FIXTURE preview: http://127.0.0.1:3108/arena-open (no model calls)',
+        'UI FIXTURE preview: http://127.0.0.1:3108/open-arena (no model calls)',
     ),
 );

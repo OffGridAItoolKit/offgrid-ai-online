@@ -90,10 +90,15 @@ registerOpenArenaRoutes(app, {
     incrementUsage: async () => {},
     reserve,
 });
-app.get(['/arena-open', '/'], (req, res) =>
+app.get(['/open-arena', '/'], (req, res) =>
     res.sendFile(path.join(root, 'arena-open-matched.html')),
 );
-app.get('/arena', (req, res) => res.redirect('https://offgridtoolkit.ai/arena'));
+app.get('/arena', (req, res) =>
+    res.redirect('https://offgridtoolkit.ai/arena'),
+);
+app.get('/arena-open', (req, res) =>
+    res.redirect('https://offgridtoolkit.ai/arena-open'),
+);
 app.use(
     '/assets/arena',
     express.static(path.join(root, 'assets/arena'), { maxAge: 0 }),
@@ -103,6 +108,6 @@ app.get('/compass-192.png', (req, res) =>
 );
 app.listen(3109, '127.0.0.1', () =>
     console.log(
-        'Real-provider private pilot: http://127.0.0.1:3109/arena-open',
+        'Real-provider private pilot: http://127.0.0.1:3109/open-arena',
     ),
 );

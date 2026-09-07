@@ -153,10 +153,10 @@ p {
     flex-shrink: 0;
 }
 .workspace {
-    max-width: 1540px;
+    max-width: 1640px;
     margin: auto;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-columns: minmax(0, 1fr) 350px;
     min-height: calc(100vh - 70px);
 }
 main {
@@ -168,6 +168,163 @@ aside {
     border-left: 1px solid var(--line);
     background: #171d20;
     min-width: 0;
+}
+.workspace.analytics-hidden {
+    grid-template-columns: minmax(0, 1fr);
+}
+.category-picker {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px 12px;
+}
+.category-picker label {
+    color: var(--muted);
+    font-size: 12px;
+}
+.category-picker select {
+    flex: 1;
+    min-width: 0;
+}
+.analytics-tabs {
+    margin-top: 18px;
+}
+.analytics-tabs label {
+    flex: 1;
+}
+.analytics-tabs span {
+    justify-content: center;
+}
+.analytics-filters {
+    display: grid;
+    gap: 7px;
+    margin-top: 14px;
+}
+.analytics-filters label {
+    font-size: 11px;
+    color: var(--muted);
+}
+.analytics-filters select {
+    width: 100%;
+    font-size: 12px;
+    min-width: 0;
+}
+.analytics-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 18px 0;
+}
+.analytics-section {
+    border-top: 1px solid var(--line);
+    margin-top: 22px;
+    padding-top: 18px;
+}
+details.analytics-section {
+    padding-top: 0;
+}
+.category-result {
+    border-bottom: 1px solid var(--line);
+    padding: 14px 0;
+}
+.category-title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px 8px;
+    align-items: baseline;
+    margin-bottom: 9px;
+}
+.category-title strong {
+    font-size: 12px;
+}
+.category-title > span {
+    font-size: 10px;
+    color: var(--muted);
+}
+.category-pair {
+    display: grid;
+    grid-template-columns: 76px minmax(0, 1fr) 42px;
+    gap: 7px;
+    align-items: center;
+    padding: 4px 0;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+.category-pair > span:nth-child(2) {
+    color: var(--muted);
+}
+.category-pair > strong {
+    text-align: right;
+}
+.criterion-group {
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+.criterion-group > strong {
+    display: block;
+    margin-bottom: 6px;
+}
+.criterion-group > div {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    color: var(--muted);
+}
+.average-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 36px;
+    gap: 6px;
+    font-size: 11px;
+    margin: 14px 0;
+}
+.average-row > strong {
+    text-align: right;
+}
+.average-row meter {
+    grid-column: 1/-1;
+    width: 100%;
+    height: 8px;
+}
+meter::-webkit-meter-bar {
+    background: var(--line);
+    border: none;
+}
+meter::-webkit-meter-optimum-value {
+    background: var(--blue);
+}
+.toolkit-band {
+    border-top: 1px solid var(--line);
+    margin-top: 24px;
+    padding: 24px 0 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.toolkit-band > div {
+    flex: 1 1 280px;
+    min-width: 0;
+}
+.toolkit-band h2 {
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+.toolkit-band p:not(.eyebrow) {
+    font-size: 12px;
+    color: var(--muted);
+}
+.toolkit-band .footnote {
+    flex-basis: 100%;
+    margin: 0;
+}
+.toolkit-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 650;
+    min-height: 44px;
 }
 .heading-row,
 .section-heading {
@@ -731,9 +888,18 @@ dialog input[type='password'] {
         padding-left: 56px;
     }
 }
+@media (min-width: 801px) {
+    aside {
+        position: sticky;
+        top: 0;
+        max-height: 100vh;
+        overflow-y: auto;
+        align-self: start;
+    }
+}
 @media (max-width: 1060px) {
     .workspace {
-        grid-template-columns: minmax(0, 1fr) 260px;
+        grid-template-columns: minmax(0, 1fr) 300px;
     }
     main {
         padding: 26px 24px;
@@ -803,6 +969,9 @@ dialog input[type='password'] {
     }
 }
 @media (max-width: 480px) {
+    .pilot {
+        display: none;
+    }
     main {
         padding: 24px 16px 16px;
     }

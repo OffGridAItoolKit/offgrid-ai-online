@@ -498,7 +498,7 @@ app.use('/api/chat', anonymousPromptDailyLimit);
 app.use('/api/stream', limiter);
 app.use('/api/stream', anonymousPromptDailyLimit);
 app.use('/api/command/', commandLimiter);
-app.use('/api/arena-open/', commandLimiter);
+app.use('/api/open-arena/', commandLimiter);
 app.use('/api/image-studio/', commandLimiter);
 
 registerOpenArenaRoutes(app, { pool, requireLicense, checkPromptLimit, incrementUsage });
@@ -2554,7 +2554,11 @@ app.get('/arena', (req, res) => {
 });
 
 app.get('/arena-open', (req, res) => {
-    res.sendFile(path.join(__dirname, process.env.OPEN_ARENA_MATCHED_ENABLED === 'true' ? 'arena-open-matched.html' : 'arena-open.html'));
+    res.sendFile(path.join(__dirname, 'arena-open.html'));
+});
+
+app.get('/open-arena', (req, res) => {
+    res.sendFile(path.join(__dirname, 'arena-open-matched.html'));
 });
 
 // =============================================================================

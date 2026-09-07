@@ -5,6 +5,27 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex" />
         <title>OffGrid AI Open Arena | Matched Model Comparison</title>
+        <meta
+            name="description"
+            content="Compare OffGrid AI Optimized and Advanced with their matching Gemma foundations. Original answers, transparent grading and category-level results."
+        />
+        <link rel="canonical" href="https://offgridtoolkit.ai/open-arena" />
+        <meta
+            property="og:title"
+            content="OffGrid AI Open Arena | Test the Difference"
+        />
+        <meta
+            property="og:description"
+            content="Same models. Different instructions. Compare original answers with transparent, accuracy-first grading."
+        />
+        <meta
+            property="og:url"
+            content="https://offgridtoolkit.ai/open-arena"
+        />
+        <meta
+            property="og:image"
+            content="https://offgridtoolkit.ai/compass-192.png"
+        />
         <link rel="icon" href="/compass-192.png" />
         <link rel="stylesheet" href="/assets/arena/matched.css" />
         <script
@@ -25,11 +46,12 @@
             integrity="sha384-o44XUELLEnv/iSlA1NWxBweqbD4TSR0qgq2VzVsxtkHS989JJjGKSE9vkfo5MN4K"
             crossorigin="anonymous"
         ></script>
+        <script defer src="/assets/arena/analytics.js"></script>
         <script defer src="/assets/arena/matched.js"></script>
     </head>
     <body>
         <header class="topbar">
-            <a class="brand" href="/arena-open"
+            <a class="brand" href="/open-arena"
                 ><img
                     src="/compass-192.png"
                     alt=""
@@ -38,6 +60,16 @@
                 /><span>OFFGRID AI <b>OPEN ARENA</b></span></a
             >
             <div class="header-tools">
+                <button
+                    class="icon-button"
+                    id="analytics-toggle"
+                    aria-label="Toggle Deep Analytics"
+                    title="Deep Analytics"
+                    aria-controls="deep-analytics"
+                    aria-expanded="true"
+                >
+                    <i data-lucide="chart-no-axes-combined"></i>
+                </button>
                 <span class="pilot">PRIVATE PILOT</span
                 ><button
                     class="icon-button"
@@ -49,7 +81,7 @@
                 </button>
             </div>
         </header>
-        <div class="workspace">
+        <div class="workspace" id="workspace">
             <main>
                 <div class="heading-row">
                     <div>
@@ -139,11 +171,25 @@
                                 <option value="shelter">
                                     Cold-weather shelter
                                 </option>
+                                <option value="navigation">Lost trail</option>
+                                <option value="planning">
+                                    Power outage plan
+                                </option>
+                                <option value="medical">
+                                    Remote first-aid kit
+                                </option>
                             </select>
                         </div>
                         <span class="char-count" id="char-count"
                             >0 / 4,000</span
                         >
+                    </div>
+                    <div class="category-picker">
+                        <label for="category">Scenario category</label
+                        ><select
+                            id="category"
+                            aria-label="Scenario category"
+                        ></select>
                     </div>
                     <div class="run-toolbar">
                         <fieldset class="segmented" id="mode-control">
@@ -223,8 +269,32 @@
                         information.
                     </p>
                 </section>
+                <section class="toolkit-band" aria-label="OffGrid AI ToolKit">
+                    <div>
+                        <p class="eyebrow">BEYOND THE ARENA</p>
+                        <h2>OffGrid AI ToolKit</h2>
+                        <p>
+                            Practical AI on a flash drive. Run locally on a
+                            compatible Windows or Mac computer, without an
+                            internet connection or a subscription for offline
+                            use.
+                        </p>
+                    </div>
+                    <a
+                        class="toolkit-link"
+                        href="https://offgridaitoolkit.com/?utm_source=open_arena&amp;utm_medium=referral&amp;utm_campaign=matched_comparison"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >Explore the ToolKit <i data-lucide="arrow-up-right"></i
+                    ></a>
+                    <p class="footnote">
+                        This Arena runs online. Hosting, hardware and runtime
+                        differences can affect results on the offline ToolKit.
+                    </p>
+                </section>
                 <footer>
                     <a href="/arena">Frontier Arena</a
+                    ><a href="/arena-open">Original Open Arena</a
                     ><a href="https://offgridaitoolkit.com"
                         >OffGrid AI ToolKit</a
                     ><button class="text-button" id="method-button">
@@ -232,42 +302,131 @@
                     </button>
                 </footer>
             </main>
-            <aside aria-label="Paired results and history">
+            <aside id="deep-analytics" aria-label="Deep Analytics">
                 <div class="section-heading">
-                    <h2>Paired Results</h2>
+                    <h2>Deep Analytics</h2>
                     <i data-lucide="chart-no-axes-combined"></i>
+                </div>
+                <fieldset class="segmented analytics-tabs">
+                    <legend class="sr-only">Analytics period</legend>
+                    <label
+                        ><input
+                            type="radio"
+                            name="analytics-period"
+                            value="session"
+                            checked
+                        /><span>Session</span></label
+                    ><label
+                        ><input
+                            type="radio"
+                            name="analytics-period"
+                            value="lifetime"
+                        /><span>Lifetime</span></label
+                    >
+                </fieldset>
+                <div class="analytics-filters">
+                    <label for="stats-config">Configuration</label
+                    ><select
+                        id="stats-config"
+                        aria-label="Analytics configuration"
+                    ></select
+                    ><label for="stats-category">Category</label
+                    ><select
+                        id="stats-category"
+                        aria-label="Analytics category"
+                    ></select>
                 </div>
                 <p class="muted" id="stats-scope">
                     GPT-5.2 Judge / current configuration
                 </p>
+                <p class="error" id="stats-storage-error" hidden></p>
                 <div class="stat-group">
                     <h3 class="optimized">OffGrid AI Optimized</h3>
                     <p>vs Gemma 4 E4B</p>
                     <div class="wlt" id="optimized-stats"></div>
+                    <p id="optimized-delta"></p>
                 </div>
                 <div class="stat-group">
                     <h3 class="advanced">OffGrid AI Advanced</h3>
                     <p>vs Gemma 4 26B A4B</p>
                     <div class="wlt" id="advanced-stats"></div>
+                    <p id="advanced-delta"></p>
                 </div>
                 <div class="stat-footer">
                     <span id="run-count">0 complete runs</span
                     ><span id="incomplete-count">0 incomplete</span>
                 </div>
+                <p class="muted" id="stats-timing"></p>
+                <p class="muted">
+                    Browser-local results, not site-wide totals. Incomplete
+                    counts span configurations; they never become losses.
+                </p>
                 <label class="check-row"
-                    ><input type="checkbox" id="remember-stats" /> Remember
-                    statistics on this device</label
+                    ><input type="checkbox" id="remember-stats" checked />
+                    Remember lifetime statistics on this device</label
                 >
-                <div class="section-heading history-heading">
-                    <h2>This Session</h2>
+                <div class="analytics-tools">
                     <button
                         class="icon-button"
-                        id="clear-stats"
-                        title="Clear new-series statistics"
-                        aria-label="Clear new-series statistics"
+                        id="share-stats"
+                        title="Share results summary"
+                        aria-label="Share results summary"
                     >
-                        <i data-lucide="trash-2"></i>
+                        <i data-lucide="share-2"></i>
                     </button>
+                    <button
+                        class="icon-button"
+                        id="export-stats"
+                        title="Export analytics"
+                        aria-label="Export analytics"
+                    >
+                        <i data-lucide="download"></i>
+                    </button>
+                    <button
+                        class="icon-button"
+                        id="reset-session"
+                        title="Reset session statistics"
+                        aria-label="Reset session statistics"
+                    >
+                        <i data-lucide="rotate-ccw"></i>
+                    </button>
+                    <button
+                        class="icon-button"
+                        id="reset-lifetime"
+                        title="Reset lifetime statistics"
+                        aria-label="Reset lifetime statistics"
+                    >
+                        <i data-lucide="archive-restore"></i>
+                    </button>
+                </div>
+                <section
+                    class="analytics-section"
+                    aria-labelledby="category-heading"
+                >
+                    <h3 id="category-heading">Category Strength</h3>
+                    <p class="muted">
+                        Each OffGrid model vs its matching baseline.
+                    </p>
+                    <div id="category-strength"></div>
+                </section>
+                <details class="analytics-section">
+                    <summary>Criterion Advantage</summary>
+                    <div id="criterion-deltas"></div>
+                    <p class="muted">
+                        Mean OffGrid minus baseline points. Accuracy and
+                        priority carry 2x weight in the total.
+                    </p>
+                </details>
+                <details class="analytics-section">
+                    <summary>Average Model Scores</summary>
+                    <div id="average-scores"></div>
+                    <p class="muted">
+                        Relative Borda points out of 15, not accuracy
+                        percentages.
+                    </p>
+                </details>
+                <div class="section-heading history-heading">
+                    <h2>This Session</h2>
                 </div>
                 <div id="history"><p class="muted">No comparisons yet.</p></div>
                 <details class="method-details">
@@ -293,6 +452,9 @@
                 </details>
                 <button id="legacy-export" class="text-button" hidden>
                     Export historical Arena statistics
+                </button>
+                <button id="pilot-export" class="text-button" hidden>
+                    Export earlier pilot statistics
                 </button>
             </aside>
         </div>
@@ -330,6 +492,42 @@
                 ><input type="checkbox" id="export-image" /> Include the
                 attached image in run exports</label
             >
+        </dialog>
+        <dialog id="reset-dialog">
+            <div class="dialog-header">
+                <h2 id="reset-heading">Reset statistics</h2>
+                <button
+                    class="icon-button close-dialog"
+                    aria-label="Close"
+                    title="Close"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p id="reset-message"></p>
+            <button id="confirm-reset">
+                <i data-lucide="rotate-ccw"></i> Reset statistics
+            </button>
+        </dialog>
+        <dialog id="share-dialog">
+            <div class="dialog-header">
+                <h2>Results Summary</h2>
+                <button
+                    class="icon-button close-dialog"
+                    aria-label="Close"
+                    title="Close"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p class="muted">
+                Includes both pairs, ties, losses and sample size. Questions and
+                answers are not included.
+            </p>
+            <pre id="share-text"></pre>
+            <button id="copy-summary" class="primary">
+                <i data-lucide="copy"></i> Copy summary
+            </button>
         </dialog>
         <dialog id="report-dialog">
             <div class="dialog-header">

@@ -15,15 +15,28 @@ const {
 } = require('../server/open-arena/providers');
 const command = process.argv[2];
 if (
-    !['e4b', 'image', 'e4b-review', 'judge', 'council', 'judge-image', 'council-image'].includes(command)
+    ![
+        'e4b',
+        'image',
+        'e4b-review',
+        'judge',
+        'council',
+        'judge-image',
+        'council-image',
+        'judge-long',
+    ].includes(command)
 )
     throw new Error(
-        'Choose e4b, image, e4b-review, judge, council, judge-image or council-image.',
+        'Choose e4b, image, e4b-review, judge, council, judge-image, council-image or judge-long.',
     );
 const imageProbe = command === 'image' || command.endsWith('-image');
-const fullComparison = ['judge', 'council', 'judge-image', 'council-image'].includes(
-    command,
-);
+const fullComparison = [
+    'judge',
+    'council',
+    'judge-image',
+    'council-image',
+    'judge-long',
+].includes(command);
 const config = configuration();
 if (!config.promptReady)
     throw new Error(
@@ -31,16 +44,25 @@ if (!config.promptReady)
     );
 const adapters = createProviders(config);
 const input = {
-    prompt:
-        imageProbe
-            ? 'Describe the visible object in this image, including its colors and shape. Be concise.'
-            : 'In three brief steps, how would you organize a small campsite so essential supplies can be found quickly in the dark?',
-    image:
-        imageProbe
-            ? `data:image/png;base64,${fs.readFileSync(path.resolve(__dirname, '../compass-192.png')).toString('base64')}`
-            : null,
+    prompt: imageProbe
+        ? 'Describe the visible object in this image, including its colors and shape. Be concise.'
+        : 'In three brief steps, how would you organize a small campsite so essential supplies can be found quickly in the dark?',
+    image: imageProbe
+        ? `data:image/png;base64,${fs.readFileSync(path.resolve(__dirname, '../compass-192.png')).toString('base64')}`
+        : null,
     mode: command.startsWith('council') ? 'council' : 'judge',
+    category: imageProbe ? 'general' : 'planning',
 };
+if (command === 'judge-long') {
+    const inventory = Array.from(
+        { length: 60 },
+        (_, i) =>
+            `Crate ${i + 1}: reusable cups, spare labels, cloth bags, notebooks, dry towels.`,
+    ).join('\n');
+    input.prompt =
+        'This is a campsite-storage planning exercise, not an emergency. Based on this inventory, recommend three brief steps to keep essential supplies easy to find after dark. Do not list every crate. We also have headlamps, a first-aid kit, water and a camp table.\n\n' +
+        inventory.slice(0, 3500);
+}
 (async () => {
     if (fullComparison) {
         if (!config.apiKey)

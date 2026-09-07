@@ -93,25 +93,14 @@ function registerOpenArenaRoutes(
         providers = createProviders(config),
     },
 ) {
-    app.get('/api/arena-open/models', (req, res, next) => {
-        if (!config.enabled) return next();
+    app.get('/api/open-arena/models', (req, res) => {
         res.json({
             models: ROSTER,
             defaultModel: 'matched',
             rosterVersion: VERSION,
         });
     });
-    app.use('/api/command', (req, res, next) => {
-        if (config.enabled && req.get('X-OffGrid-Client') === 'open-arena') {
-            return res
-                .status(409)
-                .json({
-                    error: 'Open Arena now uses matched comparisons. Reload /arena-open.',
-                });
-        }
-        next();
-    });
-    app.get('/api/arena-open/config', (req, res) => {
+    app.get('/api/open-arena/config', (req, res) => {
         res.setHeader('Cache-Control', 'no-store');
         res.json({
             roster: ROSTER,
@@ -128,7 +117,7 @@ function registerOpenArenaRoutes(
         });
     });
     app.post(
-        '/api/arena-open/run',
+        '/api/open-arena/run',
         (req, res, next) => {
             if (!accessAllowed(req.get('X-Arena-Access'), config.accessKey))
                 return res

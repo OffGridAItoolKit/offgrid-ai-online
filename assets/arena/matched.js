@@ -2,7 +2,11 @@
 
 (() => {
     const $ = (id) => document.getElementById(id);
-    const statsKey = 'offgrid-matched-statistics-v1';
+    const analytics = window.ArenaAnalytics;
+    const statsKey = 'offgrid-matched-statistics-v2';
+    const sessionKey = 'offgrid-matched-session-v2';
+    const preferenceKey = 'offgrid-matched-remember-v2';
+    const oldPilotKey = 'offgrid-matched-statistics-v1';
     const legacyKeys = [
         'offgrid-open-deep-mode-lifetime',
         'offgrid-open-deep-mode-data',
@@ -21,8 +25,13 @@
         controller = null;
     const runs = [],
         imageByRun = new Map();
-    let stats = [],
-        remember = false;
+    let sessionStats = [],
+        lifetimeStats = [],
+        remember = true;
+    let selectedSeries = '',
+        resetScope = null,
+        activeSummary = null;
+    const storageBlocked = { session: false, lifetime: false };
     const icons = () => window.lucide?.createIcons();
     const escape = (value) =>
         String(value ?? '').replace(
@@ -60,43 +69,22 @@
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
-    function series(run) {
-        const settings = (value) =>
-            Object.fromEntries(
-                Object.entries(value || {}).filter(([key]) => key !== 'seed'),
-            );
-        return JSON.stringify([
-            run.rosterVersion,
-            run.validationVersion || 'initial-validation',
-            run.rubricDigest,
-            run.promptDigest,
-            run.settings,
-            run.answers
-                .map((a) => [
-                    a.key,
-                    a.model,
-                    a.metadata?.providerRoute || a.metadata?.provider,
-                    a.metadata?.runtime,
-                    a.metadata?.artifactDigest,
-                    settings(a.metadata?.settings),
-                ])
-                .sort((a, b) => a[0].localeCompare(b[0])),
-            run.reviews
-                .map((r) => [
-                    r.reviewer,
-                    r.model,
-                    r.metadata?.providerRoute || r.metadata?.provider,
-                    r.metadata?.runtime,
-                    r.metadata?.artifactDigest,
-                    settings(r.metadata?.settings),
-                ])
-                .sort((a, b) => a[0].localeCompare(b[0])),
-        ]);
-    }
+    const period = () =>
+        document.querySelector('input[name="analytics-period"]:checked').value;
+    const activeStats = () =>
+        period() === 'session' ? sessionStats : lifetimeStats;
+    const signed = (n) =>
+        n === null ? '-' : `${n > 0 ? '+' : ''}${number(n)}`;
     function persistStats() {
         try {
-            if (remember) localStorage.setItem(statsKey, JSON.stringify(stats));
-            else localStorage.removeItem(statsKey);
+            if (!storageBlocked.session)
+                sessionStorage.setItem(
+                    sessionKey,
+                    JSON.stringify(sessionStats),
+                );
+            if (remember && !storageBlocked.lifetime)
+                localStorage.setItem(statsKey, JSON.stringify(lifetimeStats));
+            localStorage.setItem(preferenceKey, String(remember));
         } catch {
             status(
                 'This browser could not save statistics. Your run is still available to export.',
@@ -105,54 +93,117 @@
         }
     }
     function renderStats() {
-        const activeSeries =
-            [...stats]
-                .reverse()
-                .find((s) => s.mode === mode() && s.status === 'complete')
-                ?.series || null;
-        $('stats-scope').textContent =
-            `${modeName(mode())} / ${activeSeries ? 'latest configuration' : 'no completed configuration yet'}`;
-        const eligible = stats.filter(
-            (s) => s.mode === mode() && s.series === activeSeries,
+        const blocked = Object.keys(storageBlocked).filter(
+            (key) => storageBlocked[key],
         );
+        $('stats-storage-error').hidden = !blocked.length;
+        $('stats-storage-error').textContent = blocked.length
+            ? `Saved ${blocked.join(' and ')} statistics are unreadable or unavailable. Existing storage is preserved; new results remain in memory.`
+            : '';
+        const records = activeStats();
+        const configs = analytics.configurations(records, mode());
+        if (!configs.some((c) => c.id === selectedSeries))
+            selectedSeries = configs[0]?.id || '';
+        $('stats-config').innerHTML = configs.length
+            ? configs
+                  .map(
+                      (c, i) =>
+                          `<option value="${i}" ${c.id === selectedSeries ? 'selected' : ''}>${i + 1}. ${escape(new Date(c.first).toLocaleDateString())} / ${c.count} ${c.count === 1 ? 'run' : 'runs'}</option>`,
+                  )
+                  .join('')
+            : '<option value="">No completed configuration</option>';
+        $('stats-config').disabled = !configs.length;
+        const filters = {
+            mode: mode(),
+            series: selectedSeries,
+            category: $('stats-category').value,
+        };
+        const summary = analytics.summarize(records, filters);
+        activeSummary = { summary, filters, scope: period() };
+        $('stats-scope').textContent =
+            `${modeName(mode())} / ${period() === 'session' ? 'this browser session' : 'lifetime on this device'}`;
         for (const key of ['optimized', 'advanced']) {
-            const counts = { win: 0, tie: 0, loss: 0 };
-            for (const s of eligible.filter((s) => s.status === 'complete')) {
-                const pair = s.pairs.find((p) => p.conditioned === key);
-                if (pair && pair.outcome in counts) counts[pair.outcome]++;
-            }
-            $(`${key}-stats`).innerHTML = Object.entries(counts)
+            const p = summary.pairs[key];
+            $(`${key}-stats`).innerHTML = ['wins', 'ties', 'losses']
                 .map(
-                    ([label, value]) =>
-                        `<div><strong>${value}</strong><span>${label === 'loss' ? 'LOSSES' : label.toUpperCase() + 'S'}</span></div>`,
+                    (label) =>
+                        `<div><strong>${p[label]}</strong><span>${label.toUpperCase()}</span></div>`,
                 )
                 .join('');
+            $(`${key}-delta`).textContent = p.count
+                ? `${Math.round(p.winRate * 100)}% wins / ${p.count} complete. Mean advantage ${signed(p.delta.total)} points.`
+                : 'No complete comparisons in this selection.';
         }
-        $('run-count').textContent =
-            `${eligible.filter((s) => s.status === 'complete').length} complete runs`;
+        $('run-count').textContent = `${summary.count} complete`;
         $('incomplete-count').textContent =
-            `${stats.filter((s) => s.mode === mode() && s.status !== 'complete').length} incomplete (all configs)`;
+            `${summary.incomplete} incomplete (all configs)`;
+        $('stats-timing').textContent =
+            summary.medianMs === null
+                ? 'No timing data yet.'
+                : `Median comparison: ${number(summary.medianMs / 1000)}s. Since ${new Date(summary.first).toLocaleDateString()}.`;
+        $('share-stats').disabled = summary.count === 0;
+        const categories = Object.entries(analytics.CATEGORIES).filter(
+            ([key]) => filters.category === 'all' || key === filters.category,
+        );
+        $('category-strength').innerHTML = categories
+            .map(([category, label]) => {
+                const s = analytics.summarize(records, {
+                    ...filters,
+                    category,
+                });
+                return `<div class="category-result"><div class="category-title"><strong>${escape(label)}</strong><span>${s.count} ${s.count === 1 ? 'run' : 'runs'}${s.count > 0 && s.count < 10 ? ' / early sample' : ''}</span></div>${[
+                    'optimized',
+                    'advanced',
+                ]
+                    .map((key) => {
+                        const p = s.pairs[key];
+                        return `<div class="category-pair"><span class="${key}">${key === 'optimized' ? 'Optimized' : 'Advanced'}</span><span>${p.count ? `${p.wins}W / ${p.ties}T / ${p.losses}L` : 'Not tested'}</span><strong title="Mean weighted score difference">${signed(p.delta.total)}</strong></div>`;
+                    })
+                    .join('')}</div>`;
+            })
+            .join('');
+        $('criterion-deltas').innerHTML = ['optimized', 'advanced']
+            .map(
+                (key) =>
+                    `<div class="criterion-group"><strong class="${key}">${escape(names[key])}</strong>${criteria.map((c) => `<div><span>${capitalize(c)}</span><b>${signed(summary.pairs[key].delta[c])}</b></div>`).join('')}</div>`,
+            )
+            .join('');
+        $('average-scores').innerHTML = Object.entries(summary.averages)
+            .sort((a, b) => (b[1] ?? -1) - (a[1] ?? -1))
+            .map(
+                ([key, value]) =>
+                    `<div class="average-row"><span class="${key}">${escape(names[key])}</span><strong>${value === null ? '-' : number(value)}</strong><meter min="0" max="15" value="${value || 0}" aria-label="Average score for ${escape(names[key])}"></meter></div>`,
+            )
+            .join('');
     }
     function addRun(run, attachedImage) {
         runs.unshift(run);
         if (attachedImage) imageByRun.set(run.id, attachedImage);
         // Statistics retain no question, answer, image, private key or grader reasoning text.
-        const fingerprint = run.status === 'complete' ? series(run) : null;
-        stats.push({
-            id: run.id,
-            mode: run.mode,
-            status: run.status,
-            series: fingerprint,
-            pairs: run.pairs || [],
-            date: run.createdAt,
-        });
+        const entry = analytics.record(run);
+        sessionStats = analytics.add(sessionStats, entry);
+        if (remember && !storageBlocked.lifetime) {
+            try {
+                lifetimeStats = analytics.validateRecords(
+                    JSON.parse(localStorage.getItem(statsKey) || '[]'),
+                );
+            } catch {
+                storageBlocked.lifetime = true;
+                status(
+                    'Saved lifetime statistics could not be read. Existing storage was preserved.',
+                    'error',
+                );
+            }
+        }
+        lifetimeStats = analytics.add(lifetimeStats, entry);
+        selectedSeries = '';
         persistStats();
         renderStats();
         $('history').replaceChildren();
         for (const item of runs) {
             const button = document.createElement('button');
             button.className = 'history-item';
-            button.innerHTML = `${escape(item.prompt.slice(0, 110))}${item.prompt.length > 110 ? '...' : ''}<small>${escape(modeName(item.mode))} / ${item.status === 'complete' ? 'Complete' : 'Incomplete'} / ${new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
+            button.innerHTML = `${escape(item.prompt.slice(0, 110))}${item.prompt.length > 110 ? '...' : ''}<small>${escape(modeName(item.mode))} / ${escape(analytics.categoryName(item.category))} / ${item.status === 'complete' ? 'Complete' : 'Incomplete'} / ${new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</small>`;
             button.addEventListener('click', () => renderRun(item));
             $('history').append(button);
         }
@@ -209,7 +260,7 @@
         currentRun = run;
         $('results').hidden = false;
         $('result-mode').textContent =
-            `${modeName(run.mode)} / ${run.rosterVersion}`;
+            `${modeName(run.mode)} / ${analytics.categoryName(run.category)} / ${run.rosterVersion}`;
         $('result-title').textContent =
             run.status !== 'complete'
                 ? 'Incomplete comparison'
@@ -274,6 +325,7 @@
             'attach-button',
             'remove-image',
             'new-button',
+            'category',
         ])
             $(id).disabled = on;
         $('run-button').disabled = !config?.ready;
@@ -291,6 +343,7 @@
             prompt: $('question').value,
             mode: mode(),
             image: attachedImage,
+            category: $('category').value,
         };
         controller = new AbortController();
         busy(true);
@@ -298,13 +351,15 @@
             'Starting the comparison. The E4B GPU may need a cold start.',
             'busy',
         );
-        let gotResult = false;
+        let gotResult = false,
+            started = false;
+        const startedAt = Date.now();
         try {
-            const response = await fetch('/api/arena-open/run', {
+            const response = await fetch('/api/open-arena/run', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-OffGrid-Client': 'open-arena',
+                    'X-OffGrid-Client': 'matched-open-arena',
                     'X-Arena-Access': accessKey,
                 },
                 body: JSON.stringify(payload),
@@ -315,6 +370,7 @@
                     (await response.json()).error ||
                         'The comparison could not start.',
                 );
+            started = true;
             const reader = response.body.getReader(),
                 decoder = new TextDecoder();
             let buffer = '';
@@ -347,6 +403,27 @@
                 currentRun.status === 'complete' ? '' : 'error',
             );
         } catch (error) {
+            if (started && !gotResult)
+                addRun(
+                    {
+                        id: crypto.randomUUID(),
+                        createdAt: new Date().toISOString(),
+                        mode: payload.mode,
+                        category: payload.category,
+                        prompt: payload.prompt,
+                        rosterVersion: config.rosterVersion,
+                        status: 'incomplete',
+                        answers: [],
+                        reviews: [],
+                        errors: [
+                            error.name === 'AbortError'
+                                ? 'Cancelled before a complete result reached this browser.'
+                                : 'Connection failed before a complete result reached this browser.',
+                        ],
+                        elapsedMs: Date.now() - startedAt,
+                    },
+                    attachedImage,
+                );
             status(
                 error.name === 'AbortError'
                     ? 'Cancelled. No win recorded; an in-flight provider call may still be billed.'
@@ -388,6 +465,7 @@
         $('question').dispatchEvent(new Event('input'));
         $('remove-image').click();
         $('sample').value = '';
+        $('category').value = 'general';
         $('results').hidden = true;
         $('question').focus();
     });
@@ -407,9 +485,17 @@
                 'My vehicle will not start on a remote gravel road. The lights come on but I hear rapid clicking. I have a multimeter, basic tools, water and a charged phone with no signal. What is the best troubleshooting order?',
             shelter:
                 'Two adults are camping in wet, windy weather, around 40 F. One is shivering after their sleeping bag got soaked. We have a tarp, two foam pads, dry spare clothes, cord and a stove. What should we do first?',
+            navigation:
+                'I have lost a marked trail in a wooded area. It is two hours before sunset. I have a paper map, compass, charged phone with no service, headlamp, water and a light rain jacket. What should I do first?',
+            planning:
+                'Two adults are preparing for a 48-hour power outage at home. We have drinking water, canned food, flashlights, blankets and a gas stove. What should we prioritize before the power goes out?',
+            medical:
+                'Two adults are preparing a first-aid kit for a three-day remote camping trip. Space is limited and help may be several hours away. What are the most useful essentials and how should we organize them?',
         };
         if (samples[$('sample').value]) {
             $('question').value = samples[$('sample').value];
+            $('category').value =
+                { vehicle: 'repairs' }[$('sample').value] || $('sample').value;
             $('question').dispatchEvent(new Event('input'));
         }
     });
@@ -449,19 +535,115 @@
     });
     $('remember-stats').addEventListener('change', () => {
         remember = $('remember-stats').checked;
+        if (!remember && !storageBlocked.lifetime) {
+            try {
+                localStorage.removeItem(statsKey);
+            } catch {
+                status('Browser storage is unavailable.', 'error');
+            }
+        }
         persistStats();
     });
-    $('clear-stats').addEventListener('click', () => {
-        if (
-            confirm(
-                'Clear statistics for the new matched-pair series? Original answers in this session and legacy Arena history will remain.',
-            )
-        ) {
-            stats = [];
-            persistStats();
-            renderStats();
+    document
+        .querySelectorAll('input[name="analytics-period"]')
+        .forEach((input) =>
+            input.addEventListener('change', () => {
+                selectedSeries = '';
+                renderStats();
+            }),
+        );
+    $('stats-config').addEventListener('change', () => {
+        selectedSeries =
+            analytics.configurations(activeStats(), mode())[
+                Number($('stats-config').value)
+            ]?.id || '';
+        renderStats();
+    });
+    $('stats-category').addEventListener('change', renderStats);
+    for (const scope of ['session', 'lifetime'])
+        $(`reset-${scope}`).addEventListener('click', () => {
+            resetScope = scope;
+            $('reset-heading').textContent = `Reset ${scope} statistics?`;
+            $('reset-message').textContent =
+                `This clears ${scope} counts for all categories, configurations and scoring modes on this browser. ${scope === 'session' ? 'Lifetime' : 'Session'} counts, original answers currently open, legacy Arena history and server spending allowances are unchanged. Export analytics first to retain a record.`;
+            $('reset-dialog').showModal();
+        });
+    $('confirm-reset').addEventListener('click', () => {
+        if (!resetScope) return;
+        if (resetScope === 'session') sessionStats = [];
+        else lifetimeStats = [];
+        storageBlocked[resetScope] = false;
+        try {
+            (resetScope === 'session'
+                ? sessionStorage
+                : localStorage
+            ).removeItem(resetScope === 'session' ? sessionKey : statsKey);
+        } catch {
+            status('Browser storage could not be cleared.', 'error');
+        }
+        persistStats();
+        renderStats();
+        $('reset-dialog').close();
+        resetScope = null;
+    });
+    $('analytics-toggle').addEventListener('click', () => {
+        const show = $('deep-analytics').hidden;
+        $('deep-analytics').hidden = !show;
+        $('workspace').classList.toggle('analytics-hidden', !show);
+        $('analytics-toggle').setAttribute('aria-expanded', String(show));
+        if (show && window.innerWidth <= 800)
+            $('deep-analytics').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+    });
+    $('share-stats').addEventListener('click', () => {
+        const { summary, filters, scope } = activeSummary;
+        $('share-text').textContent = analytics.shareSummary(summary, {
+            ...filters,
+            scope,
+        });
+        $('copy-summary').innerHTML = '<i data-lucide="copy"></i> Copy summary';
+        icons();
+        $('share-dialog').showModal();
+    });
+    $('copy-summary').addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText($('share-text').textContent);
+            $('copy-summary').textContent = 'Copied';
+        } catch {
+            status(
+                'Clipboard access blocked. Export analytics instead.',
+                'error',
+            );
         }
     });
+    $('export-stats').addEventListener('click', () => {
+        download(
+            {
+                schemaVersion: analytics.VERSION,
+                source: 'browser-local, user-resettable',
+                exportedAt: new Date().toISOString(),
+                scope: period(),
+                selection: activeSummary.filters,
+                summary: activeSummary.summary,
+                records: activeStats(),
+                limitations:
+                    'User-selected questions, not a held-out or independently verified benchmark. No question or answer text included. Records include all modes/categories/configurations in the selected period; the summary uses the stated filters.',
+            },
+            `offgrid-analytics-${period()}-${new Date().toISOString().slice(0, 10)}.json`,
+        );
+    });
+    $('pilot-export').addEventListener('click', () =>
+        download(
+            {
+                historical: true,
+                source: 'earlier pilot v1',
+                raw: localStorage.getItem(oldPilotKey),
+            },
+            'offgrid-earlier-pilot-statistics.json',
+        ),
+    );
     $('export-button').addEventListener('click', () => {
         if (currentRun)
             download(
@@ -496,31 +678,64 @@
             'offgrid-arena-historical.json',
         );
     });
-    try {
-        const saved = JSON.parse(localStorage.getItem(statsKey) || 'null');
-        if (Array.isArray(saved)) {
-            stats = saved.filter(
-                (s) =>
-                    s &&
-                    ['judge', 'council'].includes(s.mode) &&
-                    Array.isArray(s.pairs),
+    for (const scope of ['session', 'lifetime']) {
+        try {
+            const storage = scope === 'session' ? sessionStorage : localStorage;
+            const saved = JSON.parse(
+                storage.getItem(scope === 'session' ? sessionKey : statsKey) ||
+                    '[]',
             );
-            remember = true;
+            const records = analytics.validateRecords(saved);
+            if (scope === 'session') sessionStats = records;
+            else lifetimeStats = records;
+        } catch {
+            storageBlocked[scope] = true;
+            status(
+                `Saved ${scope} statistics could not be read. Existing storage was preserved.`,
+                'error',
+            );
         }
-        $('remember-stats').checked = remember;
+    }
+    try {
+        remember = localStorage.getItem(preferenceKey) !== 'false';
         $('legacy-export').hidden = !legacyKeys.some(
             (k) => localStorage.getItem(k) || sessionStorage.getItem(k),
         );
+        $('pilot-export').hidden = !localStorage.getItem(oldPilotKey);
     } catch {
-        status(
-            'Saved statistics could not be read. Historical data has not been changed.',
-            'error',
-        );
+        /* Storage-disabled browsers still support in-memory comparisons. */
     }
+    $('remember-stats').checked = remember;
+    window.addEventListener('storage', (event) => {
+        if (event.key !== statsKey || !remember) return;
+        try {
+            lifetimeStats = analytics.validateRecords(
+                JSON.parse(event.newValue || '[]'),
+            );
+            storageBlocked.lifetime = false;
+            renderStats();
+        } catch {
+            storageBlocked.lifetime = true;
+            status(
+                'Lifetime statistics changed in another tab but could not be read.',
+                'error',
+            );
+        }
+    });
+    const categoryOptions = Object.entries(analytics.CATEGORIES)
+        .map(
+            ([key, label]) =>
+                `<option value="${key}">${escape(label)}</option>`,
+        )
+        .join('');
+    $('category').innerHTML = categoryOptions;
+    $('category').value = 'general';
+    $('stats-category').innerHTML =
+        '<option value="all">All categories</option>' + categoryOptions;
     icons();
     renderStats();
     busy(false);
-    fetch('/api/arena-open/config')
+    fetch('/api/open-arena/config')
         .then(async (response) => {
             if (!response.ok) throw new Error();
             return response.json();

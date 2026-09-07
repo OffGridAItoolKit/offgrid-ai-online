@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('node:crypto');
+const { CATEGORIES, safeCategory } = require('../../assets/arena/analytics');
 const { OFFGRID_PROMPT, PROMPT_VERSION } = require('./prompt');
 const VERSION = 'gemma4-matched-v1';
 const RUBRIC_VERSION = 'contextual-risk-2-2-1-v1';
@@ -88,6 +89,12 @@ function validateInput(body) {
     if (body.mode !== undefined && !['judge', 'council'].includes(body.mode))
         throw new Error('Unknown scoring mode.');
     if (
+        body.category !== undefined &&
+        (typeof body.category !== 'string' ||
+            !Object.hasOwn(CATEGORIES, body.category))
+    )
+        throw new Error('Unknown scenario category.');
+    if (
         body.image &&
         (typeof body.image !== 'string' ||
             body.image.length > 2800000 ||
@@ -101,6 +108,7 @@ function validateInput(body) {
         prompt: body.prompt.trim(),
         image: body.image || null,
         mode: body.mode || 'judge',
+        category: safeCategory(body.category),
     };
 }
 function candidateRequest(model, input, seed) {
@@ -267,6 +275,7 @@ async function runComparison(
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         schemaVersion: 2,
+        category: safeCategory(input.category),
         rosterVersion: VERSION,
         rubricVersion: RUBRIC_VERSION,
         validationVersion: VALIDATION_VERSION,

@@ -1,7 +1,17 @@
 # Open Arena Private Pilot
 
-This is an isolated `/arena-open` replacement. The default feature flag is OFF.
-The existing `/arena`, `/command`, `/online`, offline application and legacy Arena history are unchanged.
+The matched-model experience is additive at **`/open-arena`**, with its own **`/api/open-arena/*`** endpoints. The original `/arena-open` page and `/api/arena-open/models` are preserved.
+The existing `/arena`, `/command`, `/online`, offline application and legacy Arena history are unchanged. The default paid-comparison feature flag is OFF; production requires explicit private configuration. The initial live research preview requires a pilot access key.
+
+## Deep Analytics and Product Discovery
+
+- Separate Session (sessionStorage) and Lifetime (localStorage) statistics with independent, confirmed resets. Lifetime persistence can be disabled. Original answers remain in page memory only; resets do not change usage allowances or old Arena history.
+- Judge/Council and model/prompt/rubric/provider/settings/validation configurations are never combined. A configuration selector keeps earlier configurations available. New `matched-analytics-v2` storage does not overwrite pilot v1 or legacy statistics; historical export remains available.
+- Category is selected before submission, validated server-side and saved with the run. It does not alter candidate or grading messages. Seven categories cover water/food, shelter/exposure, medical/first aid, navigation/rescue, tools/repairs, planning/preparedness and general/visual.
+- Category Strength shows both matched pairs, W/T/L, sample count and mean weighted score difference. Fewer than ten completed runs are labeled an early sample; ten is not a statistical-certification threshold. Criterion Advantage shows unweighted component deltas; average model scores are relative Borda points, not accuracy percentages.
+- Shareable summaries include both pairs, losses, ties, sample size, mode and limitations. Analytics JSON retains metadata/scores, not questions/answers/images/private instructions/keys. Complete-run summaries use the selected configuration; incomplete counts cover the selected mode/category across configurations.
+- Browser-local, user-resettable counts are not site-wide verified evidence. No held-out or independent benchmark claim. Candidate answers remain unrewritten; the exact public grading rubric is visible.
+- A restrained ToolKit link includes campaign tags for storefront referral attribution. No new tracking beacon, false victory claim, purchase requirement, price claim or unlimited-cloud entitlement was added. Online hosted testing and offline product behavior are explicitly distinguished.
 
 ## Deployment and Budget
 
@@ -59,7 +69,7 @@ Required `.env.arena` / Render settings:
 
 | Variable | Purpose |
 | --- | --- |
-| `OPEN_ARENA_MATCHED_ENABLED` | `true` selects the new public route; leave `false` until approved |
+| `OPEN_ARENA_MATCHED_ENABLED` | `true` enables paid matched comparisons at `/open-arena`; it never replaces `/arena-open` |
 | `OPEN_ARENA_BUDGETS_CONFIRMED` | `true` only after actual provider caps are verified |
 | `OPEN_ARENA_ACCESS_KEY` | Private pilot access key; not a provider credential |
 | `OPEN_ARENA_MODAL_URL` | Deployed HTTPS `*.modal.run` URL, no trailing path |
@@ -83,7 +93,7 @@ python -X utf8 -m unittest discover -s infra/modal -p 'test_*.py' -v
 node scripts/serve-open-arena-pilot.js
 ```
 
-Real-provider preview: `http://127.0.0.1:3109/arena-open`. Missing keys/flags leave Compare disabled. Restart after configuration changes. This loopback-only launcher must never be used as a production deployment. Production uses the existing PostgreSQL-backed server.
+Real-provider preview: `http://127.0.0.1:3109/open-arena`. Missing keys/flags leave Compare disabled. Restart after configuration changes. Local `/arena-open` links back to the preserved live original. This loopback-only launcher must never be used as a production deployment. Production uses the existing PostgreSQL-backed server.
 
 `node scripts/preview-open-arena.js` serves **synthetic UI fixtures only** on port 3108. It cannot call model APIs; its displayed results are not benchmark evidence.
 
@@ -97,11 +107,16 @@ node --env-file=.env.arena scripts/pilot-open-arena.js judge
 node --env-file=.env.arena scripts/pilot-open-arena.js council
 node --env-file=.env.arena scripts/pilot-open-arena.js judge-image
 node --env-file=.env.arena scripts/pilot-open-arena.js council-image
+node --env-file=.env.arena scripts/pilot-open-arena.js judge-long
 ```
 
 These scripts save local probe records under ignored `test-results/`. Direct technical probes do not reserve the website's monthly run counter; they still use the provider usage caps. Do not run them in an unattended loop. A nonzero exit means an invalid/incomplete probe, not a model losing a benchmark.
 
-## Pilot Observations, September 7, 2026
+`scripts/check-arena-browser.js` exercises the fixture server only, using Playwright/Chrome: independent resets, reload persistence, mode/category filtering, sharing/export, incomplete counts and desktop/390px/320px layout checks. Playwright is an optional operator test dependency, not a production runtime dependency. Do not point fixture/browser scripts at a live host.
+
+## Initial Pilot Observations, September 7, 2026
+
+These are dated pre-launch observations; they are not held-out benchmark results. The owner subsequently approved additive launch at `/open-arena`, preserving the original route.
 
 - Automatic flash attention timed out on tested Ollama 0.21.0 and 0.33.3 configurations. Explicitly disabling it allowed text and image responses. This is a measured configuration result, not a proven root-cause diagnosis.
 - Final 0.33.3 text probe: Optimized cold 102.1 seconds, baseline warm 3.2 seconds. Image probe: Optimized 6.5 seconds, baseline 4.5 seconds. Small technical samples, not throughput guarantees.
@@ -113,13 +128,14 @@ These scripts save local probe records under ignored `test-results/`. Direct tec
 - A real browser/SSE/export run completed in 49.1s, correctly showed a top-place tie and all four originals, and exported no credentials. The local usage count survived restart. Temporary browser-test access was removed; the configured private access key is required.
 - These are technical integration probes, not a held-out benchmark. Wins, losses, ties and incomplete attempts are retained locally. The same simple prompts were reused with fresh generations/seeds, so they do not isolate judge-mode effects or support a win-rate claim.
 - End-of-test billing snapshots: OpenRouter $0.04077435 used against $25/month; Modal $0.77 total usage, covered by credits, with a $10 workspace cap. Provider reporting is asynchronous; these are not final invoices or per-run price guarantees.
+- Pre-launch long-input GPT probe completed in 131.993s with all four valid candidates and a valid judge. Local record `pilot-judge-long-1788824832184.json`; all identities/settings verified. This near-maximum character input with short requested output does not exhaustively test every tokenizer/context/output-limit combination.
 - GPT-5.2 remains the default outside judge. Council uses four calls but two foundation families without OffGrid candidate instructions during review; the votes are not independent experts.
 
 ## Release and Rollback Gates
 
-Budget-key, provider-identity, small text/image four-way and real local UI checks are complete. Before changing the live route: calibrate Council judgment reliability, test large-context/truncation behavior against real providers, verify the production PostgreSQL guard and Render behavior, and review cold-start latency/costs. Obtain approval to merge/deploy. No production database or Render configuration was changed by the local pilot.
+Budget-key, provider-identity, small text/image four-way, a longer-input four-way run and real local UI checks are complete. Initial live release is a key-protected research preview with the existing caps, not a claim of established Council reliability. Validate the PostgreSQL guard and actual Render response path during launch. Human calibration, broader context/output limits, throughput and frozen held-out testing remain research work before performance claims or broad public access.
 
-Rollback the web experience by setting `OPEN_ARENA_MATCHED_ENABLED=false` and restarting the web service. Legacy files and storage keys are preserved. Stop all E4B pilot availability with:
+Disable paid comparisons by setting `OPEN_ARENA_MATCHED_ENABLED=false` and restarting the web service. The preserved original `/arena-open` is unaffected. A full code rollback uses the recorded prior Render deployment. Legacy files and storage keys remain intact. Stop all E4B pilot availability with:
 
 ```powershell
 python -X utf8 -m modal app stop offgrid-gemma4-e4b-pilot

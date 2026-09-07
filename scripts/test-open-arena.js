@@ -110,7 +110,7 @@ test('input rejects history-only prompts, oversized or external images, invalid 
             messages: ['old answer'],
             system: 'override',
         }),
-        input,
+        { ...input, category: 'general' },
     );
 });
 test('rankings must be complete permutations, with substantive reasons', () => {
@@ -188,7 +188,14 @@ test('identical answers cannot receive different grades', () => {
 });
 
 test('label-only and placeholder reasons cannot become valid reviews', () => {
-    for (const placeholder of ['A', 'D', '...', 'N/A', 'Not applicable', 'TBD']) {
+    for (const placeholder of [
+        'A',
+        'D',
+        '...',
+        'N/A',
+        'Not applicable',
+        'TBD',
+    ]) {
         const result = review();
         result.reasons.A.accuracy = placeholder;
         assert.throws(() => validateReview(result), /explanation/);
@@ -317,17 +324,33 @@ test('pilot defaults fail closed and access keys never accept empty values', () 
 test('E4B identity includes pinned runtime, artifact and actual generation settings', async () => {
     const { E4B_DIGEST } = require('../server/open-arena/core');
     const data = {
-        model: 'gemma4:e4b', artifactDigest: E4B_DIGEST, runtime: '0.33.3', verified: true,
-        text: 'Original answer.', finishReason: 'stop',
-        settings: { temperature: 1, top_k: 64, top_p: 0.95, num_ctx: 4096,
-            num_predict: 2048, seed: 3, num_thread: 4, think: false }
+        model: 'gemma4:e4b',
+        artifactDigest: E4B_DIGEST,
+        runtime: '0.33.3',
+        verified: true,
+        text: 'Original answer.',
+        finishReason: 'stop',
+        settings: {
+            temperature: 1,
+            top_k: 64,
+            top_p: 0.95,
+            num_ctx: 4096,
+            num_predict: 2048,
+            seed: 3,
+            num_thread: 4,
+            think: false,
+        },
     };
-    const providers = createProviders(configuration({}), async () => ({ ok: true, json: async () => data }));
+    const providers = createProviders(configuration({}), async () => ({
+        ok: true,
+        json: async () => data,
+    }));
     const request = candidateRequest(ROSTER[0], input, 3);
     assert.equal((await providers.generate(ROSTER[0], request)).matched, true);
     data.settings.temperature = 0.7;
     assert.equal((await providers.generate(ROSTER[0], request)).matched, false);
-    data.settings.temperature = 1; data.runtime = 'different-runtime';
+    data.settings.temperature = 1;
+    data.runtime = 'different-runtime';
     assert.equal((await providers.generate(ROSTER[0], request)).matched, false);
 });
 test('usage guard fails closed when database is down', async () => {
@@ -439,6 +462,7 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
             },
         },
     });
+    app.post('/api/command/query', (req, res) => res.json({ legacy: true }));
     const server = await new Promise((resolve) => {
         const s = app.listen(0, '127.0.0.1', () => resolve(s));
     });
@@ -448,7 +472,7 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
     });
     const base = `http://127.0.0.1:${server.address().port}`;
     const post = (body = input, key = config.accessKey) =>
-        fetch(`${base}/api/arena-open/run`, {
+        fetch(`${base}/api/open-arena/run`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -480,7 +504,7 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
     assert.equal(releases, 1);
     assert.ok(result.answers.every((a) => a.text === '  Original answer.  '));
     const publicConfig = await (
-        await fetch(`${base}/api/arena-open/config`)
+        await fetch(`${base}/api/open-arena/config`)
     ).text();
     for (const secret of [
         config.accessKey,
@@ -494,5 +518,38 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
         method: 'POST',
         headers: { 'X-OffGrid-Client': 'open-arena' },
     });
-    assert.equal(legacy.status, 409);
+    assert.equal(legacy.status, 200);
+    assert.deepEqual(await legacy.json(), { legacy: true });
+});
+
+test('new route is additive and categories do not change candidate or grader messages', () => {
+    const categorized = validateInput({ ...input, category: 'repairs' });
+    assert.equal(categorized.category, 'repairs');
+    assert.throws(
+        () => validateInput({ ...input, category: ['water'] }),
+        /category/,
+    );
+    assert.throws(
+        () => validateInput({ ...input, category: 'constructor' }),
+        /category/,
+    );
+    assert.throws(
+        () => validateInput({ ...input, category: '<script>' }),
+        /category/,
+    );
+    assert.equal(validateInput(input).category, 'general');
+    assert.deepEqual(
+        candidateRequest(ROSTER[0], categorized, 42),
+        candidateRequest(ROSTER[0], input, 42),
+    );
+    const source = fs.readFileSync(
+        path.resolve(__dirname, '../index.js'),
+        'utf8',
+    );
+    assert.match(source, /app\.get\('\/open-arena'/);
+    assert.match(
+        source,
+        /app\.get\('\/arena-open', \(req, res\) => \{\s*res\.sendFile\(path\.join\(__dirname, 'arena-open\.html'\)\)/,
+    );
+    assert.ok(!source.includes("app.use('/api/arena-open/', commandLimiter)"));
 });
