@@ -19,6 +19,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const { markdownToHtml } = require('./lib/pdf-markdown');
+const { registerOpenArenaRoutes } = require('./server/open-arena/routes');
 
 // License Key & Usage Limit System
 const {
@@ -497,7 +498,10 @@ app.use('/api/chat', anonymousPromptDailyLimit);
 app.use('/api/stream', limiter);
 app.use('/api/stream', anonymousPromptDailyLimit);
 app.use('/api/command/', commandLimiter);
+app.use('/api/arena-open/', commandLimiter);
 app.use('/api/image-studio/', commandLimiter);
+
+registerOpenArenaRoutes(app, { pool, requireLicense, checkPromptLimit, incrementUsage });
 
 // =============================================================================
 // DOMAIN ROUTING: OffGrid AI FieldGuide landing page
@@ -595,6 +599,15 @@ app.use((req, res, next) => {
 // Serve static files with Cache-Control headers for edge caching & performance
 // Render's CDN uses these headers to determine how long to cache at the edge.
 // Cache is purged automatically on every redeploy, so aggressive TTLs are safe.
+// Server implementation and hosting configuration must never be downloadable.
+app.use((req, res, next) => {
+    let normalized;
+    try { normalized = path.posix.normalize(decodeURIComponent(req.path).replace(/\\/g, '/')).toLowerCase(); }
+    catch { return res.sendStatus(400); }
+    if (/^\/(server|infra)(\/|$)/.test(normalized) || /^\/\.env(?:\.|$)/.test(normalized) ||
+        normalized.startsWith('/.arena-pilot-')) return res.sendStatus(404);
+    next();
+});
 app.use(express.static(__dirname, {
     setHeaders: (res, filePath) => {
         const ext = path.extname(filePath).toLowerCase();
@@ -2541,7 +2554,7 @@ app.get('/arena', (req, res) => {
 });
 
 app.get('/arena-open', (req, res) => {
-    res.sendFile(path.join(__dirname, 'arena-open.html'));
+    res.sendFile(path.join(__dirname, process.env.OPEN_ARENA_MATCHED_ENABLED === 'true' ? 'arena-open-matched.html' : 'arena-open.html'));
 });
 
 // =============================================================================

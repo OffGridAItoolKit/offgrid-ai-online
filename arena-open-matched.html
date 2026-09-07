@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="noindex" />
+        <title>OffGrid AI Open Arena | Matched Model Comparison</title>
+        <link rel="icon" href="/compass-192.png" />
+        <link rel="stylesheet" href="/assets/arena/matched.css" />
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"
+            integrity="sha384-uTYyvsSSUZeaPhb5RbKlQa0zY/WpX/QHfvg2mczXyBQOpkWPEDy9lczyp+w7SKXu"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/marked@18.0.6/lib/marked.umd.js"
+            integrity="sha384-uGn1eBC40GtuBgao0epc/cz9O4Lo8/flg/10SW+69UjLI5nP31iT4UPc65Xz10Le"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            defer
+            src="https://cdn.jsdelivr.net/npm/dompurify@3.4.11/dist/purify.min.js"
+            integrity="sha384-o44XUELLEnv/iSlA1NWxBweqbD4TSR0qgq2VzVsxtkHS989JJjGKSE9vkfo5MN4K"
+            crossorigin="anonymous"
+        ></script>
+        <script defer src="/assets/arena/matched.js"></script>
+    </head>
+    <body>
+        <header class="topbar">
+            <a class="brand" href="/arena-open"
+                ><img
+                    src="/compass-192.png"
+                    alt=""
+                    width="38"
+                    height="38"
+                /><span>OFFGRID AI <b>OPEN ARENA</b></span></a
+            >
+            <div class="header-tools">
+                <span class="pilot">PRIVATE PILOT</span
+                ><button
+                    class="icon-button"
+                    id="settings-button"
+                    title="Pilot access and privacy"
+                    aria-label="Pilot access and privacy"
+                >
+                    <i data-lucide="settings-2"></i>
+                </button>
+            </div>
+        </header>
+        <div class="workspace">
+            <main>
+                <div class="heading-row">
+                    <div>
+                        <p class="eyebrow">MATCHED MODEL COMPARISON</p>
+                        <h1>Same foundation. Different instructions.</h1>
+                    </div>
+                    <button
+                        class="icon-button"
+                        id="new-button"
+                        title="New question"
+                        aria-label="New question"
+                    >
+                        <i data-lucide="square-pen"></i>
+                    </button>
+                </div>
+                <section class="roster" aria-label="Model pairs">
+                    <div class="pair">
+                        <span class="pair-label">E4B PAIR</span>
+                        <div>
+                            <strong class="optimized"
+                                >OffGrid AI Optimized</strong
+                            ><span>Gemma 4 E4B + OffGrid instructions</span>
+                        </div>
+                        <span class="versus">vs</span>
+                        <div>
+                            <strong>Gemma 4 E4B</strong
+                            ><span>Baseline instruction-tuned model</span>
+                        </div>
+                    </div>
+                    <div class="pair">
+                        <span class="pair-label">26B PAIR</span>
+                        <div>
+                            <strong class="advanced">OffGrid AI Advanced</strong
+                            ><span>Gemma 4 26B A4B + OffGrid instructions</span>
+                        </div>
+                        <span class="versus">vs</span>
+                        <div>
+                            <strong>Gemma 4 26B A4B</strong
+                            ><span>Baseline instruction-tuned model</span>
+                        </div>
+                    </div>
+                </section>
+                <form id="question-form" class="composer">
+                    <label for="question">Your scenario</label>
+                    <textarea
+                        id="question"
+                        maxlength="4000"
+                        rows="4"
+                        required
+                        placeholder="What is happening, what do you have, and what decision do you need to make?"
+                    ></textarea>
+                    <div class="attachment" id="attachment" hidden>
+                        <img id="image-preview" alt="Attached scenario" /><span
+                            id="image-name"
+                        ></span
+                        ><button
+                            type="button"
+                            class="icon-button"
+                            id="remove-image"
+                            title="Remove image"
+                            aria-label="Remove image"
+                        >
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div class="composer-tools">
+                        <div class="tool-group">
+                            <button
+                                type="button"
+                                class="icon-button"
+                                id="attach-button"
+                                title="Attach one image"
+                                aria-label="Attach one image"
+                            >
+                                <i data-lucide="image-plus"></i></button
+                            ><input
+                                type="file"
+                                id="image-input"
+                                accept="image/png,image/jpeg,image/webp"
+                                hidden
+                            /><select id="sample" aria-label="Sample scenario">
+                                <option value="">Sample scenarios</option>
+                                <option value="water">Water shortage</option>
+                                <option value="vehicle">
+                                    Vehicle breakdown
+                                </option>
+                                <option value="shelter">
+                                    Cold-weather shelter
+                                </option>
+                            </select>
+                        </div>
+                        <span class="char-count" id="char-count"
+                            >0 / 4,000</span
+                        >
+                    </div>
+                    <div class="run-toolbar">
+                        <fieldset class="segmented" id="mode-control">
+                            <legend class="sr-only">Scoring mode</legend>
+                            <label
+                                ><input
+                                    type="radio"
+                                    name="mode"
+                                    value="judge"
+                                    checked
+                                /><span
+                                    ><i data-lucide="scale"></i> GPT-5.2
+                                    Judge</span
+                                ></label
+                            ><label
+                                ><input
+                                    type="radio"
+                                    name="mode"
+                                    value="council"
+                                /><span
+                                    ><i data-lucide="users"></i> Council</span
+                                ></label
+                            >
+                        </fieldset>
+                        <button id="run-button" class="primary" type="submit">
+                            <i data-lucide="play"></i> Compare answers</button
+                        ><button id="cancel-button" type="button" hidden>
+                            <i data-lucide="square"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+                <div
+                    id="status"
+                    class="status"
+                    role="status"
+                    aria-live="polite"
+                >
+                    Connecting to the pilot...
+                </div>
+                <section id="results" hidden aria-label="Comparison results">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow" id="result-mode"></p>
+                            <h2 id="result-title">Results</h2>
+                        </div>
+                        <div class="tool-group">
+                            <button
+                                class="icon-button"
+                                id="review-button"
+                                title="Grading report"
+                                aria-label="Grading report"
+                            >
+                                <i data-lucide="list-checks"></i></button
+                            ><button
+                                class="icon-button"
+                                id="export-button"
+                                title="Export this run as JSON"
+                                aria-label="Export this run as JSON"
+                            >
+                                <i data-lucide="download"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="result-question" class="result-question"></p>
+                    <div id="run-errors" class="error" hidden></div>
+                    <div id="pair-results" class="pair-results"></div>
+                    <div id="winning-answers"></div>
+                    <details id="other-answers">
+                        <summary>
+                            See other answers <span id="other-count"></span>
+                        </summary>
+                        <div id="other-answer-list"></div>
+                    </details>
+                    <p class="footnote">
+                        Original model answers, not a synthesized response. AI
+                        rankings are not factual certification; verify critical
+                        information.
+                    </p>
+                </section>
+                <footer>
+                    <a href="/arena">Frontier Arena</a
+                    ><a href="https://offgridaitoolkit.com"
+                        >OffGrid AI ToolKit</a
+                    ><button class="text-button" id="method-button">
+                        Scoring methodology
+                    </button>
+                </footer>
+            </main>
+            <aside aria-label="Paired results and history">
+                <div class="section-heading">
+                    <h2>Paired Results</h2>
+                    <i data-lucide="chart-no-axes-combined"></i>
+                </div>
+                <p class="muted" id="stats-scope">
+                    GPT-5.2 Judge / current configuration
+                </p>
+                <div class="stat-group">
+                    <h3 class="optimized">OffGrid AI Optimized</h3>
+                    <p>vs Gemma 4 E4B</p>
+                    <div class="wlt" id="optimized-stats"></div>
+                </div>
+                <div class="stat-group">
+                    <h3 class="advanced">OffGrid AI Advanced</h3>
+                    <p>vs Gemma 4 26B A4B</p>
+                    <div class="wlt" id="advanced-stats"></div>
+                </div>
+                <div class="stat-footer">
+                    <span id="run-count">0 complete runs</span
+                    ><span id="incomplete-count">0 incomplete</span>
+                </div>
+                <label class="check-row"
+                    ><input type="checkbox" id="remember-stats" /> Remember
+                    statistics on this device</label
+                >
+                <div class="section-heading history-heading">
+                    <h2>This Session</h2>
+                    <button
+                        class="icon-button"
+                        id="clear-stats"
+                        title="Clear new-series statistics"
+                        aria-label="Clear new-series statistics"
+                    >
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </div>
+                <div id="history"><p class="muted">No comparisons yet.</p></div>
+                <details class="method-details">
+                    <summary>Score weights</summary>
+                    <dl>
+                        <div>
+                            <dt>Accuracy</dt>
+                            <dd>2x</dd>
+                        </div>
+                        <div>
+                            <dt>Prioritization</dt>
+                            <dd>2x</dd>
+                        </div>
+                        <div>
+                            <dt>Actionability</dt>
+                            <dd>1x</dd>
+                        </div>
+                    </dl>
+                    <p>
+                        Relative Borda points, 0-15. Council scores are averaged
+                        across all four reviewers. Tied ranks share points.
+                    </p>
+                </details>
+                <button id="legacy-export" class="text-button" hidden>
+                    Export historical Arena statistics
+                </button>
+            </aside>
+        </div>
+        <dialog id="settings-dialog">
+            <div class="dialog-header">
+                <h2>Pilot Access</h2>
+                <button
+                    class="icon-button close-dialog"
+                    title="Close"
+                    aria-label="Close"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <form id="access-form">
+                <label for="access-key">Private pilot key</label
+                ><input id="access-key" type="password" autocomplete="off" />
+                <p class="muted">
+                    Held only in this page's memory. It is never included in
+                    exports.
+                </p>
+                <button class="primary" type="submit">
+                    <i data-lucide="key-round"></i> Use key
+                </button>
+            </form>
+            <h3>Data &amp; Privacy</h3>
+            <p id="privacy"></p>
+            <p>
+                Answers stay in this page until it closes, unless you export
+                them. Remembered statistics contain counts and configuration
+                metadata, not questions or answers. Existing Arena history is
+                kept separate.
+            </p>
+            <label class="check-row"
+                ><input type="checkbox" id="export-image" /> Include the
+                attached image in run exports</label
+            >
+        </dialog>
+        <dialog id="report-dialog">
+            <div class="dialog-header">
+                <h2>Grading Report</h2>
+                <button
+                    class="icon-button close-dialog"
+                    title="Close"
+                    aria-label="Close"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div id="report-content"></div>
+        </dialog>
+        <dialog id="method-dialog">
+            <div class="dialog-header">
+                <h2>Scoring Methodology</h2>
+                <button
+                    class="icon-button close-dialog"
+                    title="Close"
+                    aria-label="Close"
+                >
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <p>
+                Each pair uses the same foundation, host and generation
+                settings. Only the OffGrid contestant receives the additional
+                OffGrid instructions. Each question stands alone. Anonymous
+                labels and generation order are shuffled; model identity can
+                still be inferred from writing style.
+            </p>
+            <p>
+                GPT-5.2 is the outside judge. Council uses four peer-review
+                calls, including duplicate foundation families; those votes are
+                not independent experts. Incomplete answers or reviews produce
+                no winner. No answer is rewritten.
+            </p>
+            <p>
+                E4B uses the pinned USB model artifact on a Linux GPU. The 26B
+                pair uses hosted OpenRouter inference, not the USB quantized
+                file. This measures conditioning within each pair, not overall
+                offline runtime equivalence.
+            </p>
+            <h3>Exact Grader Instructions</h3>
+            <pre id="grader-prompt"></pre>
+        </dialog>
+    </body>
+</html>
