@@ -6,6 +6,7 @@ const { PROMPT_READY } = require('./prompt');
 function configuration(env = process.env) {
     return {
         enabled: env.OPEN_ARENA_MATCHED_ENABLED === 'true',
+        publicAccess: env.OPEN_ARENA_PUBLIC_ACCESS === 'true',
         budgetsConfirmed: env.OPEN_ARENA_BUDGETS_CONFIRMED === 'true',
         promptReady: PROMPT_READY,
         accessKey: env.OPEN_ARENA_ACCESS_KEY || '',
@@ -34,7 +35,8 @@ function readiness(config) {
         missing.push('Provider spending limits have not been confirmed.');
     if (!config.promptReady)
         missing.push('The verified private OffGrid prompt is not configured.');
-    if (!config.accessKey) missing.push('Pilot access is not configured.');
+    if (!config.publicAccess && !config.accessKey)
+        missing.push('Pilot access is not configured.');
     if (
         !/^https:\/\/[^/]+\.modal\.run\/?$/.test(config.modalUrl) ||
         !config.modalKey ||

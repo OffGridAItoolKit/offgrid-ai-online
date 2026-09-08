@@ -333,7 +333,7 @@
     async function submit(event) {
         event.preventDefault();
         if (controller || !config?.ready) return;
-        if (!accessKey) {
+        if (config.privatePilot !== false && !accessKey) {
             $('settings-dialog').showModal();
             $('access-key').focus();
             return;
@@ -360,7 +360,9 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'X-OffGrid-Client': 'matched-open-arena',
-                    'X-Arena-Access': accessKey,
+                    ...(config.privatePilot !== false
+                        ? { 'X-Arena-Access': accessKey }
+                        : {}),
                 },
                 body: JSON.stringify(payload),
                 signal: controller.signal,
@@ -742,11 +744,24 @@
         })
         .then((data) => {
             config = data;
+            const privateAccess = data.privatePilot !== false;
+            $('access-form').hidden = !privateAccess;
+            $('access-badge').textContent = privateAccess
+                ? 'PRIVATE PILOT'
+                : 'RESEARCH PREVIEW';
+            $('settings-heading').textContent = privateAccess
+                ? 'Pilot Access'
+                : 'Privacy & Exports';
+            const settingsLabel = privateAccess
+                ? 'Pilot access and privacy'
+                : 'Privacy and exports';
+            $('settings-button').title = settingsLabel;
+            $('settings-button').setAttribute('aria-label', settingsLabel);
             $('privacy').textContent = data.privacy;
             $('grader-prompt').textContent = data.graderPrompt;
             status(
                 data.ready
-                    ? 'Pilot ready. Each question is evaluated independently.'
+                    ? `${privateAccess ? 'Pilot ready.' : 'Ready.'} Each question is evaluated independently.`
                     : data.issues.join(' '),
             );
             busy(false);

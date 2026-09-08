@@ -476,7 +476,7 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Arena-Access': key,
+                ...(key === null ? {} : { 'X-Arena-Access': key }),
             },
             body: JSON.stringify(body),
         });
@@ -520,6 +520,50 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
     });
     assert.equal(legacy.status, 200);
     assert.deepEqual(await legacy.json(), { legacy: true });
+
+    config.publicAccess = true;
+    config.accessKey = '';
+    assert.deepEqual(readiness(config), []);
+    const openConfig = await (
+        await fetch(`${base}/api/open-arena/config`)
+    ).json();
+    assert.equal(openConfig.privatePilot, false);
+    config.enabled = false;
+    assert.equal((await post(input, null)).status, 503);
+    config.enabled = true;
+    config.budgetsConfirmed = false;
+    assert.equal((await post(input, null)).status, 503);
+    config.budgetsConfirmed = true;
+    assert.equal((await post({ prompt: '' }, null)).status, 400);
+    deniedBudget = true;
+    assert.equal((await post(input, null)).status, 429);
+    assert.equal(calls, 5);
+    deniedBudget = false;
+    const anonymous = await post(input, null);
+    assert.equal(anonymous.status, 200);
+    assert.ok((await anonymous.text()).includes('"status":"complete"'));
+    assert.equal(calls, 10);
+    assert.equal(releases, 2);
+    config.publicAccess = false;
+    assert.equal((await post(input, null)).status, 403);
+});
+
+test('public access requires an explicit flag and leaves spending caps intact', () => {
+    assert.equal(configuration({}).publicAccess, false);
+    assert.equal(
+        configuration({ OPEN_ARENA_PUBLIC_ACCESS: 'false' }).publicAccess,
+        false,
+    );
+    assert.equal(
+        configuration({ OPEN_ARENA_PUBLIC_ACCESS: '1' }).publicAccess,
+        false,
+    );
+    const open = configuration({ OPEN_ARENA_PUBLIC_ACCESS: 'true' });
+    assert.equal(open.publicAccess, true);
+    assert.equal(open.monthlyRunLimit, 20);
+    assert.equal(open.dailyRunLimit, 10);
+    assert.ok(readiness(open).length >= 3);
+    assert.ok(!readiness(open).includes('Pilot access is not configured.'));
 });
 
 test('new route is additive and categories do not change candidate or grader messages', () => {
