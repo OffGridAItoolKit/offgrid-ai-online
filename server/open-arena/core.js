@@ -268,6 +268,22 @@ function scoreReviews(reviews) {
     return { scores, ranking, winners, pairs };
 }
 
+function answerFailure(result) {
+    if (result.finishReason === 'length')
+        return 'Answer reached the output limit and was cut short. Not graded.';
+    if (result.finishReason === 'error')
+        return 'Provider interrupted the answer. Partial text is retained, not graded.';
+    if (result.finishReason === 'content_filter')
+        return 'Provider stopped the answer with a content filter. Not graded.';
+    if (typeof result.text !== 'string' || !result.text.trim())
+        return 'Model service returned no answer text. Not graded.';
+    if (result.matched !== true)
+        return 'Returned model, provider or settings could not be verified. Not graded.';
+    if (result.finishReason !== 'stop')
+        return 'Provider did not confirm a complete answer. Not graded.';
+    return null;
+}
+
 async function runComparison(
     input,
     adapters,
@@ -285,6 +301,7 @@ async function runComparison(
         rosterVersion: VERSION,
         rubricVersion: RUBRIC_VERSION,
         validationVersion: VALIDATION_VERSION,
+        reliabilityVersion: adapters.reliabilityVersion || 'single-attempt-v1',
         promptVersion: PROMPT_VERSION,
         promptDigest: digest(OFFGRID_PROMPT),
         rubricDigest: digest(GRADER_PROMPT),
@@ -334,28 +351,33 @@ async function runComparison(
                 model,
                 candidateRequest(model, input, seed),
                 signal,
+                {
+                    onRetry: ({ status, nextAttempt, maxAttempts, waitMs }) =>
+                        onProgress({
+                            stage: 'retrying',
+                            key: model.key,
+                            message: `${model.name}: provider ${status === 429 ? 'rate limit' : 'temporarily unavailable'}. Retrying the same provider in ${Math.ceil(waitMs / 1000)}s (attempt ${nextAttempt}/${maxAttempts}).`,
+                        }),
+                },
             );
-            const valid =
-                typeof result.text === 'string' &&
-                result.text.trim() &&
-                result.finishReason === 'stop' &&
-                result.matched === true;
+            const failure = answerFailure(result);
+            const valid = !failure;
             run.answers.push({
                 ...model,
                 ...result,
                 text: result.text || '',
                 valid: !!valid,
+                ...(failure ? { error: failure } : {}),
             });
-            if (!valid)
-                run.errors.push(
-                    `${model.name}: incomplete answer or unverified model identity.`,
-                );
+            if (!valid) run.errors.push(`${model.name}: ${failure}`);
         } catch (error) {
+            if (signal?.aborted) throw new Error('Run cancelled.');
             run.answers.push({
                 ...model,
                 text: '',
                 valid: false,
                 error: error.message,
+                metadata: error.metadata,
             });
             run.errors.push(`${model.name}: ${error.message}`);
         }
@@ -405,7 +427,7 @@ async function runComparison(
                     model: reviewer.model,
                     labelMap,
                     valid: false,
-                    metadata: result?.metadata,
+                    metadata: result?.metadata || error.metadata,
                     rawText: result?.text || '',
                     finishReason: result?.finishReason,
                     error: error.message,

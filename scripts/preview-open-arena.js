@@ -98,6 +98,22 @@ app.post('/api/open-arena/run', async (req, res) => {
                             provider: 'LOCAL FIXTURE',
                             model: model.model,
                             runtime: 'fixture-only',
+                            ...(req.body.prompt.includes('retry') &&
+                            model.pair === '26b'
+                                ? {
+                                      transport: {
+                                          version: 'fixture-only',
+                                          attempts: [
+                                              {
+                                                  attempt: 1,
+                                                  httpStatus: 429,
+                                                  retryDelayMs: 5000,
+                                              },
+                                              { attempt: 2, httpStatus: 200 },
+                                          ],
+                                      },
+                                  }
+                                : {}),
                         },
                     };
                 },

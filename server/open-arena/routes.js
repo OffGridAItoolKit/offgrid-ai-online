@@ -13,6 +13,7 @@ const {
 } = require('./core');
 const { configuration, readiness, createProviders } = require('./providers');
 const { CATEGORY_VERSION } = require('./categories');
+const { RELIABILITY_VERSION } = require('./transport');
 
 function accessAllowed(supplied, expected) {
     if (!expected || typeof supplied !== 'string') return false;
@@ -110,6 +111,7 @@ function registerOpenArenaRoutes(
             validationVersion: VALIDATION_VERSION,
             scoringModes: ['judge'],
             categorizationVersion: CATEGORY_VERSION,
+            reliabilityVersion: RELIABILITY_VERSION,
             weights: WEIGHTS,
             graderPrompt: GRADER_PROMPT,
             ready: readiness(config).length === 0,

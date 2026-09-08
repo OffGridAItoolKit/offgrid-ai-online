@@ -2,6 +2,7 @@
 
 const { MODEL_26B, E4B_DIGEST } = require('./core');
 const { PROMPT_READY } = require('./prompt');
+const { RELIABILITY_VERSION, createPost } = require('./transport');
 
 function configuration(env = process.env) {
     return {
@@ -92,46 +93,14 @@ function openRouterPayload(
         stream: false,
     };
 }
-function createProviders(config, fetchImpl = fetch) {
-    async function post(url, payload, headers, signal, timeoutMs) {
-        const combined = AbortSignal.any([
-            ...(signal ? [signal] : []),
-            AbortSignal.timeout(timeoutMs),
-        ]);
-        try {
-            const response = await fetchImpl(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', ...headers },
-                body: JSON.stringify(payload),
-                signal: combined,
-                redirect: 'error',
-            });
-            if (!response.ok)
-                throw new Error(
-                    `Model service returned HTTP ${response.status}.`,
-                );
-            const data = await response.json();
-            if (data.error)
-                throw new Error('Model service did not produce an answer.');
-            return data;
-        } catch (error) {
-            if (combined.aborted)
-                throw new Error(
-                    signal?.aborted
-                        ? 'Run cancelled.'
-                        : 'Model service timed out.',
-                );
-            // Never forward provider response bodies/URLs/credentials to the browser or logs.
-            if (/^Model service/.test(error.message)) throw error;
-            throw new Error('Unable to reach the model service.');
-        }
-    }
+function createProviders(config, fetchImpl = fetch, sleep) {
+    const post = createPost(fetchImpl, sleep);
     async function openRouter(
         model,
         request,
         grading,
         signal,
-        { maxTokens = 4096, timeoutMs = 180000 } = {},
+        { maxTokens = 4096, timeoutMs = 180000, onRetry } = {},
     ) {
         const is26 = model === MODEL_26B;
         const provider = is26 ? config.provider26 : config.judgeProvider;
@@ -146,7 +115,7 @@ function createProviders(config, fetchImpl = fetch) {
             maxTokens,
         );
         const started = Date.now();
-        const data = await post(
+        const { data, transport, failed } = await post(
             'https://openrouter.ai/api/v1/chat/completions',
             payload,
             {
@@ -156,10 +125,19 @@ function createProviders(config, fetchImpl = fetch) {
             },
             signal,
             timeoutMs,
-        );
+            { maxAttempts: is26 && !grading ? 3 : 1, onRetry },
+        ).catch((error) => {
+            error.metadata = {
+                providerRoute: provider,
+                expectedProvider: providerName,
+                expectedModel: model,
+                transport: error.transport,
+            };
+            throw error;
+        });
         return {
             text: data.choices?.[0]?.message?.content || '',
-            finishReason: data.choices?.[0]?.finish_reason,
+            finishReason: failed ? 'error' : data.choices?.[0]?.finish_reason,
             matched: data.model === model && data.provider === providerName,
             metadata: {
                 provider: data.provider,
@@ -168,6 +146,7 @@ function createProviders(config, fetchImpl = fetch) {
                 generationId: data.id,
                 usage: data.usage,
                 elapsedMs: Date.now() - started,
+                transport,
                 settings: {
                     max_tokens: payload.max_tokens,
                     temperature: payload.temperature,
@@ -184,7 +163,7 @@ function createProviders(config, fetchImpl = fetch) {
     }
     async function modal(request, grading, signal) {
         const started = Date.now();
-        const data = await post(
+        const { data, transport, failed } = await post(
             `${config.modalUrl.replace(/\/$/, '')}/generate`,
             {
                 prompt: request.prompt,
@@ -199,7 +178,14 @@ function createProviders(config, fetchImpl = fetch) {
             },
             signal,
             140000,
-        );
+        ).catch((error) => {
+            error.metadata = {
+                expectedProvider: 'Modal / Ollama',
+                expectedModel: 'gemma4:e4b',
+                transport: error.transport,
+            };
+            throw error;
+        });
         const expected = {
             temperature: grading ? 0.2 : 1,
             top_k: 64,
@@ -212,7 +198,7 @@ function createProviders(config, fetchImpl = fetch) {
         };
         return {
             text: data.text || '',
-            finishReason: data.finishReason,
+            finishReason: failed ? 'error' : data.finishReason,
             matched:
                 data.model === 'gemma4:e4b' &&
                 data.artifactDigest === E4B_DIGEST &&
@@ -229,21 +215,23 @@ function createProviders(config, fetchImpl = fetch) {
                 settings: data.settings,
                 usage: data.usage,
                 elapsedMs: Date.now() - started,
+                transport,
                 offlineParity: 'Pinned USB model layer; Linux GPU runtime',
             },
         };
     }
     return {
+        reliabilityVersion: RELIABILITY_VERSION,
         classify(request, signal) {
             return openRouter('openai/gpt-5.2', request, true, signal, {
                 maxTokens: 128,
                 timeoutMs: 20000,
             });
         },
-        generate(model, request, signal) {
+        generate(model, request, signal, options = {}) {
             return model.pair === 'e4b'
                 ? modal(request, false, signal)
-                : openRouter(model.model, request, false, signal);
+                : openRouter(model.model, request, false, signal, options);
         },
         review(model, request, signal) {
             return model.pair === 'e4b'

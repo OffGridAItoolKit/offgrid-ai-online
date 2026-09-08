@@ -93,7 +93,14 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
                 .getByRole('button', { name: 'Cancel', exact: true })
                 .waitFor({ state: 'hidden' });
         };
-        await compare('tie fixture first', 'water');
+        await compare('tie retry fixture first', 'water');
+        assert.equal(
+            await page
+                .locator('.answer-meta')
+                .filter({ hasText: '2 provider attempts' })
+                .count(),
+            2,
+        );
         assert.equal(
             await page.locator('#run-count').textContent(),
             '1 complete',
@@ -166,6 +173,17 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
             '1 complete',
         );
         await compare('incomplete fixture', 'medical');
+        assert.match(
+            await page.locator('#results').innerText(),
+            /Answer reached the output limit and was cut short/,
+        );
+        assert.match(
+            await page
+                .locator('#results article')
+                .filter({ hasText: 'Gemma 4 E4B' })
+                .innerText(),
+            /Not graded/,
+        );
         assert.equal(
             await page.locator('#run-count').textContent(),
             '1 complete',

@@ -241,6 +241,17 @@
         const article = document.createElement('article');
         article.className = `answer${winner ? ' winner' : ''}`;
         article.innerHTML = `<div class="answer-header"><div class="answer-title"><span class="place">${ranked ? '#' + ranked.place : '-'}</span><div><h3 class="${answer.conditioned ? answer.key : ''}">${escape(answer.name)}</h3><div class="answer-meta">${winner ? (run.winners.length > 1 ? 'Tied first / ' : 'Highest ranked / ') : ''}${answer.valid ? 'Original answer' : 'Incomplete'} / ${escape(answer.metadata?.provider || 'Provider unavailable')}</div></div></div><button class="icon-button copy-answer" title="Copy original answer" aria-label="Copy ${escape(answer.name)} answer"><i data-lucide="copy"></i></button></div>${score ? `<p class="score-line"><strong>${number(score.total)} / 15</strong> &nbsp; Accuracy ${number(score.accuracy)} &middot; Priority ${number(score.prioritization)} &middot; Action ${number(score.actionability)}</p>` : ''}<div class="answer-body">${answer.text ? renderMarkdown(answer.text) : `<p class="error">${escape(answer.error || 'No complete answer returned.')}</p>`}</div>`;
+        const attempts = answer.metadata?.transport?.attempts?.length || 1;
+        if (attempts > 1)
+            article
+                .querySelector('.answer-meta')
+                .append(` / ${attempts} provider attempts`);
+        if (!answer.valid && answer.text && answer.error) {
+            const warning = document.createElement('p');
+            warning.className = 'error';
+            warning.textContent = answer.error;
+            article.querySelector('.answer-body').before(warning);
+        }
         article
             .querySelector('.copy-answer')
             .addEventListener('click', async () => {
@@ -325,7 +336,7 @@
                 html += `<div class="reason"><strong>${escape(names[key])} (anonymous ${escape(label)})</strong>${criteria.map((c) => `<p><b>${capitalize(c)}:</b> ${escape(review.reasons[label][c])}</p>`).join('')}</div>`;
             html += `<details><summary>Anonymous rankings and provider record</summary><pre>${escape(JSON.stringify({ rankings: review.rankings, labelMap: review.labelMap, metadata: review.metadata }, null, 2))}</pre></details>`;
         }
-        html += `<details><summary>Run and model records</summary><pre>${escape(JSON.stringify({ id: run.id, seed: run.seed, promptVersion: run.promptVersion, promptDigest: run.promptDigest, rubricVersion: run.rubricVersion, rubricDigest: run.rubricDigest, validationVersion: run.validationVersion || 'initial-validation', answers: run.answers.map((a) => ({ key: a.key, finishReason: a.finishReason, metadata: a.metadata })), errors: run.errors }, null, 2))}</pre></details>`;
+        html += `<details><summary>Run and model records</summary><pre>${escape(JSON.stringify({ id: run.id, seed: run.seed, promptVersion: run.promptVersion, promptDigest: run.promptDigest, rubricVersion: run.rubricVersion, rubricDigest: run.rubricDigest, validationVersion: run.validationVersion || 'initial-validation', reliabilityVersion: run.reliabilityVersion || 'single-attempt-v1', answers: run.answers.map((a) => ({ key: a.key, finishReason: a.finishReason, matched: a.matched, error: a.error, metadata: a.metadata })), errors: run.errors }, null, 2))}</pre></details>`;
         $('report-content').innerHTML = html;
         $('report-dialog').showModal();
     }
