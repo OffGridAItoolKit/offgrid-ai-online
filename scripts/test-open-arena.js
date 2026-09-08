@@ -110,7 +110,7 @@ test('input rejects history-only prompts, oversized or external images, invalid 
             messages: ['old answer'],
             system: 'override',
         }),
-        { ...input, category: 'general' },
+        { ...input, category: 'auto' },
     );
 });
 test('rankings must be complete permutations, with substantive reasons', () => {
@@ -246,8 +246,8 @@ test('failures, empty replies, truncation and model mismatch are excluded, not r
         assert.equal(result.winners, undefined);
     }
 });
-test('invalid single judge or partial council cannot become a benchmark winner', async () => {
-    for (const mode of ['judge', 'council']) {
+test('invalid single judge cannot become a benchmark winner', async () => {
+    for (const mode of ['judge']) {
         let judges = 0;
         const run = await runComparison(
             { ...input, mode },
@@ -261,10 +261,28 @@ test('invalid single judge or partial council cannot become a benchmark winner',
         );
         assert.equal(run.status, 'incomplete');
         assert.equal(run.winners, undefined);
-        assert.equal(judges, mode === 'judge' ? 1 : 4);
+        assert.equal(judges, 1);
         assert.equal(run.reviews[0].valid, false);
         assert.equal(run.reviews[0].rawText, '{}');
     }
+});
+
+test('Council requests are rejected before inference; unspecified mode uses the outside judge', async () => {
+    assert.throws(
+        () => validateInput({ ...input, mode: 'council' }),
+        /Judge only/,
+    );
+    assert.equal(validateInput({ prompt: 'Question' }).mode, 'judge');
+    await assert.rejects(
+        runComparison(
+            { ...input, mode: 'council' },
+            {
+                generate: () => assert.fail('Council must not generate'),
+                review: () => assert.fail('Council must not grade'),
+            },
+        ),
+        /Judge only/,
+    );
 });
 test('cancelled run makes no further calls', async () => {
     const controller = new AbortController();
@@ -535,6 +553,7 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
     assert.equal((await post(input, null)).status, 503);
     config.budgetsConfirmed = true;
     assert.equal((await post({ prompt: '' }, null)).status, 400);
+    assert.equal((await post({ ...input, mode: 'council' }, null)).status, 400);
     deniedBudget = true;
     assert.equal((await post(input, null)).status, 429);
     assert.equal(calls, 5);
@@ -581,7 +600,7 @@ test('new route is additive and categories do not change candidate or grader mes
         () => validateInput({ ...input, category: '<script>' }),
         /category/,
     );
-    assert.equal(validateInput(input).category, 'general');
+    assert.equal(validateInput(input).category, 'auto');
     assert.deepEqual(
         candidateRequest(ROSTER[0], categorized, 42),
         candidateRequest(ROSTER[0], input, 42),

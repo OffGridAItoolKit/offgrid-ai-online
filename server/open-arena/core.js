@@ -2,6 +2,7 @@
 
 const crypto = require('node:crypto');
 const { CATEGORIES, safeCategory } = require('../../assets/arena/analytics');
+const { resolveCategory } = require('./categories');
 const { OFFGRID_PROMPT, PROMPT_VERSION } = require('./prompt');
 const VERSION = 'gemma4-matched-v1';
 const RUBRIC_VERSION = 'contextual-risk-2-2-1-v1';
@@ -86,12 +87,15 @@ function validateInput(body) {
     ) {
         throw new Error('Enter a question of 1 to 4,000 characters.');
     }
-    if (body.mode !== undefined && !['judge', 'council'].includes(body.mode))
-        throw new Error('Unknown scoring mode.');
+    if (body.mode !== undefined && body.mode !== 'judge')
+        throw new Error(
+            'New comparisons use GPT-5.2 Judge only. Reload the Arena.',
+        );
     if (
         body.category !== undefined &&
         (typeof body.category !== 'string' ||
-            !Object.hasOwn(CATEGORIES, body.category))
+            (body.category !== 'auto' &&
+                !Object.hasOwn(CATEGORIES, body.category)))
     )
         throw new Error('Unknown scenario category.');
     if (
@@ -107,8 +111,8 @@ function validateInput(body) {
     return {
         prompt: body.prompt.trim(),
         image: body.image || null,
-        mode: body.mode || 'judge',
-        category: safeCategory(body.category),
+        mode: 'judge',
+        category: body.category || 'auto',
     };
 }
 function candidateRequest(model, input, seed) {
@@ -269,6 +273,8 @@ async function runComparison(
     adapters,
     { signal, onProgress = () => {} } = {},
 ) {
+    if (input.mode !== undefined && input.mode !== 'judge')
+        throw new Error('New comparisons use GPT-5.2 Judge only.');
     const seed = crypto.randomInt(2147483647);
     const started = Date.now();
     const run = {
@@ -284,7 +290,7 @@ async function runComparison(
         rubricDigest: digest(GRADER_PROMPT),
         prompt: input.prompt,
         imageDigest: input.image ? digest(input.image) : null,
-        mode: input.mode,
+        mode: 'judge',
         seed,
         weights: WEIGHTS,
         settings: SETTINGS,
@@ -293,6 +299,28 @@ async function runComparison(
         reviews: [],
         errors: [],
     };
+    onProgress({
+        stage: 'categorizing',
+        message:
+            input.category && input.category !== 'auto'
+                ? 'Using the selected category.'
+                : 'Categorizing the question.',
+    });
+    run.categorization = await resolveCategory(input, adapters, signal);
+    run.category = run.categorization.category;
+    onProgress({
+        stage: 'category',
+        category: run.category,
+        categorization: {
+            category: run.category,
+            source: run.categorization.source,
+            version: run.categorization.version,
+        },
+        message:
+            run.categorization.source === 'fallback'
+                ? 'Automatic categorization unavailable; using General / Visual.'
+                : `Category: ${CATEGORIES[run.category]}`,
+    });
     // Randomize execution order too; no prior winner, history, or grader text enters generation.
     for (const model of shuffle(ROSTER)) {
         if (signal?.aborted) throw new Error('Run cancelled.');
@@ -333,10 +361,9 @@ async function runComparison(
         }
     }
     if (!run.errors.length) {
-        const reviewers =
-            input.mode === 'judge'
-                ? [{ key: 'gpt-5.2', name: 'GPT-5.2', model: 'openai/gpt-5.2' }]
-                : ROSTER;
+        const reviewers = [
+            { key: 'gpt-5.2', name: 'GPT-5.2', model: 'openai/gpt-5.2' },
+        ];
         const scored = [];
         for (const reviewer of reviewers) {
             if (signal?.aborted) throw new Error('Run cancelled.');
@@ -386,7 +413,7 @@ async function runComparison(
                 run.errors.push(`${reviewer.name} review: ${error.message}`);
             }
         }
-        // Council mode requires all four reviewers. A partial council never becomes a benchmark win.
+        // An invalid or missing judge never becomes a benchmark win.
         if (!run.errors.length && scored.length === reviewers.length) {
             Object.assign(run, scoreReviews(scored), { status: 'complete' });
         }

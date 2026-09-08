@@ -19,6 +19,27 @@
     const KEYS = ['optimized', 'e4b', 'advanced', '26b'];
     const PAIRS = { optimized: 'e4b', advanced: '26b' };
     const CRITERIA = ['accuracy', 'prioritization', 'actionability', 'total'];
+    function categoryProvenance(source, version) {
+        return {
+            categorySource: [
+                'automatic',
+                'manual',
+                'fallback',
+                'unassigned',
+                'legacy',
+            ].includes(source)
+                ? source
+                : 'legacy',
+            categoryVersion: [
+                'question-only-gpt52-v1',
+                'manual-v1',
+                'unassigned',
+                'legacy',
+            ].includes(version)
+                ? version
+                : 'legacy',
+        };
+    }
     const categoryName = (key) => CATEGORIES[key] || 'Uncategorized';
     const safeCategory = (key) =>
         typeof key === 'string' && Object.hasOwn(CATEGORIES, key)
@@ -105,6 +126,10 @@
             date: run.createdAt,
             mode: run.mode,
             category: safeCategory(run.category),
+            ...categoryProvenance(
+                run.categorization?.source,
+                run.categorization?.version,
+            ),
             status: complete ? 'complete' : 'incomplete',
             series: complete ? series(run) : null,
             scores: complete
@@ -146,6 +171,7 @@
                 date: r.date,
                 mode: r.mode,
                 category: r.category,
+                ...categoryProvenance(r.categorySource, r.categoryVersion),
                 status: r.status,
                 series: r.status === 'complete' ? r.series : null,
                 scores:

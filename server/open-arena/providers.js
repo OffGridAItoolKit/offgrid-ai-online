@@ -61,11 +61,17 @@ function messages(request) {
         { role: 'user', content },
     ];
 }
-function openRouterPayload(model, request, provider, grading = false) {
+function openRouterPayload(
+    model,
+    request,
+    provider,
+    grading = false,
+    maxReviewTokens = 4096,
+) {
     return {
         model,
         messages: messages(request),
-        max_tokens: grading ? 4096 : request.settings.max_tokens,
+        max_tokens: grading ? maxReviewTokens : request.settings.max_tokens,
         ...(model === MODEL_26B
             ? { temperature: grading ? 0.2 : request.settings.temperature }
             : {}),
@@ -120,13 +126,25 @@ function createProviders(config, fetchImpl = fetch) {
             throw new Error('Unable to reach the model service.');
         }
     }
-    async function openRouter(model, request, grading, signal) {
+    async function openRouter(
+        model,
+        request,
+        grading,
+        signal,
+        { maxTokens = 4096, timeoutMs = 180000 } = {},
+    ) {
         const is26 = model === MODEL_26B;
         const provider = is26 ? config.provider26 : config.judgeProvider;
         const providerName = is26
             ? config.provider26Name
             : config.judgeProviderName;
-        const payload = openRouterPayload(model, request, provider, grading);
+        const payload = openRouterPayload(
+            model,
+            request,
+            provider,
+            grading,
+            maxTokens,
+        );
         const started = Date.now();
         const data = await post(
             'https://openrouter.ai/api/v1/chat/completions',
@@ -137,7 +155,7 @@ function createProviders(config, fetchImpl = fetch) {
                 'X-Title': 'OffGrid Matched-Pair Arena',
             },
             signal,
-            180000,
+            timeoutMs,
         );
         return {
             text: data.choices?.[0]?.message?.content || '',
@@ -216,6 +234,12 @@ function createProviders(config, fetchImpl = fetch) {
         };
     }
     return {
+        classify(request, signal) {
+            return openRouter('openai/gpt-5.2', request, true, signal, {
+                maxTokens: 128,
+                timeoutMs: 20000,
+            });
+        },
         generate(model, request, signal) {
             return model.pair === 'e4b'
                 ? modal(request, false, signal)

@@ -27,7 +27,10 @@
             content="https://offgridtoolkit.ai/compass-192.png"
         />
         <link rel="icon" href="/compass-192.png" />
-        <link rel="stylesheet" href="/assets/arena/matched.css" />
+        <link
+            rel="stylesheet"
+            href="/assets/arena/matched.css?v=20260908-judge1"
+        />
         <script
             defer
             src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"
@@ -46,8 +49,11 @@
             integrity="sha384-o44XUELLEnv/iSlA1NWxBweqbD4TSR0qgq2VzVsxtkHS989JJjGKSE9vkfo5MN4K"
             crossorigin="anonymous"
         ></script>
-        <script defer src="/assets/arena/analytics.js"></script>
-        <script defer src="/assets/arena/matched.js?v=20260907-public1"></script>
+        <script defer src="/assets/arena/analytics.js?v=20260908-category1"></script>
+        <script
+            defer
+            src="/assets/arena/matched.js?v=20260908-category1"
+        ></script>
     </head>
     <body>
         <header class="topbar">
@@ -192,28 +198,9 @@
                         ></select>
                     </div>
                     <div class="run-toolbar">
-                        <fieldset class="segmented" id="mode-control">
-                            <legend class="sr-only">Scoring mode</legend>
-                            <label
-                                ><input
-                                    type="radio"
-                                    name="mode"
-                                    value="judge"
-                                    checked
-                                /><span
-                                    ><i data-lucide="scale"></i> GPT-5.2
-                                    Judge</span
-                                ></label
-                            ><label
-                                ><input
-                                    type="radio"
-                                    name="mode"
-                                    value="council"
-                                /><span
-                                    ><i data-lucide="users"></i> Council</span
-                                ></label
-                            >
-                        </fieldset>
+                        <span class="judge-label"
+                            ><i data-lucide="scale"></i> GPT-5.2 Judge</span
+                        >
                         <button id="run-button" class="primary" type="submit">
                             <i data-lucide="play"></i> Compare answers</button
                         ><button id="cancel-button" type="button" hidden>
@@ -254,6 +241,7 @@
                         </div>
                     </div>
                     <p id="result-question" class="result-question"></p>
+                    <p id="category-assignment" class="muted"></p>
                     <div id="run-errors" class="error" hidden></div>
                     <div id="pair-results" class="pair-results"></div>
                     <div id="winning-answers"></div>
@@ -325,6 +313,17 @@
                     >
                 </fieldset>
                 <div class="analytics-filters">
+                    <label id="history-mode-label" for="history-mode" hidden
+                        >Scoring history</label
+                    >
+                    <select
+                        id="history-mode"
+                        aria-label="Scoring history"
+                        hidden
+                    >
+                        <option value="judge">GPT-5.2 Judge</option>
+                        <option value="council">Council (historical)</option>
+                    </select>
                     <label for="stats-config">Configuration</label
                     ><select
                         id="stats-config"
@@ -445,10 +444,7 @@
                             <dd>1x</dd>
                         </div>
                     </dl>
-                    <p>
-                        Relative Borda points, 0-15. Council scores are averaged
-                        across all four reviewers. Tied ranks share points.
-                    </p>
+                    <p>Relative Borda points, 0-15. Tied ranks share points.</p>
                 </details>
                 <button id="legacy-export" class="text-button" hidden>
                     Export historical Arena statistics
@@ -561,10 +557,19 @@
                 still be inferred from writing style.
             </p>
             <p>
-                GPT-5.2 is the outside judge. Council uses four peer-review
-                calls, including duplicate foundation families; those votes are
-                not independent experts. Incomplete answers or reviews produce
-                no winner. No answer is rewritten.
+                GPT-5.2 is the outside judge for every new comparison. An
+                outside AI judge can still have biases and make mistakes.
+                Incomplete answers or an invalid review produce no winner. No
+                answer is rewritten. Historical Council results remain separate
+                in analytics.
+            </p>
+            <p>
+                Automatic categories use only the question, in a separate
+                GPT-5.2 request before answer generation. A selected category
+                overrides that step. Categories never enter answer or grading
+                prompts. Classification failures are labeled General / Visual
+                fallback, not counted as answer failures. Earlier records keep
+                their original categories.
             </p>
             <p>
                 E4B uses the pinned USB model artifact on a Linux GPU. The 26B

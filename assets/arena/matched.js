@@ -47,8 +47,7 @@
         );
     const number = (n) =>
         Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 });
-    const mode = () =>
-        document.querySelector('input[name="mode"]:checked').value;
+    const mode = () => $('history-mode').value;
     const modeName = (value) =>
         value === 'judge' ? 'GPT-5.2 Judge' : 'Council';
     const capitalize = (value) =>
@@ -101,6 +100,10 @@
             ? `Saved ${blocked.join(' and ')} statistics are unreadable or unavailable. Existing storage is preserved; new results remain in memory.`
             : '';
         const records = activeStats();
+        const hasCouncil = records.some((r) => r.mode === 'council');
+        $('history-mode-label').hidden = !hasCouncil;
+        $('history-mode').hidden = !hasCouncil;
+        if (!hasCouncil) $('history-mode').value = 'judge';
         const configs = analytics.configurations(records, mode());
         if (!configs.some((c) => c.id === selectedSeries))
             selectedSeries = configs[0]?.id || '';
@@ -196,6 +199,7 @@
             }
         }
         lifetimeStats = analytics.add(lifetimeStats, entry);
+        $('history-mode').value = 'judge';
         selectedSeries = '';
         persistStats();
         renderStats();
@@ -261,6 +265,16 @@
         $('results').hidden = false;
         $('result-mode').textContent =
             `${modeName(run.mode)} / ${analytics.categoryName(run.category)} / ${run.rosterVersion}`;
+        $('category-assignment').textContent =
+            `Category: ${analytics.categoryName(run.category)} / ${
+                run.categorization?.source === 'automatic'
+                    ? 'Automatic, question only'
+                    : run.categorization?.source === 'manual'
+                      ? 'Manually selected'
+                      : run.categorization?.source === 'fallback'
+                        ? 'Automatic categorization unavailable; General / Visual fallback'
+                        : 'Earlier or unassigned category'
+            }`;
         $('result-title').textContent =
             run.status !== 'complete'
                 ? 'Incomplete comparison'
@@ -320,7 +334,6 @@
         $('cancel-button').hidden = !on;
         for (const id of [
             'question',
-            'mode-control',
             'sample',
             'attach-button',
             'remove-image',
@@ -341,7 +354,7 @@
         const attachedImage = image;
         const payload = {
             prompt: $('question').value,
-            mode: mode(),
+            mode: 'judge',
             image: attachedImage,
             category: $('category').value,
         };
@@ -353,6 +366,14 @@
         );
         let gotResult = false,
             started = false;
+        let resolvedCategory =
+            payload.category === 'auto'
+                ? null
+                : {
+                      category: payload.category,
+                      source: 'manual',
+                      version: 'manual-v1',
+                  };
         const startedAt = Date.now();
         try {
             const response = await fetch('/api/open-arena/run', {
@@ -386,8 +407,12 @@
                     buffer = buffer.slice(split + 2);
                     if (!packet.startsWith('data: ')) continue;
                     const data = JSON.parse(packet.slice(6));
-                    if (data.type === 'progress') status(data.message, 'busy');
-                    else if (data.type === 'error') throw new Error(data.error);
+                    if (data.type === 'progress') {
+                        if (data.stage === 'category')
+                            resolvedCategory = data.categorization;
+                        status(data.message, 'busy');
+                    } else if (data.type === 'error')
+                        throw new Error(data.error);
                     else if (data.type === 'result') {
                         gotResult = true;
                         addRun(data.run, attachedImage);
@@ -411,7 +436,11 @@
                         id: crypto.randomUUID(),
                         createdAt: new Date().toISOString(),
                         mode: payload.mode,
-                        category: payload.category,
+                        category: resolvedCategory?.category || 'general',
+                        categorization: resolvedCategory || {
+                            source: 'unassigned',
+                            version: 'unassigned',
+                        },
                         prompt: payload.prompt,
                         rosterVersion: config.rosterVersion,
                         status: 'incomplete',
@@ -467,7 +496,7 @@
         $('question').dispatchEvent(new Event('input'));
         $('remove-image').click();
         $('sample').value = '';
-        $('category').value = 'general';
+        $('category').value = 'auto';
         $('results').hidden = true;
         $('question').focus();
     });
@@ -477,9 +506,10 @@
             ($('char-count').textContent =
                 `${$('question').value.length.toLocaleString()} / 4,000`),
     );
-    document
-        .querySelectorAll('input[name="mode"]')
-        .forEach((input) => input.addEventListener('change', renderStats));
+    $('history-mode').addEventListener('change', () => {
+        selectedSeries = '';
+        renderStats();
+    });
     $('sample').addEventListener('change', () => {
         const samples = {
             water: 'Our well pump stopped during a power outage. Two adults have 4 liters of drinking water, a camping stove, a metal pot, and access to a nearby stream. No cellular service. What should we do first over the next 24 hours?',
@@ -496,8 +526,7 @@
         };
         if (samples[$('sample').value]) {
             $('question').value = samples[$('sample').value];
-            $('category').value =
-                { vehicle: 'repairs' }[$('sample').value] || $('sample').value;
+            $('category').value = 'auto';
             $('question').dispatchEvent(new Event('input'));
         }
     });
@@ -730,8 +759,10 @@
                 `<option value="${key}">${escape(label)}</option>`,
         )
         .join('');
-    $('category').innerHTML = categoryOptions;
-    $('category').value = 'general';
+    $('category').innerHTML =
+        '<option value="auto">Automatic (question context)</option>' +
+        categoryOptions;
+    $('category').value = 'auto';
     $('stats-category').innerHTML =
         '<option value="all">All categories</option>' + categoryOptions;
     icons();

@@ -438,6 +438,18 @@ select {
     padding: 12px 14px;
     flex-wrap: wrap;
 }
+.judge-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 13px;
+}
+.judge-label svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+}
 .segmented {
     display: flex;
     margin: 0;

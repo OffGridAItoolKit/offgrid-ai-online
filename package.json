@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node index.js",
-    "test:arena": "node --test scripts/test-open-arena.js scripts/test-arena-analytics.js",
+    "test:arena": "node --test scripts/test-open-arena.js scripts/test-arena-analytics.js scripts/test-arena-categories.js",
     "test:prompts": "node scripts/check-ready-made-prompts.js",
     "test:health-disclosure": "node scripts/check-health-disclosure.js",
     "test:privacy-policy": "node scripts/check-privacy-policy.js",

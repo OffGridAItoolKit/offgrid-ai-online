@@ -61,6 +61,22 @@ app.post('/api/open-arena/run', async (req, res) => {
         const run = await runComparison(
             req.body,
             {
+                async classify(request) {
+                    const question = JSON.parse(request.prompt).question;
+                    if (question.includes('category-failure'))
+                        throw new Error('Fixture classification failure');
+                    const category = /medicinal|look-alike/i.test(question)
+                        ? 'medical'
+                        : /water|bread/i.test(question)
+                          ? 'water'
+                          : 'general';
+                    return {
+                        text: JSON.stringify({ category }),
+                        matched: true,
+                        finishReason: 'stop',
+                        metadata: { provider: 'LOCAL FIXTURE' },
+                    };
+                },
                 async generate(model) {
                     await new Promise((resolve) =>
                         setTimeout(
