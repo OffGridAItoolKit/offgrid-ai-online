@@ -47,7 +47,7 @@
             crossorigin="anonymous"
         ></script>
         <script defer src="/assets/arena/analytics.js"></script>
-        <script defer src="/assets/arena/matched.js"></script>
+        <script defer src="/assets/arena/matched.js?v=20260907-public1"></script>
     </head>
     <body>
         <header class="topbar">
@@ -70,7 +70,7 @@
                 >
                     <i data-lucide="chart-no-axes-combined"></i>
                 </button>
-                <span class="pilot">PRIVATE PILOT</span
+                <span class="pilot" id="access-badge">RESEARCH PREVIEW</span
                 ><button
                     class="icon-button"
                     id="settings-button"
@@ -460,7 +460,7 @@
         </div>
         <dialog id="settings-dialog">
             <div class="dialog-header">
-                <h2>Pilot Access</h2>
+                <h2 id="settings-heading">Privacy &amp; Exports</h2>
                 <button
                     class="icon-button close-dialog"
                     title="Close"
@@ -469,7 +469,7 @@
                     <i data-lucide="x"></i>
                 </button>
             </div>
-            <form id="access-form">
+            <form id="access-form" hidden>
                 <label for="access-key">Private pilot key</label
                 ><input id="access-key" type="password" autocomplete="off" />
                 <p class="muted">

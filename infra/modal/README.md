@@ -1,7 +1,7 @@
 # Open Arena Private Pilot
 
 The matched-model experience is additive at **`/open-arena`**, with its own **`/api/open-arena/*`** endpoints. The original `/arena-open` page and `/api/arena-open/models` are preserved.
-The existing `/arena`, `/command`, `/online`, offline application and legacy Arena history are unchanged. The default paid-comparison feature flag is OFF; production requires explicit private configuration. The initial live research preview requires a pilot access key.
+The existing `/arena`, `/command`, `/online`, offline application and legacy Arena history are unchanged. The default paid-comparison feature flag is OFF; production requires explicit provider configuration. The owner subsequently authorized keyless access to the live research preview. Public access is enabled only with `OPEN_ARENA_PUBLIC_ACCESS=true`; private mode remains available without changing provider credentials or spending controls.
 
 ## Deep Analytics and Product Discovery
 
@@ -70,8 +70,9 @@ Required `.env.arena` / Render settings:
 | Variable | Purpose |
 | --- | --- |
 | `OPEN_ARENA_MATCHED_ENABLED` | `true` enables paid matched comparisons at `/open-arena`; it never replaces `/arena-open` |
+| `OPEN_ARENA_PUBLIC_ACCESS` | Explicit `true` removes the browser pilot-key gate; all readiness, rate, shared-usage and provider-budget controls remain. Default is private. |
 | `OPEN_ARENA_BUDGETS_CONFIRMED` | `true` only after actual provider caps are verified |
-| `OPEN_ARENA_ACCESS_KEY` | Private pilot access key; not a provider credential |
+| `OPEN_ARENA_ACCESS_KEY` | Required only in private mode; never exposed to the browser automatically. Not a provider credential. |
 | `OPEN_ARENA_MODAL_URL` | Deployed HTTPS `*.modal.run` URL, no trailing path |
 | `OPEN_ARENA_MODAL_KEY`, `OPEN_ARENA_MODAL_SECRET` | Dedicated Modal proxy credentials |
 | `OPEN_ARENA_OPENROUTER_KEY` | Dedicated monthly-budgeted OpenRouter key |
@@ -133,7 +134,7 @@ These are dated pre-launch observations; they are not held-out benchmark results
 
 ## Release and Rollback Gates
 
-Budget-key, provider-identity, small text/image four-way, a longer-input four-way run and real local UI checks are complete. Initial live release is a key-protected research preview with the existing caps, not a claim of established Council reliability. Validate the PostgreSQL guard and actual Render response path during launch. Human calibration, broader context/output limits, throughput and frozen held-out testing remain research work before performance claims or broad public access.
+Budget-key, provider-identity, small text/image four-way, a longer-input four-way run and real local UI checks are complete. The initial Render release and actual PostgreSQL reservation/SSE/browser flow passed. The owner subsequently authorized keyless access with existing caps, not a claim of established Council reliability. Use a fresh browser without an access header to verify the public-access release. Human calibration, broader context/output limits, throughput and frozen held-out testing remain research work before performance claims. An unadvertised URL is still publicly accessible; do not treat it as private.
 
 Disable paid comparisons by setting `OPEN_ARENA_MATCHED_ENABLED=false` and restarting the web service. The preserved original `/arena-open` is unaffected. A full code rollback uses the recorded prior Render deployment. Legacy files and storage keys remain intact. Stop all E4B pilot availability with:
 

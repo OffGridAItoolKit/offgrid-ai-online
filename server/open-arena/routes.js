@@ -111,7 +111,7 @@ function registerOpenArenaRoutes(
             graderPrompt: GRADER_PROMPT,
             ready: readiness(config).length === 0,
             issues: readiness(config),
-            privatePilot: true,
+            privatePilot: !config.publicAccess,
             privacy:
                 'Questions and images are sent to Modal and OpenRouter providers. The application stores usage counts, not answer text. Exports contain your question and answers.',
         });
@@ -119,7 +119,10 @@ function registerOpenArenaRoutes(
     app.post(
         '/api/open-arena/run',
         (req, res, next) => {
-            if (!accessAllowed(req.get('X-Arena-Access'), config.accessKey))
+            if (
+                !config.publicAccess &&
+                !accessAllowed(req.get('X-Arena-Access'), config.accessKey)
+            )
                 return res
                     .status(403)
                     .json({ error: 'Enter the private pilot access key.' });

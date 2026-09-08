@@ -5,6 +5,8 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const output = path.resolve(__dirname, '../test-results');
+const publicAccess = process.argv.includes('--public');
+const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is evaluated independently.`;
 (async () => {
     await fs.mkdir(output, { recursive: true });
     const browser = await chromium.launch({
@@ -23,24 +25,52 @@ const output = path.resolve(__dirname, '../test-results');
             if (message.type() === 'error') errors.push(message.text());
         });
         await page.goto('http://127.0.0.1:3108/open-arena');
-        await page
-            .getByText(
-                'Pilot ready. Each question is evaluated independently.',
-                { exact: true },
-            )
-            .waitFor();
-        await page
-            .getByRole('button', {
-                name: 'Pilot access and privacy',
-                exact: true,
-            })
-            .click();
-        await page
-            .getByRole('textbox', { name: 'Private pilot key', exact: true })
-            .fill('browser-access-test-only');
-        await page
-            .getByRole('button', { name: 'Use key', exact: true })
-            .click();
+        await page.getByText(readyText, { exact: true }).waitFor();
+        if (publicAccess) {
+            assert.equal(await page.locator('#access-form').isVisible(), false);
+            assert.equal(
+                await page.locator('#access-badge').textContent(),
+                'RESEARCH PREVIEW',
+            );
+            await page
+                .getByRole('button', {
+                    name: 'Privacy and exports',
+                    exact: true,
+                })
+                .click();
+            assert.equal(
+                await page
+                    .getByRole('textbox', {
+                        name: 'Private pilot key',
+                        exact: true,
+                    })
+                    .isVisible(),
+                false,
+            );
+            await page
+                .getByRole('button', { name: 'Close', exact: true })
+                .click();
+        } else {
+            await page
+                .getByRole('button', {
+                    name: 'Pilot access and privacy',
+                    exact: true,
+                })
+                .click();
+            await page
+                .getByRole('textbox', {
+                    name: 'Private pilot key',
+                    exact: true,
+                })
+                .fill('browser-access-test-only');
+            await page
+                .getByRole('button', { name: 'Use key', exact: true })
+                .click();
+        }
+        page.on('request', (request) => {
+            if (publicAccess && request.url().endsWith('/api/open-arena/run'))
+                assert.equal(request.headers()['x-arena-access'], undefined);
+        });
         const compare = async (prompt, category) => {
             await page
                 .getByRole('textbox', { name: 'Your scenario', exact: true })
@@ -193,12 +223,7 @@ const output = path.resolve(__dirname, '../test-results');
             ),
         );
         await page.reload();
-        await page
-            .getByText(
-                'Pilot ready. Each question is evaluated independently.',
-                { exact: true },
-            )
-            .waitFor();
+        await page.getByText(readyText, { exact: true }).waitFor();
         assert.equal(
             await page.locator('#run-count').textContent(),
             '1 complete',
