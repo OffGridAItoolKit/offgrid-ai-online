@@ -2,6 +2,8 @@
 
 Last verified against `origin/main` on 2026-05-16.
 
+Scope note (September 8, 2026): this is the legacy Arena architecture. The additive matched-pair `/open-arena` uses `server/open-arena/*`; its provider recovery policy is recorded in [OPEN_ARENA_RELIABILITY.md](OPEN_ARENA_RELIABILITY.md).
+
 This document describes the production Arena implementation used by:
 
 - `https://offgridtoolkit.ai/arena`
