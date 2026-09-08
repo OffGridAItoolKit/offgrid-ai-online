@@ -1,4 +1,4 @@
-# Open Arena Private Pilot
+# Open Arena Research Preview
 
 The matched-model experience is additive at **`/open-arena`**, with its own **`/api/open-arena/*`** endpoints. The original `/arena-open` page and `/api/arena-open/models` are preserved.
 The existing `/arena`, `/command`, `/online`, offline application and legacy Arena history are unchanged. The default paid-comparison feature flag is OFF; production requires explicit provider configuration. The owner subsequently authorized keyless access to the live research preview. Public access is enabled only with `OPEN_ARENA_PUBLIC_ACCESS=true`; private mode remains available without changing provider credentials or spending controls.
@@ -6,8 +6,10 @@ The existing `/arena`, `/command`, `/online`, offline application and legacy Are
 ## Deep Analytics and Product Discovery
 
 - Separate Session (sessionStorage) and Lifetime (localStorage) statistics with independent, confirmed resets. Lifetime persistence can be disabled. Original answers remain in page memory only; resets do not change usage allowances or old Arena history.
-- Judge/Council and model/prompt/rubric/provider/settings/validation configurations are never combined. A configuration selector keeps earlier configurations available. New `matched-analytics-v2` storage does not overwrite pilot v1 or legacy statistics; historical export remains available.
-- Category is selected before submission, validated server-side and saved with the run. It does not alter candidate or grading messages. Seven categories cover water/food, shelter/exposure, medical/first aid, navigation/rescue, tools/repairs, planning/preparedness and general/visual.
+- New comparisons use GPT-5.2 only. Council requests are rejected before model calls. A scoring-history selector appears only when this browser has earlier Council records; it cannot change the judge for a new run. Model/prompt/rubric/provider/settings/validation configurations and historical modes are never combined. Existing storage and exports remain available.
+- Category defaults to Automatic, with a manual dropdown override. A separate pinned GPT-5.2 classification sees only the question before any candidate answer is generated; it receives no image, model identity, candidate text, score or OffGrid instructions. One bounded request, 128 output tokens and a 20-second timeout, inside the existing shared usage reservation. Manual selection skips this call. The classification version is `question-only-gpt52-v1`.
+- Seven categories cover water/food, shelter/exposure, medical/first aid, navigation/rescue, tools/repairs, planning/preparedness and general/visual. Invalid, unavailable or unverified classification is explicitly labeled a General / Visual fallback; it does not invalidate otherwise complete answers. Cancellation stops subsequent calls. Categories never enter candidate or grading messages.
+- Full run exports retain classification source/version/provider metadata; saved analytics whitelist only source/version/category, never question or classifier text. Earlier records retain their assigned categories and scores and are marked legacy on read; no question-based backfill is possible from metadata-only storage. Category method does not change inference or split otherwise identical judge statistics. Candidate/grader prompts and 2:2:1 weights are unchanged.
 - Category Strength shows both matched pairs, W/T/L, sample count and mean weighted score difference. Fewer than ten completed runs are labeled an early sample; ten is not a statistical-certification threshold. Criterion Advantage shows unweighted component deltas; average model scores are relative Borda points, not accuracy percentages.
 - Shareable summaries include both pairs, losses, ties, sample size, mode and limitations. Analytics JSON retains metadata/scores, not questions/answers/images/private instructions/keys. Complete-run summaries use the selected configuration; incomplete counts cover the selected mode/category across configurations.
 - Browser-local, user-resettable counts are not site-wide verified evidence. No held-out or independent benchmark claim. Candidate answers remain unrewritten; the exact public grading rubric is visible.
@@ -43,7 +45,7 @@ The CPU image build verifies the manifest and every model/config/parameter/licen
 
 The offline Windows runtime inspected was Ollama 0.21.0. This pilot uses a newer Linux GPU runtime with `OLLAMA_FLASH_ATTENTION=0`. Thus E4B weights match the inspected USB artifact, but hardware/runtime and the Arena output cap differ. The 26B pair uses the same OpenRouter model/provider for both contestants; its hosted artifact is **not verified as the USB GGUF**.
 
-E4B generation: context 4096, maximum output 2048, temperature 1, top-p .95, top-k 64, thinking off, shared per-run seed, four threads. Council review uses context 32768, maximum output 4096, temperature .2 and the separate grader prompt. E4B settings/runtime/digest mismatches invalidate a run.
+E4B generation: context 4096, maximum output 2048, temperature 1, top-p .95, top-k 64, thinking off, shared per-run seed, four threads. The retained private E4B review probe uses context 32768, maximum output 4096, temperature .2 and the separate grader prompt; new Arena comparisons no longer run Council reviews. E4B settings/runtime/digest mismatches invalidate a run.
 
 ## Private Configuration
 
@@ -105,9 +107,7 @@ node --env-file=.env.arena scripts/pilot-open-arena.js e4b
 node --env-file=.env.arena scripts/pilot-open-arena.js image
 node --env-file=.env.arena scripts/pilot-open-arena.js e4b-review
 node --env-file=.env.arena scripts/pilot-open-arena.js judge
-node --env-file=.env.arena scripts/pilot-open-arena.js council
 node --env-file=.env.arena scripts/pilot-open-arena.js judge-image
-node --env-file=.env.arena scripts/pilot-open-arena.js council-image
 node --env-file=.env.arena scripts/pilot-open-arena.js judge-long
 ```
 
@@ -130,7 +130,7 @@ These are dated pre-launch observations; they are not held-out benchmark results
 - These are technical integration probes, not a held-out benchmark. Wins, losses, ties and incomplete attempts are retained locally. The same simple prompts were reused with fresh generations/seeds, so they do not isolate judge-mode effects or support a win-rate claim.
 - End-of-test billing snapshots: OpenRouter $0.04077435 used against $25/month; Modal $0.77 total usage, covered by credits, with a $10 workspace cap. Provider reporting is asynchronous; these are not final invoices or per-run price guarantees.
 - Pre-launch long-input GPT probe completed in 131.993s with all four valid candidates and a valid judge. Local record `pilot-judge-long-1788824832184.json`; all identities/settings verified. This near-maximum character input with short requested output does not exhaustively test every tokenizer/context/output-limit combination.
-- GPT-5.2 remains the default outside judge. Council uses four calls but two foundation families without OffGrid candidate instructions during review; the votes are not independent experts.
+- At that earlier stage GPT-5.2 was the default and Council optional. The September 8 update removes Council for new runs, while preserving historical evidence. An outside judge is not guaranteed unbiased.
 
 ## Release and Rollback Gates
 

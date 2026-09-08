@@ -20,23 +20,15 @@ if (
         'image',
         'e4b-review',
         'judge',
-        'council',
         'judge-image',
-        'council-image',
         'judge-long',
     ].includes(command)
 )
     throw new Error(
-        'Choose e4b, image, e4b-review, judge, council, judge-image, council-image or judge-long.',
+        'Choose e4b, image, e4b-review, judge, judge-image or judge-long.',
     );
 const imageProbe = command === 'image' || command.endsWith('-image');
-const fullComparison = [
-    'judge',
-    'council',
-    'judge-image',
-    'council-image',
-    'judge-long',
-].includes(command);
+const fullComparison = ['judge', 'judge-image', 'judge-long'].includes(command);
 const config = configuration();
 if (!config.promptReady)
     throw new Error(
@@ -50,7 +42,7 @@ const input = {
     image: imageProbe
         ? `data:image/png;base64,${fs.readFileSync(path.resolve(__dirname, '../compass-192.png')).toString('base64')}`
         : null,
-    mode: command.startsWith('council') ? 'council' : 'judge',
+    mode: 'judge',
     category: imageProbe ? 'general' : 'planning',
 };
 if (command === 'judge-long') {

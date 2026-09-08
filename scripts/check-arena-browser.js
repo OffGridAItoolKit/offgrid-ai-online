@@ -26,6 +26,9 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
         });
         await page.goto('http://127.0.0.1:3108/open-arena');
         await page.getByText(readyText, { exact: true }).waitFor();
+        assert.equal(await page.locator('input[name="mode"]').count(), 0);
+        assert.equal(await page.locator('#history-mode').isVisible(), false);
+        assert.equal(await page.locator('#category').inputValue(), 'auto');
         if (publicAccess) {
             assert.equal(await page.locator('#access-form').isVisible(), false);
             assert.equal(
@@ -68,6 +71,8 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
                 .click();
         }
         page.on('request', (request) => {
+            if (request.url().endsWith('/api/open-arena/run'))
+                assert.equal(request.postDataJSON().mode, 'judge');
             if (publicAccess && request.url().endsWith('/api/open-arena/run'))
                 assert.equal(request.headers()['x-arena-access'], undefined);
         });
@@ -169,19 +174,43 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
             await page.locator('#incomplete-count').textContent(),
             '1 incomplete (all configs)',
         );
-        await page.getByRole('radio', { name: 'Council', exact: true }).check();
-        assert.equal(
-            await page.locator('#run-count').textContent(),
-            '0 complete',
-        );
-        await compare('tie council fixture', 'navigation');
+        // Seed only this isolated test browser with a historical record, never a new Council run.
+        await page.evaluate(() => {
+            const session = JSON.parse(
+                sessionStorage.getItem('offgrid-matched-session-v2'),
+            );
+            const original = session.find((r) => r.status === 'complete');
+            const legacy = {
+                ...original,
+                id: 'historical-council-fixture',
+                mode: 'council',
+                category: 'navigation',
+                series: 'historical-council-fixture',
+            };
+            sessionStorage.setItem(
+                'offgrid-matched-session-v2',
+                JSON.stringify([...session, legacy]),
+            );
+            const lifetime = JSON.parse(
+                localStorage.getItem('offgrid-matched-statistics-v2'),
+            );
+            localStorage.setItem(
+                'offgrid-matched-statistics-v2',
+                JSON.stringify([...lifetime, legacy]),
+            );
+        });
+        await page.reload();
+        await page.getByText(readyText, { exact: true }).waitFor();
+        await page
+            .getByRole('combobox', { name: 'Scoring history', exact: true })
+            .selectOption('council');
         assert.equal(
             await page.locator('#run-count').textContent(),
             '1 complete',
         );
         await page
-            .getByRole('radio', { name: 'GPT-5.2 Judge', exact: true })
-            .check();
+            .getByRole('combobox', { name: 'Scoring history', exact: true })
+            .selectOption('judge');
         assert.equal(
             await page.locator('#run-count').textContent(),
             '1 complete',
@@ -235,7 +264,9 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
             await page.locator('#run-count').textContent(),
             '0 complete',
         );
-        await page.getByRole('radio', { name: 'Council', exact: true }).check();
+        await page
+            .getByRole('combobox', { name: 'Scoring history', exact: true })
+            .selectOption('council');
         assert.equal(
             await page.locator('#run-count').textContent(),
             '1 complete',
@@ -277,9 +308,89 @@ const readyText = `${publicAccess ? 'Ready.' : 'Pilot ready.'} Each question is 
                 );
             assert.deepEqual(clipped, [], `Clipped controls at ${width}`);
         }
+        if (!publicAccess) {
+            await page
+                .getByRole('button', {
+                    name: 'Pilot access and privacy',
+                    exact: true,
+                })
+                .click();
+            await page
+                .getByRole('textbox', {
+                    name: 'Private pilot key',
+                    exact: true,
+                })
+                .fill('browser-access-test-only');
+            await page
+                .getByRole('button', { name: 'Use key', exact: true })
+                .click();
+        }
+        // A new run while viewing historical Council statistics must still use the outside judge.
+        await compare('How can I bake bread over a campfire?', 'auto');
+        assert.equal(await page.locator('#history-mode').inputValue(), 'judge');
+        assert.match(
+            await page.locator('#category-assignment').innerText(),
+            /Water & Food \/ Automatic, question only/,
+        );
+        assert.equal(
+            await page.locator('#run-count').textContent(),
+            '1 complete',
+        );
+        await compare(
+            'What are medicinal plants and dangerous look-alikes?',
+            'auto',
+        );
+        assert.match(
+            await page.locator('#category-assignment').innerText(),
+            /Medical & First Aid \/ Automatic/,
+        );
+        await compare('How can I bake bread over a campfire?', 'shelter');
+        assert.match(
+            await page.locator('#category-assignment').innerText(),
+            /Shelter & Exposure \/ Manually selected/,
+        );
+        await compare('category-failure fixture', 'auto');
+        assert.match(
+            await page.locator('#category-assignment').innerText(),
+            /fallback/,
+        );
+        assert.equal(
+            await page.locator('#run-count').textContent(),
+            '4 complete',
+        );
+        assert.equal(
+            await page.locator('#incomplete-count').textContent(),
+            '1 incomplete (all configs)',
+        );
+        await page
+            .getByRole('combobox', { name: 'Scoring history', exact: true })
+            .selectOption('council');
+        assert.equal(
+            await page.locator('#run-count').textContent(),
+            '1 complete',
+        );
+        await page
+            .getByRole('combobox', { name: 'Scoring history', exact: true })
+            .selectOption('judge');
+        for (const width of [1440, 390, 320]) {
+            await page.setViewportSize({
+                width,
+                height: width > 800 ? 1000 : 844,
+            });
+            assert.ok(
+                await page.evaluate(
+                    () =>
+                        document.documentElement.scrollWidth <= innerWidth + 1,
+                ),
+            );
+            await page.screenshot({
+                path: path.join(output, `categories-${width}.png`),
+                fullPage: true,
+            });
+        }
         assert.deepEqual(errors, []);
         console.log(
-            'Browser passed: independent resets, persistence, category/mode separation, incomplete counts, sharing/export, toggles and 1440/390/320px layouts. Synthetic fixtures only.',
+            'Browser passed: judge-only new runs, historical Council preserved, automatic/manual/fallback categories, independent resets, persistence, sharing/export and 1440/390/320px layouts. Synthetic fixtures only.',
         );
     } finally {
         await browser.close();
