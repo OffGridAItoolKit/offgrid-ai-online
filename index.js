@@ -20,6 +20,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { markdownToHtml } = require('./lib/pdf-markdown');
 const { registerOpenArenaRoutes } = require('./server/open-arena/routes');
+const { createLegacyOptimized, isOptimized, keepAlive: keepOptimizedAlive, TIMEOUT_MS: OPTIMIZED_TIMEOUT_MS } = require('./server/legacy-arena-optimized');
 
 // License Key & Usage Limit System
 const {
@@ -35,6 +36,7 @@ const {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const legacyOptimized = createLegacyOptimized({ pool });
 
 // =============================================================================
 // CONFIGURATION
@@ -201,11 +203,12 @@ const OPEN_ARENA_MODELS = {
         multimodal: true
     },
     'navigator': {
-        id: 'google/gemma-3n-e4b-it',
+        id: 'gemma4:e4b',
+        inference: 'modal-e4b',
         name: 'OffGrid AI Optimized',
         shortName: 'OffGrid Optimized',
         emoji: '\ud83c\udf2c\ufe0f',
-        description: 'E4B-class Gemma with OffGrid behavior layer',
+        description: 'Gemma 4 E4B with OffGrid behavior layer (Modal)',
         multimodal: true,
         offgridPrompt: true
     },
@@ -1097,8 +1100,10 @@ async function runCouncilReview(userQuery, labeledResults, activeModels = COMMAN
 
         try {
             const reviewText = await withTimeout(
-                callOpenRouter(reviewModel.id, reviewMessages, 1024, 0.2),
-                REVIEW_TIMEOUT_MS,
+                isOptimized(reviewModel)
+                    ? legacyOptimized.call(reviewMessages, { grading: true }).then(result => result.text)
+                    : callOpenRouter(reviewModel.id, reviewMessages, 1024, 0.2),
+                isOptimized(reviewModel) ? OPTIMIZED_TIMEOUT_MS : REVIEW_TIMEOUT_MS,
                 `${reviewModel.shortName} review`
             );
             const parsed = safeParseJSON(reviewText);
@@ -1387,6 +1392,8 @@ app.get('/api/arena-open/models', (req, res) => {
  */
 app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, res) => {
     const cmdStreamStart = Date.now();
+    let releaseOptimized;
+    let stopOptimizedHeartbeat;
     try {
         const { model, messages } = req.body;
         
@@ -1414,7 +1421,15 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         
-        await streamOpenRouter(modelConfig.id, openRouterMessages, res);
+        if (isOptimized(modelConfig)) {
+            releaseOptimized = await legacyOptimized.acquire();
+            stopOptimizedHeartbeat = keepOptimizedAlive(res);
+            const result = await legacyOptimized.call(openRouterMessages);
+            res.write(`data: ${JSON.stringify({ content: result.text, model: result.metadata.model, provider: result.metadata.provider })}\n\n`);
+            res.write('data: [DONE]\n\n');
+        } else {
+            await streamOpenRouter(modelConfig.id, openRouterMessages, res);
+        }
         
         // Increment prompt usage ONLY after successful stream
         if (req.license) {
@@ -1430,8 +1445,12 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
         }
-        res.write(`data: ${JSON.stringify({ error: 'Stream error occurred' })}\n\n`);
+        const optimized = isOptimized(getCommandModelSet(req).activeModels[req.body.model]);
+        res.write(`data: ${JSON.stringify({ error: optimized ? error.message : 'Stream error occurred' })}\n\n`);
         res.end();
+    } finally {
+        if (stopOptimizedHeartbeat) stopOptimizedHeartbeat();
+        if (releaseOptimized) await releaseOptimized();
     }
 });
 
@@ -1449,6 +1468,8 @@ app.post('/api/command/stream', requireLicense, checkPromptLimit, async (req, re
  */
 app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, res) => {
     const councilStartTime = Date.now();
+    let releaseOptimized;
+    let stopOptimizedHeartbeat;
     try {
         const { messages, judgeMode } = req.body;
         
@@ -1462,6 +1483,9 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         
         // Determine which model set to use: Arena, Open Arena, or Command Center.
         const { isArenaRequest, arenaType, activeModels } = getCommandModelSet(req);
+        if (Object.values(activeModels).some(isOptimized)) {
+            releaseOptimized = await legacyOptimized.acquire();
+        }
         
         // Set up SSE
         res.setHeader('Content-Type', 'text/event-stream');
@@ -1469,6 +1493,7 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
         res.setHeader('Connection', 'keep-alive');
         
         // Extract the user's original query (last user message)
+        if (releaseOptimized) stopOptimizedHeartbeat = keepOptimizedAlive(res);
         const lastUserMessage = messages.filter(m => m.role === 'user').pop();
         const userQuery = lastUserMessage?.content || '';
         
@@ -1495,14 +1520,17 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
                 }
                 
                 const response = await withTimeout(
-                    callOpenRouter(model.id, modelMessages, 2048),
-                    MODEL_TIMEOUT_MS,
+                    isOptimized(model)
+                        ? legacyOptimized.call(modelMessages).then(result => result.text)
+                        : callOpenRouter(model.id, modelMessages, 2048),
+                    isOptimized(model) ? OPTIMIZED_TIMEOUT_MS : MODEL_TIMEOUT_MS,
                     model.shortName
                 );
                 
                 // Send progress update
                 res.write(`data: ${JSON.stringify({ 
-                    progress: key, 
+                    progress: key,
+                    ...(isOptimized(model) ? { modelId: model.id, provider: 'Modal / Ollama', verified: true } : {}),
                     message: `${model.emoji} ${model.shortName} complete ✓` 
                 })}\n\n`);
                 
@@ -1687,6 +1715,9 @@ Based on these, write the final Command answer as described.
         }
         res.write(`data: ${JSON.stringify({ error: 'Council error: ' + error.message })}\n\n`);
         res.end();
+    } finally {
+        if (stopOptimizedHeartbeat) stopOptimizedHeartbeat();
+        if (releaseOptimized) await releaseOptimized();
     }
 });
 
