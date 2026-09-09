@@ -327,6 +327,7 @@
 
         .command-theme .chat-container {
             flex: 1;
+            min-width: 0;
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -690,6 +691,7 @@
         /* Button row */
         .command-theme .button-row {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             gap: 8px;
@@ -700,7 +702,57 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            min-width: 0;
+            max-width: 100%;
         }
+
+        .command-theme .test-input-actions,
+        .command-theme .test-response-actions {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .command-theme .test-input-actions { margin-left: auto; }
+        .command-theme .test-response-actions { margin-top: 10px; }
+        .command-theme .test-response-actions .see-deliberation-btn { margin: 0; min-height: 34px; }
+        .command-theme .new-test-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 6px 10px;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-secondary);
+            font: 500 12px var(--font-sans);
+            letter-spacing: 0;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .command-theme .new-test-btn svg { width: 16px; height: 16px; flex: none; }
+        .command-theme .new-test-btn:hover:not(:disabled) {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+        .command-theme .new-test-control:disabled { opacity: 0.5; cursor: not-allowed; }
+        .command-theme .new-test-control:focus-visible { outline: 2px solid var(--gold-primary); outline-offset: 3px; }
+        .command-theme .new-test-dialog {
+            margin: auto;
+            width: min(360px, calc(100% - 32px));
+            padding: 20px;
+            border: 1px solid var(--border-emphasis);
+            border-radius: 8px;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+        }
+        .command-theme .new-test-dialog::backdrop { background: rgba(0, 0, 0, 0.65); }
+        .command-theme .new-test-dialog h2 { font-size: 17px; margin: 0 0 12px; letter-spacing: 0; }
+        .command-theme .new-test-dialog p { font-size: 13px; line-height: 1.5; margin: 0 0 20px; }
+        .command-theme .new-test-dialog .test-input-actions { justify-content: flex-end; }
 
         /* Model selector */
         .command-theme .model-selector {
@@ -2840,27 +2892,6 @@
             border-color: var(--gold-primary);
         }
 
-        .command-theme .create-visual-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--ranger-color);
-            background: rgba(251, 146, 60, 0.05);
-            border: 1px solid rgba(251, 146, 60, 0.3);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 6px;
-            margin-left: 8px;
-        }
-        .command-theme .create-visual-btn:hover {
-            background: rgba(251, 146, 60, 0.1);
-            border-color: var(--ranger-color);
-            color: var(--gold-primary);
-        }
 
         .command-theme .deliberation-overlay {
             position: fixed;
@@ -3293,6 +3324,7 @@
 
         .command-theme.deep-panel-open .main-container {
             margin-right: 300px;
+            width: calc(100% - 300px);
             transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -3695,11 +3727,13 @@
 
         /* Mobile: hide panel */
         @media (max-width: 768px) {
-            .command-theme .deep-analytics-panel {
-                display: none;
+            .command-theme .deep-analytics-panel,
+            .command-theme .deep-mode-indicator {
+                display: none !important;
             }
             .command-theme.deep-panel-open .main-container {
                 margin-right: 0;
+                width: 100%;
             }
         }
 
@@ -4601,9 +4635,9 @@
                 <div id="usageDisplay"></div>
             </div>
 
-            <button class="new-chat-btn" onclick="clearChat()">
+            <button class="new-chat-btn new-test-control" onclick="clearChat()">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                New Chat
+                New Test
             </button>
 
             <a href="https://offgridtoolkit.ai/command/ready-made-prompts?filter=survival" target="_blank" class="survival-prompts-button">🏕️ Survival Prompts</a>
@@ -4626,9 +4660,13 @@
                     <div class="prompt-item" onclick="usePrompt(this)">How do I navigate using the stars with no compass?</div>
                     <div class="prompt-item" onclick="usePrompt(this)">Build the ideal bug-out bag under 30 lbs and explain the tradeoffs.</div>
                     <div class="prompt-item" onclick="usePrompt(this)">What are the top 5 medicinal plants in North America and their dangerous look-alikes?</div>
-                    <!-- Practical General -->
-                    <div class="prompt-item" onclick="usePrompt(this)">How do I properly maintain a vehicle to avoid expensive repairs?</div>
-                    <div class="prompt-item" onclick="usePrompt(this)">What are the most common mistakes people make when buying their first home?</div>
+                    <!-- Favorable development examples, not a representative benchmark. See vault provenance. -->
+                    <div class="prompt-item" onclick="usePrompt(this)">I spilled hot cooking water over my palm and two fingers five minutes ago. The skin is red with a small blister, my ring feels tight, and I can move the fingers. I have clean running water, a clean non-stick dressing, ice and butter. A clinic is reachable later today. What should I do now, and what would change the need for medical help?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">A rescue dispatcher asks for my location. My offline map shows latitude 36.1234 and longitude -112.2468 in decimal degrees, but my companion wants to read those numbers as degrees and minutes. We have a weak voice connection and no data service. How should I communicate the coordinates clearly, and how can we avoid a format or hemisphere mistake?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">My pickup tire is losing air from a visible cut in its sidewall, not the tread. I am on level gravel with room away from traffic. I have a jack, wheel wrench, wheel chocks, a correctly sized inflated spare and a tire-plug kit. I do not have the vehicle's jack-point diagram in front of me. What should I do, and which details must I verify before lifting or driving?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">A 1,500-watt, 120-volt heater is connected through a long lightweight extension cord that is partly coiled on a reel. The plug smells hot and has brown discoloration. The breaker has not tripped. I can switch the heater off and reach the supply plug without touching exposed conductors. We also have blankets and a shorter heavy-duty cord, but I do not know either cord's rating. How should I handle the problem and decide whether to reconnect anything?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">For a cabin energy budget, assume a fully charged 12-volt 100-Ah battery, a planned 50% discharge limit, and a refrigerator averaging 40 watts over 24 hours. A 200-watt solar panel receives the equivalent of three peak-sun hours daily. Ignore losses for the first calculation, then explain how losses and weather change the plan. Can this run continuously, and what should we change or measure before relying on it?</div>
+                    <div class="prompt-item" onclick="usePrompt(this)">Several green tomatoes have a sunken dark patch at the blossom end, while the leaves look mostly normal. The bed alternates between very dry soil and heavy watering. I do not have a soil test or photos to share. What are the most likely explanations, what can I do now, and should I add lime or spray a fungicide?</div>
                 </div>
             </div>
 
@@ -4686,45 +4724,6 @@
                             <div class="image-preview" id="imagePreviewWelcome"></div>
 
                             <div class="input-wrapper">
-                                <div class="attach-btn" onclick="toggleAttachMenu()" title="Attach files">+</div>
-                                <div class="attach-menu" id="attachMenuWelcome">
-                                    <div class="attach-menu-item" onclick="triggerGalleryUpload(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">🖼️</span>
-                                        <span>Upload Image</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📄</span>
-                                        <span>Upload Document</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupTranslator(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">🌐</span>
-                                        <span>Translate</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupTranscribe(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">✍️</span>
-                                        <span>Transcribe Text from Image</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupFactCheckClaim(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">✅</span>
-                                        <span>Fact Check Claim</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupFactCheckDoc(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📊</span>
-                                        <span>Fact Check Document</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupSummarizeText(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📝</span>
-                                        <span>Summarize Text</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📖</span>
-                                        <span>Summarize Document</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="window.location.href='/command/ready-made-prompts'; closeAttachMenu();" style="border-top: 1px solid rgba(184, 134, 11, 0.15); padding-top: 10px;">
-                                        <span class="attach-menu-icon">📋</span>
-                                        <span>Ready-Made Prompts</span>
-                                    </div>
-                                </div>
 
                                 <textarea 
                                     id="messageInputWelcome" 
@@ -4780,7 +4779,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
+                                <div class="test-input-actions">
+                                    <button type="button" class="new-test-btn new-test-control" onclick="clearChat()" title="Clear conversation; keep Deep Mode analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>New Test</button>
+                                    <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -4814,13 +4816,6 @@
                                 <div class="mobile-action-desc">Camera or gallery</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" onclick="openImageStudio()">
-                            <div class="mobile-action-icon">🎨</div>
-                            <div class="mobile-action-text">
-                                <div class="mobile-action-title">Generate Visual</div>
-                                <div class="mobile-action-desc">AI-powered Image Studio</div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Voice recording indicator -->
@@ -4847,46 +4842,6 @@
             <!-- Hidden file inputs moved to end of body so they're always accessible -->
 
             <div class="input-wrapper">
-                <!-- Plus button -->
-                <div class="attach-btn desktop-only" onclick="toggleAttachMenu()" title="Attach files">+</div>
-                <div class="attach-menu" id="attachMenu">
-                    <div class="attach-menu-item" onclick="triggerGalleryUpload(); closeAttachMenu();">
-                        <span class="attach-menu-icon">🖼️</span>
-                        <span>Upload Image</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
-                        <span class="attach-menu-icon">📄</span>
-                        <span>Upload Document</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="setupTranslator(); closeAttachMenu();">
-                        <span class="attach-menu-icon">🌐</span>
-                        <span>Translate</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="setupTranscribe(); closeAttachMenu();">
-                        <span class="attach-menu-icon">✍️</span>
-                        <span>Transcribe Text from Image</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="setupFactCheckClaim(); closeAttachMenu();">
-                        <span class="attach-menu-icon">✅</span>
-                        <span>Fact Check Claim</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="setupFactCheckDoc(); closeAttachMenu();">
-                        <span class="attach-menu-icon">📊</span>
-                        <span>Fact Check Document</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="setupSummarizeText(); closeAttachMenu();">
-                        <span class="attach-menu-icon">📝</span>
-                        <span>Summarize Text</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
-                        <span class="attach-menu-icon">📖</span>
-                        <span>Summarize Document</span>
-                    </div>
-                    <div class="attach-menu-item" onclick="window.location.href='/command/ready-made-prompts'; closeAttachMenu();" style="border-top: 1px solid rgba(184, 134, 11, 0.15); padding-top: 10px;">
-                        <span class="attach-menu-icon">📋</span>
-                        <span>Ready-Made Prompts</span>
-                    </div>
-                </div>
 
                 <textarea 
                     id="messageInput" 
@@ -4946,9 +4901,12 @@
                     </div>
                 </div>
 
-                <button class="send-button" onclick="sendMessage()" id="sendButton">
-                    Send
-                </button>
+                <div class="test-input-actions">
+                    <button type="button" class="new-test-btn new-test-control" onclick="clearChat()" title="Clear conversation; keep Deep Mode analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>New Test</button>
+                    <button class="send-button" onclick="sendMessage()" id="sendButton">
+                        Send
+                    </button>
+                </div>
             </div>
             </div>
             </div>
@@ -4973,17 +4931,13 @@
 
     <!-- MOBILE: Quick-actions toolbar -->
     <div class="mobile-quick-toolbar" id="mobileQuickToolbar">
-        <button class="quick-btn" onclick="openImageStudio()">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-            Image
-        </button>
         <button class="quick-btn" onclick="triggerGalleryUpload()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
             Upload
         </button>
-        <button class="quick-btn" onclick="softResetChat()">
+        <button class="quick-btn new-test-control" onclick="clearChat()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-            New Chat
+            New Test
         </button>
         <button class="quick-btn" id="oledToggleBtn" onclick="toggleOLEDMode()">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
@@ -5566,6 +5520,7 @@
         // ============================================
 
         async function sendMessage() {
+            if (isTyping) return;
             // Read from whichever input is active (welcome or bottom)
             const welcomeInput = document.getElementById('messageInputWelcome');
             const bottomInput = document.getElementById('messageInput');
@@ -5576,10 +5531,12 @@
             if (bottomInput) bottomInput.value = message;
             const requestStartTime = Date.now();
 
-            if ((!message && !selectedImage) || isTyping) return;
+            if (!message && !selectedImage) return;
 
+            setTestBusy(true);
             const isConnected = await checkConnection();
             if (!isConnected) {
+                setTestBusy(false);
                 addMessage('Cannot connect to the server. Please refresh the page and try again.', 'assistant', true);
                 return;
             }
@@ -5614,10 +5571,6 @@
             if (bottomInput) { bottomInput.value = ''; autoResize(bottomInput); }
             const imageToSend = selectedImage;
             removeImage();
-
-            // Set typing state
-            isTyping = true;
-            document.getElementById('sendButton').disabled = true;
 
             if (selectedModel === 'command') {
                 await sendCommandMessage(userMessage, imageToSend, requestStartTime);
@@ -5746,13 +5699,10 @@
                 timeIndicator.innerHTML = `⚡ ${config.shortName} • ${responseTime}s`;
                 messageDiv.querySelector('.message-content').appendChild(timeIndicator);
 
-                // Add "Create Visual" button for single-model responses
-                const singleVisualBtn = document.createElement('button');
-                singleVisualBtn.className = 'create-visual-btn';
-                singleVisualBtn.innerHTML = '\ud83c\udfa8 Create Visual';
-                const capturedSingleResponse = fullResponse;
-                singleVisualBtn.onclick = () => createVisualFromResponse(capturedSingleResponse, singleVisualBtn);
-                messageDiv.querySelector('.message-content').appendChild(singleVisualBtn);
+                const actions = document.createElement('div');
+                actions.className = 'test-response-actions';
+                actions.appendChild(createNewTestButton());
+                messageDiv.querySelector('.message-content').appendChild(actions);
 
                 // Add share button on mobile
                 if (typeof addShareButtonToMessage === 'function') {
@@ -5787,8 +5737,7 @@
                 }
             } finally {
                 streamingContent.removeAttribute('id');
-                isTyping = false;
-                document.getElementById('sendButton').disabled = false;
+                setTestBusy(false);
                 document.getElementById('messageInput').focus();
             }
         }
@@ -6109,6 +6058,10 @@
                     messageDiv.querySelector('.message-content').appendChild(meterDiv);
                 }
 
+                const actions = document.createElement('div');
+                actions.className = 'test-response-actions';
+                messageDiv.querySelector('.message-content').appendChild(actions);
+
                 // Add "See Deliberation" button if we have deliberation data
                 if (lastCouncilDeliberation && lastCouncilDeliberation.rawReviews && lastCouncilDeliberation.rawReviews.length > 0) {
                     const delibBtn = document.createElement('button');
@@ -6119,16 +6072,10 @@
                     const capturedLabelMap = lastCouncilLabelMap ? JSON.parse(JSON.stringify(lastCouncilLabelMap)) : null;
                     const capturedScores = councilScores ? JSON.parse(JSON.stringify(councilScores)) : null;
                     delibBtn.onclick = () => showDeliberationModal(capturedDelib, capturedLabelMap, capturedScores);
-                    messageDiv.querySelector('.message-content').appendChild(delibBtn);
+                    actions.appendChild(delibBtn);
                 }
 
-                // Add "Create Visual" button to generate an Image Studio prompt from this response
-                const visualBtn = document.createElement('button');
-                visualBtn.className = 'create-visual-btn';
-                visualBtn.innerHTML = '🎨 Create Visual';
-                const capturedResponse = fullResponse;
-                visualBtn.onclick = () => createVisualFromResponse(capturedResponse, visualBtn);
-                messageDiv.querySelector('.message-content').appendChild(visualBtn);
+                actions.appendChild(createNewTestButton());
 
                 // Add share button on mobile
                 if (typeof addShareButtonToMessage === 'function') {
@@ -6176,8 +6123,7 @@
                     addMessage('Error: ' + error.message, 'assistant', true);
                 }
             } finally {
-                isTyping = false;
-                document.getElementById('sendButton').disabled = false;
+                setTestBusy(false);
                 document.getElementById('messageInput').focus();
             }
         }
@@ -6584,7 +6530,26 @@
         // UI FUNCTIONS
         // ============================================
 
+        function createNewTestButton() {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'new-test-btn new-test-control';
+            button.title = 'Clear conversation; keep Deep Mode analytics';
+            button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>New Test';
+            button.disabled = isTyping;
+            button.onclick = clearChat;
+            return button;
+        }
+
+        function setTestBusy(busy) {
+            isTyping = busy;
+            document.querySelectorAll('.new-test-control, .send-button').forEach(button => {
+                button.disabled = busy;
+            });
+        }
+
         function softResetChat() {
+            if (isTyping) return;
             // Reset conversation state (but NOT deepModeData)
             conversationHistory = [];
             lastCouncilDeliberation = null;
@@ -6616,45 +6581,6 @@
                         <div class="input-container">
                             <div class="image-preview" id="imagePreviewWelcome"></div>
                             <div class="input-wrapper">
-                                <div class="attach-btn" onclick="toggleAttachMenu()" title="Attach files">+</div>
-                                <div class="attach-menu" id="attachMenuWelcome">
-                                    <div class="attach-menu-item" onclick="triggerGalleryUpload(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">🖼️</span>
-                                        <span>Upload Image</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="document.getElementById('docInput').click(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📄</span>
-                                        <span>Upload Document</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupTranslator(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">🌐</span>
-                                        <span>Translate</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupTranscribe(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">✍️</span>
-                                        <span>Transcribe Text from Image</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupFactCheckClaim(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">✅</span>
-                                        <span>Fact Check Claim</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupFactCheckDoc(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📊</span>
-                                        <span>Fact Check Document</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupSummarizeText(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📝</span>
-                                        <span>Summarize Text</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="setupSummarizeDoc(); closeAttachMenu();">
-                                        <span class="attach-menu-icon">📖</span>
-                                        <span>Summarize Document</span>
-                                    </div>
-                                    <div class="attach-menu-item" onclick="window.location.href='/command/ready-made-prompts'; closeAttachMenu();" style="border-top: 1px solid rgba(184, 134, 11, 0.15); padding-top: 10px;">
-                                        <span class="attach-menu-icon">📋</span>
-                                        <span>Ready-Made Prompts</span>
-                                    </div>
-                                </div>
                                 <textarea 
                                     id="messageInputWelcome" 
                                     class="message-input"
@@ -6707,7 +6633,10 @@
                                         </div>
                                     </div>
                                 </div>
-                                <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
+                                <div class="test-input-actions">
+                                    <button type="button" class="new-test-btn new-test-control" onclick="clearChat()" title="Clear conversation; keep Deep Mode analytics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>New Test</button>
+                                    <button class="send-button" onclick="sendMessage()" id="sendButtonWelcome">Send</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -6735,13 +6664,6 @@
                                 <div class="mobile-action-desc">Camera or gallery</div>
                             </div>
                         </div>
-                        <div class="mobile-action-card" onclick="openImageStudio()">
-                            <div class="mobile-action-icon">🎨</div>
-                            <div class="mobile-action-text">
-                                <div class="mobile-action-title">Generate Visual</div>
-                                <div class="mobile-action-desc">AI-powered Image Studio</div>
-                            </div>
-                        </div>
                     </div>
                     <div class="voice-recording" id="voiceRecording">
                         <div class="voice-pulse"></div>
@@ -6762,8 +6684,11 @@
             const mobileImagePreview = document.getElementById('mobileImagePreview');
             if (mobileImagePreview) { mobileImagePreview.style.display = 'none'; mobileImagePreview.classList.remove('active'); }
 
-            // Reset model selector to Command (Council)
-            selectModel('command');
+            // Independent question, same selected model and grading mode.
+            selectModel(selectedModel);
+            const bottomInput = document.getElementById('messageInput');
+            if (bottomInput) { bottomInput.value = ''; autoResize(bottomInput); }
+            document.querySelectorAll('input[type="file"]').forEach(input => { input.value = ''; });
 
             // Clear any active streaming indicators
             const streamingEls = document.querySelectorAll('.streaming-indicator');
@@ -6791,9 +6716,18 @@
         }
 
         function clearChat() {
-            if (confirm('Start a new chat? Your Deep Mode analytics will be preserved.')) {
-                softResetChat();
-            }
+            if (isTyping || document.querySelector('.new-test-dialog')) return;
+            const dialog = document.createElement('dialog');
+            dialog.className = 'new-test-dialog';
+            dialog.setAttribute('aria-labelledby', 'newTestTitle');
+            dialog.innerHTML = '<form method="dialog"><h2 id="newTestTitle">Start a new test?</h2><p>The current conversation will be cleared. Session and All-Time analytics will be kept.</p><div class="test-input-actions"><button class="new-test-btn" value="cancel" autofocus>Cancel</button><button class="send-button" value="confirm">New Test</button></div></form>';
+            dialog.addEventListener('close', () => {
+                const confirmed = dialog.returnValue === 'confirm';
+                dialog.remove();
+                if (confirmed) softResetChat();
+            }, { once: true });
+            document.body.appendChild(dialog);
+            dialog.showModal();
         }
 
         function returnToHome() {
