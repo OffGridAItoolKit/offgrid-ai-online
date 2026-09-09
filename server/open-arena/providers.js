@@ -3,6 +3,7 @@
 const { MODEL_26B, E4B_DIGEST } = require('./core');
 const { PROMPT_READY } = require('./prompt');
 const { RELIABILITY_VERSION, createPost } = require('./transport');
+const { FORMAT, REVIEW_SCHEMA } = require('./review-schema');
 
 function configuration(env = process.env) {
     return {
@@ -77,7 +78,19 @@ function openRouterPayload(
             ? { temperature: grading ? 0.2 : request.settings.temperature }
             : {}),
         ...(grading
-            ? { response_format: { type: 'json_object' } }
+            ? {
+                  response_format:
+                      model === MODEL_26B
+                          ? {
+                                type: 'json_schema',
+                                json_schema: {
+                                    name: FORMAT,
+                                    strict: true,
+                                    schema: REVIEW_SCHEMA,
+                                },
+                            }
+                          : { type: 'json_object' },
+              }
             : {
                   top_p: request.settings.top_p,
                   top_k: request.settings.top_k,
@@ -170,6 +183,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 system: request.system || '',
                 image: request.image,
                 grading,
+                ...(grading ? { reviewFormat: FORMAT } : {}),
                 seed: request.settings?.seed || 0,
             },
             {
@@ -203,6 +217,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 data.model === 'gemma4:e4b' &&
                 data.artifactDigest === E4B_DIGEST &&
                 data.runtime === '0.33.3' &&
+                (!grading || data.reviewFormat === FORMAT) &&
                 data.verified === true &&
                 Object.entries(expected).every(
                     ([key, value]) => data.settings?.[key] === value,
@@ -213,6 +228,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 artifactDigest: data.artifactDigest,
                 runtime: data.runtime,
                 settings: data.settings,
+                ...(grading ? { reviewFormat: data.reviewFormat } : {}),
                 usage: data.usage,
                 elapsedMs: Date.now() - started,
                 transport,

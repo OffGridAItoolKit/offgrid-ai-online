@@ -85,6 +85,7 @@
                 run.reviews
                     .map(metadata)
                     .sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+                ...(run.gradingProtocol ? [run.gradingProtocol] : []),
             ]),
         );
     }

@@ -7,6 +7,7 @@ const { OFFGRID_PROMPT, PROMPT_VERSION } = require('./prompt');
 const VERSION = 'gemma4-matched-v1';
 const RUBRIC_VERSION = 'contextual-risk-2-2-1-v1';
 const VALIDATION_VERSION = 'substantive-reviews-v2';
+const COUNCIL_VERSION = 'balanced-four-seats-schema-v2';
 const WEIGHTS = Object.freeze({
     accuracy: 2,
     prioritization: 2,
@@ -87,10 +88,8 @@ function validateInput(body) {
     ) {
         throw new Error('Enter a question of 1 to 4,000 characters.');
     }
-    if (body.mode !== undefined && body.mode !== 'judge')
-        throw new Error(
-            'New comparisons use GPT-5.2 Judge only. Reload the Arena.',
-        );
+    if (body.mode !== undefined && !['judge', 'council'].includes(body.mode))
+        throw new Error('Unknown scoring mode.');
     if (
         body.category !== undefined &&
         (typeof body.category !== 'string' ||
@@ -111,7 +110,7 @@ function validateInput(body) {
     return {
         prompt: body.prompt.trim(),
         image: body.image || null,
-        mode: 'judge',
+        mode: body.mode || 'judge',
         category: body.category || 'auto',
     };
 }
@@ -284,13 +283,138 @@ function answerFailure(result) {
     return null;
 }
 
+function createReviewPlan(mode, answers, randomInt = crypto.randomInt) {
+    if (mode === 'judge') {
+        const ordered = shuffle(answers, randomInt);
+        return [
+            {
+                reviewer: {
+                    key: 'gpt-5.2',
+                    name: 'GPT-5.2',
+                    model: 'openai/gpt-5.2',
+                },
+                mapping: Object.fromEntries(
+                    ordered.map((answer, i) => [
+                        String.fromCharCode(65 + i),
+                        answer,
+                    ]),
+                ),
+            },
+        ];
+    }
+    if (mode !== 'council') throw new Error('Unknown scoring mode.');
+    const ordered = shuffle(answers, randomInt);
+    const offsets = shuffle([0, 1, 2, 3], randomInt);
+    // Every answer occupies each label once; seats share the rubric, never candidate conditioning.
+    return shuffle(ROSTER, randomInt).map((model, index) => ({
+        reviewer: {
+            key: model.key,
+            name: model.name,
+            model: model.model,
+            pair: model.pair,
+        },
+        mapping: Object.fromEntries(
+            ordered.map((_, i) => [
+                String.fromCharCode(65 + i),
+                ordered[(i + offsets[index]) % 4],
+            ]),
+        ),
+    }));
+}
+
+async function reviewAnswers(
+    input,
+    answers,
+    adapters,
+    { signal, onProgress = () => {}, randomInt = crypto.randomInt } = {},
+) {
+    if (
+        answers.length !== 4 ||
+        new Set(answers.map((a) => a.key)).size !== 4 ||
+        answers.some(
+            (a) =>
+                !ROSTER.some((m) => m.key === a.key) ||
+                a.valid === false ||
+                answerFailure(a),
+        )
+    ) {
+        throw new Error(
+            'Four complete verified answers are required before grading.',
+        );
+    }
+    const mode = input.mode || 'judge';
+    const plan = createReviewPlan(mode, answers, randomInt);
+    const outcome = {
+        reviews: [],
+        errors: [],
+        status: 'incomplete',
+        ...(mode === 'council' ? { gradingProtocol: COUNCIL_VERSION } : {}),
+    };
+    const scored = [];
+    for (const { reviewer, mapping } of plan) {
+        if (signal?.aborted) throw new Error('Run cancelled.');
+        onProgress({
+            stage: 'grading',
+            message: `Reviewing with ${reviewer.name}`,
+        });
+        const labelMap = Object.fromEntries(
+            Object.entries(mapping).map(([label, answer]) => [
+                label,
+                answer.key,
+            ]),
+        );
+        const identity = {
+            reviewer: reviewer.name,
+            model: reviewer.model,
+            ...(mode === 'council' ? { reviewerKey: reviewer.key } : {}),
+        };
+        let result;
+        try {
+            result = await adapters.review(
+                reviewer,
+                reviewerRequest(input, mapping),
+                signal,
+            );
+            if (result.finishReason !== 'stop' || result.matched !== true)
+                throw new Error('Incomplete or unverified judge response.');
+            const review = validateReview(result.text, mapping);
+            outcome.reviews.push({
+                ...identity,
+                metadata: result.metadata,
+                labelMap,
+                ...review,
+                valid: true,
+                rawText: result.text,
+                finishReason: result.finishReason,
+            });
+            scored.push({ review, mapping });
+        } catch (error) {
+            if (signal?.aborted) throw new Error('Run cancelled.');
+            outcome.reviews.push({
+                ...identity,
+                labelMap,
+                valid: false,
+                metadata: result?.metadata || error.metadata,
+                rawText: result?.text || '',
+                finishReason: result?.finishReason,
+                error: error.message,
+            });
+            outcome.errors.push(`${reviewer.name} review: ${error.message}`);
+        }
+    }
+    // Never turn a partial council into a complete benchmark result.
+    if (!outcome.errors.length && scored.length === plan.length)
+        Object.assign(outcome, scoreReviews(scored), { status: 'complete' });
+    return outcome;
+}
+
 async function runComparison(
     input,
     adapters,
     { signal, onProgress = () => {} } = {},
 ) {
-    if (input.mode !== undefined && input.mode !== 'judge')
-        throw new Error('New comparisons use GPT-5.2 Judge only.');
+    if (input.mode !== undefined && !['judge', 'council'].includes(input.mode))
+        throw new Error('Unknown scoring mode.');
     const seed = crypto.randomInt(2147483647);
     const started = Date.now();
     const run = {
@@ -307,7 +431,7 @@ async function runComparison(
         rubricDigest: digest(GRADER_PROMPT),
         prompt: input.prompt,
         imageDigest: input.image ? digest(input.image) : null,
-        mode: 'judge',
+        mode: input.mode || 'judge',
         seed,
         weights: WEIGHTS,
         settings: SETTINGS,
@@ -383,62 +507,13 @@ async function runComparison(
         }
     }
     if (!run.errors.length) {
-        const reviewers = [
-            { key: 'gpt-5.2', name: 'GPT-5.2', model: 'openai/gpt-5.2' },
-        ];
-        const scored = [];
-        for (const reviewer of reviewers) {
-            if (signal?.aborted) throw new Error('Run cancelled.');
-            onProgress({
-                stage: 'grading',
-                message: `Reviewing with ${reviewer.name}`,
-            });
-            const mapping = anonymize(run.answers);
-            const labelMap = Object.fromEntries(
-                Object.entries(mapping).map(([label, answer]) => [
-                    label,
-                    answer.key,
-                ]),
-            );
-            let result;
-            try {
-                result = await adapters.review(
-                    reviewer,
-                    reviewerRequest(input, mapping),
-                    signal,
-                );
-                if (result.finishReason !== 'stop' || result.matched !== true)
-                    throw new Error('Incomplete or unverified judge response.');
-                const review = validateReview(result.text, mapping);
-                run.reviews.push({
-                    reviewer: reviewer.name,
-                    model: reviewer.model,
-                    metadata: result.metadata,
-                    labelMap,
-                    ...review,
-                    valid: true,
-                    rawText: result.text,
-                    finishReason: result.finishReason,
-                });
-                scored.push({ review, mapping });
-            } catch (error) {
-                run.reviews.push({
-                    reviewer: reviewer.name,
-                    model: reviewer.model,
-                    labelMap,
-                    valid: false,
-                    metadata: result?.metadata || error.metadata,
-                    rawText: result?.text || '',
-                    finishReason: result?.finishReason,
-                    error: error.message,
-                });
-                run.errors.push(`${reviewer.name} review: ${error.message}`);
-            }
-        }
-        // An invalid or missing judge never becomes a benchmark win.
-        if (!run.errors.length && scored.length === reviewers.length) {
-            Object.assign(run, scoreReviews(scored), { status: 'complete' });
-        }
+        Object.assign(
+            run,
+            await reviewAnswers(input, run.answers, adapters, {
+                signal,
+                onProgress,
+            }),
+        );
     }
     run.elapsedMs = Date.now() - started;
     return run;
@@ -448,6 +523,7 @@ module.exports = {
     VERSION,
     RUBRIC_VERSION,
     VALIDATION_VERSION,
+    COUNCIL_VERSION,
     WEIGHTS,
     MODEL_26B,
     E4B_DIGEST,
@@ -462,5 +538,7 @@ module.exports = {
     reviewerRequest,
     validateReview,
     scoreReviews,
+    createReviewPlan,
+    reviewAnswers,
     runComparison,
 };

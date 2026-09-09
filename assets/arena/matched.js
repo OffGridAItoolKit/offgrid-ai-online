@@ -199,7 +199,7 @@
             }
         }
         lifetimeStats = analytics.add(lifetimeStats, entry);
-        $('history-mode').value = 'judge';
+        $('history-mode').value = run.mode;
         selectedSeries = '';
         persistStats();
         renderStats();
@@ -324,6 +324,9 @@
         if (!currentRun) return;
         const run = currentRun;
         let html = `<p>${escape(modeName(run.mode))} / ${escape(run.status)}. Score = 2 x Accuracy + 2 x Prioritization + 1 x Actionability.</p>`;
+        if (run.mode === 'council')
+            html +=
+                '<p>Council scores average four votes on a 0-15 scale. Two E4B and two 26B seats use the identical rubric; they are not four independent judging families.</p>';
         if (run.ranking)
             html += `<div class="table-scroll"><table class="report-table"><thead><tr><th>Place / Model</th><th>Accuracy</th><th>Priority</th><th>Action</th><th>Total</th></tr></thead><tbody>${run.ranking.map((s) => `<tr><td>#${s.place} ${escape(names[s.key])}</td><td>${number(s.accuracy)}</td><td>${number(s.prioritization)}</td><td>${number(s.actionability)}</td><td><strong>${number(s.total)}</strong></td></tr>`).join('')}</tbody></table></div>`;
         for (const review of run.reviews) {
@@ -336,7 +339,7 @@
                 html += `<div class="reason"><strong>${escape(names[key])} (anonymous ${escape(label)})</strong>${criteria.map((c) => `<p><b>${capitalize(c)}:</b> ${escape(review.reasons[label][c])}</p>`).join('')}</div>`;
             html += `<details><summary>Anonymous rankings and provider record</summary><pre>${escape(JSON.stringify({ rankings: review.rankings, labelMap: review.labelMap, metadata: review.metadata }, null, 2))}</pre></details>`;
         }
-        html += `<details><summary>Run and model records</summary><pre>${escape(JSON.stringify({ id: run.id, seed: run.seed, promptVersion: run.promptVersion, promptDigest: run.promptDigest, rubricVersion: run.rubricVersion, rubricDigest: run.rubricDigest, validationVersion: run.validationVersion || 'initial-validation', reliabilityVersion: run.reliabilityVersion || 'single-attempt-v1', answers: run.answers.map((a) => ({ key: a.key, finishReason: a.finishReason, matched: a.matched, error: a.error, metadata: a.metadata })), errors: run.errors }, null, 2))}</pre></details>`;
+        html += `<details><summary>Run and model records</summary><pre>${escape(JSON.stringify({ id: run.id, seed: run.seed, gradingProtocol: run.gradingProtocol, promptVersion: run.promptVersion, promptDigest: run.promptDigest, rubricVersion: run.rubricVersion, rubricDigest: run.rubricDigest, validationVersion: run.validationVersion || 'initial-validation', reliabilityVersion: run.reliabilityVersion || 'single-attempt-v1', answers: run.answers.map((a) => ({ key: a.key, finishReason: a.finishReason, matched: a.matched, error: a.error, metadata: a.metadata })), errors: run.errors }, null, 2))}</pre></details>`;
         $('report-content').innerHTML = html;
         $('report-dialog').showModal();
     }
@@ -353,6 +356,9 @@
         ])
             $(id).disabled = on;
         $('run-button').disabled = !config?.ready;
+        $('scoring-judge').disabled = on;
+        $('scoring-council').disabled =
+            on || !config?.scoringModes?.includes('council');
     }
     async function submit(event) {
         event.preventDefault();
@@ -365,7 +371,7 @@
         const attachedImage = image;
         const payload = {
             prompt: $('question').value,
-            mode: 'judge',
+            mode: $('scoring-council').checked ? 'council' : 'judge',
             image: attachedImage,
             category: $('category').value,
         };
