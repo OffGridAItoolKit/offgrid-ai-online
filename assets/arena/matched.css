@@ -487,6 +487,9 @@ select {
 .segmented input:focus-visible + span {
     outline: 2px solid var(--gold);
 }
+.segmented input:disabled + span {
+    opacity: 0.5;
+}
 .segmented svg {
     width: 15px;
     height: 15px;

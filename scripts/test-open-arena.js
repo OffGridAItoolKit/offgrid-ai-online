@@ -23,8 +23,12 @@ const {
     validateReview,
     scoreReviews,
     runComparison,
+    reviewAnswers,
+    createReviewPlan,
+    COUNCIL_VERSION,
 } = require('../server/open-arena/core');
 const { OFFGRID_PROMPT } = require('../server/open-arena/prompt');
+const { FORMAT, REVIEW_SCHEMA } = require('../server/open-arena/review-schema');
 const {
     configuration,
     readiness,
@@ -246,13 +250,13 @@ test('failures, empty replies, truncation and model mismatch are excluded, not r
         assert.equal(result.winners, undefined);
     }
 });
-test('invalid single judge cannot become a benchmark winner', async () => {
-    for (const mode of ['judge']) {
+test('one invalid review invalidates the entire judge or Council result', async () => {
+    for (const mode of ['judge', 'council']) {
         let judges = 0;
         const run = await runComparison(
             { ...input, mode },
             {
-                generate: async () => good('answer'),
+                generate: async (model) => good(`Answer ${model.key}`),
                 review: async () => {
                     judges++;
                     return good(judges === 1 ? '{}' : JSON.stringify(review()));
@@ -261,27 +265,28 @@ test('invalid single judge cannot become a benchmark winner', async () => {
         );
         assert.equal(run.status, 'incomplete');
         assert.equal(run.winners, undefined);
-        assert.equal(judges, 1);
+        assert.equal(judges, mode === 'judge' ? 1 : 4);
         assert.equal(run.reviews[0].valid, false);
         assert.equal(run.reviews[0].rawText, '{}');
     }
 });
 
-test('Council requests are rejected before inference; unspecified mode uses the outside judge', async () => {
+test('Council is optional; unknown modes are rejected and default remains outside judge', async () => {
+    assert.equal(validateInput({ ...input, mode: 'council' }).mode, 'council');
     assert.throws(
-        () => validateInput({ ...input, mode: 'council' }),
-        /Judge only/,
+        () => validateInput({ ...input, mode: 'unknown' }),
+        /Unknown scoring mode/,
     );
     assert.equal(validateInput({ prompt: 'Question' }).mode, 'judge');
     await assert.rejects(
         runComparison(
-            { ...input, mode: 'council' },
+            { ...input, mode: 'unknown' },
             {
                 generate: () => assert.fail('Council must not generate'),
                 review: () => assert.fail('Council must not grade'),
             },
         ),
-        /Judge only/,
+        /Unknown scoring mode/,
     );
 });
 test('cancelled run makes no further calls', async () => {
@@ -295,6 +300,91 @@ test('cancelled run makes no further calls', async () => {
         ),
         /cancelled/,
     );
+});
+
+test('Council labels balance every answer once per position across four rubric-only seats', () => {
+    const answers = ROSTER.map((m) => ({ ...m, ...good(`Original ${m.key}`) }));
+    const plan = createReviewPlan('council', answers, (n) => n - 1);
+    assert.equal(new Set(plan.map((p) => p.reviewer.key)).size, 4);
+    assert.equal(plan.filter((p) => p.reviewer.pair === 'e4b').length, 2);
+    assert.equal(plan.filter((p) => p.reviewer.pair === '26b').length, 2);
+    for (const label of ['A', 'B', 'C', 'D'])
+        assert.deepEqual(
+            plan.map((p) => p.mapping[label].key).sort(),
+            ROSTER.map((m) => m.key).sort(),
+        );
+    for (const p of plan) {
+        assert.equal(p.reviewer.conditioned, undefined);
+        assert.equal(reviewerRequest(input, p.mapping).system, GRADER_PROMPT);
+    }
+});
+
+test('Council regrades saved answers without generating, rewriting or injecting candidate instructions', async () => {
+    const answers = ROSTER.map((m) => ({
+        ...m,
+        ...good(`  Original ${m.key}\n`),
+    }));
+    const before = JSON.stringify(answers);
+    let calls = 0;
+    const result = await reviewAnswers({ ...input, mode: 'council' }, answers, {
+        generate: () => assert.fail('Saved answers must never regenerate'),
+        review: async (model, request) => {
+            calls++;
+            assert.notEqual(model.model, 'openai/gpt-5.2');
+            assert.equal(request.system, GRADER_PROMPT);
+            assert.deepEqual(
+                Object.values(JSON.parse(request.prompt).answers).sort(),
+                answers.map((a) => a.text).sort(),
+            );
+            return good(JSON.stringify(review()));
+        },
+    });
+    assert.equal(calls, 4);
+    assert.equal(result.status, 'complete');
+    assert.equal(result.gradingProtocol, COUNCIL_VERSION);
+    assert.equal(JSON.stringify(answers), before);
+    // Label-only voting cancels exactly under the balanced protocol.
+    assert.ok(Object.values(result.scores).every((s) => s.total === 7.5));
+    assert.ok(
+        result.reviews.every((r) => r.reviewerKey && r.valid && r.rawText),
+    );
+});
+
+test('saved-answer Council fails closed for missing, duplicate or unverified answers', async () => {
+    const answers = ROSTER.map((m) => ({ ...m, ...good(`Answer ${m.key}`) }));
+    for (const invalid of [
+        answers.slice(1),
+        [answers[0], ...answers.slice(0, 3)],
+        answers.map((a, i) => (i ? a : { ...a, matched: false })),
+    ]) {
+        await assert.rejects(
+            reviewAnswers({ ...input, mode: 'council' }, invalid, {
+                review: () => assert.fail('Invalid answer set must not grade'),
+            }),
+            /Four complete verified/,
+        );
+    }
+});
+
+test('Council cancellation stops remaining reviewers', async () => {
+    const controller = new AbortController();
+    let calls = 0;
+    await assert.rejects(
+        reviewAnswers(
+            { ...input, mode: 'council' },
+            ROSTER.map((m) => ({ ...m, ...good(m.key) })),
+            {
+                review: async () => {
+                    calls++;
+                    controller.abort();
+                    return good(JSON.stringify(review()));
+                },
+            },
+            { signal: controller.signal },
+        ),
+        /cancelled/,
+    );
+    assert.equal(calls, 1);
 });
 test('generation provider routing is pinned with no fallback; GPT judge omits unsupported temperature', () => {
     const r = candidateRequest(ROSTER[2], input, 123);
@@ -382,6 +472,54 @@ test('usage guard fails closed when database is down', async () => {
             configuration({}),
         ),
     );
+});
+
+test('Council requests a strict review schema without changing GPT or candidate payloads', async () => {
+    const request = reviewerRequest(input, mapping);
+    const council = openRouterPayload(
+        ROSTER[2].model,
+        request,
+        'darkbloom',
+        true,
+    );
+    assert.deepEqual(council.response_format, {
+        type: 'json_schema',
+        json_schema: { name: FORMAT, strict: true, schema: REVIEW_SCHEMA },
+    });
+    assert.equal(council.messages[0].content, GRADER_PROMPT);
+    const judge = openRouterPayload('openai/gpt-5.2', request, 'openai', true);
+    assert.deepEqual(judge.response_format, { type: 'json_object' });
+    let payload;
+    const data = {
+        model: 'gemma4:e4b',
+        artifactDigest: require('../server/open-arena/core').E4B_DIGEST,
+        runtime: '0.33.3',
+        verified: true,
+        text: '{}',
+        finishReason: 'stop',
+        settings: {
+            temperature: 0.2,
+            top_k: 64,
+            top_p: 0.95,
+            num_ctx: 32768,
+            num_predict: 4096,
+            seed: 0,
+            num_thread: 4,
+            think: false,
+        },
+    };
+    const providers = createProviders(
+        configuration({}),
+        async (url, options) => {
+            payload = JSON.parse(options.body);
+            return { ok: true, json: async () => data };
+        },
+    );
+    assert.equal((await providers.review(ROSTER[0], request)).matched, false);
+    assert.equal(payload.reviewFormat, FORMAT);
+    data.reviewFormat = FORMAT;
+    assert.equal((await providers.review(ROSTER[0], request)).matched, true);
+    assert.equal(payload.system, GRADER_PROMPT);
 });
 test('monthly usage cap blocks calls and releases its advisory lock', async () => {
     const queries = [];
@@ -553,7 +691,7 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
     assert.equal((await post(input, null)).status, 503);
     config.budgetsConfirmed = true;
     assert.equal((await post({ prompt: '' }, null)).status, 400);
-    assert.equal((await post({ ...input, mode: 'council' }, null)).status, 400);
+    assert.equal((await post({ ...input, mode: 'unknown' }, null)).status, 400);
     deniedBudget = true;
     assert.equal((await post(input, null)).status, 429);
     assert.equal(calls, 5);
@@ -563,6 +701,13 @@ test('HTTP route gates credentials, readiness, inputs and budget before any mode
     assert.ok((await anonymous.text()).includes('"status":"complete"'));
     assert.equal(calls, 10);
     assert.equal(releases, 2);
+    assert.deepEqual(openConfig.scoringModes, ['judge', 'council']);
+    assert.equal(openConfig.councilProtocol, COUNCIL_VERSION);
+    const council = await post({ ...input, mode: 'council' }, null);
+    assert.equal(council.status, 200);
+    assert.ok((await council.text()).includes('"status":"complete"'));
+    assert.equal(calls, 18);
+    assert.equal(releases, 3);
     config.publicAccess = false;
     assert.equal((await post(input, null)).status, 403);
 });

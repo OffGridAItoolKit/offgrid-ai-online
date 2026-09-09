@@ -10,6 +10,7 @@ const {
     GRADER_PROMPT,
     WEIGHTS,
     VERSION,
+    COUNCIL_VERSION,
     runComparison,
 } = require('../server/open-arena/core');
 const app = express();
@@ -21,6 +22,8 @@ app.get('/api/open-arena/config', (req, res) =>
     res.json({
         roster: ROSTER,
         ready: true,
+        scoringModes: ['judge', 'council'],
+        councilProtocol: COUNCIL_VERSION,
         privatePilot: process.env.OPEN_ARENA_PUBLIC_ACCESS !== 'true',
         issues: [],
         rosterVersion: VERSION,

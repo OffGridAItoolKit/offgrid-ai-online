@@ -1,7 +1,7 @@
 import asyncio
 import unittest
 import httpx
-from e4b import create_api, MODEL, ARTIFACT
+from e4b import create_api, MODEL, ARTIFACT, REVIEW_FORMAT, review_schema
 
 
 class ApiTests(unittest.IsolatedAsyncioTestCase):
@@ -56,6 +56,24 @@ class ApiTests(unittest.IsolatedAsyncioTestCase):
         async with httpx.AsyncClient(transport=httpx.ASGITransport(app=create_api("0.21.0", generate)), base_url="http://test") as client:
             response = await client.post("/generate", json={"prompt": "q"})
             self.assertEqual(response.json()["finishReason"], "context_limit")
+
+    async def test_matched_schema_is_opt_in_and_echoed(self):
+        response = await self.client.post("/generate", json={"prompt": "answers", "system": "rubric", "grading": True, "reviewFormat": REVIEW_FORMAT})
+        self.assertEqual(response.json()["reviewFormat"], REVIEW_FORMAT)
+        self.assertEqual(self.calls[0]["format"], review_schema())
+        self.assertEqual(self.calls[0]["system"], "rubric")
+        for body in ({"prompt": "q", "reviewFormat": REVIEW_FORMAT}, {"prompt": "q", "grading": True, "reviewFormat": "arbitrary"}):
+            response = await self.client.post("/generate", json=body)
+            self.assertEqual(response.status_code, 400)
+        self.assertEqual(len(self.calls), 1)
+
+    def test_schema_matches_node_adapter(self):
+        import json
+        from pathlib import Path
+        import subprocess
+        root = Path(__file__).resolve().parents[2]
+        encoded = subprocess.check_output(["node", "-e", "process.stdout.write(JSON.stringify(require('./server/open-arena/review-schema').REVIEW_SCHEMA))"], cwd=root)
+        self.assertEqual(review_schema(), json.loads(encoded))
 
     async def test_concurrent_work_is_rejected(self):
         ready, finish = asyncio.Event(), asyncio.Event()

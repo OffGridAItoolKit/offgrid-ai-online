@@ -81,6 +81,7 @@ test('mode, prompt, rubric, validation, provider and model changes split configu
         'rubricDigest',
         'validationVersion',
         'rosterVersion',
+        'gradingProtocol',
     ]) {
         const changed = run('two', { [field]: 'different' });
         assert.notEqual(A.series(run()), A.series(changed));
@@ -90,6 +91,22 @@ test('mode, prompt, rubric, validation, provider and model changes split configu
     assert.notEqual(A.series(run()), A.series(changed));
     changed.answers[0].model = 'different';
     assert.notEqual(A.series(run()), A.series(changed));
+});
+
+test('absent Council protocol preserves existing judge fingerprints; new protocol splits old Council', () => {
+    assert.equal(
+        A.series(run()),
+        A.series(run('two', { gradingProtocol: undefined })),
+    );
+    assert.notEqual(
+        A.series(run('old', { mode: 'council' })),
+        A.series(
+            run('new', {
+                mode: 'council',
+                gradingProtocol: 'balanced-four-seats-rubric-only-v1',
+            }),
+        ),
+    );
 });
 test('category is assigned before scoring, but does not split inference configurations', () => {
     assert.equal(

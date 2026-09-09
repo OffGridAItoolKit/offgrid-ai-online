@@ -17,6 +17,21 @@ PARAMS = "sha256:56380ca2ab89f1f68c283f4d50863c0bcab52ae3f1b9a88e4ab5617b176f71a
 OLLAMA_VERSION = "0.33.3"
 OLLAMA_IMAGE = "ollama/ollama@sha256:32931b46719f673c05fdbaa81ccb26da18ea4a1c57590a754874ab28ba269eb2"
 MODELS_PATH = "/opt/offgrid-models"
+REVIEW_FORMAT = "matched-review-v1"
+
+
+def review_schema():
+    # Keep identical to server/open-arena/review-schema.js; cross-language parity is tested.
+    def obj(properties):
+        return {"type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}
+    labels = ["A", "B", "C", "D"]
+    criteria = ["accuracy", "prioritization", "actionability"]
+    ranking = {"type": "array", "minItems": 1, "maxItems": 4,
+               "items": {"type": "array", "minItems": 1, "maxItems": 4,
+                         "items": {"type": "string", "enum": labels}}}
+    return obj({"rankings": obj({c: ranking for c in criteria}),
+                "reasons": obj({label: obj({c: {"type": "string", "minLength": 12, "maxLength": 2400}
+                                          for c in criteria}) for label in labels})})
 
 
 def download_model():
@@ -87,6 +102,9 @@ def create_api(runtime, generate):
         try:
             body = json.loads(raw)
             grading = body.get("grading", False)
+            review_format = body.get("reviewFormat")
+            if review_format is not None and (review_format != REVIEW_FORMAT or grading is not True):
+                raise ValueError()
             if not isinstance(grading, bool):
                 raise ValueError()
             prompt = body["prompt"]
@@ -115,7 +133,7 @@ def create_api(runtime, generate):
         payload = {"model": MODEL, "prompt": prompt, "system": system, "images": images,
                    "think": False, "stream": False, "keep_alive": "3m", "options": options}
         if grading:
-            payload["format"] = "json"
+            payload["format"] = review_schema() if review_format == REVIEW_FORMAT else "json"
         async with busy:
             try:
                 data = await asyncio.wait_for(generate(payload), timeout=110)
@@ -131,6 +149,7 @@ def create_api(runtime, generate):
                 "model": data.get("model"), "artifactDigest": ARTIFACT,
                 "runtime": runtime, "verified": data.get("model") == MODEL,
                 "settings": {**options, "think": False},
+                **({"reviewFormat": review_format} if review_format else {}),
                 "usage": {k: data.get(k) for k in ("prompt_eval_count", "eval_count", "total_duration", "load_duration", "eval_duration")}}
     return api
 
