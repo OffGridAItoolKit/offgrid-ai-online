@@ -12,6 +12,7 @@ const checks = [
   ['versioned contextual media consent', index.includes("const AI_MEDIA_CONSENT_VERSION = '2026-09-11-v1'")],
   ['legacy consent cannot bypass new disclosure', index.includes('const needsFirstRunConsent = !hasAiDataConsent()')],
   ['named recipients appear before consent', ['Render', 'OpenRouter', 'Google Vertex AI', 'OpenAI'].every(name => index.includes(name))],
+  ['speech provider wording is platform-specific', index.includes("ACTIVE_PLATFORM === 'ios'") && index.includes("'Apple Speech Recognition'")],
   ['AI send is blocked without consent', index.includes('async function sendMessage() {\n            if (!requireAiDataConsent()) return;')],
   ['media features are blocked without consent', ['triggerCameraCapture', 'triggerGalleryUpload', 'triggerVideoUpload', 'triggerVideoRecord'].every(name => index.includes(`function ${name}() {\n            if (!requireAiDataConsent()) return;`))],
   ['first media transfer requires contextual confirmation', index.includes('function confirmMediaTransfer()') && index.includes('if (!confirmMediaTransfer()) return;') && index.includes('This media consent remains active for future selections until you withdraw it')],

@@ -1245,7 +1245,7 @@
             <div class="first-run-message">
                 <p><strong>Welcome to OffGrid AI FieldGuide.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
                 <p><strong>Before anything is sent:</strong> You choose whether to send text prompts, voice transcription text, selected photos, up to eight extracted video frames, or image-generation prompts. Camera, microphone, media, and compass permissions are requested only when you tap the related feature.</p>
-                <p><strong>Who receives data:</strong> When you use Voice Input, Apple Speech Recognition may process microphone audio to produce text. Data you choose to submit for AI processing travels through the OffGrid AI service hosted by Render, then OpenRouter, and then Google Vertex AI or OpenAI to produce the requested answer or visual.</p>
+                <p id="speechProviderDisclosure"><strong>Who receives data:</strong> When you use Voice Input, your device or browser speech-recognition service may process microphone audio to produce text. Data you choose to submit for AI processing travels through the OffGrid AI service hosted by Render, then OpenRouter, and then Google Vertex AI or OpenAI to produce the requested answer or visual.</p>
                 <p><strong>Photos and video:</strong> Selected media may contain a visible face or other personal information. OffGrid AI does not detect, recognize, identify, map, measure, or create a biometric profile from faces. Raw video stays on your phone; only extracted frames are sent. The first time you submit a photo or video, you will see a separate media-transfer confirmation that remains valid until you withdraw consent.</p>
                 <p><strong>Use and retention:</strong> Submitted content is used only to complete your request. It is not used for advertising, profiling, or AI training and is not saved as an OffGrid AI account, conversation, face, or media history. AI requests use Zero Data Retention routing.</p>
                 <p><strong>Health information:</strong> OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
@@ -1254,7 +1254,7 @@
             <div class="first-run-terms">
                 <label class="terms-checkbox">
                     <input type="checkbox" id="acceptTermsBanner">
-                    <span>I consent to the described processing by Apple Speech Recognition, Render, OpenRouter, Google Vertex AI, and OpenAI for the purpose of completing features I choose to use, and I accept the safety notes</span>
+                    <span id="aiConsentLabel">I consent to the described processing by my device or browser speech-recognition service, Render, OpenRouter, Google Vertex AI, and OpenAI for the purpose of completing features I choose to use, and I accept the safety notes</span>
                 </label>
             </div>
             <div class="first-run-actions">
@@ -1739,10 +1739,27 @@
         // Experience config injected by server
         const CONFIG = window.OFFGRID_CONFIG || { isCustomer: false, experience: 'demo', surface: 'web', platform: 'web', apiBase: '' };
         const IS_APP_SURFACE = CONFIG.surface === 'app';
+        const ACTIVE_PLATFORM = CONFIG.platform && CONFIG.platform !== 'web'
+            ? CONFIG.platform
+            : (window.Capacitor?.getPlatform?.() || 'web');
         const IS_MOBILE_VIEW = window.matchMedia ? window.matchMedia('(max-width: 768px)').matches : window.innerWidth <= 768;
         const IS_PHONE_SURFACE = IS_APP_SURFACE || IS_MOBILE_VIEW;
         const MULTI_IMAGE_PREVIEW_ENABLED = CONFIG.features?.multiImagePreview === true;
         const MAX_SELECTED_IMAGES = MULTI_IMAGE_PREVIEW_ENABLED ? 4 : 1;
+
+        function applyPlatformPrivacyWording() {
+            const isIos = ACTIVE_PLATFORM === 'ios';
+            const speechProvider = isIos ? 'Apple Speech Recognition' : 'your device or browser speech-recognition service';
+            const disclosure = document.getElementById('speechProviderDisclosure');
+            const consentLabel = document.getElementById('aiConsentLabel');
+            if (disclosure) {
+                disclosure.innerHTML = `<strong>Who receives data:</strong> When you use Voice Input, ${speechProvider} may process microphone audio to produce text. Data you choose to submit for AI processing travels through the OffGrid AI service hosted by Render, then OpenRouter, and then Google Vertex AI or OpenAI to produce the requested answer or visual.`;
+            }
+            if (consentLabel) {
+                consentLabel.textContent = `I consent to the described processing by ${speechProvider}, Render, OpenRouter, Google Vertex AI, and OpenAI for the purpose of completing features I choose to use, and I accept the safety notes`;
+            }
+        }
+        applyPlatformPrivacyWording();
 
         // Keep the app's system status bar aligned with its gold field-guide branding.
         async function applyBrandedStatusBar() {

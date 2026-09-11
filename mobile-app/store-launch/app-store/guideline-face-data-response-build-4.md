@@ -62,7 +62,7 @@ The specific text in **“Photos, Video Frames, And Face Data”** states:
 Build 4 now does all of the following before personal data can be shared with an AI service:
 
 1. On first launch after this update, it displays the exact categories of data that may be processed: text prompts, voice transcription text, selected photos, up to eight extracted video frames, and image-generation prompts.
-2. It identifies the recipients by name: Apple Speech Recognition for optional voice transcription; the OffGrid AI service hosted on Render; OpenRouter; Google Vertex AI; and OpenAI for text-only Image Studio prompt preparation.
+2. On iOS it identifies the recipients by name: Apple Speech Recognition for optional voice transcription; the OffGrid AI service hosted on Render; OpenRouter; Google Vertex AI; and OpenAI for text-only Image Studio prompt preparation.
 3. It requires the user to affirmatively check the consent box before online AI features are enabled. Choosing `Not Now` sends no AI data and keeps online AI features blocked.
 4. Before the first photo or video-frame transfer, it presents a separate contextual confirmation explaining that the media may contain a visible face, naming Render, OpenRouter, and Google Vertex AI, and stating the purpose and retention restrictions. This media consent remains active until withdrawn.
 5. It provides `+ menu > Privacy & AI Data > Withdraw AI Data Consent`, which blocks future transfers and clears selected media. The user may review and consent again later.

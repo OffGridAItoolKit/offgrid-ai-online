@@ -77,7 +77,7 @@
         <p>You may withdraw consent at any time from <strong>+ menu &gt; Privacy &amp; AI Data &gt; Withdraw AI Data Consent</strong>. Withdrawal blocks future AI and media transfers and clears any currently selected media from the app interface. It does not affect a request that was already completed. You can later review the disclosure and consent again.</p>
 
         <h2>Information You Choose To Send</h2>
-        <p>Depending on the feature you deliberately use, Apple Speech Recognition may process microphone audio to produce voice transcription text. The app may send that resulting text, text you type, a selected or captured photo, extracted frames from a selected or recorded video, an AI answer you choose to turn into a visual, or an image-generation prompt to the named AI processors below. Microphone audio used for Voice Input is not sent to the OffGrid AI application server. A selected photo is resized to a maximum of 1024 by 1024 pixels before transfer. A raw video file is not transferred; the app extracts and sends up to eight JPEG frames, each no larger than 512 by 384 pixels.</p>
+        <p>Depending on the feature you deliberately use, a platform speech-recognition service may process microphone audio to produce voice transcription text. On iOS, this is Apple Speech Recognition; on other platforms, it is the speech-recognition service supplied by the device or browser. The app may send the resulting text, text you type, a selected or captured photo, extracted frames from a selected or recorded video, an AI answer you choose to turn into a visual, or an image-generation prompt to the named AI processors below. Microphone audio used for Voice Input is not sent to the OffGrid AI application server. A selected photo is resized to a maximum of 1024 by 1024 pixels before transfer. A raw video file is not transferred; the app extracts and sends up to eight JPEG frames, each no larger than 512 by 384 pixels.</p>
         <p>OffGrid AI FieldGuide uses submitted content only to produce the answer or visual you requested. It does not use submitted content for identity verification, advertising, marketing, user profiling, sale, or AI-model training. The content is not written to the OffGrid AI application database as a saved conversation, face database, media library, or personal account history.</p>
 
         <h2>Photos, Video Frames, And Face Data</h2>
@@ -89,7 +89,7 @@
 
         <h2>Named Service Providers And Data Route</h2>
         <ul>
-            <li><strong>Apple Speech Recognition</strong> may process microphone audio when the user deliberately activates Voice Input, solely to return transcription text. The resulting text is not sent into the AI route until the user chooses to submit the question.</li>
+            <li><strong>Platform speech recognition</strong> may process microphone audio when the user deliberately activates Voice Input, solely to return transcription text. This is Apple Speech Recognition on iOS and the device or browser speech-recognition service on other platforms. The resulting text is not sent into the AI route until the user chooses to submit the question.</li>
             <li><strong>Render</strong> hosts the OffGrid AI application service, which receives the request and forwards only the content needed to complete it.</li>
             <li><strong>OpenRouter</strong> routes the request. FieldGuide requests require Zero Data Retention, deny provider data collection, and disable unapproved fallback providers.</li>
             <li><strong>Google Vertex AI</strong> processes FieldGuide text, selected photos, extracted video frames, and Google-powered image-generation requests.</li>
@@ -102,7 +102,7 @@
         <ul>
             <li>Anonymous daily usage counters contain a one-way network-address hash, dates, counts, and timestamps, but no prompt or media content. These counters are automatically deleted after 31 days.</li>
             <li>Optional feedback, content reports, and support correspondence are retained only as long as reasonably necessary to investigate, respond, resolve the request, maintain safety, or meet legal obligations. You may request deletion at any time using the process below.</li>
-            <li>Apple, Render, OpenRouter, Google Vertex AI, OpenAI, and security systems may process limited non-content technical metadata for their billing, security, reliability, abuse-prevention, and legal-compliance periods. OffGrid AI does not control those metadata retention periods.</li>
+            <li>The applicable platform speech provider, Render, OpenRouter, Google Vertex AI, OpenAI, and security systems may process limited non-content technical metadata for their billing, security, reliability, abuse-prevention, and legal-compliance periods. OffGrid AI does not control those metadata retention periods.</li>
             <li>Images, PDFs, and other exports you choose to save remain on your device until you delete them.</li>
         </ul>
 
