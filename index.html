@@ -2910,44 +2910,47 @@
                 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
+                let streamBuffer = '';
+
+                function processStreamLines(text, flush = false) {
+                    streamBuffer += text;
+                    const lines = streamBuffer.split('\n');
+                    streamBuffer = flush ? '' : (lines.pop() || '');
+
+                    for (const line of lines) {
+                        if (!line.startsWith('data: ')) continue;
+                        const data = line.slice(6);
+                        if (data === '[DONE]') continue;
+                        const parsed = JSON.parse(data);
+                        if (parsed.content) {
+                            fullResponse += parsed.content;
+                            if (typeof marked !== 'undefined') {
+                                streamingTextEl.innerHTML = renderMarkdownSafe(fullResponse);
+                                streamingTextEl.querySelectorAll('a').forEach(a => {
+                                    a.setAttribute('target', '_blank');
+                                    a.setAttribute('rel', 'noopener noreferrer');
+                                });
+                            } else {
+                                streamingTextEl.textContent = fullResponse;
+                            }
+                            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                        }
+                        if (parsed.error) throw new Error(parsed.error);
+                    }
+                }
                 
                 while (true) {
                     const { done, value } = await reader.read();
                     if (done) break;
-                    
-                    const chunk = decoder.decode(value, { stream: true });
-                    const lines = chunk.split('\n');
-                    
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = line.slice(6);
-                            if (data === '[DONE]') continue;
-                            try {
-                                const parsed = JSON.parse(data);
-                                if (parsed.content) {
-                                    fullResponse += parsed.content;
-                                    if (typeof marked !== 'undefined') {
-                                        streamingTextEl.innerHTML = renderMarkdownSafe(fullResponse);
-                                        // Make links open in new tab
-                                        streamingTextEl.querySelectorAll('a').forEach(a => {
-                                            a.setAttribute('target', '_blank');
-                                            a.setAttribute('rel', 'noopener noreferrer');
-                                        });
-                                    } else {
-                                        streamingTextEl.textContent = fullResponse;
-                                    }
-                                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                                }
-                                if (parsed.error) {
-                                    throw new Error(parsed.error);
-                                }
-                            } catch (e) {
-                                if (e.message && !e.message.includes('JSON')) throw e;
-                            }
-                        }
-                    }
+
+                    processStreamLines(decoder.decode(value, { stream: true }));
                 }
-                
+                processStreamLines(decoder.decode(), true);
+
+                if (!fullResponse.trim()) {
+                    throw new Error('The AI service returned an empty response. Please try again.');
+                }
+
                 // Remove the streaming ID to avoid conflicts
                 streamingTextEl.removeAttribute('id');
                 

@@ -78,10 +78,34 @@ const GEMMA_MODELS = {
     }
 };
 
+// Keep FieldGuide requests on the disclosed Google Vertex AI processor while
+// allowing a second multimodal model to recover from transient Gemma capacity
+// limits. The fallback is used only when the primary endpoint returns a
+// retryable provider error.
+const FIELDGUIDE_VERTEX_FALLBACK_MODEL = 'google/gemini-2.5-flash';
+
 function getZdrProviderPolicy(modelId) {
     if (String(modelId).startsWith('google/')) return GOOGLE_VERTEX_ZDR_POLICY;
     if (String(modelId).startsWith('openai/')) return OPENAI_ZDR_POLICY;
     return { zdr: true, data_collection: 'deny' };
+}
+
+function getProviderRequestModels(modelId, enforceZdr) {
+    if (enforceZdr && modelId === GEMMA_MODELS['gemma-4-26b'].id) {
+        return [modelId, FIELDGUIDE_VERTEX_FALLBACK_MODEL];
+    }
+    return [modelId];
+}
+
+function isRetryableProviderStatus(status) {
+    return [408, 409, 429, 500, 502, 503, 504].includes(status);
+}
+
+function getProviderErrorMessage(errorData, status) {
+    const detail = errorData?.error?.message || errorData?.error;
+    return typeof detail === 'string' && detail.trim()
+        ? detail
+        : `Provider returned error ${status}`;
 }
 
 // =============================================================================
@@ -758,59 +782,81 @@ function withTimeout(promise, ms, label = 'Operation') {
  * Make a non-streaming request to OpenRouter and return the text response
  */
 async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7, enforceZdr = false) {
-    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://offgridtoolkit.ai',
-            'X-Title': 'OffGrid AI Command Center'
-        },
-        body: JSON.stringify({
-            model: modelId,
-            messages: messages,
-            max_tokens: maxTokens,
-            temperature: temperature,
-            ...(enforceZdr ? { provider: getZdrProviderPolicy(modelId) } : {})
-        })
-    });
+    const requestModels = getProviderRequestModels(modelId, enforceZdr);
 
-    if (!response.ok) {
+    for (let index = 0; index < requestModels.length; index++) {
+        const requestModel = requestModels[index];
+        const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://offgridtoolkit.ai',
+                'X-Title': 'OffGrid AI Command Center'
+            },
+            body: JSON.stringify({
+                model: requestModel,
+                messages: messages,
+                max_tokens: maxTokens,
+                temperature: temperature,
+                ...(enforceZdr ? { provider: getZdrProviderPolicy(requestModel) } : {})
+            })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || '';
+        }
+
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `API error ${response.status}`);
+        const errorMessage = getProviderErrorMessage(errorData, response.status);
+        const canRetry = index < requestModels.length - 1 && isRetryableProviderStatus(response.status);
+        if (!canRetry) throw new Error(errorMessage);
+        console.warn(`OpenRouter ${requestModel} returned ${response.status}; retrying on Google Vertex fallback.`);
     }
 
-    const data = await response.json();
-    return data.choices?.[0]?.message?.content || '';
+    throw new Error('No AI provider response was available.');
 }
 
 /**
  * Make a streaming request to OpenRouter and pipe SSE chunks to Express response
  */
 async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temperature = 0.7, enforceZdr = false) {
-    const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://offgridtoolkit.ai',
-            'X-Title': 'OffGrid AI Command Center'
-        },
-        body: JSON.stringify({
-            model: modelId,
-            messages: messages,
-            max_tokens: maxTokens,
-            temperature: temperature,
-            stream: true,
-            ...(enforceZdr ? { provider: getZdrProviderPolicy(modelId) } : {})
-        })
-    });
+    const requestModels = getProviderRequestModels(modelId, enforceZdr);
+    let response;
 
-    if (!response.ok) {
+    for (let index = 0; index < requestModels.length; index++) {
+        const requestModel = requestModels[index];
+        response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                'Content-Type': 'application/json',
+                'HTTP-Referer': 'https://offgridtoolkit.ai',
+                'X-Title': 'OffGrid AI Command Center'
+            },
+            body: JSON.stringify({
+                model: requestModel,
+                messages: messages,
+                max_tokens: maxTokens,
+                temperature: temperature,
+                stream: true,
+                ...(enforceZdr ? { provider: getZdrProviderPolicy(requestModel) } : {})
+            })
+        });
+
+        if (response.ok) break;
+
         const errorData = await response.json().catch(() => ({}));
-        const errMsg = errorData.error?.message || errorData.error || 'Provider returned error';
-        console.error('OpenRouter stream error status:', response.status);
-        res.write(`data: ${JSON.stringify({ error: typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg) })}\n\n`);
+        const errMsg = getProviderErrorMessage(errorData, response.status);
+        const canRetry = index < requestModels.length - 1 && isRetryableProviderStatus(response.status);
+        if (canRetry) {
+            console.warn(`OpenRouter ${requestModel} returned ${response.status}; retrying on Google Vertex fallback.`);
+            continue;
+        }
+
+        console.error(`OpenRouter stream error status: ${response.status}; ${errMsg}`);
+        res.write(`data: ${JSON.stringify({ error: errMsg })}\n\n`);
         res.end();
         return;
     }

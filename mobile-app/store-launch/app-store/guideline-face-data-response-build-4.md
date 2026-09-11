@@ -35,6 +35,8 @@ Face-containing selected media is processed by the following service chain only:
 2. OpenRouter routes the request under enforced Zero Data Retention and data-collection restrictions.
 3. Google Vertex AI performs the user-requested photo or video-frame analysis.
 
+The primary analysis model is Google Gemma 4 26B. If that model is temporarily rate-limited or unavailable, the request may be retried with Google Gemini 2.5 Flash on the same Google Vertex AI processor. Both paths use the same Zero Data Retention, denied data-collection, and provider-allowlist restrictions. No other AI-model provider receives the selected media.
+
 No face-containing photo or video frame is sent to OpenAI. OpenAI is used only for text-only visual-prompt preparation in Image Studio. Apple Speech Recognition may process microphone audio only when a user activates Voice Input; that feature does not receive photos or video frames.
 
 **4. How long is face data retained?**

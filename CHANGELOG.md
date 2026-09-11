@@ -9,6 +9,9 @@ This document provides a reverse-chronological summary of recent development pro
 ### September 2026
 
 **2026-09-11**
+*   **FieldGuide AI-response reliability**
+    *   Recovered from transient Google Vertex rate limits by retrying the request with a second multimodal Google model on the same disclosed Google Vertex processor, while preserving Zero Data Retention, denied provider collection, and the provider allowlist.
+    *   Buffered split streaming events and replaced unexplained empty timestamp bubbles with an actionable error message when no AI response content is available.
 *   **Apple AI-data and face-data compliance (iOS build 4)**
     *   Added versioned, explicit consent before any online AI feature can transmit user-selected data; existing installations must review the new disclosure once.
     *   Added a contextual consent immediately before the first photo or extracted-video-frame transfer, with remembered consent and an in-app withdrawal control under `Privacy & AI Data`.
