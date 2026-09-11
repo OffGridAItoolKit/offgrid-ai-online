@@ -91,7 +91,7 @@ const checks = [
     ['empty Saved Guides state has a recovery action', html.includes('No saved guides recorded yet') && html.includes("'Check Folder'")],
     ['markdown tables receive a scroll region', html.includes("wrapper.className = 'markdown-table-scroll'") && css.includes('.markdown-table-scroll')],
     ['redundant online badges are absent from markup', !html.includes('<span class="online-badge"') && !html.includes('id="customerBadge"')],
-    ['customer UI does not name the provider model generation', !html.includes('Gemma 4')]
+    ['assistant branding stays model-neutral outside required privacy disclosures', html.includes("'gemma-4-26b': { name: 'OffGrid AI'") && !html.includes('>Gemma 4</option>')]
 ];
 
 let failed = 0;

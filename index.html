@@ -1242,23 +1242,23 @@
                 <span>OffGrid AI FieldGuide</span>
             </div>
             <div class="first-run-tagline">No account history. Phone-native tools. Field-ready help.</div>
-            <div class="first-run-message">
+            <div class="first-run-message" id="firstRunMessage">
                 <p><strong>Welcome to OffGrid AI FieldGuide.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
                 <p><strong>Before anything is sent:</strong> You choose whether to send text prompts, voice transcription text, selected photos, up to eight extracted video frames, or image-generation prompts. Camera, microphone, media, and compass permissions are requested only when you tap the related feature.</p>
-                <p id="speechProviderDisclosure"><strong>Who receives data:</strong> When you use Voice Input, your device or browser speech-recognition service may process microphone audio to produce text. Data you choose to submit for AI processing travels through the OffGrid AI service hosted by Render, then OpenRouter, and then Google Vertex AI or OpenAI to produce the requested answer or visual.</p>
+                <p id="speechProviderDisclosure"><strong>Who receives data:</strong> On iOS, Apple Speech Recognition may process microphone audio only when you activate Voice Input. Text, selected photos, extracted video frames, and text-only Image Studio prompt preparation that you submit travel through the OffGrid AI service hosted by Render and OpenRouter to one of four fixed Gemma 4 processors: NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only if all four are unavailable, a FieldGuide request may go to Gemini 2.5 Pro through Google Cloud Vertex AI. Image Studio sends its prepared text prompt to Google Cloud Vertex AI for image generation.</p>
                 <p><strong>Photos and video:</strong> Selected media may contain a visible face or other personal information. OffGrid AI does not detect, recognize, identify, map, measure, or create a biometric profile from faces. Raw video stays on your phone; only extracted frames are sent. The first time you submit a photo or video, you will see a separate media-transfer confirmation that remains valid until you withdraw consent.</p>
-                <p><strong>Use and retention:</strong> Submitted content is used only to complete your request. It is not used for advertising, profiling, or AI training and is not saved as an OffGrid AI account, conversation, face, or media history. AI requests use Zero Data Retention routing.</p>
+                <p><strong>Use and retention:</strong> Submitted content is used only to complete your request. It is not used for advertising, profiling, or AI training and is not saved as an OffGrid AI account, conversation, face, or media history. Every iOS AI request uses a fixed provider allowlist, Zero Data Retention routing, and denied provider data collection.</p>
                 <p><strong>Health information:</strong> OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
                 <p>AI can make mistakes. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services. Verify other important survival, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
                 <label class="terms-checkbox">
                     <input type="checkbox" id="acceptTermsBanner">
-                    <span id="aiConsentLabel">I consent to the described processing by my device or browser speech-recognition service, Render, OpenRouter, Google Vertex AI, and OpenAI for the purpose of completing features I choose to use, and I accept the safety notes</span>
+                    <span id="aiConsentLabel">I consent to the described processing by Apple Speech Recognition, Render, OpenRouter, NextBit, Venice, Parasail, Novita, and Google Cloud Vertex AI for the purpose of completing features I choose to use, and I accept the safety notes</span>
                 </label>
             </div>
             <div class="first-run-actions">
-                <button class="first-run-secondary-button" type="button" onclick="declineAiDataConsent()">Not Now</button>
+                <button id="declineAiDataConsentButton" class="first-run-secondary-button" type="button" onclick="declineAiDataConsent()">Not Now</button>
                 <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
                     Consent &amp; Continue
                 </button>
@@ -1559,7 +1559,7 @@
                                             <span class="plus-menu-icon">✉️</span>
                                             <span class="plus-menu-label">Feedback</span>
                                         </div>
-                                        <div class="plus-menu-item" onclick="plusMenuAction('privacy')">
+                                        <div class="plus-menu-item" data-ios-ai-privacy onclick="plusMenuAction('privacy')">
                                             <span class="plus-menu-icon">🔐</span>
                                             <span class="plus-menu-label">Privacy &amp; AI Data</span>
                                         </div>
@@ -1742,21 +1742,47 @@
         const ACTIVE_PLATFORM = CONFIG.platform && CONFIG.platform !== 'web'
             ? CONFIG.platform
             : (window.Capacitor?.getPlatform?.() || 'web');
+        const IS_IOS_APP = IS_APP_SURFACE && ACTIVE_PLATFORM === 'ios';
         const IS_MOBILE_VIEW = window.matchMedia ? window.matchMedia('(max-width: 768px)').matches : window.innerWidth <= 768;
         const IS_PHONE_SURFACE = IS_APP_SURFACE || IS_MOBILE_VIEW;
         const MULTI_IMAGE_PREVIEW_ENABLED = CONFIG.features?.multiImagePreview === true;
         const MAX_SELECTED_IMAGES = MULTI_IMAGE_PREVIEW_ENABLED ? 4 : 1;
 
         function applyPlatformPrivacyWording() {
-            const isIos = ACTIVE_PLATFORM === 'ios';
-            const speechProvider = isIos ? 'Apple Speech Recognition' : 'your device or browser speech-recognition service';
+            const firstRunMessage = document.getElementById('firstRunMessage');
             const disclosure = document.getElementById('speechProviderDisclosure');
             const consentLabel = document.getElementById('aiConsentLabel');
+            const declineButton = document.getElementById('declineAiDataConsentButton');
+            const acceptButton = document.getElementById('acceptBannerBtn');
+            const firstRunActions = acceptButton?.closest('.first-run-actions');
+
+            document.querySelectorAll('[data-ios-ai-privacy]').forEach(item => {
+                item.style.display = IS_IOS_APP ? '' : 'none';
+            });
+
+            if (!IS_IOS_APP) {
+                if (firstRunMessage) {
+                    firstRunMessage.innerHTML = `
+                        <p><strong>Welcome to OffGrid AI FieldGuide.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
+                        <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
+                        <p>Photos, videos, and prompts are sent to the online AI service only when you choose to use those features.</p>
+                        <p>Chats are not saved to an OffGrid AI account or personal cloud history. Online providers process requests under their own privacy policies; no account is required for v1.</p>
+                        <p><strong>Health information:</strong> OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
+                        <p>AI can make mistakes. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services. Verify other important survival, legal, financial, or safety details before acting.</p>`;
+                }
+                if (consentLabel) consentLabel.textContent = 'I understand and accept these safety and privacy notes';
+                if (declineButton) declineButton.style.display = 'none';
+                if (acceptButton) acceptButton.textContent = 'Start Using OffGrid AI';
+                if (firstRunActions) firstRunActions.classList.add('is-legacy-first-run');
+                return;
+            }
+
+            const speechProvider = 'Apple Speech Recognition';
             if (disclosure) {
-                disclosure.innerHTML = `<strong>Who receives data:</strong> When you use Voice Input, ${speechProvider} may process microphone audio to produce text. Data you choose to submit for AI processing travels through the OffGrid AI service hosted by Render, then OpenRouter, and then Google Vertex AI or OpenAI to produce the requested answer or visual.`;
+                disclosure.innerHTML = `<strong>Who receives data:</strong> On iOS, ${speechProvider} may process microphone audio only when you activate Voice Input. Text, selected photos, extracted video frames, and text-only Image Studio prompt preparation that you submit travel through the OffGrid AI service hosted by Render and OpenRouter to one of four fixed Gemma 4 processors: NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only if all four are unavailable, a FieldGuide request may go to Gemini 2.5 Pro through Google Cloud Vertex AI. Image Studio sends its prepared text prompt to Google Cloud Vertex AI for image generation.`;
             }
             if (consentLabel) {
-                consentLabel.textContent = `I consent to the described processing by ${speechProvider}, Render, OpenRouter, Google Vertex AI, and OpenAI for the purpose of completing features I choose to use, and I accept the safety notes`;
+                consentLabel.textContent = `I consent to the described processing by ${speechProvider}, Render, OpenRouter, NextBit, Venice, Parasail, Novita, and Google Cloud Vertex AI for the purpose of completing features I choose to use, and I accept the safety notes`;
             }
         }
         applyPlatformPrivacyWording();
@@ -1859,13 +1885,21 @@
         let liveCompassNative = false;
         let liveCompassStatusTimer = null;
         const API_BASE = CONFIG.apiBase || '';  // Same origin by default; app debug builds can use production API.
+        const FIELDGUIDE_API_PREFIX = IS_IOS_APP ? '/api/ios' : '/api';
+        const IMAGE_STUDIO_API_PREFIX = IS_IOS_APP ? '/api/ios/image-studio' : '/api/image-studio';
         const AI_DATA_CONSENT_KEY = 'offgrid-ai-third-party-consent';
-        const AI_DATA_CONSENT_VERSION = '2026-09-11-v1';
+        const AI_DATA_CONSENT_VERSION = '2026-09-11-v2';
         const AI_MEDIA_CONSENT_KEY = 'offgrid-ai-media-transfer-consent';
-        const AI_MEDIA_CONSENT_VERSION = '2026-09-11-v1';
+        const AI_MEDIA_CONSENT_VERSION = '2026-09-11-v2';
 
         function hasAiDataConsent() {
             return localStorage.getItem(AI_DATA_CONSENT_KEY) === AI_DATA_CONSENT_VERSION;
+        }
+
+        function hasCompletedRequiredFirstRun() {
+            return IS_IOS_APP
+                ? hasAiDataConsent()
+                : localStorage.getItem('offgrid-online-initialized') === 'true';
         }
 
         function prepareAiDataConsentBanner() {
@@ -1898,13 +1932,21 @@
         }
 
         function requireAiDataConsent() {
+            if (!IS_IOS_APP) return true;
             if (hasAiDataConsent()) return true;
             showAiDataConsent();
             showSaveToast('Consent required', 'Review the AI data disclosure before using an online AI feature.');
             return false;
         }
 
+        // Stable hooks for the injected native iOS bridge. The bridge must fail
+        // closed before starting Apple Speech Recognition if hosted consent
+        // state is unavailable or no longer current.
+        window.offgridHasAiDataConsent = hasAiDataConsent;
+        window.offgridShowAiDataConsent = showAiDataConsent;
+
         function confirmMediaTransfer() {
+            if (!IS_IOS_APP) return true;
             if (!selectedImages.length && !selectedVideo) return true;
             if (localStorage.getItem(AI_MEDIA_CONSENT_KEY) === AI_MEDIA_CONSENT_VERSION) return true;
             const mediaDescription = selectedVideo
@@ -1912,8 +1954,8 @@
                 : `${selectedImages.length === 1 ? 'the selected photo' : `${selectedImages.length} selected photos`}`;
             const confirmed = window.confirm(
                 `Send ${mediaDescription} for AI analysis?\n\n` +
-                'The media may contain a visible face or other personal information. It will be sent through the OffGrid AI service hosted by Render and OpenRouter to Google Vertex AI only to answer this request.\n\n' +
-                'No facial recognition, biometric profile, advertising, or AI training is performed. Submitted content uses Zero Data Retention routing and is not saved as an OffGrid AI media history.\n\n' +
+                'The media may contain a visible face or other personal information. It will be sent through the OffGrid AI service hosted by Render and OpenRouter to one of four fixed Gemma 4 processors: NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only if all four are unavailable, it may be analyzed by Gemini 2.5 Pro through Google Cloud Vertex AI. Photos and video frames are not sent to Image Studio or any unlisted AI processor.\n\n' +
+                'No facial recognition, biometric profile, advertising, or AI training is performed. Every iOS media request uses the fixed provider allowlist, Zero Data Retention routing, and denied provider data collection, and is not saved as an OffGrid AI media history.\n\n' +
                 'Choose OK to consent and send. This media consent remains active for future selections until you withdraw it from Privacy & AI Data. Choose Cancel to keep this media on your device.'
             );
             if (confirmed) localStorage.setItem(AI_MEDIA_CONSENT_KEY, AI_MEDIA_CONSENT_VERSION);
@@ -2486,7 +2528,7 @@
                                     <span class="plus-menu-icon">✉️</span>
                                     <span class="plus-menu-label">Feedback</span>
                                 </div>
-                                <div class="plus-menu-item" onclick="plusMenuAction('privacy')">
+                                <div class="plus-menu-item" data-ios-ai-privacy style="${IS_IOS_APP ? '' : 'display: none;'}" onclick="plusMenuAction('privacy')">
                                     <span class="plus-menu-icon">🔐</span>
                                     <span class="plus-menu-label">Privacy &amp; AI Data</span>
                                 </div>
@@ -2762,12 +2804,13 @@
             localStorage.removeItem(AI_MEDIA_CONSENT_KEY);
             localStorage.removeItem('offgrid-online-initialized');
             localStorage.removeItem('offgrid-online-init-date');
+            conversationHistory = [];
+            sessionStorage.removeItem('offgrid-image-studio-payload');
             removeImage();
             removeVideo();
             stopVoiceInput();
             closeOnlineImageStudio();
-            showAiDataConsent();
-            showSaveToast('Consent withdrawn', 'No new AI request can be sent until you consent again.');
+            location.reload();
         }
         
         function fillInput(text, focusAtEnd = false) {
@@ -2875,7 +2918,7 @@
                     videoFrames: msg.videoFrames
                 }));
                 
-                const response = await fetch(`${API_BASE}/api/stream`, {
+                const response = await fetch(`${API_BASE}${FIELDGUIDE_API_PREFIX}/stream`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4533,7 +4576,7 @@ Mobile app output requirements:
                 if (errorEl) errorEl.innerHTML = '';
                 if (statusEl) statusEl.textContent = 'Crafting visual prompt...';
 
-                const promptResponse = await fetch(`${API_BASE}/api/image-studio/visual-prompt`, {
+                const promptResponse = await fetch(`${API_BASE}${IMAGE_STUDIO_API_PREFIX}/visual-prompt`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -4550,7 +4593,7 @@ Mobile app output requirements:
                 onlineStudioState.prompt = imagePrompt;
                 if (statusEl) statusEl.textContent = 'Generating image - usually about 60 seconds...';
 
-                const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
+                const imageResponse = await fetch(`${API_BASE}${IMAGE_STUDIO_API_PREFIX}/generate-image`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -6582,7 +6625,9 @@ Mobile app output requirements:
         function acceptFirstRun() {
             const checkbox = document.getElementById('acceptTermsBanner');
             if (!checkbox || !checkbox.checked) return;
-            localStorage.setItem(AI_DATA_CONSENT_KEY, AI_DATA_CONSENT_VERSION);
+            if (IS_IOS_APP) {
+                localStorage.setItem(AI_DATA_CONSENT_KEY, AI_DATA_CONSENT_VERSION);
+            }
             localStorage.setItem('offgrid-online-initialized', 'true');
             localStorage.setItem('offgrid-online-init-date', new Date().toISOString());
             
@@ -6620,7 +6665,7 @@ Mobile app output requirements:
             console.log('Experience:', CONFIG.experience, '| Customer:', CONFIG.isCustomer);
             
             // Check first run
-            const needsFirstRunConsent = !hasAiDataConsent();
+            const needsFirstRunConsent = !hasCompletedRequiredFirstRun();
             if (needsFirstRunConsent) {
                 showAiDataConsent();
             }
@@ -6751,7 +6796,7 @@ Mobile app output requirements:
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
 
-                if (!hasAiDataConsent()) {
+                if (!hasCompletedRequiredFirstRun()) {
                     pendingOnlineStudioPayload = studioPayload;
                 } else {
                     setTimeout(() => {

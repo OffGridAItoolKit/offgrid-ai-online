@@ -2,13 +2,15 @@
 
 Prepared: 2026-08-29
 
+Build 5 compliance update: 2026-09-11
+
 ## Identity
 
 - Platform: iOS
 - App name (21/30): `OffGrid AI FieldGuide`
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
-- Candidate build: `2`
+- Candidate build: `5`
 - First submitted build: `1`
 - Apple ID: `6806680581`
 - SKU: `offgrid-ai-fieldguide-ios`
@@ -87,7 +89,8 @@ The following conservative disclosure was configured in App Store Connect on 202
 - Performance Data: App Functionality; linked conservatively because short-lived operational logs can include a network address; not used for tracking.
 - Other Diagnostic Data: App Functionality; linked conservatively because short-lived operational logs can include a network address; not used for tracking.
 - Other Data Types: App Functionality; linked conservatively because hosting logs can briefly contain a network address; not used for tracking.
-- Text prompts, selected images, selected video frames, voice input, and generated-image requests are processed for the user-requested operation and are not retained as account history. Re-check Apple's real-time processing exception while completing the live form.
+- Text prompts, Apple Speech transcription text, selected images, selected video frames, and generated-image requests are processed for the user-requested operation and are not retained as account history. Microphone audio is processed by Apple Speech Recognition only when Voice Input is activated; it is not sent to the OffGrid AI service.
+- On iOS, main assistant requests and text-only Image Studio prompt-preparation requests travel through Render and OpenRouter and are restricted to Google Gemma 4 through NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only after all four fail may a main assistant request use Google Gemini 2.5 Pro through Google Cloud Vertex AI. Google-powered Image Studio generation also uses Google Cloud Vertex AI and receives the prepared text prompt. Every iOS AI request enforces Zero Data Retention, `data_collection: "deny"`, a fixed processor allowlist, and no undisclosed provider fallback.
 - Tracking: No.
 
 The privacy policy URL is `https://offgridtoolkit.ai/privacy`; the user privacy choices URL is `https://offgridtoolkit.ai/data-deletion`. The account holder approved and published the disclosure on 2026-08-29.
@@ -115,4 +118,12 @@ The six files were uploaded individually on 2026-08-29 so App Store Connect reta
 
 On 2026-08-29, Apple verified the approved EU Digital Services Act trader phone and email and marked the compliance record Active. Version `1.0 (1)` was submitted with manual release selected and was later returned under Guideline 2.1 for additional information and physical-device video evidence.
 
-Build `1.0 (3)` retains the native Apple Speech fix from build `2` and moves iPhone video selection/frame extraction to native PhotosUI and AVFoundation. The same 4K/60-fps clip that failed in build `2` passed the physical attachment test in build `3` on 2026-09-04. Use build `3` for the final TestFlight smoke test and physical-device App Review recording. The complete seven-part response and recording checklist are in `guideline-2.1-response-build-3.md`.
+Build `1.0 (3)` retained the native Apple Speech fix from build `2` and moved iPhone video selection/frame extraction to native PhotosUI and AVFoundation. The same 4K/60-fps clip that failed in build `2` passed the physical attachment test in build `3` on 2026-09-04. The complete seven-part response and recording checklist used for that submission are in `guideline-2.1-response-build-3.md`.
+
+Build `1.0 (3)` was resubmitted on 2026-09-04 with the requested physical-device recording and complete Guideline 2.1 answers. Apple then requested detailed face-data practices and explicit permission before sharing personal data with third-party AI services.
+
+Build `1.0 (4)` added the first iOS AI-data consent flow, contextual media confirmation, consent withdrawal, expanded privacy disclosures, and named native permission strings. It was uploaded on 2026-09-11. Physical testing found that its Google Vertex-only main-analysis route reduced photo-analysis quality and returned a video provider error, so its prepared face-data reply was not sent and Build `4` was not used for the next resubmission. The Build `4` response remains in `guideline-face-data-response-build-4.md` as history only.
+
+Build `1.0 (5)` is the current candidate. It retains the explicit iOS consent experience and uses a fixed, disclosed, quality-preserving route: Render and OpenRouter; Google Gemma 4 through NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16 for the main assistant and text-only Image Studio prompt preparation; and Google Gemini 2.5 Pro through Google Cloud Vertex AI only after all four Gemma processors fail for a main assistant request. Google-powered Image Studio generation also uses Google Cloud Vertex AI and receives the prepared text prompt. All iOS AI requests enforce Zero Data Retention, `data_collection: "deny"`, fixed allowlists, and no undisclosed provider fallback. Android and web continue to use the legacy OpenRouter ZDR route and existing Image Studio helper behavior and are not part of the iOS App Store submission.
+
+Do not reply or resubmit until Build `5` is uploaded, processed, selected for version `1.0`, its live privacy policy matches the app, and the physical TestFlight smoke test and updated review recording pass. Then use `guideline-face-data-response-build-5.md`.

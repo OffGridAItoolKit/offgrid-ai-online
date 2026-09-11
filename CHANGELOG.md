@@ -9,6 +9,14 @@ This document provides a reverse-chronological summary of recent development pro
 ### September 2026
 
 **2026-09-11**
+*   **Apple AI-data compliance and quality-preserving platform isolation (iOS build 5 candidate)**
+    *   Isolated the iOS App Store route from Android and web so the published Google Play experience keeps its existing first-run flow and legacy OpenRouter ZDR routing.
+    *   Preserved Google Gemma 4 26B A4B as the iOS primary model and qualified a fixed BF16 processor order: NextBit, Venice, Parasail, and Novita.
+    *   Verified that all four processors accept a single cohesive eight-frame video request; no lower-quality 4-plus-4 frame split is required.
+    *   Added Google Gemini 2.5 Pro on Google Cloud Vertex AI only as a quality-first emergency fallback after all four Gemma processors fail.
+    *   Routed iOS Image Studio text preparation through the same fixed Gemma pool and kept Gemini 3 Pro Image generation pinned to Google Cloud Vertex AI; Android and web retain their existing Image Studio route.
+    *   Made the native iOS Voice Input bridge fail closed unless the current hosted consent version is active, preventing Apple Speech Recognition from starting after a user chooses `Not Now` or withdraws consent.
+    *   Updated the iOS consent, contextual media confirmation, privacy/deletion disclosures, App Review response, native permission strings, automated checks, and native build number to `5` so the wording matches the implementation.
 *   **FieldGuide AI-response reliability**
     *   Recovered from transient Google Vertex rate limits by retrying the request with a second multimodal Google model on the same disclosed Google Vertex processor, while preserving Zero Data Retention, denied provider collection, and the provider allowlist.
     *   Buffered split streaming events and replaced unexplained empty timestamp bubbles with an actionable error message when no AI response content is available.

@@ -176,6 +176,19 @@ final class OffGridBridgeViewController: CAPBridgeViewController {
             finish();
             return;
           }
+          if (typeof window.offgridHasAiDataConsent !== 'function') {
+            alert('Voice Input could not verify AI data consent. Please reopen the app and review the privacy disclosure.');
+            return;
+          }
+          if (!window.offgridHasAiDataConsent()) {
+            if (typeof window.offgridShowAiDataConsent === 'function') {
+              window.offgridShowAiDataConsent();
+            }
+            if (typeof window.showSaveToast === 'function') {
+              window.showSaveToast('Consent required', 'Review the AI data disclosure before using Voice Input.');
+            }
+            return;
+          }
           if (moveToChat && document.getElementById('welcome') && typeof window.transitionToChat === 'function') {
             window.transitionToChat();
           }

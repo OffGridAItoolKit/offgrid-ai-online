@@ -2166,6 +2166,10 @@ body.image-zoom-active {
     gap: 12px;
 }
 
+.first-run-actions.is-legacy-first-run .first-run-button {
+    flex: none;
+}
+
 .first-run-secondary-button {
     background: transparent;
     color: #d6d9de;
@@ -2278,6 +2282,10 @@ body.image-zoom-active {
 
     .first-run-actions {
         align-items: stretch;
+    }
+
+    .first-run-actions.is-legacy-first-run .first-run-button {
+        width: 100%;
     }
 
     .first-run-secondary-button {

@@ -44,18 +44,26 @@ const legacyOptimized = createLegacyOptimized({ pool });
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const IOS_GEMMA_PROVIDER_ORDER = Object.freeze([
+    'nextbit/bf16',
+    'venice/bf16',
+    'parasail/bf16',
+    'novita/bf16'
+]);
+const IOS_GEMMA_ZDR_POLICY = Object.freeze({
+    zdr: true,
+    data_collection: 'deny',
+    only: IOS_GEMMA_PROVIDER_ORDER,
+    order: IOS_GEMMA_PROVIDER_ORDER,
+    allow_fallbacks: true
+});
 const GOOGLE_VERTEX_ZDR_POLICY = Object.freeze({
     zdr: true,
     data_collection: 'deny',
     only: ['google-vertex'],
     allow_fallbacks: false
 });
-const OPENAI_ZDR_POLICY = Object.freeze({
-    zdr: true,
-    data_collection: 'deny',
-    only: ['openai'],
-    allow_fallbacks: false
-});
+const LEGACY_ZDR_POLICY = Object.freeze({ zdr: true });
 const IMAGE_HEALTH_TOKEN = process.env.IMAGE_HEALTH_TOKEN || '';
 const ANON_DAILY_PROMPT_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_PROMPT_LIMIT, 10) || 100);
 const ANON_DAILY_IMAGE_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_IMAGE_LIMIT, 10) || 6);
@@ -78,27 +86,46 @@ const GEMMA_MODELS = {
     }
 };
 
-// Keep FieldGuide requests on the disclosed Google Vertex AI processor while
-// allowing a second multimodal model to recover from transient Gemma capacity
-// limits. The fallback is used only when the primary endpoint returns a
-// retryable provider error.
-const FIELDGUIDE_VERTEX_FALLBACK_MODEL = 'google/gemini-2.5-flash';
+// The iOS app keeps Gemma 4 as its primary model on a fixed, disclosed set of
+// ZDR-capable processors. Gemini 2.5 Pro on Google Vertex AI is a quality-first
+// recovery path used only after a retryable Gemma provider failure.
+const FIELDGUIDE_VERTEX_FALLBACK_MODEL = 'google/gemini-2.5-pro';
 
-function getZdrProviderPolicy(modelId) {
+function getZdrProviderPolicy(modelId, routingProfile = 'legacy') {
+    // Android, web, and the existing Command Center keep the exact routing
+    // contract used before the App Store-specific privacy work. Apple-specific
+    // routes opt into the named processor restrictions below.
+    if (routingProfile !== 'ios') return LEGACY_ZDR_POLICY;
+    if (modelId === GEMMA_MODELS['gemma-4-26b'].id) return IOS_GEMMA_ZDR_POLICY;
     if (String(modelId).startsWith('google/')) return GOOGLE_VERTEX_ZDR_POLICY;
-    if (String(modelId).startsWith('openai/')) return OPENAI_ZDR_POLICY;
     return { zdr: true, data_collection: 'deny' };
 }
 
-function getProviderRequestModels(modelId, enforceZdr) {
-    if (enforceZdr && modelId === GEMMA_MODELS['gemma-4-26b'].id) {
+function getProviderRequestModels(modelId, enforceZdr, routingProfile = 'legacy') {
+    if (routingProfile === 'ios' && enforceZdr && modelId === GEMMA_MODELS['gemma-4-26b'].id) {
         return [modelId, FIELDGUIDE_VERTEX_FALLBACK_MODEL];
     }
     return [modelId];
 }
 
+function getRequestRoutingProfile(req) {
+    return req.path.startsWith('/api/ios/') ? 'ios' : 'legacy';
+}
+
+function getImageStudioTextModel(req) {
+    // Keep Android and web on their existing GPT-4.1 Mini route. The iOS app
+    // uses the same qualified Gemma 4 BF16 pool as FieldGuide so every text
+    // helper stays inside the fixed, disclosed iOS processor allowlist.
+    return getRequestRoutingProfile(req) === 'ios'
+        ? GEMMA_MODELS['gemma-4-26b'].id
+        : 'openai/gpt-4.1-mini';
+}
+
 function isRetryableProviderStatus(status) {
-    return [408, 409, 429, 500, 502, 503, 504].includes(status);
+    // OpenRouter uses 404 when no endpoint matches or remains available under
+    // the requested provider/privacy policy, and 529 for provider overload.
+    // Both are appropriate reasons to try the separately disclosed iOS model.
+    return [404, 408, 409, 429, 500, 502, 503, 504, 529].includes(status);
 }
 
 function getProviderErrorMessage(errorData, status) {
@@ -542,9 +569,14 @@ app.use('/api/chat', limiter);
 app.use('/api/chat', anonymousPromptDailyLimit);
 app.use('/api/stream', limiter);
 app.use('/api/stream', anonymousPromptDailyLimit);
+app.use('/api/ios/chat', limiter);
+app.use('/api/ios/chat', anonymousPromptDailyLimit);
+app.use('/api/ios/stream', limiter);
+app.use('/api/ios/stream', anonymousPromptDailyLimit);
 app.use('/api/command/', commandLimiter);
 app.use('/api/open-arena/', commandLimiter);
 app.use('/api/image-studio/', commandLimiter);
+app.use('/api/ios/image-studio/', commandLimiter);
 
 registerOpenArenaRoutes(app, { pool, requireLicense, checkPromptLimit, incrementUsage });
 
@@ -781,8 +813,8 @@ function withTimeout(promise, ms, label = 'Operation') {
 /**
  * Make a non-streaming request to OpenRouter and return the text response
  */
-async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7, enforceZdr = false) {
-    const requestModels = getProviderRequestModels(modelId, enforceZdr);
+async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature = 0.7, enforceZdr = false, routingProfile = 'legacy') {
+    const requestModels = getProviderRequestModels(modelId, enforceZdr, routingProfile);
 
     for (let index = 0; index < requestModels.length; index++) {
         const requestModel = requestModels[index];
@@ -799,7 +831,7 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature =
                 messages: messages,
                 max_tokens: maxTokens,
                 temperature: temperature,
-                ...(enforceZdr ? { provider: getZdrProviderPolicy(requestModel) } : {})
+                ...(enforceZdr ? { provider: getZdrProviderPolicy(requestModel, routingProfile) } : {})
             })
         });
 
@@ -812,7 +844,7 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature =
         const errorMessage = getProviderErrorMessage(errorData, response.status);
         const canRetry = index < requestModels.length - 1 && isRetryableProviderStatus(response.status);
         if (!canRetry) throw new Error(errorMessage);
-        console.warn(`OpenRouter ${requestModel} returned ${response.status}; retrying on Google Vertex fallback.`);
+        console.warn(`OpenRouter ${requestModel} returned ${response.status}; retrying with ${FIELDGUIDE_VERTEX_FALLBACK_MODEL} on Google Vertex AI.`);
     }
 
     throw new Error('No AI provider response was available.');
@@ -821,8 +853,8 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature =
 /**
  * Make a streaming request to OpenRouter and pipe SSE chunks to Express response
  */
-async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temperature = 0.7, enforceZdr = false) {
-    const requestModels = getProviderRequestModels(modelId, enforceZdr);
+async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temperature = 0.7, enforceZdr = false, routingProfile = 'legacy') {
+    const requestModels = getProviderRequestModels(modelId, enforceZdr, routingProfile);
     let response;
 
     for (let index = 0; index < requestModels.length; index++) {
@@ -841,7 +873,7 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temper
                 max_tokens: maxTokens,
                 temperature: temperature,
                 stream: true,
-                ...(enforceZdr ? { provider: getZdrProviderPolicy(requestModel) } : {})
+                ...(enforceZdr ? { provider: getZdrProviderPolicy(requestModel, routingProfile) } : {})
             })
         });
 
@@ -851,7 +883,7 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temper
         const errMsg = getProviderErrorMessage(errorData, response.status);
         const canRetry = index < requestModels.length - 1 && isRetryableProviderStatus(response.status);
         if (canRetry) {
-            console.warn(`OpenRouter ${requestModel} returned ${response.status}; retrying on Google Vertex fallback.`);
+            console.warn(`OpenRouter ${requestModel} returned ${response.status}; retrying with ${FIELDGUIDE_VERTEX_FALLBACK_MODEL} on Google Vertex AI.`);
             continue;
         }
 
@@ -1323,7 +1355,7 @@ app.post('/api/feedback', feedbackLimiter, async (req, res) => {
  * POST /api/chat
  * Main chat endpoint - proxies requests to OpenRouter (non-streaming, Gemma models)
  */
-app.post('/api/chat', async (req, res) => {
+app.post(['/api/chat', '/api/ios/chat'], async (req, res) => {
     const startTime = Date.now();
     
     try {
@@ -1350,7 +1382,8 @@ app.post('/api/chat', async (req, res) => {
             { role: 'system', content: OFFGRID_SYSTEM_PROMPT },
             ...buildOpenRouterMessages(messages, modelConfig.multimodal)
         ];
-        const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages, 4096, 0.7, true);
+        const routingProfile = getRequestRoutingProfile(req);
+        const aiResponse = await callOpenRouter(modelConfig.id, openRouterMessages, 4096, 0.7, true, routingProfile);
         const responseTime = Date.now() - startTime;
         
         res.json({
@@ -1372,7 +1405,7 @@ app.post('/api/chat', async (req, res) => {
  * POST /api/stream
  * Streaming chat endpoint for Gemma 4 (free tier) with system prompt
  */
-app.post('/api/stream', async (req, res) => {
+app.post(['/api/stream', '/api/ios/stream'], async (req, res) => {
     const streamStart = Date.now();
     try {
         const { model, messages } = req.body;
@@ -1395,7 +1428,8 @@ app.post('/api/stream', async (req, res) => {
         res.setHeader('Cache-Control', 'no-cache');
         res.setHeader('Connection', 'keep-alive');
         
-        await streamOpenRouter(modelConfig.id, openRouterMessages, res, 4096, 0.7, true);
+        const routingProfile = getRequestRoutingProfile(req);
+        await streamOpenRouter(modelConfig.id, openRouterMessages, res, 4096, 0.7, true, routingProfile);
         res.end();
         
     } catch (error) {
@@ -1897,7 +1931,7 @@ function withOffGridImageBranding(prompt) {
     return `${trimmedPrompt}\n\nDo not include any footer, credit line, watermark, year, copyright symbol, website address, or brand attribution in the generated artwork. The OffGrid AI app adds its own small attribution after generation.`;
 }
 
-app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], imageBurstLimiter, requireLicense, anonymousImageDailyLimit, checkImageLimit, async (req, res) => {
+app.post(['/api/command/generate-image', '/api/image-studio/generate-image', '/api/ios/image-studio/generate-image'], imageBurstLimiter, requireLicense, anonymousImageDailyLimit, checkImageLimit, async (req, res) => {
     const genStartTime = Date.now();
     try {
         const { prompt, model } = req.body;
@@ -1939,7 +1973,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], im
                     }
                 ],
                 modalities: ['image', 'text'],
-                provider: getZdrProviderPolicy(imageModel)
+                provider: getZdrProviderPolicy(imageModel, getRequestRoutingProfile(req))
             })
         });
         
@@ -2065,12 +2099,13 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], im
 
 /**
  * POST /api/command/craft-prompt
- * Uses GPT-4.1 Mini via OpenRouter to transform a user's plain-language description
- * into an optimized image generation prompt for Nano Banana Pro.
+ * Uses the platform-specific text helper model via OpenRouter to transform a
+ * user's plain-language description into an optimized image generation prompt.
+ * Android/web retain GPT-4.1 Mini; iOS uses the disclosed Gemma 4 BF16 pool.
  * Includes audience-specific context for OffGrid AI ToolKit users.
  * No data is stored — processed in memory and discarded.
  */
-app.post(['/api/command/craft-prompt', '/api/image-studio/craft-prompt'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
+app.post(['/api/command/craft-prompt', '/api/image-studio/craft-prompt', '/api/ios/image-studio/craft-prompt'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
     try {
         const { description, category } = req.body;
 
@@ -2126,6 +2161,7 @@ RULES:
 - Include "labeled" or "annotated" for diagrams
 - Use "educational" "technical" "reference" "clinical" framing for sensitive topics`;
 
+        const textModel = getImageStudioTextModel(req);
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',
             headers: {
@@ -2135,14 +2171,14 @@ RULES:
                 'X-Title': 'OffGrid Command Center'
             },
             body: JSON.stringify({
-                model: 'openai/gpt-4.1-mini',
+                model: textModel,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: description.trim() }
                 ],
                 temperature: 0.7,
                 max_tokens: 300,
-                provider: getZdrProviderPolicy('openai/gpt-4.1-mini')
+                provider: getZdrProviderPolicy(textModel, getRequestRoutingProfile(req))
             })
         });
 
@@ -2164,7 +2200,7 @@ RULES:
         res.json({
             success: true,
             prompt: craftedPrompt,
-            model: 'gpt-4.1-mini',
+            model: textModel,
             category: category || 'other'
         });
 
@@ -2186,10 +2222,10 @@ RULES:
  * Generates a practical contextual summary for a generated image.
  * Takes the image prompt and category, returns actionable text:
  * supplies needed, steps, safety notes, etc.
- * Uses GPT-4.1 Mini for fast, cost-effective generation.
+ * Android/web retain GPT-4.1 Mini; iOS uses the disclosed Gemma 4 BF16 pool.
  * No data is stored — processed in memory and discarded.
  */
-app.post(['/api/command/image-summary', '/api/image-studio/image-summary'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
+app.post(['/api/command/image-summary', '/api/image-studio/image-summary', '/api/ios/image-studio/image-summary'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
     try {
         const { prompt, category } = req.body;
 
@@ -2244,6 +2280,7 @@ Rules:
 - Do NOT describe the image itself — add NEW practical value
 - Total response should be 150-250 words max`;
 
+        const textModel = getImageStudioTextModel(req);
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',
             headers: {
@@ -2253,13 +2290,13 @@ Rules:
                 'X-Title': 'OffGrid Command Center'
             },
             body: JSON.stringify({
-                model: 'openai/gpt-4.1-mini',
+                model: textModel,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: `Generate a practical companion summary for this image. The image was created from this prompt: "${prompt}"` }
                 ],
                 temperature: 0.4,
-                provider: getZdrProviderPolicy('openai/gpt-4.1-mini')
+                provider: getZdrProviderPolicy(textModel, getRequestRoutingProfile(req))
             })
         });
 
@@ -2290,10 +2327,10 @@ Rules:
  * POST /api/command/visual-prompt
  * Takes the last council/AI response from a conversation and generates
  * an optimized Image Studio prompt based on that content.
- * Uses GPT-4.1 Mini for fast, cost-effective generation.
+ * Android/web retain GPT-4.1 Mini; iOS uses the disclosed Gemma 4 BF16 pool.
  * No data is stored — processed in memory and discarded.
  */
-app.post(['/api/command/visual-prompt', '/api/image-studio/visual-prompt'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
+app.post(['/api/command/visual-prompt', '/api/image-studio/visual-prompt', '/api/ios/image-studio/visual-prompt'], requireLicense, anonymousPromptDailyLimit, async (req, res) => {
     try {
         const { conversationContext, category } = req.body;
 
@@ -2347,6 +2384,7 @@ RULES:
 - Include wording such as "mobile-readable", "large legible labels", and "portrait field-card layout" when appropriate
 - Do not include any footer, credit line, watermark, year, copyright symbol, website address, or brand attribution in the generated artwork`;
 
+        const textModel = getImageStudioTextModel(req);
         const response = await fetch(`${OPENROUTER_BASE_URL}/chat/completions`, {
             method: 'POST',
             headers: {
@@ -2356,14 +2394,14 @@ RULES:
                 'X-Title': 'OffGrid Command Center'
             },
             body: JSON.stringify({
-                model: 'openai/gpt-4.1-mini',
+                model: textModel,
                 messages: [
                     { role: 'system', content: systemPrompt },
                     { role: 'user', content: `Read this AI response and create an optimized image generation prompt for a practical companion visual:\n\n${conversationContext.substring(0, 4000)}` }
                 ],
                 temperature: 0.7,
                 max_tokens: 400,
-                provider: getZdrProviderPolicy('openai/gpt-4.1-mini')
+                provider: getZdrProviderPolicy(textModel, getRequestRoutingProfile(req))
             })
         });
 
@@ -2385,7 +2423,7 @@ RULES:
         res.json({
             success: true,
             prompt: visualPrompt,
-            model: 'gpt-4.1-mini'
+            model: textModel
         });
 
     } catch (error) {

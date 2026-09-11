@@ -15,7 +15,7 @@ Archive and upload the Capacitor iOS app for TestFlight and App Store review fro
 - App name: OffGrid AI FieldGuide
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
-- Working build: `4`
+- Working build: `5`
 - First submitted build: `1`
 - Device family: iPhone
 - Orientation: portrait
@@ -72,8 +72,12 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Attach the public review video, add the complete reviewer answers to App Review Information and Resolution Center, and resubmit version `1.0` using build `3`.
 - [x] Add explicit third-party AI and face-data consent, a contextual first-media-transfer confirmation, consent withdrawal, expanded privacy disclosures, and provider-routing restrictions for build `1.0 (4)`.
 - [x] Archive, export, validate, and upload build `1.0 (4)` to App Store Connect on 2026-09-11; App Store Connect accepted the package and began processing.
-- [ ] Publish the hosted consent, privacy-policy, and provider-routing update after authenticating this Mac's Git client with GitHub.
-- [ ] Complete a focused TestFlight smoke test of build `1.0 (4)`, select it for review, update the App Review notes, reply to Apple with the prepared face-data response, and resubmit.
+- [x] Publish the hosted build `4` consent, privacy-policy, and provider-routing update.
+- [x] Select and physically retest build `1.0 (4)`. Pause the App Review reply and resubmission after the Google Vertex-only route degraded photo and video analysis compared with the production experience.
+- [x] Qualify the Build `5` quality-preserving iOS route: Google Gemma 4 through NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16, with Google Gemini 2.5 Pro through Google Cloud Vertex AI only after all four Gemma processors fail. The qualification record is `app-store/provider-qualification-build-5.md`.
+- [ ] Complete the Build `5` hosted and native disclosure changes, automated tests, and production verification without changing the Android/web legacy OpenRouter ZDR route.
+- [ ] Increment the native build to `1.0 (5)`, archive, export, validate, upload, and wait for App Store Connect processing.
+- [ ] Install the exact TestFlight build `1.0 (5)` fresh on the physical iPhone, complete the focused consent/chat/photo/video/Image Studio smoke test, record the updated physical-device review video, select build `5`, update App Review Information, send the Build `5` face-data response, and resubmit.
 
 The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully on 2026-09-03, passed App Store Connect processing, and is listed in TestFlight as `Ready to Submit`. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
 
@@ -89,12 +93,22 @@ Version `1.0` build `3` was resubmitted to App Review on 2026-09-04 at 09:06 MST
 
 Build `4` adds iOS permission strings that name the relevant AI-data route and increments the native build number. Its archive is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-4/OffGrid-AI-FieldGuide-1.0-4.xcarchive`. The exported IPA is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-4/export/App.ipa` and has SHA-256 `b0b1d6849b3dbe2c78aed0ae6d92f23016d6f9ffab6f264f42f88186cc053b99`. The IPA is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`, has `get-task-allow = false` and `beta-reports-active = true`, and was accepted for App Store Connect processing on 2026-09-11 at 11:58 MST.
 
+Build `4` was then selected and physically exercised on the iPhone. The new consent and privacy flow worked, but the Google Vertex-only main-analysis route was not accepted for release because it reduced photo-analysis quality and produced a video provider error. No Build `4` face-data reply was sent to Apple and Build `4` was not used for the next resubmission.
+
+Build `5` keeps the iOS consent flow while restoring the intended Google Gemma 4 quality with a fixed, disclosed processor chain. Main assistant requests and text-only Image Studio prompt-preparation requests travel through Render and OpenRouter and may use only NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16 for Gemma 4. Only after all four fail may the server attempt Google Gemini 2.5 Pro through Google Cloud Vertex AI for a main assistant request. Google-powered Image Studio generation also uses Google Cloud Vertex AI and receives the prepared text prompt. Every iOS AI request requires Zero Data Retention, `data_collection: "deny"`, a fixed allowlist, and no undisclosed provider fallback. Apple Speech Recognition receives microphone audio only when Voice Input is activated. Android and web retain their legacy OpenRouter ZDR route, existing Image Studio helper behavior, and existing first-run experience.
+
 ## App Review Note
 
 ```text
 OffGrid AI FieldGuide is a free online AI companion for practical field guidance. No account or review credentials are required. The app has no ads and no in-app purchases.
 
-The reviewer can start on the main screen and submit a question, tap Take Photo / Upload Images, tap Record Video / Upload Video, or open Ready-Made Prompts. Camera, photo library, microphone, and motion permissions are requested only after the reviewer taps the related feature.
+Build reviewed: OffGrid AI FieldGuide version 1.0 (Build 5).
+
+On first launch, the iOS app explains which user-selected data may be sent for online AI processing and names Apple Speech Recognition, Render, OpenRouter, NextBit, Venice, Parasail, Novita, and Google Cloud Vertex AI. The reviewer must check the consent box and tap Consent & Continue before online AI features are enabled. Choosing Not Now sends no AI data. Before the first selected photo or extracted video-frame transfer, the app shows one contextual media confirmation; it does not add a recurring prompt to later requests. Consent can be withdrawn from + menu > Privacy & AI Data.
+
+The reviewer can submit a question, tap Take Photo / Upload Images, tap Record Video / Upload Video, or open Ready-Made Prompts. Camera, photo-library, microphone, Speech Recognition, and motion permissions are requested only after the reviewer taps the related feature. Voice Input uses Apple Speech Recognition when activated; only its transcription text enters the online AI request when submitted.
+
+Main assistant requests and text-only Image Studio prompt-preparation requests travel through the OffGrid service on Render and OpenRouter. Google Gemma 4 is restricted to NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only if all four fail may a main assistant request use Google Gemini 2.5 Pro through Google Cloud Vertex AI. Google-powered Image Studio generation also uses Google Cloud Vertex AI and receives the prepared text prompt. All iOS AI requests enforce Zero Data Retention, denied provider data collection, fixed processor allowlists, and no undisclosed provider fallback.
 
 After an AI response, the reviewer can create a visual or make a Field Guide. Save Field Guide generates a native PDF, creates the app's OffGrid AI Field Guides folder in Files, and opens the saved guide. Saved Guides opens that same folder. Image Studio visuals can be saved to Photos or shared with the native share sheet.
 
