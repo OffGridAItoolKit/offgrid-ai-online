@@ -15,7 +15,7 @@ Archive and upload the Capacitor iOS app for TestFlight and App Store review fro
 - App name: OffGrid AI FieldGuide
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
-- Working build: `3`
+- Working build: `4`
 - First submitted build: `1`
 - Device family: iPhone
 - Orientation: portrait
@@ -70,6 +70,10 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Run a complete internal TestFlight smoke test using build `1.0 (3)` on the physical iPhone 14 Plus.
 - [x] Record the requested physical-device review video using the exact TestFlight build selected for review.
 - [x] Attach the public review video, add the complete reviewer answers to App Review Information and Resolution Center, and resubmit version `1.0` using build `3`.
+- [x] Add explicit third-party AI and face-data consent, a contextual first-media-transfer confirmation, consent withdrawal, expanded privacy disclosures, and provider-routing restrictions for build `1.0 (4)`.
+- [x] Archive, export, validate, and upload build `1.0 (4)` to App Store Connect on 2026-09-11; App Store Connect accepted the package and began processing.
+- [ ] Publish the hosted consent, privacy-policy, and provider-routing update after authenticating this Mac's Git client with GitHub.
+- [ ] Complete a focused TestFlight smoke test of build `1.0 (4)`, select it for review, update the App Review notes, reply to Apple with the prepared face-data response, and resubmit.
 
 The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully on 2026-09-03, passed App Store Connect processing, and is listed in TestFlight as `Ready to Submit`. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
 
@@ -82,6 +86,8 @@ The exact TestFlight build `1.0 (3)` was installed fresh and recorded on the phy
 The public App Review delivery is a tighter 7:20 cut stored locally as `OffGrid-AI-FieldGuide-1.0-3-App-Review-Upload-7m20.m4v`. It retains the same workflows at 500×1080 H.264/AAC, is exactly 101,296,500 bytes, and has SHA-256 `bbfe60fb48c0186e0a1c31a3c30a72d30b48699471b9890b2c183c93c873ae7b`. It is uploaded to Google Drive at `https://drive.google.com/file/d/1q96781-qZbh_5ZXmV1RxS_ArAF0avL2O/view?usp=sharing`. Anonymous byte-range retrieval returned HTTP `206` with the correct filename, size, and content range, confirming that App Review can access it without a Google login.
 
 Version `1.0` build `3` was resubmitted to App Review on 2026-09-04 at 09:06 MST. App Store Connect shows the submission and app version as `Waiting for Review`. Submission ID: `823b9b5d-6d12-4109-b6b2-008d5412f5f6`.
+
+Build `4` adds iOS permission strings that name the relevant AI-data route and increments the native build number. Its archive is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-4/OffGrid-AI-FieldGuide-1.0-4.xcarchive`. The exported IPA is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-4/export/App.ipa` and has SHA-256 `b0b1d6849b3dbe2c78aed0ae6d92f23016d6f9ffab6f264f42f88186cc053b99`. The IPA is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`, has `get-task-allow = false` and `beta-reports-active = true`, and was accepted for App Store Connect processing on 2026-09-11 at 11:58 MST.
 
 ## App Review Note
 
