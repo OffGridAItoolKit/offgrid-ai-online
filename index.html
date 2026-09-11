@@ -1244,21 +1244,25 @@
             <div class="first-run-tagline">No account history. Phone-native tools. Field-ready help.</div>
             <div class="first-run-message">
                 <p><strong>Welcome to OffGrid AI FieldGuide.</strong> This app uses online AI responses and practical phone tools for field-ready help.</p>
-                <p>Camera, microphone, media, and compass access are requested only when you tap those features.</p>
-                <p>Photos, videos, and prompts are sent to the online AI service only when you choose to use those features.</p>
-                <p>Chats are not saved to an OffGrid AI account or personal cloud history. Online providers process requests under their own privacy policies; no account is required for v1.</p>
+                <p><strong>Before anything is sent:</strong> You choose whether to send text prompts, voice transcription text, selected photos, up to eight extracted video frames, or image-generation prompts. Camera, microphone, media, and compass permissions are requested only when you tap the related feature.</p>
+                <p><strong>Who receives data:</strong> When you use Voice Input, Apple Speech Recognition may process microphone audio to produce text. Data you choose to submit for AI processing travels through the OffGrid AI service hosted by Render, then OpenRouter, and then Google Vertex AI or OpenAI to produce the requested answer or visual.</p>
+                <p><strong>Photos and video:</strong> Selected media may contain a visible face or other personal information. OffGrid AI does not detect, recognize, identify, map, measure, or create a biometric profile from faces. Raw video stays on your phone; only extracted frames are sent. The first time you submit a photo or video, you will see a separate media-transfer confirmation that remains valid until you withdraw consent.</p>
+                <p><strong>Use and retention:</strong> Submitted content is used only to complete your request. It is not used for advertising, profiling, or AI training and is not saved as an OffGrid AI account, conversation, face, or media history. AI requests use Zero Data Retention routing.</p>
                 <p><strong>Health information:</strong> OffGrid AI FieldGuide is not a medical device and does not diagnose, treat, cure, or prevent any medical condition. Photo and video analysis may provide general educational health or first-aid information, but it is not a substitute for professional medical advice.</p>
                 <p>AI can make mistakes. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services. Verify other important survival, legal, financial, or safety details before acting.</p>
             </div>
             <div class="first-run-terms">
                 <label class="terms-checkbox">
                     <input type="checkbox" id="acceptTermsBanner">
-                    <span>I understand and accept these safety and privacy notes</span>
+                    <span>I consent to the described processing by Apple Speech Recognition, Render, OpenRouter, Google Vertex AI, and OpenAI for the purpose of completing features I choose to use, and I accept the safety notes</span>
                 </label>
             </div>
-            <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
-                Start Using OffGrid AI
-            </button>
+            <div class="first-run-actions">
+                <button class="first-run-secondary-button" type="button" onclick="declineAiDataConsent()">Not Now</button>
+                <button id="acceptBannerBtn" class="first-run-button" onclick="acceptFirstRun()" disabled>
+                    Consent &amp; Continue
+                </button>
+            </div>
             <div class="first-run-footer">
                 <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> &middot;
                 <a href="mailto:support@offgridaitoolkit.com?subject=OffGrid%20AI%20Field%20Guide%20Support">Support</a>
@@ -1555,6 +1559,10 @@
                                             <span class="plus-menu-icon">✉️</span>
                                             <span class="plus-menu-label">Feedback</span>
                                         </div>
+                                        <div class="plus-menu-item" onclick="plusMenuAction('privacy')">
+                                            <span class="plus-menu-icon">🔐</span>
+                                            <span class="plus-menu-label">Privacy &amp; AI Data</span>
+                                        </div>
                                     </div>
                                 </div>
                                 <textarea 
@@ -1834,6 +1842,66 @@
         let liveCompassNative = false;
         let liveCompassStatusTimer = null;
         const API_BASE = CONFIG.apiBase || '';  // Same origin by default; app debug builds can use production API.
+        const AI_DATA_CONSENT_KEY = 'offgrid-ai-third-party-consent';
+        const AI_DATA_CONSENT_VERSION = '2026-09-11-v1';
+        const AI_MEDIA_CONSENT_KEY = 'offgrid-ai-media-transfer-consent';
+        const AI_MEDIA_CONSENT_VERSION = '2026-09-11-v1';
+
+        function hasAiDataConsent() {
+            return localStorage.getItem(AI_DATA_CONSENT_KEY) === AI_DATA_CONSENT_VERSION;
+        }
+
+        function prepareAiDataConsentBanner() {
+            const checkbox = document.getElementById('acceptTermsBanner');
+            const button = document.getElementById('acceptBannerBtn');
+            if (!checkbox || !button) return;
+            checkbox.checked = false;
+            button.disabled = true;
+            button.style.opacity = '0.5';
+            button.style.cursor = 'not-allowed';
+            if (checkbox.dataset.consentBound !== 'true') {
+                checkbox.dataset.consentBound = 'true';
+                checkbox.addEventListener('change', function() {
+                    button.disabled = !this.checked;
+                    button.style.opacity = this.checked ? '1' : '0.5';
+                    button.style.cursor = this.checked ? 'pointer' : 'not-allowed';
+                });
+            }
+        }
+
+        function showAiDataConsent() {
+            const banner = document.getElementById('firstRunBanner');
+            if (!banner) return;
+            prepareAiDataConsentBanner();
+            const content = banner.querySelector('.first-run-content');
+            if (content) content.scrollTop = 0;
+            banner.style.transition = '';
+            banner.style.opacity = '1';
+            banner.style.display = 'flex';
+        }
+
+        function requireAiDataConsent() {
+            if (hasAiDataConsent()) return true;
+            showAiDataConsent();
+            showSaveToast('Consent required', 'Review the AI data disclosure before using an online AI feature.');
+            return false;
+        }
+
+        function confirmMediaTransfer() {
+            if (!selectedImages.length && !selectedVideo) return true;
+            if (localStorage.getItem(AI_MEDIA_CONSENT_KEY) === AI_MEDIA_CONSENT_VERSION) return true;
+            const mediaDescription = selectedVideo
+                ? 'up to eight extracted video frames (the raw video stays on this device)'
+                : `${selectedImages.length === 1 ? 'the selected photo' : `${selectedImages.length} selected photos`}`;
+            const confirmed = window.confirm(
+                `Send ${mediaDescription} for AI analysis?\n\n` +
+                'The media may contain a visible face or other personal information. It will be sent through the OffGrid AI service hosted by Render and OpenRouter to Google Vertex AI only to answer this request.\n\n' +
+                'No facial recognition, biometric profile, advertising, or AI training is performed. Submitted content uses Zero Data Retention routing and is not saved as an OffGrid AI media history.\n\n' +
+                'Choose OK to consent and send. This media consent remains active for future selections until you withdraw it from Privacy & AI Data. Choose Cancel to keep this media on your device.'
+            );
+            if (confirmed) localStorage.setItem(AI_MEDIA_CONSENT_KEY, AI_MEDIA_CONSENT_VERSION);
+            return confirmed;
+        }
 
         function cardinalFromHeading(degrees) {
             const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
@@ -2310,6 +2378,7 @@
         });
         
         function sendWelcomeMessage() {
+            if (!requireAiDataConsent()) return;
             const welcomeInput = document.getElementById('welcomeMessageInput');
             const message = welcomeInput.value.trim();
             if (!message && !selectedImages.length) return;
@@ -2399,6 +2468,10 @@
                                 <div class="plus-menu-item" onclick="plusMenuAction('feedback')">
                                     <span class="plus-menu-icon">✉️</span>
                                     <span class="plus-menu-label">Feedback</span>
+                                </div>
+                                <div class="plus-menu-item" onclick="plusMenuAction('privacy')">
+                                    <span class="plus-menu-icon">🔐</span>
+                                    <span class="plus-menu-label">Privacy &amp; AI Data</span>
                                 </div>
                             </div>
                         </div>
@@ -2553,6 +2626,19 @@
                 case 'feedback':
                     openFeedback('Plus menu');
                     break;
+                case 'privacy':
+                    openAiPrivacySettings();
+                    break;
+                case 'privacyConsent':
+                    if (hasAiDataConsent()) {
+                        withdrawAiDataConsent();
+                    } else {
+                        showAiDataConsent();
+                    }
+                    break;
+                case 'privacyPolicy':
+                    window.open(new URL('/privacy', window.location.origin).href, '_blank', 'noopener,noreferrer');
+                    break;
                 case 'identifyImage':
                     const identifyPrompt = 'Identify and analyze this image. Point out what matters, any safety concerns, and practical next steps.';
                     fillInput(identifyPrompt);
@@ -2634,6 +2720,38 @@
                 { icon: '🎬', label: 'Upload Video', desc: 'Analyze an existing clip', action: 'uploadVideo' }
             ], 'Health-related video analysis provides general information only—not diagnosis or medical advice. Seek professional care for medical concerns and emergency services for urgent situations.');
         }
+
+        function openAiPrivacySettings() {
+            const consented = hasAiDataConsent();
+            openMobileActionSheet('Privacy & AI Data', [
+                {
+                    icon: consented ? '⛔' : '✅',
+                    label: consented ? 'Withdraw AI Data Consent' : 'Review and Consent',
+                    desc: consented ? 'Blocks future AI and media transfers' : 'Required before online AI features can send data',
+                    action: 'privacyConsent'
+                },
+                { icon: '📄', label: 'Privacy Policy', desc: 'Face data, providers, retention, and deletion', action: 'privacyPolicy' }
+            ], consented
+                ? `AI consent is active. Media consent is ${localStorage.getItem(AI_MEDIA_CONSENT_KEY) === AI_MEDIA_CONSENT_VERSION ? 'also active' : 'requested before the first photo or video transfer'}.`
+                : 'Consent is not active. Offline device features remain available, but online AI features cannot send data.');
+        }
+
+        function withdrawAiDataConsent() {
+            const confirmed = window.confirm(
+                'Withdraw consent for online AI data processing?\n\nFuture prompts, voice transcription text, photos, video frames, and image-generation requests will be blocked until you consent again.'
+            );
+            if (!confirmed) return;
+            localStorage.removeItem(AI_DATA_CONSENT_KEY);
+            localStorage.removeItem(AI_MEDIA_CONSENT_KEY);
+            localStorage.removeItem('offgrid-online-initialized');
+            localStorage.removeItem('offgrid-online-init-date');
+            removeImage();
+            removeVideo();
+            stopVoiceInput();
+            closeOnlineImageStudio();
+            showAiDataConsent();
+            showSaveToast('Consent withdrawn', 'No new AI request can be sent until you consent again.');
+        }
         
         function fillInput(text, focusAtEnd = false) {
             const welcomeInput = document.getElementById('welcomeMessageInput');
@@ -2659,6 +2777,7 @@
         // ============================================
         
         async function sendMessage() {
+            if (!requireAiDataConsent()) return;
             const input = document.getElementById('messageInput');
             const welcomeInput = document.getElementById('welcomeMessageInput');
             if (!input && welcomeInput) {
@@ -2670,6 +2789,8 @@
             const requestStartTime = Date.now();
             
             if ((!message && !selectedImages.length && !selectedVideo) || isTyping) return;
+
+            if (!confirmMediaTransfer()) return;
             
             const isConnected = await checkConnection();
             if (!isConnected) {
@@ -3056,6 +3177,7 @@
         // ============================================
         
         function triggerImageUpload() {
+            if (!requireAiDataConsent()) return;
             let input = document.getElementById('imageInput');
             if (!input) {
                 // Save any existing text from welcome input before transitioning
@@ -3080,6 +3202,7 @@
         }
         
         function triggerCameraCapture() {
+            if (!requireAiDataConsent()) return;
             let input = document.getElementById('imageInput');
             if (!input) {
                 // Save any existing text from welcome input before transitioning
@@ -3104,6 +3227,7 @@
         }
 
         function triggerGalleryUpload() {
+            if (!requireAiDataConsent()) return;
             // Keep camera capture in the dedicated Take Photo action. The image
             // picker can offer Gallery/photo sources and Files without duplicate
             // camera entries from Android's generic any-file chooser.
@@ -3270,6 +3394,7 @@
         }
         
         function triggerVideoUpload() {
+            if (!requireAiDataConsent()) return;
             autoSelectVideoModel();
             // Ensure we're in chat mode
             let input = document.getElementById('videoInput');
@@ -3298,6 +3423,7 @@
         }
 
         function triggerVideoRecord() {
+            if (!requireAiDataConsent()) return;
             autoSelectVideoModel();
             // Create a temporary video input with capture attribute for recording
             let input = document.getElementById('videoRecordInput');
@@ -3851,6 +3977,7 @@
         // ============================================
         
         function toggleVoiceInput() {
+            if (!requireAiDataConsent()) return;
             if (voiceRecognition) {
                 stopVoiceInput();
                 return;
@@ -4119,6 +4246,7 @@
         }
 
         function handleCreateVisual() {
+            if (!requireAiDataConsent()) return;
             const latestAssistant = [...conversationHistory].reverse().find(m => m.role === 'assistant' && m.content && m.content.trim());
             if (!latestAssistant) {
                 showCopyToast('Ask a question first, then create a visual.');
@@ -4134,6 +4262,7 @@
         }
 
         function startStandaloneVisualPrompt() {
+            if (!requireAiDataConsent()) return;
             haptic('medium');
             const starter = 'Create a practical mobile-friendly field guide visual for: ';
             const welcomeInput = document.getElementById('welcomeMessageInput');
@@ -4231,6 +4360,10 @@
         }
 
         function openOnlineImageStudio(payload, options = {}) {
+            if (!requireAiDataConsent()) {
+                pendingOnlineStudioPayload = payload;
+                return;
+            }
             const normalized = normalizeImageStudioPayload(payload);
             if (!normalized) {
                 showCopyToast('No answer was available for Image Studio.');
@@ -4360,6 +4493,7 @@ Mobile app output requirements:
         }
 
         async function generateOnlineStudioImage() {
+            if (!requireAiDataConsent()) return;
             if (!onlineStudioState) return;
             const statusEl = document.getElementById('onlineStudioStatus');
             const previewEl = document.getElementById('onlineStudioPreview');
@@ -6426,6 +6560,9 @@ Mobile app output requirements:
         // ============================================
         
         function acceptFirstRun() {
+            const checkbox = document.getElementById('acceptTermsBanner');
+            if (!checkbox || !checkbox.checked) return;
+            localStorage.setItem(AI_DATA_CONSENT_KEY, AI_DATA_CONSENT_VERSION);
             localStorage.setItem('offgrid-online-initialized', 'true');
             localStorage.setItem('offgrid-online-init-date', new Date().toISOString());
             
@@ -6447,6 +6584,12 @@ Mobile app output requirements:
                 }, 380);
             }
         }
+
+        function declineAiDataConsent() {
+            const banner = document.getElementById('firstRunBanner');
+            if (banner) banner.style.display = 'none';
+            showSaveToast('No data sent', 'Online AI features remain blocked. Review Privacy & AI Data from the + menu whenever you are ready.');
+        }
         
         // ============================================
         // INITIALIZATION
@@ -6457,21 +6600,9 @@ Mobile app output requirements:
             console.log('Experience:', CONFIG.experience, '| Customer:', CONFIG.isCustomer);
             
             // Check first run
-            const needsFirstRunConsent = !localStorage.getItem('offgrid-online-initialized');
+            const needsFirstRunConsent = !hasAiDataConsent();
             if (needsFirstRunConsent) {
-                const banner = document.getElementById('firstRunBanner');
-                const checkbox = document.getElementById('acceptTermsBanner');
-                const button = document.getElementById('acceptBannerBtn');
-                
-                if (banner && checkbox && button) {
-                    banner.style.display = 'block';
-                    
-                    checkbox.addEventListener('change', function() {
-                        button.disabled = !this.checked;
-                        button.style.opacity = this.checked ? '1' : '0.5';
-                        button.style.cursor = this.checked ? 'pointer' : 'not-allowed';
-                    });
-                }
+                showAiDataConsent();
             }
             
             // Initialize connection check
@@ -6600,7 +6731,7 @@ Mobile app output requirements:
                     window.history.replaceState({}, document.title, cleanUrl);
                 }
 
-                if (!localStorage.getItem('offgrid-online-initialized')) {
+                if (!hasAiDataConsent()) {
                     pendingOnlineStudioPayload = studioPayload;
                 } else {
                     setTimeout(() => {

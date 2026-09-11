@@ -44,6 +44,18 @@ const legacyOptimized = createLegacyOptimized({ pool });
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 const OPENROUTER_BASE_URL = 'https://openrouter.ai/api/v1';
+const GOOGLE_VERTEX_ZDR_POLICY = Object.freeze({
+    zdr: true,
+    data_collection: 'deny',
+    only: ['google-vertex'],
+    allow_fallbacks: false
+});
+const OPENAI_ZDR_POLICY = Object.freeze({
+    zdr: true,
+    data_collection: 'deny',
+    only: ['openai'],
+    allow_fallbacks: false
+});
 const IMAGE_HEALTH_TOKEN = process.env.IMAGE_HEALTH_TOKEN || '';
 const ANON_DAILY_PROMPT_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_PROMPT_LIMIT, 10) || 100);
 const ANON_DAILY_IMAGE_LIMIT = Math.max(1, parseInt(process.env.ANON_DAILY_IMAGE_LIMIT, 10) || 6);
@@ -65,6 +77,12 @@ const GEMMA_MODELS = {
         responseTime: '~1-3 seconds'
     }
 };
+
+function getZdrProviderPolicy(modelId) {
+    if (String(modelId).startsWith('google/')) return GOOGLE_VERTEX_ZDR_POLICY;
+    if (String(modelId).startsWith('openai/')) return OPENAI_ZDR_POLICY;
+    return { zdr: true, data_collection: 'deny' };
+}
 
 // =============================================================================
 // OFFGRID AI SYSTEM PROMPT
@@ -753,7 +771,7 @@ async function callOpenRouter(modelId, messages, maxTokens = 4096, temperature =
             messages: messages,
             max_tokens: maxTokens,
             temperature: temperature,
-            ...(enforceZdr ? { provider: { zdr: true } } : {})
+            ...(enforceZdr ? { provider: getZdrProviderPolicy(modelId) } : {})
         })
     });
 
@@ -784,7 +802,7 @@ async function streamOpenRouter(modelId, messages, res, maxTokens = 4096, temper
             max_tokens: maxTokens,
             temperature: temperature,
             stream: true,
-            ...(enforceZdr ? { provider: { zdr: true } } : {})
+            ...(enforceZdr ? { provider: getZdrProviderPolicy(modelId) } : {})
         })
     });
 
@@ -1789,7 +1807,7 @@ app.get('/api/health/image-gen', async (req, res) => {
                 model: IMAGE_STUDIO_IMAGE_MODELS.gemini,
                 messages: [{ role: 'user', content: 'Generate a simple image of a green circle on a white background' }],
                 modalities: ['image', 'text'],
-                provider: { zdr: true }
+                provider: getZdrProviderPolicy(IMAGE_STUDIO_IMAGE_MODELS.gemini)
             })
         });
         const durationMs = Date.now() - startTime;
@@ -1875,7 +1893,7 @@ app.post(['/api/command/generate-image', '/api/image-studio/generate-image'], im
                     }
                 ],
                 modalities: ['image', 'text'],
-                provider: { zdr: true }
+                provider: getZdrProviderPolicy(imageModel)
             })
         });
         
@@ -2078,7 +2096,7 @@ RULES:
                 ],
                 temperature: 0.7,
                 max_tokens: 300,
-                provider: { zdr: true }
+                provider: getZdrProviderPolicy('openai/gpt-4.1-mini')
             })
         });
 
@@ -2195,7 +2213,7 @@ Rules:
                     { role: 'user', content: `Generate a practical companion summary for this image. The image was created from this prompt: "${prompt}"` }
                 ],
                 temperature: 0.4,
-                provider: { zdr: true }
+                provider: getZdrProviderPolicy('openai/gpt-4.1-mini')
             })
         });
 
@@ -2299,7 +2317,7 @@ RULES:
                 ],
                 temperature: 0.7,
                 max_tokens: 400,
-                provider: { zdr: true }
+                provider: getZdrProviderPolicy('openai/gpt-4.1-mini')
             })
         });
 

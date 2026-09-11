@@ -25,13 +25,13 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>OffGrid AI FieldGuide uses the camera only when you take a picture or record a video to analyze with the online AI service.</string>
+	<string>OffGrid AI FieldGuide uses the camera only when you take a photo or record a video. After your separate confirmation, a selected photo or extracted video frames may be sent through Render and OpenRouter to Google Vertex AI for analysis.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>OffGrid AI FieldGuide uses the microphone only when you record video or use voice input.</string>
+	<string>OffGrid AI FieldGuide uses the microphone only when you record video or dictate a question. Apple Speech Recognition may process voice audio; resulting text is sent to the disclosed AI providers only after you submit it.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>OffGrid AI FieldGuide converts speech to text only when you tap Voice Input so you can dictate a question.</string>
+	<string>OffGrid AI FieldGuide uses Apple Speech Recognition only when you tap Voice Input. The resulting text is sent to the disclosed AI providers only if you choose to submit the question.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>OffGrid AI FieldGuide lets you choose photos and videos to upload for online AI analysis.</string>
+	<string>OffGrid AI FieldGuide lets you choose photos and videos. After your separate confirmation, selected photos or extracted video frames may be sent through Render and OpenRouter to Google Vertex AI for analysis.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>OffGrid AI FieldGuide can save generated visuals and field guides to your phone when you choose Save.</string>
 	<key>NSMotionUsageDescription</key>

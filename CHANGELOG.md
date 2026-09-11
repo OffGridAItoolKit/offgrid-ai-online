@@ -1,10 +1,21 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-08-16
+**Last Updated:** 2026-09-11
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
+
+### September 2026
+
+**2026-09-11**
+*   **Apple AI-data and face-data compliance (iOS build 4)**
+    *   Added versioned, explicit consent before any online AI feature can transmit user-selected data; existing installations must review the new disclosure once.
+    *   Added a contextual consent immediately before the first photo or extracted-video-frame transfer, with remembered consent and an in-app withdrawal control under `Privacy & AI Data`.
+    *   Disclosed Apple Speech Recognition, Render, OpenRouter, Google Vertex AI, and OpenAI by name and explained the specific data each service processes.
+    *   Added a dedicated privacy-policy section covering incidental visible faces, prohibited facial-recognition/biometric uses, purpose, sharing, storage, retention, deletion, and local raw-video handling.
+    *   Restricted Google requests to Google Vertex AI and OpenAI requests to OpenAI through OpenRouter, with Zero Data Retention required, provider data collection denied, and fallback providers disabled.
+    *   Updated iOS permission descriptions, incremented the iOS build number to `4`, and added automated AI-consent/privacy regression checks.
 
 ### August 2026
 

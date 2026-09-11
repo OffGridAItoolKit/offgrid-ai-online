@@ -2047,6 +2047,9 @@ body.image-zoom-active {
         0 0 36px rgba(184, 134, 11, 0.14),
         0 24px 60px rgba(0, 0, 0, 0.58);
     animation: slideUp 0.6s ease;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .first-run-logo {
@@ -2157,6 +2160,28 @@ body.image-zoom-active {
     letter-spacing: 1px;
 }
 
+.first-run-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.first-run-secondary-button {
+    background: transparent;
+    color: #d6d9de;
+    border: 1px solid #59616b;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.first-run-secondary-button:hover {
+    border-color: #daa520;
+    color: #f3f4f6;
+}
+
 .first-run-button:not(:disabled) {
     cursor: pointer;
     opacity: 1;
@@ -2174,6 +2199,10 @@ body.image-zoom-active {
     color: #8f98a3;
     font-size: 12px;
     font-style: italic;
+}
+
+.first-run-footer a {
+    color: #d5b06a;
 }
 
 @keyframes slideUp {
@@ -2244,7 +2273,17 @@ body.image-zoom-active {
     .first-run-button {
         padding: 12px 24px;
         font-size: 14px;
-        width: 100%;
+        flex: 1;
+    }
+
+    .first-run-actions {
+        align-items: stretch;
+    }
+
+    .first-run-secondary-button {
+        padding: 12px 16px;
+        font-size: 14px;
+        flex: 0 0 auto;
     }
 }
 /* Online version: Show hamburger menu on mobile for sidebar access */

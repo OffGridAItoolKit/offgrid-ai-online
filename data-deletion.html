@@ -45,7 +45,7 @@
 <body>
     <main>
         <h1>Request Data Deletion</h1>
-        <div class="meta">OffGrid AI FieldGuide app and online mobile experience. Last updated August 11, 2026.</div>
+        <div class="meta">OffGrid AI FieldGuide app and online mobile experience. Last updated September 11, 2026.</div>
 
         <div class="callout">
             OffGrid AI FieldGuide does not require an account and does not save your conversations, uploaded media, or generated images as an account history. You can still request deletion of feedback or content reports you chose to submit.
@@ -62,13 +62,16 @@
         <p>A verified request deletes matching optional feedback or content-report records, including the category, details you entered, basic app context, and a reported AI response if you chose to include it.</p>
 
         <h2>What Is Not Stored As Account Data</h2>
-        <p>Chat prompts, AI responses, uploaded photos, selected video frames, and generated images are processed to complete your request but are not written to the OffGrid AI application database as saved conversation or media history.</p>
+        <p>Chat prompts, AI responses, uploaded photos, extracted video frames, visible faces that may incidentally appear in selected media, and generated images are processed transiently to complete your request but are not written to the OffGrid AI application database as saved conversation, face, or media history. FieldGuide AI requests use Zero Data Retention routing with provider data collection denied, so there is no server-side prompt, photo, video-frame, or face record to delete after processing.</p>
+
+        <h2>Withdraw AI Data Consent</h2>
+        <p>In the app, open <strong>+ menu &gt; Privacy &amp; AI Data &gt; Withdraw AI Data Consent</strong>. This immediately blocks future AI and media transfers, withdraws the remembered contextual media consent, and clears currently selected media from the app interface. You can also cancel the confirmation shown before the first selected photo or extracted video frames are sent.</p>
 
         <h2>Automatic Retention</h2>
         <p>Anonymous daily usage counters contain a one-way network-address hash, dates, counts, and timestamps but no prompt or media content. They are automatically deleted after 31 days. Hosting and security systems may retain limited technical request metadata for shorter operational periods. These records may be kept when required for security, fraud prevention, legal compliance, or resolving an active abuse incident.</p>
 
         <h2>Files Saved To Your Phone</h2>
-        <p>Images, PDFs, and other exports that you save remain on your device. You can delete them at any time using your phone's Gallery or Files app.</p>
+        <p>Images, PDFs, original videos, and other exports that you save remain on your device. You can delete them at any time using Photos or Files. Uninstalling OffGrid AI FieldGuide removes app-private data but may not remove files you separately saved outside the app.</p>
 
         <p>For the full policy, read the <a href="/privacy">OffGrid AI FieldGuide Privacy Policy</a>.</p>
 
