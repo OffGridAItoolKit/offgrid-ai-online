@@ -9,13 +9,51 @@ Use this reply only after all of the following are true:
 
 Replace `[BUILD 5 REVIEW VIDEO URL]` before sending. Do not reuse the Build `4` draft or the Build `3` video as evidence for this build.
 
-## Reply To App Review
+## Final Copy/Paste Reply (Under 4,000 Characters)
+
+```text
+Hello App Review,
+
+Build 5 adds affirmative iOS consent before any AI transfer, confirmation before the first media transfer, withdrawal, and fixed named processors. Tested on iPhone 14 Plus / iOS 26.5.2.
+
+Build 5 video (public; no sign-in):
+https://drive.google.com/file/d/1hd_kqrKMtTehl9mruKNvzena9Z-aRuTH/view?usp=drivesdk
+
+1. FACE DATA COLLECTED
+No biometric face data is intentionally collected. The only possible face data is incidental visible facial imagery in a deliberately submitted photo or in up to eight JPEG frames (maximum 512x384) extracted on-device from a selected/recorded video. Raw video is never uploaded. There is no face detection, recognition, identification, authentication, comparison, tracking, geometry, faceprint, template, embedding, biometric identifier, profile, or face database.
+
+2. USE, SHARING, STORAGE, RETENTION, DELETION
+Incidental facial imagery is used only for requested general media analysis—not identity, advertising, profiling, surveillance, sale, eligibility, sharing with users, or model training. Media travels through Render and OpenRouter to Google Gemma 4 on only NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only if all four fail may it retry with Gemini 2.5 Pro through Google Cloud Vertex AI. Fixed allowlists prohibit unlisted processors; media never enters Image Studio.
+
+Every iOS request enforces OpenRouter Zero Data Retention and data_collection: deny. Content is transient and is not stored in our database/logs or retained as face/media/chat history by OffGrid AI, OpenRouter, or the AI processor. Render keeps non-content request metadata up to 7 days; anonymous abuse counters keep a nonreversible network-address HMAC/counts up to 31 days. Neither contains face data/content. Raw video stays on-device; its temporary extraction copy is deleted immediately. No server-side face record exists after processing. Users may remove media before sending or withdraw consent; withdrawal blocks future transfers and clears attachments and active local conversation/media context.
+
+3. THIRD PARTIES / LOCATION
+After consent/submission, media is processed transiently only by Render, OpenRouter, and one named Gemma processor; Vertex AI is only the stated emergency fallback. No advertisers, brokers, other users, Image Studio, or unlisted processors receive it. Apple Speech Recognition receives audio only when Voice Input is activated and receives no media.
+
+4. RETENTION
+Face-containing content exists only during the request; persistent retention is zero. The content-free metadata/counters above contain no face data.
+
+5. PRIVACY POLICY LOCATIONS AND QUOTED TEXT
+https://offgridtoolkit.ai/privacy — “AI Data Consent And Withdrawal,” “Photos, Video Frames, And Face Data,” “Named Service Providers And Data Route,” “Data Retention,” and “Data Deletion.” Exact excerpts:
+
+“OffGrid AI FieldGuide does not intentionally collect biometric face data. If a photo or extracted video frame that you choose to send contains a person, the submitted image may incidentally contain a visible image of that person's face. That visible facial imagery is the only face-related data the app may process.”
+
+“Face-containing photos and video frames are handled transiently only for the time needed to complete the current request. They are not persisted in the OffGrid AI application database or application logs and are not retained as a face or media history after processing.”
+
+“Because OffGrid AI, OpenRouter, and the selected AI endpoint do not persist the submitted face-containing content under this configuration, there is no server-side face record to delete after processing.”
+
+Before transfer, Build 5 names all data/recipients, requires the checkbox plus Consent & Continue, and sends nothing if Not Now is chosen. It separately confirms the first media transfer. Consent is withdrawable at + menu > Privacy & AI Data.
+
+Thank you.
+```
+
+## Detailed Supporting Record (Do Not Paste Into The Limited Reply Field)
 
 Hello App Review,
 
 Thank you for the additional guidance. We revised OffGrid AI FieldGuide in version 1.0, build 5 to provide complete, iOS-specific disclosures and affirmative permission before any user-selected data is shared for online AI processing. Build 5 also presents a contextual confirmation before the first selected photo or extracted video-frame transfer, provides in-app consent withdrawal, updates the Apple permission purpose strings, and restricts every iOS AI request to the named processors under Zero Data Retention and denied provider data collection. We also updated the privacy policy at https://offgridtoolkit.ai/privacy.
 
-Physical-device review video for the exact submitted TestFlight Build 5: [BUILD 5 REVIEW VIDEO URL]
+Physical-device review video for the exact submitted TestFlight Build 5: https://drive.google.com/file/d/1hd_kqrKMtTehl9mruKNvzena9Z-aRuTH/view?usp=drivesdk
 
 ### Face data
 

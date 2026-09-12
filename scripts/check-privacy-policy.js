@@ -34,6 +34,7 @@ const checks = [
   ['standalone deletion page', deletion.includes('<h1>Request Data Deletion</h1>')],
   ['standalone deletion request procedure', deletion.includes('support@offgridaitoolkit.com')],
   ['iOS consent withdrawal instructions', deletion.includes('<strong>iOS app:</strong>') && deletion.includes('Withdraw AI Data Consent')],
+  ['withdrawal disclosure matches the complete local reset', privacy.includes('pending Image Studio context, and the full active local conversation and media history') && deletion.includes('pending Image Studio context, and the full active local conversation and media history')],
   ['deletion page separates Android and web', deletion.includes('<strong>Android and web:</strong>') && deletion.includes('do not use the iOS named-provider consent control')],
   ['deletion page distinguishes fixed iOS and legacy routes', deletion.includes('Every iOS AI request uses a fixed provider allowlist') && deletion.includes('Android and web use the legacy OpenRouter Zero Data Retention route')],
   ['deletion page has exact automatic retention periods', deletion.includes('automatically deleted after 31 days') && deletion.includes('for up to 7 days')],
