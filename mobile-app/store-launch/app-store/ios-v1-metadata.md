@@ -2,7 +2,7 @@
 
 Prepared: 2026-08-29
 
-Build 5 compliance update: 2026-09-11
+Build 6 compliance update: 2026-09-15
 
 ## Identity
 
@@ -124,8 +124,10 @@ Build `1.0 (3)` was resubmitted on 2026-09-04 with the requested physical-device
 
 Build `1.0 (4)` added the first iOS AI-data consent flow, contextual media confirmation, consent withdrawal, expanded privacy disclosures, and named native permission strings. It was uploaded on 2026-09-11. Physical testing found that its Google Vertex-only main-analysis route reduced photo-analysis quality and returned a video provider error, so its prepared face-data reply was not sent and Build `4` was not used for the next resubmission. The Build `4` response remains in `guideline-face-data-response-build-4.md` as history only.
 
-Build `1.0 (5)` is the current candidate. It retains the explicit iOS consent experience and uses a fixed, disclosed, quality-preserving route: Render and OpenRouter; Google Gemma 4 through NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16 for the main assistant and text-only Image Studio prompt preparation; and Google Gemini 2.5 Pro through Google Cloud Vertex AI only after all four Gemma processors fail for a main assistant request. Google-powered Image Studio generation also uses Google Cloud Vertex AI and receives the prepared text prompt. All iOS AI requests enforce Zero Data Retention, `data_collection: "deny"`, fixed allowlists, and no undisclosed provider fallback. Android and web continue to use the legacy OpenRouter ZDR route and existing Image Studio helper behavior and are not part of the iOS App Store submission.
+Build `1.0 (6)` is the current candidate. It preserves Build `5`'s fixed, disclosed, quality-preserving iOS route: Render and OpenRouter; Google Gemma 4 through NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16 for the main assistant and text-only Image Studio prompt preparation; and Google Gemini 2.5 Pro through Google Cloud Vertex AI only after all four Gemma processors fail for a main assistant request. Google-powered Image Studio generation also uses Google Cloud Vertex AI and receives the prepared text prompt. All iOS AI requests enforce Zero Data Retention, `data_collection: "deny"`, fixed allowlists, and no undisclosed provider fallback. Android and web continue to use the legacy OpenRouter ZDR route and existing Image Studio helper behavior and are not part of the iOS App Store submission.
 
 The hosted Build `5` route and privacy policy were deployed from commit `14ec049` and passed production smoke tests for legacy chat plus iOS text, photo, cohesive eight-frame video, and Image Studio prompt preparation. The distribution-signed Build `5` IPA was accepted by App Store Connect at 2026-09-11 14:44 MST, completed processing, and is available in the `Internal QA` TestFlight group as `Ready to Submit`.
 
-Do not reply or resubmit until Build `5` is uploaded, processed, selected for version `1.0`, its live privacy policy matches the app, and the physical TestFlight smoke test and updated review recording pass. Then use `guideline-face-data-response-build-5.md`.
+Apple reviewed Build `5` on an iPad Air 11-inch (M3) and returned it on 2026-09-15 under Guidelines 5.1.1(i) and 5.1.2(i). Build `6` replaces the combined consent-and-safety checkbox with a standalone AI Data Sharing Permission screen. The categories of personal data and every permitted recipient appear before permission, and distinct `Don’t Allow` and `Allow Third-Party AI` actions remain visible while the detailed disclosure scrolls. Build `6` also increments both stored consent versions and makes the native iOS platform query explicit so the iOS disclosure cannot depend solely on bridge detection.
+
+The hosted Build `6` update was deployed from commit `f8a8424`. Its signed IPA was uploaded successfully at 2026-09-15 11:23 MST and is processing in App Store Connect. Do not reply or resubmit until Build `6` finishes processing, is selected for version `1.0`, its live privacy policy matches the app, and the physical TestFlight smoke test and new review recording pass. Then use `guideline-ai-permission-response-build-6.md`.

@@ -15,7 +15,7 @@ Archive and upload the Capacitor iOS app for TestFlight and App Store review fro
 - App name: OffGrid AI FieldGuide
 - Bundle ID: `com.offgridaitoolkit.app`
 - Version: `1.0`
-- Working build: `5`
+- Working build: `6`
 - First submitted build: `1`
 - Device family: iPhone
 - Orientation: portrait
@@ -23,7 +23,7 @@ Archive and upload the Capacitor iOS app for TestFlight and App Store review fro
 - Accounts: none
 - In-app purchases: none
 - Ads: none
-- Production URL: `https://offgridtoolkit.ai/online?surface=app`
+- Production URL: `https://offgridtoolkit.ai/online?surface=app&platform=ios`
 - Xcode: 26.6
 - Signing team and App Store public seller: `INSPIRED MARKETING & DESIGN, LLC` (`3X9J4MHTK3`)
 
@@ -77,7 +77,11 @@ Testing on an iPhone 14 Plus running iOS 26.5.2 passed:
 - [x] Qualify the Build `5` quality-preserving iOS route: Google Gemma 4 through NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16, with Google Gemini 2.5 Pro through Google Cloud Vertex AI only after all four Gemma processors fail. The qualification record is `app-store/provider-qualification-build-5.md`.
 - [x] Complete the Build `5` hosted and native disclosure changes, automated tests, and production verification without changing the Android/web legacy OpenRouter ZDR route.
 - [x] Increment the native build to `1.0 (5)`, archive, export, validate, upload, and wait for App Store Connect processing. App Store Connect completed processing and placed Build `5` in the `Internal QA` TestFlight group as `Ready to Submit`.
-- [ ] Install the exact TestFlight build `1.0 (5)` fresh on the physical iPhone, complete the focused consent/chat/photo/video/Image Studio smoke test, record the updated physical-device review video, select build `5`, update App Review Information, send the Build `5` face-data response, and resubmit.
+- [x] Install the exact TestFlight build `1.0 (5)` fresh on the physical iPhone, complete the focused consent/chat/photo/video/Image Studio smoke test, record the updated physical-device review video, select build `5`, update App Review Information, send the Build `5` face-data response, and resubmit.
+- [x] Review Apple's September 15 response for Build `5` and reproduce the consent screen on an iPad Air 11-inch simulator in iPhone compatibility mode.
+- [x] Replace the combined checkbox/terms acknowledgment with a dedicated Build `6` AI Data Sharing Permission screen, distinct allow/decline choices, independently scrolling disclosure, persistent visible actions, a new consent version, and an explicit native iOS URL.
+- [x] Deploy and verify the hosted Build `6` experience, archive and export version `1.0 (6)`, validate its distribution signature and entitlements, and upload it to App Store Connect on 2026-09-15.
+- [ ] Wait for Build `6` processing, install it fresh through TestFlight, complete the physical consent/text/photo/video smoke test, record the new permission flow, select Build `6`, update App Review Information, reply to Apple, and resubmit.
 
 The App Store IPA for build `2` is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`. The upload completed successfully on 2026-09-03, passed App Store Connect processing, and is listed in TestFlight as `Ready to Submit`. The distributable and export records are stored outside the repository at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-2/`.
 
@@ -99,14 +103,18 @@ Build `5` keeps the iOS consent flow while restoring the intended Google Gemma 4
 
 The Build `5` hosted update was deployed from commit `14ec049` and verified in production on 2026-09-11. Separate live requests passed on the legacy Android/web chat route and the iOS text, photo, cohesive eight-frame video, and Image Studio prompt-preparation routes. The Build `5` archive is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-5/OffGrid-AI-FieldGuide-1.0-5.xcarchive`. The exported IPA is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-5/export/App.ipa` and has SHA-256 `88148368d42d8ef4abd4214b0348ce689d58131b26b146c0feb8b34857cab0f4`. It is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`, has `get-task-allow = false` and `beta-reports-active = true`, and App Store Connect accepted the upload at 2026-09-11 14:44 MST. Processing completed successfully; Build `5` is in the `Internal QA` TestFlight group with status `Ready to Submit`.
 
+Apple reviewed Build `5` on an iPad Air 11-inch (M3) and returned the submission on 2026-09-15 under Guidelines 5.1.1(i) and 5.1.2(i), stating that the app did not clearly explain what personal data would be sent, identify the recipients, and ask permission before sharing it. Build `6` addresses the presentation issue without changing the quality-preserving iOS provider route or the Android/web experience. It replaces the combined consent-and-safety checkbox with a standalone `AI DATA SHARING PERMISSION` screen, labels the categories as personal data, names each permitted recipient and purpose before permission, and presents distinct `Don’t Allow` and `Allow Third-Party AI` buttons that remain visible while the detailed disclosure scrolls. The stored consent and media-consent versions were incremented, and the native package now explicitly opens `platform=ios`.
+
+The hosted Build `6` update was deployed from commit `f8a8424` and verified on 2026-09-15 in Safari at iPad and iPhone sizes and inside the native iPhone-compatibility app on an iPad Air 11-inch simulator. The archive is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-6/OffGrid-AI-FieldGuide-1.0-6.xcarchive`. The exported IPA is stored at `/Users/davidprian/Developer/OffGridAI/Releases/OffGrid-AI-FieldGuide-1.0-6/export/App.ipa` and has SHA-256 `c8e8ee0cf65604f9114b0886b25a9194972e41557a2fcc160765a10ce8195f5c`. It is signed by `Apple Distribution: INSPIRED MARKETING & DESIGN, LLC (3X9J4MHTK3)`, has `get-task-allow = false` and `beta-reports-active = true`, and App Store Connect accepted the upload at 2026-09-15 11:23 MST. Processing and physical TestFlight proof remain pending.
+
 ## App Review Note
 
 ```text
 OffGrid AI FieldGuide is a free online AI companion for practical field guidance. No account or review credentials are required. The app has no ads and no in-app purchases.
 
-Build reviewed: OffGrid AI FieldGuide version 1.0 (Build 5).
+Build reviewed: OffGrid AI FieldGuide version 1.0 (Build 6).
 
-On first launch, the iOS app explains which user-selected data may be sent for online AI processing and names Apple Speech Recognition, Render, OpenRouter, NextBit, Venice, Parasail, Novita, and Google Cloud Vertex AI. The reviewer must check the consent box and tap Consent & Continue before online AI features are enabled. Choosing Not Now sends no AI data. Before the first selected photo or extracted video-frame transfer, the app shows one contextual media confirmation; it does not add a recurring prompt to later requests. Consent can be withdrawn from + menu > Privacy & AI Data.
+On first launch, the iOS app shows a separate AI Data Sharing Permission screen before any AI data can be sent. It identifies typed prompts, Apple Speech transcription text, selected photos, up to eight extracted video frames, and Image Studio text prompts as the data categories; identifies Apple Speech Recognition, Render, OpenRouter, NextBit, Venice, Parasail, Novita, and Google Cloud Vertex AI and their roles; and provides distinct `Don’t Allow` and `Allow Third-Party AI` choices that remain visible while the disclosure scrolls. Choosing Don’t Allow sends no AI data and leaves AI features blocked. Before the first selected photo or extracted video-frame transfer, the app shows one contextual media confirmation. Consent can be reviewed or withdrawn from + menu > Privacy & AI Data.
 
 The reviewer can submit a question, tap Take Photo / Upload Images, tap Record Video / Upload Video, or open Ready-Made Prompts. Camera, photo-library, microphone, Speech Recognition, and motion permissions are requested only after the reviewer taps the related feature. Voice Input uses Apple Speech Recognition when activated; only its transcription text enters the online AI request when submitted.
 

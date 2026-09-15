@@ -1,12 +1,20 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-09-11
+**Last Updated:** 2026-09-15
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
 
 ### September 2026
+
+**2026-09-15**
+*   **Apple third-party AI permission clarity (iOS build 6)**
+    *   Replaced the combined iOS consent-and-safety checkbox with a standalone `AI DATA SHARING PERMISSION` screen and distinct `Don’t Allow` / `Allow Third-Party AI` actions.
+    *   Identified the personal-data categories and every permitted recipient before permission, while keeping the decision buttons visible as the detailed disclosure scrolls on an iPhone and in iPhone compatibility mode on an iPad.
+    *   Incremented the AI and media consent versions so every existing iOS installation must review the clearer permission flow.
+    *   Added an explicit `platform=ios` marker to the native package and platform-specific Capacitor sync commands; Android and web behavior remain unchanged.
+    *   Updated the September 15 privacy policy and regression checks, deployed commit `f8a8424`, validated the production screen on iPhone and iPad simulators, and uploaded the signed Build `6` package to App Store Connect.
 
 **2026-09-11**
 *   **Apple AI-data compliance and quality-preserving platform isolation (iOS build 5 candidate)**
