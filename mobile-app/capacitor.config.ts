@@ -2,7 +2,9 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 declare const process: { env: Record<string, string | undefined> };
 
-const serverUrl = process.env.OFFGRID_MOBILE_SERVER_URL || 'https://offgridtoolkit.ai/online?surface=app';
+const mobilePlatform = String(process.env.OFFGRID_MOBILE_PLATFORM || '').trim().toLowerCase();
+const platformQuery = ['ios', 'android'].includes(mobilePlatform) ? `&platform=${mobilePlatform}` : '';
+const serverUrl = process.env.OFFGRID_MOBILE_SERVER_URL || `https://offgridtoolkit.ai/online?surface=app${platformQuery}`;
 
 const config: CapacitorConfig = {
   appId: 'com.offgridaitoolkit.app',

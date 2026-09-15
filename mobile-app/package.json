@@ -6,6 +6,8 @@
   "scripts": {
     "build": "node scripts/build.js",
     "sync": "npx cap sync",
+    "sync:ios": "OFFGRID_MOBILE_PLATFORM=ios npx cap sync ios",
+    "sync:android": "OFFGRID_MOBILE_PLATFORM=android npx cap sync android",
     "doctor": "npx cap doctor"
   },
   "dependencies": {

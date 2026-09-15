@@ -1749,12 +1749,16 @@
         const MAX_SELECTED_IMAGES = MULTI_IMAGE_PREVIEW_ENABLED ? 4 : 1;
 
         function applyPlatformPrivacyWording() {
+            const banner = document.getElementById('firstRunBanner');
             const firstRunMessage = document.getElementById('firstRunMessage');
             const disclosure = document.getElementById('speechProviderDisclosure');
             const consentLabel = document.getElementById('aiConsentLabel');
+            const termsBlock = document.querySelector('.first-run-terms');
             const declineButton = document.getElementById('declineAiDataConsentButton');
             const acceptButton = document.getElementById('acceptBannerBtn');
             const firstRunActions = acceptButton?.closest('.first-run-actions');
+
+            banner?.classList.toggle('is-ai-consent', IS_IOS_APP);
 
             document.querySelectorAll('[data-ios-ai-privacy]').forEach(item => {
                 item.style.display = IS_IOS_APP ? '' : 'none';
@@ -1771,19 +1775,43 @@
                         <p>AI can make mistakes. For medical advice, diagnosis, or treatment, consult a qualified healthcare professional. In an emergency, contact local emergency services. Verify other important survival, legal, financial, or safety details before acting.</p>`;
                 }
                 if (consentLabel) consentLabel.textContent = 'I understand and accept these safety and privacy notes';
+                if (termsBlock) termsBlock.style.display = '';
                 if (declineButton) declineButton.style.display = 'none';
                 if (acceptButton) acceptButton.textContent = 'Start Using OffGrid AI';
                 if (firstRunActions) firstRunActions.classList.add('is-legacy-first-run');
                 return;
             }
 
-            const speechProvider = 'Apple Speech Recognition';
-            if (disclosure) {
-                disclosure.innerHTML = `<strong>Who receives data:</strong> On iOS, ${speechProvider} may process microphone audio only when you activate Voice Input. Text, selected photos, extracted video frames, and text-only Image Studio prompt preparation that you submit travel through the OffGrid AI service hosted by Render and OpenRouter to one of four fixed Gemma 4 processors: NextBit BF16, Venice BF16, Parasail BF16, or Novita BF16. Only if all four are unavailable, a FieldGuide request may go to Gemini 2.5 Pro through Google Cloud Vertex AI. Image Studio sends its prepared text prompt to Google Cloud Vertex AI for image generation.`;
+            if (firstRunMessage) {
+                firstRunMessage.innerHTML = `
+                    <div class="ai-consent-heading">
+                        <span class="ai-consent-eyebrow">AI DATA SHARING PERMISSION</span>
+                        <h2>Allow third-party AI processing?</h2>
+                        <p>OffGrid AI FieldGuide must share the content you choose to submit with the third-party services below to produce the answer or image you request.</p>
+                    </div>
+                    <section class="ai-consent-section">
+                        <h3>What data may be sent</h3>
+                        <p>Typed prompts, Apple Speech transcription text, selected photos, up to eight frames extracted on your device from a selected or recorded video, and Image Studio text prompts. These items are personal data when they identify you or another person.</p>
+                    </section>
+                    <section class="ai-consent-section">
+                        <h3>Who receives it</h3>
+                        <p><strong>Render</strong> hosts the OffGrid AI service. <strong>OpenRouter</strong> routes FieldGuide requests to only <strong>NextBit, Venice, Parasail, or Novita</strong> for Google Gemma 4 processing. If all four are unavailable, <strong>Google Cloud Vertex AI</strong> may process the request with Gemini 2.5 Pro. Vertex AI also processes Image Studio text prompts. <strong>Apple Speech Recognition</strong> receives microphone audio only when you activate Voice Input.</p>
+                    </section>
+                    <section class="ai-consent-section">
+                        <h3>How it is used and protected</h3>
+                        <p>The personal data you choose to submit is used only to complete the feature you request. AI request content is processed transiently with Zero Data Retention, denied provider data collection, and fixed provider lists. It is not used for advertising, profiling, sale, or AI training and is not saved as an OffGrid AI account, chat, face, or media history.</p>
+                    </section>
+                    <div class="ai-consent-choice">
+                        <strong>Your choice:</strong> Tap <em>Allow Third-Party AI</em> to permit this sharing. Tap <em>Don’t Allow</em> and no AI data will be sent. You can review or withdraw permission later from <strong>+ menu &gt; Privacy &amp; AI Data</strong>.
+                    </div>`;
             }
-            if (consentLabel) {
-                consentLabel.textContent = `I consent to the described processing by ${speechProvider}, Render, OpenRouter, NextBit, Venice, Parasail, Novita, and Google Cloud Vertex AI for the purpose of completing features I choose to use, and I accept the safety notes`;
+            if (termsBlock) termsBlock.style.display = 'none';
+            if (declineButton) {
+                declineButton.style.display = '';
+                declineButton.textContent = 'Don\u2019t Allow';
             }
+            if (acceptButton) acceptButton.textContent = 'Allow Third-Party AI';
+            if (firstRunActions) firstRunActions.classList.remove('is-legacy-first-run');
         }
         applyPlatformPrivacyWording();
 
@@ -1888,9 +1916,9 @@
         const FIELDGUIDE_API_PREFIX = IS_IOS_APP ? '/api/ios' : '/api';
         const IMAGE_STUDIO_API_PREFIX = IS_IOS_APP ? '/api/ios/image-studio' : '/api/image-studio';
         const AI_DATA_CONSENT_KEY = 'offgrid-ai-third-party-consent';
-        const AI_DATA_CONSENT_VERSION = '2026-09-11-v2';
+        const AI_DATA_CONSENT_VERSION = '2026-09-15-v3';
         const AI_MEDIA_CONSENT_KEY = 'offgrid-ai-media-transfer-consent';
-        const AI_MEDIA_CONSENT_VERSION = '2026-09-11-v2';
+        const AI_MEDIA_CONSENT_VERSION = '2026-09-15-v3';
 
         function hasAiDataConsent() {
             return localStorage.getItem(AI_DATA_CONSENT_KEY) === AI_DATA_CONSENT_VERSION;
@@ -1906,6 +1934,13 @@
             const checkbox = document.getElementById('acceptTermsBanner');
             const button = document.getElementById('acceptBannerBtn');
             if (!checkbox || !button) return;
+            if (IS_IOS_APP) {
+                checkbox.checked = false;
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.style.cursor = 'pointer';
+                return;
+            }
             checkbox.checked = false;
             button.disabled = true;
             button.style.opacity = '0.5';
@@ -6624,7 +6659,7 @@ Mobile app output requirements:
         
         function acceptFirstRun() {
             const checkbox = document.getElementById('acceptTermsBanner');
-            if (!checkbox || !checkbox.checked) return;
+            if (!IS_IOS_APP && (!checkbox || !checkbox.checked)) return;
             if (IS_IOS_APP) {
                 localStorage.setItem(AI_DATA_CONSENT_KEY, AI_DATA_CONSENT_VERSION);
             }

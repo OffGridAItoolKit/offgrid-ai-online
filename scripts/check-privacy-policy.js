@@ -6,9 +6,10 @@ const privacy = fs.readFileSync(path.join(root, 'privacy.html'), 'utf8');
 const deletion = fs.readFileSync(path.join(root, 'data-deletion.html'), 'utf8');
 
 const checks = [
-  ['September 11 policy revision', privacy.includes('Last updated September 11, 2026')],
+  ['September 15 policy revision', privacy.includes('Last updated September 15, 2026')],
   ['explicit AI consent and withdrawal heading', privacy.includes('<h2>AI Data Consent And Withdrawal</h2>')],
   ['iOS consent flow is scoped to the iOS app', privacy.includes('<strong>iOS app:</strong> Before any online AI feature can send data') && privacy.includes('Withdraw AI Data Consent')],
+  ['iOS permission is a distinct opt-in and is not bundled with terms', privacy.includes('<strong>Don’t Allow</strong>') && privacy.includes('<strong>Allow Third-Party AI</strong>') && privacy.includes('not bundled with acceptance of terms or safety notes')],
   ['Android and web acknowledgment is described separately', privacy.includes('<strong>Android and web:</strong> These experiences use their existing first-run safety-and-privacy acknowledgment')],
   ['explicit face-data heading', privacy.includes('<h2>Photos, Video Frames, And Face Data</h2>')],
   ['face-data collection is narrowly described', privacy.includes('visible image of that person\'s face')],

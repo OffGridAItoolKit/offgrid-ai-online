@@ -6,16 +6,23 @@ const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const server = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
 const infoPlist = fs.readFileSync(path.join(root, 'mobile-app/ios/App/App/Info.plist'), 'utf8');
 const iosBridge = fs.readFileSync(path.join(root, 'mobile-app/ios/App/App/AppDelegate.swift'), 'utf8');
+const capacitorConfig = fs.readFileSync(path.join(root, 'mobile-app/capacitor.config.ts'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'offgridai.css'), 'utf8');
 
 const checks = [
-  ['build 5 uses a new versioned AI consent key', index.includes("const AI_DATA_CONSENT_VERSION = '2026-09-11-v2'")],
-  ['build 5 uses a new contextual media-consent version', index.includes("const AI_MEDIA_CONSENT_VERSION = '2026-09-11-v2'")],
+  ['build 6 uses a new versioned AI consent key', index.includes("const AI_DATA_CONSENT_VERSION = '2026-09-15-v3'")],
+  ['build 6 uses a new contextual media-consent version', index.includes("const AI_MEDIA_CONSENT_VERSION = '2026-09-15-v3'")],
   ['iOS app requires versioned consent while legacy surfaces keep prior first-run state', index.includes("const IS_IOS_APP = IS_APP_SURFACE && ACTIVE_PLATFORM === 'ios'") && index.includes('const needsFirstRunConsent = !hasCompletedRequiredFirstRun()')],
   ['all permitted iOS recipients appear before consent', ['Apple Speech Recognition', 'Render', 'OpenRouter', 'NextBit', 'Venice', 'Parasail', 'Novita', 'Google Cloud Vertex AI'].every(name => index.includes(name))],
-  ['consent disclosure distinguishes primary Gemma processors from the Vertex fallback', index.includes('one of four fixed Gemma 4 processors') && index.includes('Only if all four are unavailable')],
-  ['Image Studio recipients and purposes are disclosed before consent', index.includes('text-only Image Studio prompt preparation that you submit travel through the OffGrid AI service hosted by Render and OpenRouter to one of four fixed Gemma 4 processors') && index.includes('Image Studio sends its prepared text prompt to Google Cloud Vertex AI for image generation')],
+  ['consent is a dedicated AI permission with separate allow and decline choices', index.includes('AI DATA SHARING PERMISSION') && index.includes('Allow third-party AI processing?') && index.includes("declineButton.textContent = 'Don\\u2019t Allow'") && index.includes("acceptButton.textContent = 'Allow Third-Party AI'")],
+  ['iOS consent is not bundled with the legacy terms and safety checkbox', index.includes("if (termsBlock) termsBlock.style.display = 'none';") && index.includes('if (!IS_IOS_APP && (!checkbox || !checkbox.checked)) return;')],
+  ['consent disclosure identifies submitted personal data', index.includes('These items are personal data when they identify you or another person.') && index.includes('The personal data you choose to submit is used only to complete the feature you request.')],
+  ['consent disclosure distinguishes primary Gemma processors from the Vertex fallback', index.includes('for Google Gemma 4 processing') && index.includes('If all four are unavailable')],
+  ['Image Studio recipient and purpose are disclosed before consent', index.includes('Vertex AI also processes Image Studio text prompts.')],
   ['iOS consent contains no obsolete OpenAI recipient', !index.includes('OpenAI')],
-  ['speech provider wording is platform-specific', index.includes("ACTIVE_PLATFORM === 'ios'") && index.includes("'Apple Speech Recognition'")],
+  ['iOS native sync pins the hosted experience to the iOS platform', capacitorConfig.includes('OFFGRID_MOBILE_PLATFORM') && capacitorConfig.includes('`&platform=${mobilePlatform}`')],
+  ['AI permission choices remain visible while disclosure text scrolls', css.includes('.first-run-banner.is-ai-consent .first-run-message') && css.includes('overflow-y: auto;') && css.includes('.first-run-banner.is-ai-consent .first-run-actions') && css.includes('flex: 0 0 auto;')],
+  ['speech provider wording is platform-specific', index.includes("ACTIVE_PLATFORM === 'ios'") && index.includes('Apple Speech Recognition')],
   ['AI send is blocked without consent', index.includes('async function sendMessage() {\n            if (!requireAiDataConsent()) return;')],
   ['native iOS Voice Input fails closed without current consent', index.includes('window.offgridHasAiDataConsent = hasAiDataConsent;') && iosBridge.includes("if (typeof window.offgridHasAiDataConsent !== 'function')") && iosBridge.includes('if (!window.offgridHasAiDataConsent())') && iosBridge.indexOf('if (!window.offgridHasAiDataConsent())') < iosBridge.indexOf('window.OffGridNative.startVoiceInput();')],
   ['media features are blocked without consent', ['triggerCameraCapture', 'triggerGalleryUpload', 'triggerVideoUpload', 'triggerVideoRecord'].every(name => index.includes(`function ${name}() {\n            if (!requireAiDataConsent()) return;`))],

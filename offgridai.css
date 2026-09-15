@@ -2209,6 +2209,92 @@ body.image-zoom-active {
     color: #d5b06a;
 }
 
+/* iOS Build 6: keep the explicit third-party-AI choice visible while the
+   disclosure itself scrolls. This avoids presenting consent as a long terms
+   document and remains usable in iPhone compatibility mode on iPad. */
+.first-run-banner.is-ai-consent .first-run-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.first-run-banner.is-ai-consent .first-run-message {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    margin-bottom: 14px;
+}
+
+.first-run-banner.is-ai-consent .first-run-actions {
+    flex: 0 0 auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(218, 165, 32, 0.28);
+}
+
+.first-run-banner.is-ai-consent .first-run-footer {
+    flex: 0 0 auto;
+    margin-top: 12px;
+}
+
+.ai-consent-heading {
+    margin-bottom: 14px;
+}
+
+.ai-consent-eyebrow {
+    display: inline-block;
+    color: #f0c040;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    margin-bottom: 6px;
+}
+
+.ai-consent-heading h2 {
+    color: #fff;
+    font-size: 22px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+}
+
+.ai-consent-heading p,
+.ai-consent-section p {
+    color: #c7cbd1;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.ai-consent-section {
+    border-top: 1px solid #2d333b;
+    padding: 12px 0;
+}
+
+.ai-consent-section h3 {
+    color: #f3f4f6;
+    font-size: 15px;
+    margin: 0 0 5px;
+}
+
+.ai-consent-choice {
+    background: rgba(184, 134, 11, 0.14);
+    border: 1px solid rgba(218, 165, 32, 0.38);
+    border-radius: 10px;
+    color: #e7e9ec;
+    font-size: 13px;
+    line-height: 1.5;
+    padding: 12px;
+}
+
+.ai-consent-choice strong {
+    color: #fff;
+}
+
+.ai-consent-choice em {
+    color: #f0c040;
+    font-style: normal;
+    font-weight: 700;
+}
+
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -2235,6 +2321,33 @@ body.image-zoom-active {
         max-height: none;
         margin: auto;
         border-radius: 16px;
+    }
+
+    .first-run-banner.is-ai-consent .first-run-content {
+        max-height: calc(100dvh - 20px);
+        margin: 0 auto;
+    }
+
+    .first-run-banner.is-ai-consent .first-run-logo {
+        font-size: 20px;
+    }
+
+    .first-run-banner.is-ai-consent .first-run-tagline {
+        margin-bottom: 10px;
+    }
+
+    .first-run-banner.is-ai-consent .first-run-message {
+        padding: 12px;
+    }
+
+    .first-run-banner.is-ai-consent .first-run-actions {
+        gap: 8px;
+    }
+
+    .first-run-banner.is-ai-consent .first-run-button,
+    .first-run-banner.is-ai-consent .first-run-secondary-button {
+        font-size: 12px;
+        padding: 12px 10px;
     }
     
     .first-run-logo {
