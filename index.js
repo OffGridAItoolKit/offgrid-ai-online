@@ -2704,16 +2704,18 @@ app.get('/open-arena', (req, res) => {
 // frontend reads to conditionally show/hide elements.
 // =============================================================================
 
-function serveWithExperience(req, res, isCustomer) {
-    const htmlPath = path.join(__dirname, 'index.html');
+function serveWithExperience(req, res, isCustomer, htmlFilename = 'index.html') {
+    const htmlPath = path.join(__dirname, htmlFilename);
     fs.readFile(htmlPath, 'utf8', (err, html) => {
         if (err) {
             console.error('Error reading index.html:', err);
             return res.status(500).send('Server error');
         }
-        const surface = req.query.surface === 'app' ? 'app' : 'web';
-        const platform = ['ios', 'android'].includes(req.query.platform) ? req.query.platform : 'web';
-        const apiBase = req.query.apiBase === 'production' ? 'https://offgridtoolkit.ai' : '';
+        // The QR browser release never opts into native app or iOS API behavior.
+        const isBrowserRelease = htmlFilename === 'mobile.html';
+        const surface = !isBrowserRelease && req.query.surface === 'app' ? 'app' : 'web';
+        const platform = !isBrowserRelease && ['ios', 'android'].includes(req.query.platform) ? req.query.platform : 'web';
+        const apiBase = !isBrowserRelease && req.query.apiBase === 'production' ? 'https://offgridtoolkit.ai' : '';
         // Multi-photo analysis passed device testing and is now the default.
         // Keep a query-string rollback available while the rollout settles.
         const multiImagePreview = req.query.preview !== 'single-image';
@@ -2750,9 +2752,13 @@ app.get('/online', (req, res) => {
     serveWithExperience(req, res, true);
 });
 
-// Mobile route redirects to the customer online Field Guide experience.
+// Independent QR browser release. /online and its app assets remain unchanged.
+app.get('/mobile/ready-made-prompts', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mobile-ready-made-prompts.html'));
+});
+
 app.get('/mobile', (req, res) => {
-    res.redirect(301, '/online');
+    serveWithExperience(req, res, true, 'mobile.html');
 });
 
 // Prospect experience - free demo with sales messaging

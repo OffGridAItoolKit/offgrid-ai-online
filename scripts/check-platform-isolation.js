@@ -2,8 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const page = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const server = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
+// Match source text consistently on both Windows and macOS checkouts.
+const page = fs.readFileSync(path.join(root, 'index.html'), 'utf8').replace(/\r\n/g, '\n');
+const server = fs.readFileSync(path.join(root, 'index.js'), 'utf8').replace(/\r\n/g, '\n');
 const expectedIosGemmaProviders = [
   'nextbit/bf16',
   'venice/bf16',

@@ -2,12 +2,14 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const server = fs.readFileSync(path.join(root, 'index.js'), 'utf8');
-const infoPlist = fs.readFileSync(path.join(root, 'mobile-app/ios/App/App/Info.plist'), 'utf8');
-const iosBridge = fs.readFileSync(path.join(root, 'mobile-app/ios/App/App/AppDelegate.swift'), 'utf8');
-const capacitorConfig = fs.readFileSync(path.join(root, 'mobile-app/capacitor.config.ts'), 'utf8');
-const css = fs.readFileSync(path.join(root, 'offgridai.css'), 'utf8');
+// Normalize checkout line endings; keep the consent assertions unchanged.
+const readSource = file => fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+const index = readSource('index.html');
+const server = readSource('index.js');
+const infoPlist = readSource('mobile-app/ios/App/App/Info.plist');
+const iosBridge = readSource('mobile-app/ios/App/App/AppDelegate.swift');
+const capacitorConfig = readSource('mobile-app/capacitor.config.ts');
+const css = readSource('offgridai.css');
 
 const checks = [
   ['build 6 uses a new versioned AI consent key', index.includes("const AI_DATA_CONSENT_VERSION = '2026-09-15-v3'")],
