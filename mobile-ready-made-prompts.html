@@ -1662,7 +1662,11 @@
         }
 
         function returnPathFor(path) {
-            const query = buildReturnQuery();
+            const params = new URLSearchParams(buildReturnQuery());
+            // Older browsers may retain the former permanent /mobile -> /online redirect.
+            // Keep browser prompt returns on an uncached URL without changing app routes.
+            if (path === '/mobile') params.set('release', '20260920');
+            const query = params.toString();
             return query ? `${path}?${query}` : path;
         }
         
