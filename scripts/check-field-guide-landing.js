@@ -8,7 +8,10 @@ const imageTags = html.match(/<img\b[^>]*>/g) || [];
 
 const checks = [
     ['canonical domain', html.includes('https://offgridai.guide/')],
+    ['App Store product link', html.includes('https://apps.apple.com/app/id6806680581')],
     ['Google Play package link', html.includes('id=com.offgridaitoolkit.app')],
+    ['dual-platform structured data', html.includes('"iOS 15.0 or later"') && html.includes('"Android"')],
+    ['Smart App Banner', html.includes('name="apple-itunes-app" content="app-id=6806680581"')],
     ['web app link', html.includes('https://offgridtoolkit.ai/online')],
     ['privacy link', html.includes('https://offgridtoolkit.ai/privacy')],
     ['real phone hero asset', html.includes('/assets/field-guide/brand/offgrid-field-guide-phone-angle-left.webp')],
@@ -29,6 +32,8 @@ const checks = [
     ['accessible gallery lightbox', html.includes('<dialog class="lightbox"') && html.includes('aria-label="Close enlarged image"')],
     ['gallery verification disclosure', html.includes('AI-generated visuals can contain mistakes')],
     ['compact mobile navigation label', html.includes('class="nav-cta-short">Get the app</span>')],
+    ['dual-store launch copy', html.includes('Available now on the App Store and Google Play.') && !html.includes('Apple version on the way.')],
+    ['official store badges', html.includes('download-on-the-app-store/black/en-us') && html.includes('en_badge_web_generic.png')],
     ['mobile swipe gallery', html.includes('scroll-snap-type: x mandatory') && html.includes('Swipe through the examples')],
     ['small-phone feature fallback', html.includes('@media (max-width: 370px)')],
     ['online/offline product distinction', html.includes('FieldGuide is online. ToolKit is built for offline use.')],

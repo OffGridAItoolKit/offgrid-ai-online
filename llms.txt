@@ -1,8 +1,9 @@
 # OffGrid AI FieldGuide
 
-> OffGrid AI FieldGuide is a free online Android app that turns practical questions, one or multiple photos, and short videos into prioritized answers, visual references, and downloadable field guide PDFs.
+> OffGrid AI FieldGuide is a free online app for iPhone and Android that turns practical questions, one or multiple photos, and short videos into prioritized answers, visual references, and downloadable field guide PDFs.
 
 Canonical website: https://offgridai.guide/
+App Store: https://apps.apple.com/app/id6806680581
 Google Play: https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app
 Publisher: OffGrid AI ToolKit LLC
 

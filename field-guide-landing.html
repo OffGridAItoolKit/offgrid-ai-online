@@ -9,6 +9,7 @@
   <link rel="canonical" href="https://offgridai.guide/">
   <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
   <meta name="theme-color" content="#0c1116">
+  <meta name="apple-itunes-app" content="app-id=6806680581">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://offgridai.guide/">
   <meta property="og:title" content="OffGrid AI FieldGuide">
@@ -31,10 +32,13 @@
     "@type": "SoftwareApplication",
     "name": "OffGrid AI FieldGuide",
     "applicationCategory": "UtilitiesApplication",
-    "operatingSystem": "Android",
+    "operatingSystem": ["iOS 15.0 or later", "Android"],
     "description": "Ask practical questions, compare one or multiple photos, analyze short videos, and turn useful answers into visual field guides you can save to your phone.",
     "url": "https://offgridai.guide/",
-    "downloadUrl": "https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app",
+    "downloadUrl": [
+      "https://apps.apple.com/app/id6806680581",
+      "https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app"
+    ],
     "image": "https://offgridai.guide/offgrid-ai-fieldguide-social-share.png",
     "screenshot": [
       "https://offgridai.guide/assets/field-guide/device-renders/01-offgrid-ai-fieldguide-home-phone.webp",
@@ -204,7 +208,22 @@
       color: #c6ced7;
       font-size: clamp(1.05rem, 1.8vw, 1.3rem);
     }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+    .store-badges { display: flex; flex-wrap: wrap; align-items: center; justify-content: inherit; gap: 12px; }
+    .store-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 48px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: transform 160ms ease, filter 160ms ease;
+    }
+    .store-badge:hover { transform: translateY(-2px); filter: brightness(1.08); }
+    .store-badge:focus-visible { outline: 3px solid rgba(241,199,92,0.8); outline-offset: 4px; }
+    .store-badge img { display: block; width: auto; height: 48px; }
+    .store-badge.google-play { width: 155px; overflow: hidden; }
+    .store-badge.google-play img { height: 60px; max-width: none; }
     .availability {
       margin: 18px 0 0;
       color: var(--muted);
@@ -486,8 +505,11 @@
     .final-cta { text-align: center; }
     .final-cta .cta-panel { padding: clamp(42px, 7vw, 78px); border: 1px solid rgba(224,170,24,0.40); border-radius: 26px; background: linear-gradient(145deg, rgba(53,39,15,0.7), rgba(20,27,35,0.92)); }
     .final-cta p { max-width: 680px; margin: 0 auto 28px; color: var(--muted); font-size: 1.08rem; }
+    .final-cta .store-badges { justify-content: center; }
 
     footer { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; padding: 34px 0 48px; display: flex; justify-content: space-between; gap: 22px; border-top: 1px solid rgba(255,255,255,0.08); color: var(--muted); font-size: 0.86rem; }
+    .footer-copy { display: grid; gap: 7px; }
+    .trademark-credit { max-width: 690px; color: #7f8995; font-size: 0.72rem; line-height: 1.45; }
     footer nav { display: flex; flex-wrap: wrap; gap: 18px; }
     footer a { text-decoration: none; }
     footer a:hover { color: var(--cream); }
@@ -528,7 +550,8 @@
       h2 { margin-bottom: 13px; font-size: clamp(2rem, 10vw, 2.55rem); line-height: 1.05; }
       .hero-copy > p { margin-bottom: 22px; font-size: 1rem; line-height: 1.48; }
       .hero-actions { display: grid; }
-      .hero-actions .button { width: 100%; }
+      .hero-actions .button, .hero-actions .store-badges { width: 100%; }
+      .hero-actions .store-badges { justify-content: center; }
       .availability { margin-top: 14px; }
       .hero-phone { width: min(100%, 300px); max-height: 465px; }
       .phone-wrap::before { width: 270px; height: 270px; }
@@ -632,7 +655,7 @@
         <a href="#examples">Examples</a>
         <a href="#how-it-works">How it works</a>
         <a href="#contact">Contact</a>
-        <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app"><span class="nav-cta-long">Get it on Google Play</span><span class="nav-cta-short">Get the app</span></a>
+        <a class="button" href="#download"><span class="nav-cta-long">Download the app</span><span class="nav-cta-short">Get the app</span></a>
       </div>
     </nav>
   </header>
@@ -644,10 +667,17 @@
         <h1>Turn questions into <span class="warm">field guides.</span></h1>
         <p>Ask what to do, compare one or multiple photos, analyze short videos, and turn practical answers into visual guides you can save to your phone for the trail, the road, the homestead, or the unexpected.</p>
         <div class="hero-actions">
-          <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app" aria-label="Download OffGrid AI FieldGuide from Google Play">Get the Android app</a>
+          <div class="store-badges" aria-label="Download OffGrid AI FieldGuide">
+            <a class="store-badge" href="https://apps.apple.com/app/id6806680581" aria-label="Download OffGrid AI FieldGuide on the App Store">
+              <img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us" width="120" height="40" alt="Download on the App Store">
+            </a>
+            <a class="store-badge google-play" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app" aria-label="Get OffGrid AI FieldGuide on Google Play">
+              <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="155" height="60" alt="Get it on Google Play">
+            </a>
+          </div>
           <a class="button secondary" href="https://offgridtoolkit.ai/online">Try it on the web</a>
         </div>
-        <p class="availability"><strong>Available now on Android.</strong> Apple version on the way.</p>
+        <p class="availability"><strong>Available now on the App Store and Google Play.</strong></p>
       </div>
 
       <div class="phone-wrap">
@@ -712,7 +742,7 @@
         <div class="section-head">
           <p class="eyebrow">The real app, start to finish</p>
           <h2 id="app-tour-title">See what FieldGuide can do on your phone.</h2>
-          <p>These are real screens from the current Android app—from ready-made prompts and multi-photo analysis to visual creation, read aloud, and saved guides.</p>
+          <p>These are real screens from the current app—from ready-made prompts and multi-photo analysis to visual creation, read aloud, and saved guides.</p>
         </div>
         <div class="tour-controls" aria-label="App tour controls">
           <button class="tour-button tour-prev" type="button" aria-label="Show previous app screen">←</button>
@@ -937,18 +967,28 @@
       </form>
     </section>
 
-    <section class="section final-cta">
+    <section class="section final-cta" id="download">
       <div class="cta-panel">
         <p class="eyebrow">Take useful knowledge with you</p>
         <h2>Build your next Field Guide.</h2>
-        <p>Free on Google Play, with no account, ads, or in-app purchases. Internet access is required for AI responses and visual generation.</p>
-        <a class="button" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app">Download OffGrid AI FieldGuide</a>
+        <p>Free on the App Store and Google Play, with no account, ads, or in-app purchases. Internet access is required for AI responses and visual generation.</p>
+        <div class="store-badges" aria-label="Download OffGrid AI FieldGuide">
+          <a class="store-badge" href="https://apps.apple.com/app/id6806680581" aria-label="Download OffGrid AI FieldGuide on the App Store">
+            <img src="https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us" width="120" height="40" loading="lazy" alt="Download on the App Store">
+          </a>
+          <a class="store-badge google-play" href="https://play.google.com/store/apps/details?id=com.offgridaitoolkit.app" aria-label="Get OffGrid AI FieldGuide on Google Play">
+            <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" width="155" height="60" loading="lazy" alt="Get it on Google Play">
+          </a>
+        </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <span>© 2026 OffGrid AI ToolKit LLC</span>
+    <div class="footer-copy">
+      <span>© 2026 OffGrid AI ToolKit LLC</span>
+      <span class="trademark-credit">Apple and the Apple logo are trademarks of Apple Inc., registered in the U.S. and other countries and regions. App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.</span>
+    </div>
     <nav aria-label="Legal and support">
       <a href="https://offgridtoolkit.ai/privacy">Privacy</a>
       <a href="https://offgridaitoolkit.com/pages/terms-and-conditions">Terms</a>

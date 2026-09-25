@@ -1,12 +1,19 @@
 # Development Changelog & Progress Report
 
-**Last Updated:** 2026-09-15
+**Last Updated:** 2026-09-25
 
 This document provides a reverse-chronological summary of recent development progress, features, and improvements to the OffGrid AI FieldGuide online platform.
 
 ---
 
 ### September 2026
+
+**2026-09-25**
+*   **OffGrid AI FieldGuide App Store launch**
+    *   Released iOS version `1.0 (7)` and verified its public App Store product page.
+    *   Added the official App Store badge and retained Google Play and web access on `offgridai.guide`.
+    *   Replaced the Apple pre-launch notice, added an Apple Smart App Banner, and updated structured metadata and search-facing product documentation for both iPhone and Android availability.
+    *   Added dual-store regression checks and verified the landing page at desktop and phone widths.
 
 **2026-09-15**
 *   **Apple third-party AI permission clarity (iOS build 6)**

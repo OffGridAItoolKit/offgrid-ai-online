@@ -5,6 +5,7 @@
 - Canonical domain: `https://offgridai.guide`
 - Redirect domain: `https://offgridaifieldguide.com`
 - Product: online `OffGrid AI FieldGuide`
+- App Store Apple ID: `6806680581`
 - Google Play package: `com.offgridaitoolkit.app`
 
 `offgridai.guide` is the primary address because it is short, memorable, and matches the product name. Both root and `www` forms of `offgridaifieldguide.com` redirect permanently to the corresponding path on `offgridai.guide`.
@@ -25,7 +26,7 @@ Namecheap BasicDNS uses an `A` record for each root (`@`) pointing to Render's d
 ## Product positioning
 
 - Lead promise: turn questions, photos, and short videos into practical Field Guides.
-- Primary CTA: Google Play listing.
+- Primary CTAs: App Store and Google Play listings.
 - Secondary CTA: online web experience.
 - Online edition: free, no account, no ads, internet required for AI and visual generation.
 - Offline edition: separate future paid `OffGrid AI ToolKit`, designed to run AI locally and intentionally not presented as the same app.
@@ -43,7 +44,7 @@ The gallery includes a prominent verification notice because its examples includ
 
 ## Mobile presentation
 
-The landing page is mobile-first for the expected audience. On phone-width screens it uses a shorter hero render, compact Google Play header action, 2-by-2 trust summary, denser feature cards, reduced section spacing, smaller straight-on video frame, and a horizontally swipeable gallery instead of stacking six large images. Very narrow screens switch the feature cards to a readable single-column horizontal layout.
+The landing page is mobile-first for the expected audience. On phone-width screens it uses a shorter hero render, a compact download header action, paired App Store and Google Play badges, a 2-by-2 trust summary, denser feature cards, reduced section spacing, a smaller straight-on video frame, and a horizontally swipeable gallery instead of stacking six large images. Very narrow screens switch the feature cards to a readable single-column horizontal layout.
 
 ## Website support form
 
@@ -66,3 +67,9 @@ As of 2026-08-31, `support@offgridaitoolkit.com` is verified and selected as the
 - Both root and `www` forms of `https://offgridaifieldguide.com` are verified and redirect permanently to the canonical domain.
 - The Google Play store-listing contact website is published as `https://offgridai.guide`.
 - The landing page now includes an actual app hero render, straight-on workflow video, and six-example responsive gallery with keyboard-accessible lightbox.
+
+## App Store launch - 2026-09-25
+
+- OffGrid AI FieldGuide version `1.0 (7)` reached Ready for Distribution and its public App Store page became available at `https://apps.apple.com/app/id6806680581`.
+- The landing page now presents the App Store first and Google Play second using their official badges, replaces the pre-launch Apple notice, adds the Apple Smart App Banner, and advertises the web experience separately.
+- The structured application data and `llms.txt` now describe both iPhone and Android availability.
