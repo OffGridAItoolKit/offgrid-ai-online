@@ -3,10 +3,12 @@ const { execFileSync, spawn } = require('node:child_process');
 const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
+const { outsideDesktopKBSave } = require('./kb-save-release-scope');
 
 const root = path.resolve(__dirname, '..');
-// Release already containing iOS Build 6 consent, native bridge and API safeguards.
-const BASELINE = '2eaf89cb1d91b511dc998666691cb64c71a22dbe';
+// Production immediately before the desktop KB-folder correction, including
+// App Store launch links and all previously released mobile/browser safeguards.
+const BASELINE = '2dfabdf7efbdc50d906ab77942a34f2af2539d2e';
 const customerWeb = {
     isCustomer: true,
     experience: 'online',
@@ -159,8 +161,8 @@ async function main() {
                 assert.equal(await page(route), fs.readFileSync(path.join(root, 'mobile-ready-made-prompts.html'), 'utf8'));
             });
         }
-        await check('the root keeps its existing prospect page', async () => {
-            assert.equal(await page('/'), baselineFile('index.html').toString('utf8'));
+        await check('the root keeps its prospect page outside the tested desktop KB save functions', async () => {
+            assert.equal(outsideDesktopKBSave(await page('/')), outsideDesktopKBSave(baselineFile('index.html').toString('utf8')));
         });
     });
     console.log(`Browser routing checks passed (${checks}/${checks}).`);

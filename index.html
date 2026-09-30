@@ -5335,7 +5335,9 @@ Mobile app output requirements:
         // SAVE TO KNOWLEDGE BASE
         // ============================================
         
-        let kbDirectoryHandle = null; // File System Access API handle
+        let kbDirectoryHandle = null; // Retained only in this browser session.
+        let kbDirectoryState = null;
+        let kbFolderBusy = false;
         
         function handleSaveToKB() {
             if (conversationHistory.length === 0) return;
@@ -5412,12 +5414,12 @@ Mobile app output requirements:
             }
         }
         
-        function showSaveModal() {
+        function showSaveModal(options = {}) {
             // Auto-generate title from first user message
             const firstUserMsg = conversationHistory.find(m => m.role === 'user');
-            const autoTitle = firstUserMsg
+            const autoTitle = options.title || (firstUserMsg
                 ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
-                : 'Conversation';
+                : 'Conversation');
             
             const isMobile = window.innerWidth <= 768;
             const overlay = document.createElement('div');
@@ -5431,7 +5433,7 @@ Mobile app output requirements:
                         <h3>💾 Save Conversation</h3>
                         <div class="save-modal-subtitle">Saved directly to your device — never to our servers.</div>
                         <label for="saveTitle">Title</label>
-                        <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
+                        <input type="text" id="saveTitle" placeholder="Enter a title...">
                         <div class="save-modal-actions" style="margin-top: 16px;">
                             <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
                             <button class="save-modal-btn primary" onclick="exportAsPDF()" style="flex: 2;">🖨️ Save as PDF</button>
@@ -5446,7 +5448,7 @@ Mobile app output requirements:
                         <h3>💾 Save to Knowledge Base</h3>
                         <div class="save-modal-subtitle">Saved directly to your computer — never to our servers.</div>
                         <label for="saveTitle">Title</label>
-                        <input type="text" id="saveTitle" value="${escapeHtml(autoTitle)}" placeholder="Enter a title...">
+                        <input type="text" id="saveTitle" placeholder="Enter a title...">
                         <label for="saveCategory">Category</label>
                         <select id="saveCategory">
                             <option value="Other">Other</option>
@@ -5459,18 +5461,22 @@ Mobile app output requirements:
                             <option value="Skills & Reference">Skills & Reference</option>
                             <option value="Water & Food">Water & Food</option>
                         </select>
-                        <div class="folder-hint">💡 <strong>OffGrid AI USB users:</strong> When the Save dialog opens, navigate to your OffGrid AI drive &gt; Saved Knowledge Base &gt; the matching category folder.</div>
+                        <div class="folder-hint" id="kbSaveFolderLabel" aria-live="polite">Choose your OffGrid AI product folder, Saved Knowledge Base, or a category folder.</div>
+                        <button type="button" class="save-modal-btn secondary" id="kbChooseFolderBtn" onclick="pickKBDirectory()">Choose Knowledge Base Folder</button>
                         <label for="saveTags">Tags <span style="font-weight: 400; color: #9ca3af;">(comma-separated, optional)</span></label>
                         <input type="text" id="saveTags" placeholder="e.g., water, purification, emergency">
                         <div class="save-modal-actions">
                             <button class="save-modal-btn secondary" onclick="closeSaveModal()">Cancel</button>
                             <button class="save-modal-btn secondary" onclick="exportAsPDF()" style="border-color: #b8860b; color: #8b6914;">🖨️ Print / Save PDF</button>
-                            <button class="save-modal-btn primary" onclick="executeSave()">💾 Save .md</button>
+                            <button class="save-modal-btn primary" id="kbWriteFilesBtn" onclick="executeSave()">💾 Save to Selected Folder</button>
                         </div>
                     </div>
                 `;
             }
             document.body.appendChild(overlay);
+            overlay.querySelector('#saveTitle').value = String(autoTitle);
+            if (!isMobile) refreshKBFolderOptions(
+                options.category && options.category !== 'Other' ? options.category : kbDirectoryState?.selectedPath || 'Other');
             overlay.addEventListener('click', function(e) {
                 if (e.target === overlay) closeSaveModal();
             });
@@ -5489,14 +5495,9 @@ Mobile app output requirements:
             // Open the user's Saved Knowledge Base folder using File System Access API
             if ('showDirectoryPicker' in window) {
                 try {
-                    const dirHandle = await window.showDirectoryPicker({
-                        id: 'offgrid-kb',
-                        mode: 'read',
-                        startIn: 'documents'
-                    });
-                    // Store the handle for future saves
-                    kbDirectoryHandle = dirHandle;
-                    showSaveToast(`Opened: ${dirHandle.name}`, 'Your Knowledge Base folder is ready for saving.');
+                    if (await pickKBDirectory()) {
+                        showSaveToast(escapeHtml(`Opened: ${kbDirectoryHandle.name}`), 'Your Knowledge Base folder is ready for saving.');
+                    }
                 } catch (err) {
                     if (err.name !== 'AbortError') {
                         console.error('Error opening Knowledge Base:', err);
@@ -5516,20 +5517,136 @@ Mobile app output requirements:
             }
         }
         
-        async function pickKBDirectory() {
-            try {
-                kbDirectoryHandle = await window.showDirectoryPicker({
-                    mode: 'readwrite',
-                    startIn: 'documents'
-                });
-                // Refresh the modal to show the new directory
-                closeSaveModal();
-                setTimeout(() => showSaveModal(), 250);
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error('Directory picker error:', err);
+        // Resolve existing folders only. Selecting a product folder descends into its
+        // Saved Knowledge Base; selecting a category uses that explicit destination.
+        async function resolveKBDirectory(selected) {
+            let root = selected;
+            if (selected.name !== 'Saved Knowledge Base') {
+                try {
+                    root = await selected.getDirectoryHandle('Saved Knowledge Base');
+                } catch (error) {
+                    if (error.name !== 'NotFoundError' && error.name !== 'TypeMismatchError') throw error;
                 }
             }
+            const isLibrary = root.name === 'Saved Knowledge Base';
+            const destinations = [];
+            async function visit(directory, prefix, depth) {
+                if (depth > 8 || destinations.length > 500) {
+                    throw new Error('This folder has too many subfolders. Choose the category folder directly.');
+                }
+                const children = [];
+                for await (const [name, handle] of directory.entries()) {
+                    if (handle.kind === 'directory' && !name.startsWith('.')) children.push([name, handle]);
+                }
+                children.sort(([a], [b]) => a.localeCompare(b));
+                for (const [name, handle] of children) {
+                    const relativePath = prefix ? `${prefix}/${name}` : name;
+                    destinations.push({ path: relativePath, name, handle });
+                    await visit(handle, relativePath, depth + 1);
+                }
+            }
+            if (isLibrary) {
+                await visit(root, '', 0);
+                if (!destinations.length) throw new Error('No category folders were found. Choose an existing category folder.');
+            } else {
+                // Do not enumerate or create folders inside an unrelated selected directory.
+                destinations.push({ path: '.', name: root.name, handle: root });
+            }
+            const label = root === selected ? root.name : `${selected.name}/${root.name}`;
+            return { root, label, destinations, selectedPath: destinations[0].path };
+        }
+
+        function refreshKBFolderOptions(preferredCategory) {
+            const select = document.getElementById('saveCategory');
+            const label = document.getElementById('kbSaveFolderLabel');
+            const choose = document.getElementById('kbChooseFolderBtn');
+            const save = document.getElementById('kbWriteFilesBtn');
+            if (!select || !label) return;
+            const canChoose = 'showDirectoryPicker' in window;
+            if (choose) choose.hidden = !canChoose;
+            if (save) save.textContent = canChoose ? '💾 Save to Selected Folder' : '💾 Download Files';
+            if (!canChoose) {
+                label.textContent = 'This browser downloads the files. Move the Markdown and images together into your Knowledge Base category folder.';
+                return;
+            }
+            if (!kbDirectoryState) {
+                select.disabled = true;
+                label.textContent = 'Choose your OffGrid AI product folder, Saved Knowledge Base, or the exact category folder.';
+                return;
+            }
+            select.disabled = false;
+            select.replaceChildren();
+            for (const destination of kbDirectoryState.destinations) {
+                const option = document.createElement('option');
+                option.value = destination.path;
+                option.textContent = destination.path === '.' ? destination.name : destination.path;
+                select.appendChild(option);
+            }
+            const preferred = kbDirectoryState.destinations.find(entry =>
+                entry.path === preferredCategory || entry.name === preferredCategory);
+            select.value = preferred?.path || kbDirectoryState.selectedPath;
+            kbDirectoryState.selectedPath = select.value;
+            select.onchange = () => { kbDirectoryState.selectedPath = select.value; };
+            label.textContent = `Folder: ${kbDirectoryState.label}. The article and images will be saved together in the selected category.`;
+            if (choose) choose.textContent = 'Change Knowledge Base Folder';
+        }
+
+        async function pickKBDirectory() {
+            if (kbFolderBusy || !('showDirectoryPicker' in window)) return false;
+            const preferred = document.getElementById('saveCategory')?.value || 'Other';
+            kbFolderBusy = true;
+            const save = document.getElementById('kbWriteFilesBtn');
+            if (save) save.disabled = true;
+            try {
+                const selected = await window.showDirectoryPicker({
+                    id: 'offgrid-knowledge-base',
+                    mode: 'readwrite',
+                    startIn: kbDirectoryHandle || 'documents'
+                });
+                const resolved = await resolveKBDirectory(selected);
+                kbDirectoryHandle = resolved.root;
+                kbDirectoryState = resolved;
+                refreshKBFolderOptions(preferred);
+                return true;
+            } catch (err) {
+                if (err.name !== 'AbortError') {
+                    showSaveToast('Could not select Knowledge Base folder', escapeHtml(err.message || 'Choose the category folder directly.'));
+                }
+                return false;
+            } finally {
+                kbFolderBusy = false;
+                if (save) save.disabled = false;
+            }
+        }
+
+        async function confirmKBBundleOverwrite(destination, filenames) {
+            const existing = [];
+            for (const filename of new Set(filenames)) {
+                try {
+                    await destination.getFileHandle(filename);
+                    existing.push(filename);
+                } catch (error) {
+                    if (error.name !== 'NotFoundError') throw error;
+                }
+            }
+            if (!existing.length) return true;
+            return window.confirm(
+                `This title already has saved files in the selected folder:\n\n${existing.join('\n')}\n\nReplace the matching article and image files? Cancel to keep the existing files and choose a different title.`
+            );
+        }
+
+        async function writeKBBundle(destination, filename, markdownContent, images, imageFilenames) {
+            // Write images first so a newly visible article never refers to a missing image.
+            for (let i = 0; i < images.length; i++) {
+                const imageHandle = await destination.getFileHandle(imageFilenames[i], { create: true });
+                const imageWriter = await imageHandle.createWritable();
+                await imageWriter.write(dataUrlToBlob(images[i].dataUrl));
+                await imageWriter.close();
+            }
+            const markdownHandle = await destination.getFileHandle(filename, { create: true });
+            const markdownWriter = await markdownHandle.createWritable();
+            await markdownWriter.write(markdownContent);
+            await markdownWriter.close();
         }
         
         function generateMarkdownContent(title, category, tags, imageFilenames) {
@@ -5669,108 +5786,12 @@ Mobile app output requirements:
                 showSaveToast('Image not ready yet', 'Please wait for Image Studio to finish generating.');
                 return;
             }
-
             addOnlineStudioResultToChat();
-
-            const saveBtn = document.getElementById('onlineStudioSaveBtn');
-            const statusEl = document.getElementById('onlineStudioStatus');
-            const title = onlineStudioState.title || 'OffGrid AI Visual Guide';
-            const category = onlineStudioState.category || 'Other';
-            const tags = '';
-            const filename = generateFilename(title);
-            const baseName = filename.replace('.md', '');
-            const embeddedImages = extractBase64Images();
-
-            if (embeddedImages.length === 0) {
-                showSaveToast('No image found to save', 'The visual was not available in the chat package.');
-                return;
-            }
-
-            const imageFilenames = embeddedImages.map((img, i) =>
-                `${baseName}-img-${i + 1}.${img.format}`
-            );
-            const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
-
-            if (saveBtn) {
-                saveBtn.disabled = true;
-                saveBtn.textContent = 'Choose Folder...';
-            }
-            if (statusEl) statusEl.textContent = 'Choose your Saved Knowledge Base category folder...';
-
-            if ('showDirectoryPicker' in window) {
-                try {
-                    const dirHandle = await window.showDirectoryPicker({
-                        id: 'offgrid-knowledge-base',
-                        mode: 'readwrite',
-                        startIn: 'documents'
-                    });
-
-                    const mdHandle = await dirHandle.getFileHandle(filename, { create: true });
-                    const mdWritable = await mdHandle.createWritable();
-                    await mdWritable.write(markdownContent);
-                    await mdWritable.close();
-
-                    for (let i = 0; i < embeddedImages.length; i++) {
-                        const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
-                        const imgHandle = await dirHandle.getFileHandle(imageFilenames[i], { create: true });
-                        const imgWritable = await imgHandle.createWritable();
-                        await imgWritable.write(imgBlob);
-                        await imgWritable.close();
-                    }
-
-                    if (saveBtn) saveBtn.textContent = 'Saved to Knowledge Base';
-                    if (statusEl) statusEl.textContent = 'Saved - backup added to this online session below.';
-                    showSaveToast(
-                        'Your field guide has been saved to your Knowledge Base',
-                        'A backup has also been added to this online session below.'
-                    );
-                    setTimeout(closeOnlineImageStudio, 1200);
-                    return;
-                } catch (err) {
-                    if (err.name === 'AbortError') {
-                        if (saveBtn) {
-                            saveBtn.disabled = false;
-                            saveBtn.textContent = 'Save to Knowledge Base';
-                        }
-                        if (statusEl) statusEl.textContent = 'Visual ready - review, save, or continue in chat.';
-                        return;
-                    }
-                    console.error('Image Studio direct save failed, falling back:', err);
-                }
-            }
-
-            const mdBlob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
-            const mdUrl = URL.createObjectURL(mdBlob);
-            const mdLink = document.createElement('a');
-            mdLink.href = mdUrl;
-            mdLink.download = filename;
-            document.body.appendChild(mdLink);
-            mdLink.click();
-            document.body.removeChild(mdLink);
-            URL.revokeObjectURL(mdUrl);
-
-            for (let i = 0; i < embeddedImages.length; i++) {
-                const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
-                const imgUrl = URL.createObjectURL(imgBlob);
-                const imgLink = document.createElement('a');
-                imgLink.href = imgUrl;
-                imgLink.download = imageFilenames[i];
-                document.body.appendChild(imgLink);
-                await new Promise(resolve => setTimeout(resolve, 300));
-                imgLink.click();
-                document.body.removeChild(imgLink);
-                URL.revokeObjectURL(imgUrl);
-            }
-
-            if (saveBtn) {
-                saveBtn.disabled = false;
-                saveBtn.textContent = 'Download Again';
-            }
-            if (statusEl) statusEl.textContent = 'Downloaded files - move them to your Knowledge Base folder.';
-            showSaveToast(
-                `Downloaded: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
-                `Move ALL downloaded files to your OffGrid AI drive > Saved Knowledge Base > ${category}.`
-            );
+            closeOnlineImageStudio();
+            showSaveModal({
+                title: onlineStudioState.title || 'OffGrid AI Visual Guide',
+                category: onlineStudioState.category || 'Other'
+            });
         }
 
         function shareOnlineStudioFieldGuide() {
@@ -5896,8 +5917,9 @@ Mobile app output requirements:
         }
         
         async function executeSave() {
+            if (kbFolderBusy) return;
             const title = document.getElementById('saveTitle')?.value.trim() || 'Conversation';
-            const category = document.getElementById('saveCategory')?.value || 'Other';
+            let category = document.getElementById('saveCategory')?.value || 'Other';
             const tags = document.getElementById('saveTags')?.value || '';
             
             const filename = generateFilename(title);
@@ -5906,6 +5928,39 @@ Mobile app output requirements:
             // Check if conversation contains uploaded images
             const embeddedImages = extractBase64Images();
             const hasImages = embeddedImages.length > 0;
+
+            if ('showDirectoryPicker' in window) {
+                if (!kbDirectoryState) {
+                    // Let the user inspect actual categories before a subsequent Save click.
+                    await pickKBDirectory();
+                    return;
+                }
+                const destination = kbDirectoryState.destinations.find(entry => entry.path === category);
+                if (!destination) {
+                    showSaveToast('Choose a category folder', 'Select the folder where this field guide belongs.');
+                    return;
+                }
+                category = destination.path === '.' ? destination.name : destination.path;
+                const imageFilenames = embeddedImages.map((img, i) => `${baseName}-img-${i + 1}.${img.format}`);
+                const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
+                const save = document.getElementById('kbWriteFilesBtn');
+                kbFolderBusy = true;
+                if (save) save.disabled = true;
+                try {
+                    if (!await confirmKBBundleOverwrite(destination.handle, [filename, ...imageFilenames])) return;
+                    await writeKBBundle(destination.handle, filename, markdownContent, embeddedImages, imageFilenames);
+                    closeSaveModal();
+                    const savedPath = destination.path === '.' ? category : `${kbDirectoryState.label}/${category}`;
+                    showSaveToast(escapeHtml(`Saved to ${savedPath}`),
+                        `Article and ${embeddedImages.length} image${embeddedImages.length === 1 ? '' : 's'} saved together for offline use.`);
+                } catch (error) {
+                    showSaveToast('Save could not finish', escapeHtml(error.message || 'Check folder access and try again.'));
+                } finally {
+                    kbFolderBusy = false;
+                    if (save) save.disabled = false;
+                }
+                return;
+            }
             
             closeSaveModal();
 
@@ -5915,41 +5970,6 @@ Mobile app output requirements:
                     `${baseName}-img-${i + 1}.${img.format}`
                 );
                 const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
-
-                if ('showDirectoryPicker' in window) {
-                    try {
-                        showSaveToast('Select folder...', `Choose the Knowledge Base > ${category} folder on your OffGrid AI drive.`);
-                        const dirHandle = await window.showDirectoryPicker({
-                            id: 'offgrid-knowledge-base',
-                            mode: 'readwrite',
-                            startIn: 'documents'
-                        });
-
-                        // Write the .md file
-                        const mdHandle = await dirHandle.getFileHandle(filename, { create: true });
-                        const mdWritable = await mdHandle.createWritable();
-                        await mdWritable.write(markdownContent);
-                        await mdWritable.close();
-
-                        // Write each image as a separate file
-                        for (let i = 0; i < embeddedImages.length; i++) {
-                            const imgBlob = dataUrlToBlob(embeddedImages[i].dataUrl);
-                            const imgHandle = await dirHandle.getFileHandle(imageFilenames[i], { create: true });
-                            const imgWritable = await imgHandle.createWritable();
-                            await imgWritable.write(imgBlob);
-                            await imgWritable.close();
-                        }
-
-                        showSaveToast(
-                            `Saved: ${filename} + ${embeddedImages.length} image${embeddedImages.length > 1 ? 's' : ''}`,
-                            `Files saved to your selected folder. Never stored on our servers.`
-                        );
-                        return;
-                    } catch (err) {
-                        if (err.name === 'AbortError') return;
-                        console.error('showDirectoryPicker failed, falling back:', err);
-                    }
-                }
 
                 // Fallback: download .md + image files separately
                 const mdBlob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });

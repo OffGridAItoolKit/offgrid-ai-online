@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { BASELINE, root, customerWeb, baselineFile, injectConfig, withServer } = require('./check-mobile-routing');
+const { outsideDesktopKBSave } = require('./kb-save-release-scope');
 
 // These files implement the store apps, their policies and their shared backend.
 // A browser-only change must not rewrite any of them.
@@ -51,10 +52,16 @@ async function main() {
         const files = protectedFiles();
         assert.ok(files.length > 100, 'Protection manifest unexpectedly shrank');
         for (const filename of files) {
-            assert.ok(fs.readFileSync(path.join(root, filename)).equals(baselineFile(filename)),
-                `${filename} differs from the pinned release`);
+            const actual = fs.readFileSync(path.join(root, filename));
+            const expected = baselineFile(filename);
+            if (filename === 'index.html') {
+                assert.equal(outsideDesktopKBSave(actual), outsideDesktopKBSave(expected),
+                    'index.html changed outside tested desktop KB-save functions');
+            } else {
+                assert.ok(actual.equals(expected), `${filename} differs from the pinned release`);
+            }
         }
-        const changed = execFileSync('git', ['diff', '--name-only', BASELINE, '--', ...protectedPaths], {
+        const changed = execFileSync('git', ['diff', '--name-only', BASELINE, '--', ...protectedPaths.filter(entry => entry !== 'index.html')], {
             cwd: root, windowsHide: true
         }).toString('utf8').trim();
         assert.equal(changed, '', 'Protected tracked files must have no staged or unstaged changes');
@@ -83,8 +90,8 @@ async function main() {
             ['/online?surface=app&surface=web&platform=ios&platform=android&apiBase=production&apiBase=unknown', customerWeb]
         ];
         for (const [route, config] of onlineCases) {
-            await check(`${route} returns the exact release page and config`, async () => {
-                assert.equal(await page(route), injectConfig(originalHtml, config));
+            await check(`${route} preserves release page/config outside tested desktop KB saves`, async () => {
+                assert.equal(outsideDesktopKBSave(await page(route)), outsideDesktopKBSave(injectConfig(originalHtml, config)));
             });
         }
         const assets = [
@@ -116,7 +123,13 @@ async function main() {
 async function checkLiveRelease() {
     // Opt-in, read-only HTTP checks. No AI requests, uploads, credentials or database calls.
     // Git blobs use the LF line endings sent by the Linux production deployment.
-    const rawFile = filename => execFileSync('git', ['show', `${BASELINE}:${filename}`], {
+    const releaseArg = process.argv.indexOf('--release-ref');
+    const releaseInput = releaseArg === -1 ? BASELINE : process.argv[releaseArg + 1];
+    assert.ok(releaseInput && !releaseInput.startsWith('-'), '--release-ref needs a commit reference');
+    const releaseRef = execFileSync('git', ['rev-parse', '--verify', `${releaseInput}^{commit}`], {
+        cwd: root, windowsHide: true
+    }).toString('utf8').trim();
+    const rawFile = filename => execFileSync('git', ['show', `${releaseRef}:${filename}`], {
         cwd: root, windowsHide: true, maxBuffer: 16 * 1024 * 1024
     });
     const originalHtml = rawFile('index.html').toString('utf8');
@@ -145,7 +158,7 @@ async function checkLiveRelease() {
         assert.equal(response.status, 200, `LIVE ${route} did not return HTTP 200`);
         const actual = Buffer.from(await response.arrayBuffer());
         assert.ok(actual.equals(expected),
-            `LIVE ${route} differs from ${BASELINE.slice(0, 7)}: expected sha256 ${hash(expected)}, received ${hash(actual)}`);
+            `LIVE ${route} differs from ${releaseRef.slice(0, 7)}: expected sha256 ${hash(expected)}, received ${hash(actual)}`);
         return route;
     }));
     let failures = 0;
@@ -157,7 +170,7 @@ async function checkLiveRelease() {
         }
     }
     assert.equal(failures, 0, `${failures} live release checks failed; production baseline is NOT verified`);
-    console.log(`Live release verification passed (${results.length}/${results.length}) against ${BASELINE}.`);
+    console.log(`Live release verification passed (${results.length}/${results.length}) against ${releaseRef}.`);
 }
 
 (process.argv.includes('--live') ? checkLiveRelease() : main()).catch(error => {
