@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Ready-Made Prompts - OffGrid AI Online</title>
     <meta name="description" content="Hundreds of expert prompts for building your offline Knowledge Base. Click to copy or send directly to OffGrid AI.">
     <link rel="icon" type="image/png" href="/compasstilted.png">
@@ -558,6 +558,28 @@
             body.is-app-surface .theme-toggle { width: 38px; min-height: 38px; padding: 0; }
             body.is-app-surface .theme-toggle-label { display: none; }
             body.is-app-surface .back-link { padding: 8px 9px; white-space: nowrap; }
+        }
+
+        /* iPhone Duo and edge-to-edge iPhone layouts can have asymmetric safe
+           areas. Apply each inset independently and keep the page responsive
+           when the app moves between the outer and inner displays. */
+        body.is-app-surface {
+            min-height: 100dvh;
+        }
+        body.is-app-surface .header {
+            padding-top: calc(10px + env(safe-area-inset-top, 0px));
+            padding-left: calc(14px + env(safe-area-inset-left, 0px));
+            padding-right: calc(14px + env(safe-area-inset-right, 0px));
+        }
+        body.is-app-surface .hero,
+        body.is-app-surface .controls,
+        body.is-app-surface .collection-note,
+        body.is-app-surface .categories {
+            padding-left: calc(16px + env(safe-area-inset-left, 0px));
+            padding-right: calc(16px + env(safe-area-inset-right, 0px));
+        }
+        body.is-app-surface .categories {
+            padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
         }
         
         /* No results */
