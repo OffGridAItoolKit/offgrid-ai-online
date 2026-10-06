@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#c58b00">
     <title>OffGrid AI FieldGuide - Cloud-Powered Field Assistance</title>
     <meta name="description" content="Create practical field guides, identify images and videos, and get prioritized field assistance from OffGrid AI.">
@@ -24,7 +24,7 @@
     <meta name="twitter:image" content="https://offgridtoolkit.ai/og-image.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/compass-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/compass-180.png">
-    <link rel="stylesheet" href="offgridai.css?v=6.6">
+    <link rel="stylesheet" href="offgridai.css?v=6.7">
     <script src="/vendor/marked.umd.js"></script>
     <script src="/vendor/purify.min.js"></script>
     <script src="/vendor/qrcode.min.js"></script>
@@ -1855,6 +1855,24 @@
         if (CONFIG.platform) {
             document.body.classList.add(`platform-${CONFIG.platform}`);
         }
+
+        // iPhone Duo can move the app between compact and regular-width displays
+        // without reloading. Keep a live layout signal for CSS and future native
+        // integrations instead of assuming the launch width remains unchanged.
+        function updateAppViewportState() {
+            if (!IS_APP_SURFACE) return;
+            const viewport = window.visualViewport;
+            const width = Math.round(viewport?.width || window.innerWidth || 0);
+            const height = Math.round(viewport?.height || window.innerHeight || 0);
+            document.body.classList.toggle('is-app-regular-width', width > 768);
+            document.body.classList.toggle('is-app-landscape', width > height);
+            document.documentElement.style.setProperty('--app-viewport-height', `${height}px`);
+        }
+
+        updateAppViewportState();
+        window.addEventListener('resize', updateAppViewportState, { passive: true });
+        window.addEventListener('orientationchange', updateAppViewportState, { passive: true });
+        window.visualViewport?.addEventListener('resize', updateAppViewportState, { passive: true });
         const APP_THEME_STORAGE_KEY = 'offgrid-toolkit-theme';
 
         function haptic(type = 'light') {

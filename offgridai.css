@@ -4685,6 +4685,227 @@ body.app-theme-night:not(.command-theme) .chat-search-bar input {
     color: #f3f4f6;
 }
 
+/* ============================================ */
+/* iPhone Duo + edge-to-edge app adaptability   */
+/* ============================================ */
+
+/* The native app can move between compact and regular-width displays while
+   it is running. These rules are intentionally scoped to the app surface so
+   the browser and desktop products retain their existing layouts. */
+body.is-app-surface {
+    height: var(--app-viewport-height, 100dvh);
+    min-height: 100dvh;
+    max-width: 100%;
+}
+
+/* Never expose website-only or desktop-only controls when a Duo display is
+   wide enough to cross the historical 768px mobile breakpoint. */
+body.is-app-surface .prospect-only,
+body.is-app-surface .purchase-cta,
+body.is-app-surface .save-btn,
+body.is-app-surface .save-kb-button,
+body.is-app-surface .online-kb-save-callout,
+body.is-app-surface #onlineStudioSaveBtn,
+body.is-app-surface .desktop-quick-actions,
+body.is-app-surface .sidebar,
+body.is-app-surface .toggle-sidebar {
+    display: none !important;
+}
+
+body.is-app-surface .mobile-quick-actions {
+    display: block !important;
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+body.is-app-surface .mobile-action-grid {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 100%;
+    padding-bottom: 12px;
+}
+
+body.is-app-surface .mobile-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 1px solid rgba(184, 134, 11, 0.25);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+body.is-app-surface .mobile-action-btn-more {
+    border-style: dashed;
+    background: rgba(250, 245, 237, 0.92);
+}
+
+body.is-app-surface .mobile-action-icon {
+    width: 32px;
+    flex: 0 0 32px;
+    text-align: center;
+    font-size: 24px;
+}
+
+body.is-app-surface .mobile-action-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+body.is-app-surface .mobile-action-label {
+    color: #2c1810;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+body.is-app-surface .mobile-action-desc {
+    color: #8a7664;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.25;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+/* Treat left and right safe areas independently. Duo system controls and
+   landscape camera regions are not necessarily symmetrical. */
+body.is-app-surface .header {
+    padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+}
+
+body.is-app-surface .main-container,
+body.is-app-surface .chat-container {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+body.is-app-surface .messages {
+    padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+}
+
+body.is-app-surface .input-area {
+    padding-left: calc(10px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(10px + env(safe-area-inset-right, 0px)) !important;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body.is-app-surface .first-run-banner {
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    padding-right: calc(10px + env(safe-area-inset-right, 0px));
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(10px + env(safe-area-inset-left, 0px));
+}
+
+body.is-app-surface .first-run-content {
+    max-height: calc(100dvh - 20px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+body.is-app-surface .mobile-action-sheet,
+body.is-app-surface .online-studio-menu-overlay,
+body.is-app-surface .feedback-overlay {
+    padding-left: calc(14px + env(safe-area-inset-left, 0px));
+    padding-right: calc(14px + env(safe-area-inset-right, 0px));
+}
+
+body.is-app-surface .online-studio-overlay {
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-right: calc(16px + env(safe-area-inset-right, 0px));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    padding-left: calc(16px + env(safe-area-inset-left, 0px));
+}
+
+body.is-app-surface .online-studio-modal {
+    max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}
+
+.app-pdf-toolbar {
+    padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+}
+
+.app-pdf-floating-actions {
+    padding-left: calc(12px + env(safe-area-inset-left, 0px)) !important;
+    padding-right: calc(12px + env(safe-area-inset-right, 0px)) !important;
+}
+
+/* Duo's inner display reports a regular horizontal size class. Preserve the
+   familiar app hierarchy and use the extra room for a calm two-column action
+   grid instead of falling through to the unrelated desktop website UI. */
+body.is-app-surface.is-app-regular-width .welcome-content {
+    max-width: 920px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 0 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome {
+    height: auto;
+    justify-content: flex-start;
+    padding: 4px 8px 14px !important;
+}
+
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome-icon {
+    width: clamp(92px, 16vh, 132px) !important;
+    height: clamp(92px, 16vh, 132px) !important;
+    margin: 0 0 2px !important;
+}
+
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome-tagline {
+    order: 1 !important;
+    display: block !important;
+    margin-bottom: 4px !important;
+    font-size: 12px !important;
+}
+
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome h2,
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome-subtitle,
+body.is-app-surface.is-app-regular-width:not(.command-theme) .feature-badges,
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome-content > p:not(.welcome-tagline) {
+    display: none !important;
+}
+
+body.is-app-surface.is-app-regular-width:not(.command-theme) .welcome-input-area {
+    order: 7 !important;
+    width: min(100%, 760px) !important;
+    max-width: 760px !important;
+    margin: 6px auto 10px !important;
+}
+
+body.is-app-surface.is-app-regular-width .mobile-quick-actions {
+    order: 8 !important;
+}
+
+body.is-app-surface.is-app-regular-width .mobile-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.is-app-surface.is-app-regular-width .mobile-action-btn {
+    min-height: 78px;
+}
+
+body.is-app-surface.is-app-regular-width .app-pdf-document,
+body.is-app-surface.is-app-regular-width .app-pdf-bottom-actions {
+    max-width: 860px;
+}
+
 @media print {
     body.pdf-preview-active {
         background: #fff !important;

@@ -19,6 +19,7 @@
     "test:browser-files": "node scripts/check-browser-files.js",
     "test:browser-isolation": "node scripts/check-browser-isolation.js",
     "test:pdf-markdown": "node scripts/check-pdf-markdown.js",
+    "test:iphone-duo": "node scripts/check-iphone-duo.js",
     "test:landing": "node scripts/check-field-guide-landing.js && node scripts/smoke-field-guide-hosts.js"
   },
   "dependencies": {
