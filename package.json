@@ -4,6 +4,7 @@
   "description": "OffGrid AI FieldGuide - priority-first preparedness and field decision support",
   "main": "index.js",
   "scripts": {
+    "test:image-studio": "node --test scripts/test-image-studio.js && node scripts/check-image-studio-release.js",
     "test:kb-save": "node --test scripts/test-kb-category-save.js",
     "test:legacy-arena": "node --test scripts/test-legacy-arena-optimized.js scripts/test-legacy-arena-ui.js",
     "start": "node index.js",

@@ -506,6 +506,66 @@
                 gap: 10px;
             }
         }
+        /* Standalone creation workspace */
+        [hidden] { display: none !important; }
+        .shell { grid-template-columns: 260px minmax(0, 1fr); }
+        .sidebar { padding: 22px 16px; }
+        .workspace { width: min(1100px, calc(100% - 56px)); margin-top: 28px; }
+        .topbar a { color: var(--muted); font-size: 13px; text-decoration: none; }
+        .topbar a:hover { color: var(--text); }
+        .intro { padding: 6px 2px 0; }
+        .eyebrow { color: var(--green); text-transform: uppercase; letter-spacing: .14em; font-size: 11px; font-weight: 800; margin-bottom: 12px; }
+        .intro h1 { font-size: clamp(28px, 3.5vw, 44px); letter-spacing: -.035em; margin-bottom: 12px; }
+        .intro h1 em { font-style: normal; color: #efbd55; }
+        .intro p { max-width: 650px; }
+        .mode-switch { display: flex; gap: 6px; padding: 6px; border-bottom: 1px solid var(--line-soft); background: #10171e; }
+        .mode-switch button { flex: 1; color: var(--muted); border: 0; padding: 13px 12px; border-radius: 6px; background: transparent; cursor: pointer; font-weight: 750; }
+        .mode-switch button[aria-pressed="true"] { color: #f8db93; background: #2a2921; box-shadow: inset 0 0 0 1px #6e5730; }
+        .composer-body { gap: 18px; padding: 24px; }
+        #visualInput { min-height: 126px; font-size: 16px; }
+        .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        select { font: inherit; width: 100%; min-height: 44px; padding: 10px; border-radius: 7px; border: 1px solid #39414a; background: #101821; color: var(--text); }
+        :focus-visible { outline: 2px solid #eeb950; outline-offset: 3px; }
+        .small-copy { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 8px 0 0; }
+        .prompt-editor { padding: 14px; border: 1px solid var(--line); border-radius: 8px; }
+        .prompt-editor summary, .save-details summary { cursor: pointer; color: #e6ce93; font-size: 13px; }
+        .prompt-editor textarea { margin-top: 12px; min-height: 140px; }
+        .prompt-editor .btn { margin-top: 10px; }
+        .save-details .field-row { margin-top: 14px; }
+        .usage-pill { font-size: 11px; }
+        .stage:empty { display: none; }
+        .examples-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+        .examples-head h2 { font-size: 18px; }
+        .examples-head a { color: #d9be7b; font-size: 12px; }
+        .examples { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+        .example-card { overflow: hidden; border: 1px solid #343d42; border-radius: 10px; background: #161f27; color: var(--text); text-align: left; padding: 0; cursor: pointer; transition: border-color .15s; }
+        .example-card:hover { border-color: #d5a722; }
+        .example-card img { display: block; width: 100%; height: 140px; object-fit: cover; object-position: top; background: #efe8d8; }
+        .example-card strong { display: block; font-size: 13px; margin: 13px 14px 5px; }
+        .example-card span { display: block; color: var(--muted); font-size: 11px; margin: 0 14px 14px; }
+        .result-image img { max-height: none; }
+        .result { scroll-margin-top: 85px; }
+        @media (max-width: 980px) {
+            .shell { display: flex; flex-direction: column; }
+            .main { order: -1; }
+            .sidebar { max-height: none; border-top: 1px solid var(--line); }
+            .sidebar .brand, .sidebar .privacy { display: none; }
+            .workspace { width: calc(100% - 32px); margin: 22px auto 30px; }
+            .topbar-title { font-size: 14px; }
+            .topbar-title .pill { display: none; }
+        }
+        @media (max-width: 560px) {
+            .composer-body { padding: 16px; }
+            .controls-row { grid-template-columns: 1fr; gap: 12px; }
+            .examples { grid-template-columns: 1fr; }
+            .example-card { display: grid; grid-template-columns: 100px 1fr; align-items: center; }
+            .example-card img { grid-row: span 2; height: 92px; }
+            .example-card strong { align-self: end; }
+            .example-card span { align-self: start; }
+            .examples-head { align-items: flex-start; }
+            .topbar a { font-size: 11px; }
+            .mode-switch button { font-size: 13px; }
+        }
     </style>
 </head>
 <body>
@@ -533,50 +593,85 @@
                     <span>OffGrid AI Image Studio</span>
                     <span class="pill">OffGrid AI Visuals</span>
                 </div>
-                <span class="pill" id="connectionStatus">Connected</span>
+                <a href="https://offgridai.guide/">Open FieldGuide ↗</a>
             </header>
 
             <div class="workspace">
-                <section class="composer">
-                    <div class="composer-head">
-                        <h1>Create a Field Visual</h1>
-                        <p class="copy">Describe the visual you need or paste source notes. Image Studio will create the diagram, infographic, or reference guide.</p>
+                <section class="intro">
+                    <div class="eyebrow">Your AI field illustrator</div>
+                    <h1>Your idea, <em>illustrated.</em></h1>
+                    <p class="copy">Diagrams, field cards, illustrations and practical guides. Describe what you have in mind. We’ll help shape the image.</p>
+                </section>
+                <section class="composer" aria-label="Image creator">
+                    <div class="mode-switch" aria-label="Creation mode">
+                        <button id="modeCreate" aria-pressed="true" onclick="setStudioMode('create')">Create an image</button>
+                        <button id="modeArticle" aria-pressed="false" onclick="setStudioMode('article')">Create from an article</button>
                     </div>
 
                     <div class="composer-body">
                         <div>
-                            <label for="visualInput">Describe what you want</label>
-                            <textarea id="visualInput" placeholder="Example: Create a clear infographic showing how to build a simple emergency water filter with labeled layers, materials, and safety notes."></textarea>
+                            <label for="visualInput" id="requestLabel">What would you like to create?</label>
+                            <textarea id="visualInput" placeholder="A labeled camp kitchen layout with separate cooking, food prep and washing areas…" oninput="invalidatePrompt()"></textarea>
+                            <p class="small-copy" id="modeHelp">Start with an idea. No article or technical prompt needed.</p>
                         </div>
 
-                        <div class="field-row">
+                        <div class="controls-row">
+                            <div><label for="visualCategory">Visual category</label>
+                                <select id="visualCategory" onchange="invalidatePrompt()">
+                                    <option value="other">Let the idea lead</option><option value="survival">Survival & emergency</option>
+                                    <option value="homestead">Homesteading</option><option value="medical">Medical reference</option>
+                                    <option value="wilderness">Nature & field skills</option><option value="adventure">Adventure & gear</option>
+                                    <option value="research">Field research</option><option value="education">Education</option><option value="ministry">Ministry</option>
+                                </select>
+                            </div>
+                            <div><label for="visualFormat">Layout</label>
+                                <select id="visualFormat" onchange="invalidatePrompt()">
+                                    <option value="auto">Best fit for my image</option><option value="phone">Phone field card · portrait</option>
+                                    <option value="print">Printable guide · portrait</option><option value="landscape">Wide diagram · landscape</option><option value="square">Square image</option>
+                                </select>
+                            </div>
+                        </div>
+                        <details class="prompt-editor" id="promptEditor">
+                            <summary>Shape the prompt <span class="small-copy">· optional</span></summary>
+                            <p class="small-copy">Craft a prompt to review and edit, or write your own. Create Image will use the text below when it is filled in.</p>
+                            <label for="craftedPrompt" class="small-copy">Image prompt</label>
+                            <textarea id="craftedPrompt" placeholder="Your image prompt will appear here. You can also write it yourself."></textarea>
+                            <button class="btn btn-secondary" id="craftBtn" onclick="craftPrompt()">Craft My Prompt</button>
+                            <p class="small-copy" id="promptNote" aria-live="polite">Crafting a prompt does not generate an image.</p>
+                        </details>
+                        <details class="save-details">
+                            <summary>Title & Knowledge Base category</summary>
+                            <div class="field-row">
                             <div>
                                 <label for="titleInput">Title</label>
                                 <input id="titleInput" placeholder="Auto-filled from your request">
                             </div>
                             <div>
                                 <label for="categoryInput">Category</label>
-                                <input id="categoryInput" value="Other">
+                                <input id="categoryInput" value="Other" oninput="if (studioMode === 'article') invalidatePrompt()">
                             </div>
-                        </div>
+                            </div>
+                        </details>
 
                         <div class="actions">
                             <button class="btn btn-primary" id="createBtn" onclick="createImage()">Create Image</button>
                             <button class="btn btn-secondary" onclick="pasteFromClipboard()">Paste</button>
                             <button class="btn btn-secondary" onclick="clearStudio()">New Visual</button>
                             <div class="usage-pill" id="imageUsagePill">Images remaining this month: checking...</div>
-                            <div class="status-line" id="statusLine"></div>
+                            <div class="status-line" id="statusLine" role="status" aria-live="polite"></div>
                         </div>
                     </div>
                 </section>
 
-                <section class="stage" id="stage">
-                    <div class="empty">
-                        <div class="empty-inner">
-                            <h2>Ready to Create</h2>
-                            <p class="copy">Choose a ready-made prompt from the left, or describe your own visual above, then click Create Image.</p>
-                        </div>
+                <section class="stage" id="stage" aria-label="Generated image"></section>
+                <section aria-label="Image inspiration">
+                    <div class="examples-head"><h2>A little inspiration</h2><a href="https://imagestudio.offgridtoolkit.ai/#gallery" target="_blank" rel="noopener noreferrer">Explore the gallery ↗</a></div>
+                    <div class="examples">
+                        <button class="example-card" onclick="usePreset(1, 0)"><img loading="lazy" referrerpolicy="no-referrer" src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/XcIRTZDygOVsSTZR.png" alt="Example chicken coop illustration"><strong>Plan a homestead project</strong><span>Chicken coop · use this idea ↗</span></button>
+                        <button class="example-card" onclick="usePreset(0, 0)"><img loading="lazy" referrerpolicy="no-referrer" src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/sQEWCSEUaYUUqLeL.jpg" alt="Example emergency decision guide"><strong>Make a plan you can follow</strong><span>72-hour guide · use this idea ↗</span></button>
+                        <button class="example-card" onclick="usePreset(3, 4)"><img loading="lazy" referrerpolicy="no-referrer" src="https://files.manuscdn.com/user_upload_by_module/session_file/310419663030693133/iKIfAOnyygcAQooY.jpg" alt="Example overlander toolkit illustration"><strong>Get your gear organized</strong><span>Trail toolkit · use this idea ↗</span></button>
                     </div>
+                    <p class="small-copy">Examples from our Image Studio gallery. Pick an idea, personalize it, then create. Results will vary.</p>
                 </section>
             </div>
         </main>
@@ -587,10 +682,14 @@
         <div class="toast-subtitle" id="toastSubtitle"></div>
     </div>
 
+    <script src="/assets/image-studio-flow.js"></script>
     <script>
         const API_BASE = window.location.origin;
         const TOKEN_KEY = 'offgrid-license-token';
         const IMAGE_MODEL = 'google/gemini-3-pro-image-preview';
+        let studioMode = 'create';
+        let studioBusy = false;
+        let promptSignature = '';
 
         let current = {
             title: '',
@@ -742,7 +841,7 @@
         async function refreshImageUsage() {
             const token = getAuthToken();
             if (!token) {
-                setImageUsageText('Images remaining this month: 10 / 10');
+                setImageUsageText('Preview access · server limits apply');
                 return;
             }
 
@@ -757,14 +856,16 @@
                 if (Number.isFinite(remaining) && Number.isFinite(limit)) {
                     setImageUsageText(`Images remaining this month: ${remaining} / ${limit}`);
                 } else {
-                    setImageUsageText('Images remaining this month: 10 / 10');
+                    setImageUsageText('Image allowance unavailable');
                 }
             } catch (error) {
-                setImageUsageText('Images remaining this month: 10 / 10');
+                setImageUsageText('Image allowance unavailable');
             }
         }
 
         function setBusy(isBusy, text) {
+            studioBusy = isBusy;
+            document.querySelectorAll('button, input, textarea, select').forEach(control => { control.disabled = isBusy; });
             const btn = document.getElementById('createBtn');
             btn.disabled = isBusy;
             btn.innerHTML = isBusy ? '<span class="spinner"></span>' + (text || 'Working...') : 'Create Image';
@@ -785,13 +886,19 @@
         }
 
         function usePreset(categoryIndex, promptIndex) {
+            if (studioBusy) return;
             const group = promptCategories[categoryIndex];
-            const preset = group.prompts[promptIndex];
+            const preset = group?.prompts[promptIndex];
             if (!group || !preset) return;
+            setStudioMode('create');
+            document.getElementById('visualCategory').value = ['survival', 'homestead', 'medical', 'adventure', 'wilderness', 'survival'][categoryIndex] || 'other';
             const [title, request] = preset;
             document.getElementById('titleInput').value = title;
             document.getElementById('categoryInput').value = group.category;
             document.getElementById('visualInput').value = request;
+            invalidatePrompt();
+            document.querySelector('.composer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('visualInput').focus({ preventScroll: true });
             setStatus('Prompt loaded. Click Create Image when ready.');
             showToast('Prompt loaded', 'Review it, then click Create Image.');
         }
@@ -910,9 +1017,11 @@
                             <div class="result-meta">${escapeHtml(current.imageFilename)} | Generated using OffGrid AI Image Studio</div>
                         </div>
                         <div class="actions">
+                            <button class="btn btn-primary" onclick="saveImage()">Save Image</button>
                             <button class="btn btn-kb" onclick="saveToKnowledgeBase()">Save to Knowledge Base</button>
                             <button class="btn btn-secondary" onclick="savePDF()">Save PDF</button>
                             <button class="btn btn-secondary" onclick="downloadKBFiles()">Download KB Files</button>
+                            <button class="btn btn-secondary" onclick="shareImage()">Share Image</button>
                             <button class="btn btn-secondary" onclick="clearStudio()">New Visual</button>
                         </div>
                     </div>
@@ -926,11 +1035,75 @@
             `;
         }
 
+        function studioInputs() {
+            return {
+                mode: studioMode,
+                request: document.getElementById('visualInput').value.trim(),
+                category: studioMode === 'article'
+                    ? (document.getElementById('categoryInput').value.trim() || 'Other')
+                    : document.getElementById('visualCategory').value,
+                format: document.getElementById('visualFormat').value
+            };
+        }
+
+        function invalidatePrompt() {
+            document.getElementById('craftedPrompt').value = '';
+            promptSignature = '';
+            document.getElementById('promptNote').textContent = 'Your next image will use the updated idea, category and layout.';
+        }
+
+        function setStudioMode(mode) {
+            if (studioBusy || !['create', 'article'].includes(mode)) return;
+            if (studioMode !== mode) invalidatePrompt();
+            studioMode = mode;
+            document.getElementById('modeCreate').setAttribute('aria-pressed', String(mode === 'create'));
+            document.getElementById('modeArticle').setAttribute('aria-pressed', String(mode === 'article'));
+            document.getElementById('requestLabel').textContent = mode === 'article' ? 'Paste your article or source notes' : 'What would you like to create?';
+            document.getElementById('modeHelp').textContent = mode === 'article'
+                ? 'Create a companion visual. Your original text stays with the saved guide. The visual uses the first 4,000 characters.'
+                : 'Start with an idea. No article or technical prompt needed.';
+        }
+
+        async function requestCraftedPrompt(inputs) {
+            const { endpoint, body } = ImageStudioFlow.promptRequest(inputs);
+            const response = await fetch(`${API_BASE}${endpoint}`, {
+                method: 'POST', headers: getAuthHeaders(), body: JSON.stringify(body)
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success || !data.prompt) throw new Error(data.error || 'Prompt generation failed.');
+            document.getElementById('craftedPrompt').value = data.prompt;
+            promptSignature = ImageStudioFlow.signature(inputs);
+            document.getElementById('promptNote').textContent = 'Prompt ready. Edit it if you like, then select Create Image.';
+            return data.prompt;
+        }
+
+        async function craftPrompt() {
+            if (studioBusy) return;
+            const inputs = studioInputs();
+            if (!inputs.request) {
+                document.getElementById('visualInput').focus();
+                return showToast('Add an idea first', 'Describe your image or paste your article above.');
+            }
+            try {
+                setBusy(true, 'Crafting…');
+                setStatus('Crafting your image prompt…');
+                await requestCraftedPrompt(inputs);
+                document.getElementById('promptEditor').open = true;
+                setStatus('Prompt ready to review. No image generated yet.');
+            } catch (error) {
+                setStatus('Prompt could not be crafted. Your text is still here.');
+                showToast('Prompt crafting failed', error.message);
+            } finally { setBusy(false); }
+        }
+
         async function createImage() {
+            if (studioBusy) return;
             const requestInput = document.getElementById('visualInput');
             const titleInput = document.getElementById('titleInput');
             const categoryInput = document.getElementById('categoryInput');
-            const request = requestInput.value.trim();
+            const inputs = studioInputs();
+            const editedPrompt = document.getElementById('craftedPrompt').value.trim();
+            const request = requestInput.value.trim() || (studioMode === 'create' ? editedPrompt : '');
 
             if (!request) {
                 requestInput.focus();
@@ -942,23 +1115,15 @@
             titleInput.value = title;
             const category = categoryInput.value.trim() || 'Other';
 
-            revokeObjectUrl(current.displayImageUrl);
-            current = { title, category, request, image: '', displayImageUrl: '', imageFilename: '', markdown: '' };
-
             try {
                 setBusy(true, 'Crafting...');
                 setStatus('Crafting Image Studio prompt...');
                 renderGenerating('Crafting the visual plan');
 
-                const promptResponse = await fetch(`${API_BASE}/api/image-studio/visual-prompt`, {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: JSON.stringify({ conversationContext: request, category })
-                });
-                const promptData = await promptResponse.json();
-                if (!promptResponse.ok || !promptData.success || !promptData.prompt) {
-                    throw new Error(promptData.error || 'Prompt generation failed.');
-                }
+                // Edited prompts are reusable only while their source settings still match.
+                // User-written prompts have no signature and are used as-is.
+                const prompt = editedPrompt && (!promptSignature || promptSignature === ImageStudioFlow.signature(inputs))
+                    ? editedPrompt : await requestCraftedPrompt(inputs);
 
                 setBusy(true, 'Generating...');
                 setStatus('Generating visual...');
@@ -967,7 +1132,7 @@
                 const imageResponse = await fetch(`${API_BASE}/api/image-studio/generate-image`, {
                     method: 'POST',
                     headers: getAuthHeaders(),
-                    body: JSON.stringify({ prompt: promptData.prompt, model: IMAGE_MODEL })
+                    body: JSON.stringify({ prompt: ImageStudioFlow.imagePrompt(prompt, studioMode, inputs.format), model: IMAGE_MODEL })
                 });
                 const imageData = await imageResponse.json();
                 if (!imageResponse.ok || !imageData.success || !imageData.image) {
@@ -975,23 +1140,43 @@
                 }
 
                 const rawImage = imageData.image.startsWith('data:') ? imageData.image : `data:image/png;base64,${imageData.image}`;
-                current.image = await applyOffGridImageWatermark(rawImage);
-                current.displayImageUrl = createImageDisplayUrl(current.image);
-                current.imageFilename = `${slugify(title)}-img-1.${imageExtension(current.image)}`;
-                current.markdown = buildMarkdown(title, category, request, current.imageFilename);
+                const image = await applyOffGridImageWatermark(rawImage);
+                const displayImageUrl = createImageDisplayUrl(image);
+                const imageFilename = `${slugify(title)}-img-1.${imageExtension(image)}`;
+                revokeObjectUrl(current.displayImageUrl);
+                current = { title, category, request, image, displayImageUrl, imageFilename,
+                    markdown: buildMarkdown(title, category, request, imageFilename) };
 
                 renderResult();
+                document.getElementById('stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
                 refreshImageUsage();
                 setStatus('Visual ready.');
                 showToast('Visual ready', 'Save it to your Knowledge Base or export a PDF.');
             } catch (error) {
                 console.error('Image Studio error:', error);
-                renderError(error);
+                if (current.image) renderResult();
+                else renderError(error);
                 setStatus('Image Studio needs attention.');
                 showToast('Image Studio could not finish', error.message || 'Please try again.');
             } finally {
                 setBusy(false);
             }
+        }
+
+        function saveImage() {
+            if (!current.image) return;
+            downloadBlob(dataUrlToBlob(current.image), current.imageFilename);
+        }
+
+        async function shareImage() {
+            if (!current.image) return;
+            const file = new File([dataUrlToBlob(current.image)], current.imageFilename, { type: 'image/png' });
+            if (!navigator.canShare?.({ files: [file] })) {
+                saveImage();
+                return showToast('Image downloaded', 'Share the saved image from your device.');
+            }
+            try { await navigator.share({ title: current.title, files: [file] }); }
+            catch (error) { if (error.name !== 'AbortError') showToast('Could not share', 'Use Save Image and share it from your device.'); }
         }
 
         async function saveToKnowledgeBase() {
@@ -1075,10 +1260,13 @@
         }
 
         async function pasteFromClipboard() {
+            if (studioBusy) return;
             try {
                 const text = await navigator.clipboard.readText();
+                if (studioBusy) return;
                 if (!text.trim()) return showToast('Clipboard is empty', 'Copy text first, then paste here.');
                 document.getElementById('visualInput').value = text.trim();
+                invalidatePrompt();
                 const titleInput = document.getElementById('titleInput');
                 if (!titleInput.value.trim()) titleInput.value = inferTitle(text);
             } catch {
@@ -1087,20 +1275,19 @@
         }
 
         function clearStudio() {
+            if (studioBusy) return;
             document.getElementById('visualInput').value = '';
             document.getElementById('titleInput').value = '';
             document.getElementById('categoryInput').value = 'Other';
+            document.getElementById('visualCategory').value = 'other';
+            document.getElementById('visualFormat').value = 'auto';
+            document.getElementById('promptEditor').open = false;
+            invalidatePrompt();
+            setStudioMode('create');
             setStatus('');
             revokeObjectUrl(current.displayImageUrl);
             current = { title: '', category: 'Other', request: '', image: '', displayImageUrl: '', imageFilename: '', markdown: '' };
-            document.getElementById('stage').innerHTML = `
-                <div class="empty">
-                    <div class="empty-inner">
-                        <h2>Ready to Create</h2>
-                        <p class="copy">Choose a ready-made prompt from the left, or describe your own visual above, then click Create Image.</p>
-                    </div>
-                </div>
-            `;
+            document.getElementById('stage').innerHTML = '';
         }
 
         function readPayloadFromUrl() {
@@ -1134,6 +1321,7 @@
             refreshImageUsage();
             const payload = readPayloadFromUrl() || readPayloadFromStorage();
             if (payload && (payload.answer || payload.text)) {
+                setStudioMode('article');
                 const request = payload.answer || payload.text;
                 document.getElementById('visualInput').value = request;
                 document.getElementById('titleInput').value = payload.title || inferTitle(request);
