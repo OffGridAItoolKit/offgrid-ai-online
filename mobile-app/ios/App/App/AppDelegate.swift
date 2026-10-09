@@ -483,35 +483,77 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
         voiceStartRequested = true
         emitVoiceEvent("offgrid-native-voice-state", details: ["status": "requesting-permission"])
 
-        SFSpeechRecognizer.requestAuthorization { [weak self] status in
-            DispatchQueue.main.async {
-                guard let self else { return }
-                guard self.voiceStartRequested else { return }
-                guard status == .authorized else {
-                    self.voiceStartRequested = false
-                    self.emitVoicePermissionError(for: status)
-                    return
+        let currentStatus = SFSpeechRecognizer.authorizationStatus()
+        switch currentStatus {
+        case .authorized:
+            requestMicrophonePermission()
+        case .denied:
+            voiceStartRequested = false
+            emitVoicePermissionError(for: currentStatus, canOpenSettings: true)
+        case .restricted:
+            voiceStartRequested = false
+            emitVoicePermissionError(for: currentStatus, canOpenSettings: false)
+        case .notDetermined:
+            SFSpeechRecognizer.requestAuthorization { [weak self] status in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    guard self.voiceStartRequested else { return }
+                    guard status == .authorized else {
+                        self.voiceStartRequested = false
+                        // Respect the first denial. Settings are offered only if the
+                        // user later taps Voice Input again while access remains denied.
+                        self.emitVoicePermissionError(for: status, canOpenSettings: false)
+                        return
+                    }
+                    self.requestMicrophonePermission()
                 }
-                self.requestMicrophonePermission()
             }
+        @unknown default:
+            voiceStartRequested = false
+            emitVoicePermissionError(for: currentStatus, canOpenSettings: false)
         }
     }
 
     private func requestMicrophonePermission() {
+        if #available(iOS 17.0, *) {
+            switch AVAudioApplication.shared.recordPermission {
+            case .granted:
+                startVoiceInput()
+            case .denied:
+                voiceStartRequested = false
+                emitMicrophonePermissionError(canOpenSettings: true)
+            case .undetermined:
+                requestMicrophonePermissionPrompt()
+            @unknown default:
+                voiceStartRequested = false
+                emitMicrophonePermissionError(canOpenSettings: false)
+            }
+            return
+        }
+
+        switch AVAudioSession.sharedInstance().recordPermission {
+        case .granted:
+            startVoiceInput()
+        case .denied:
+            voiceStartRequested = false
+            emitMicrophonePermissionError(canOpenSettings: true)
+        case .undetermined:
+            requestMicrophonePermissionPrompt()
+        @unknown default:
+            voiceStartRequested = false
+            emitMicrophonePermissionError(canOpenSettings: false)
+        }
+    }
+
+    private func requestMicrophonePermissionPrompt() {
         let completion: (Bool) -> Void = { [weak self] allowed in
             DispatchQueue.main.async {
                 guard let self else { return }
                 guard self.voiceStartRequested else { return }
                 guard allowed else {
                     self.voiceStartRequested = false
-                    self.emitVoiceEvent(
-                        "offgrid-native-voice-error",
-                        details: [
-                            "code": "microphone-permission-denied",
-                            "message": "Microphone access is required for Voice Input.",
-                            "canOpenSettings": true
-                        ]
-                    )
+                    // Do not direct the user to Settings after the first denial.
+                    self.emitMicrophonePermissionError(canOpenSettings: false)
                     return
                 }
                 self.startVoiceInput()
@@ -523,6 +565,20 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
         } else {
             AVAudioSession.sharedInstance().requestRecordPermission(completion)
         }
+    }
+
+    private func emitMicrophonePermissionError(canOpenSettings: Bool) {
+        let message = canOpenSettings
+            ? "Microphone access is off for Voice Input. You can continue by typing, or open Settings to enable it."
+            : "Microphone access wasn’t enabled. Voice Input will remain off. You can continue by typing your question."
+        emitVoiceEvent(
+            "offgrid-native-voice-error",
+            details: [
+                "code": "microphone-permission-denied",
+                "message": message,
+                "canOpenSettings": canOpenSettings
+            ]
+        )
     }
 
     private func startVoiceInput() {
@@ -629,13 +685,18 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
         }
     }
 
-    private func emitVoicePermissionError(for status: SFSpeechRecognizerAuthorizationStatus) {
+    private func emitVoicePermissionError(
+        for status: SFSpeechRecognizerAuthorizationStatus,
+        canOpenSettings: Bool
+    ) {
         let message: String
         switch status {
         case .restricted:
             message = "Speech Recognition is restricted on this iPhone."
         case .denied:
-            message = "Speech Recognition access is required for Voice Input."
+            message = canOpenSettings
+                ? "Speech Recognition access is off for Voice Input. You can continue by typing, or open Settings to enable it."
+                : "Speech Recognition access wasn’t enabled. Voice Input will remain off. You can continue by typing your question."
         case .notDetermined:
             message = "Speech Recognition permission was not completed. Please try again."
         case .authorized:
@@ -648,7 +709,7 @@ private final class OffGridNativeMessageHandler: NSObject, WKScriptMessageHandle
             details: [
                 "code": "speech-permission-denied",
                 "message": message,
-                "canOpenSettings": status == .denied
+                "canOpenSettings": canOpenSettings
             ]
         )
     }

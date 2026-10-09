@@ -4203,14 +4203,7 @@
         }
 
         function showMicrophonePermissionHelp() {
-            if (IS_APP_SURFACE && window.OffGridNative && typeof window.OffGridNative.openAppSettings === 'function') {
-                const openSettings = confirm('Microphone access is blocked for OffGrid AI FieldGuide. Open app settings now so you can allow Microphone access?');
-                if (openSettings) {
-                    window.OffGridNative.openAppSettings();
-                }
-                return;
-            }
-            alert('Microphone access was denied. Please allow microphone access in your browser or app settings.');
+            alert('Microphone access wasn\'t enabled. Voice Input will remain off. You can continue by typing your question.');
         }
 
         function stopVoiceInput() {

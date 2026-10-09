@@ -30,7 +30,7 @@ const checks = [
   ['full-screen compatibility mode is not forced', !plist.includes('UIRequiresFullScreen')],
   ['Xcode 27 scene lifecycle is declared', plist.includes('UIApplicationSceneManifest') && plist.includes('UISceneDelegateClassName')],
   ['scene delegate preserves Capacitor URL routing', appDelegate.includes('final class SceneDelegate') && appDelegate.includes('ApplicationDelegateProxy.shared.application')],
-  ['Duo update is versioned separately from the approved build', (project.match(/CURRENT_PROJECT_VERSION = 7;/g) || []).length === 2 && (project.match(/MARKETING_VERSION = 1\.1;/g) || []).length === 2],
+  ['Duo update is versioned separately from the approved build', (project.match(/CURRENT_PROJECT_VERSION = 8;/g) || []).length === 2 && (project.match(/MARKETING_VERSION = 1\.1;/g) || []).length === 2],
 ];
 
 let failed = false;
