@@ -520,6 +520,14 @@ test('Council requests a strict review schema without changing GPT or candidate 
     data.reviewFormat = FORMAT;
     assert.equal((await providers.review(ROSTER[0], request)).matched, true);
     assert.equal(payload.system, GRADER_PROMPT);
+    const { createLegacyOptimized } = require('../server/legacy-arena-optimized');
+    const legacy = createLegacyOptimized({ providers });
+    const messages = [{ role: 'user', content: 'Rank the four answers.' }];
+    await assert.rejects(legacy.call(messages, { grading: true }), /identity/);
+    delete data.reviewFormat;
+    assert.equal((await legacy.call(messages, { grading: true })).matched, true);
+    assert.equal(payload.grading, true);
+    assert.ok(!Object.hasOwn(payload, 'reviewFormat'));
 });
 test('monthly usage cap blocks calls and releases its advisory lock', async () => {
     const queries = [];

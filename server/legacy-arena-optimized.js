@@ -94,7 +94,9 @@ function createLegacyOptimized({ pool, config = configuration(), providers = cre
     async function call(messages, { grading = false, signal } = {}) {
         const request = toRequest(messages, grading);
         const model = { pair: 'e4b', model: MODEL_ID };
-        const result = await (grading ? providers.review : providers.generate)(model, request, signal);
+        const result = grading
+            ? await providers.review(model, request, signal, { legacyArena: true })
+            : await providers.generate(model, request, signal);
         if (!result.matched) throw new Error('Optimized model identity could not be verified.');
         if (result.finishReason !== 'stop' || !result.text?.trim())
             throw new Error('Optimized returned an incomplete response. Please use a shorter question.');
