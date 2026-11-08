@@ -1475,6 +1475,7 @@ app.get('/api/arena/models', (req, res) => {
 });
 
 app.get('/api/arena-open/models', (req, res) => {
+    res.setHeader('X-OffGrid-E4B-Review', 'legacy-flat-v1');
     res.json({
         models: Object.entries(OPEN_ARENA_MODELS).map(([key, model]) => ({
             key,
@@ -1617,18 +1618,19 @@ app.post('/api/command/council', requireLicense, checkPromptLimit, async (req, r
                     ];
                 }
                 
-                const response = await withTimeout(
+                const result = await withTimeout(
                     isOptimized(model)
-                        ? legacyOptimized.call(modelMessages).then(result => result.text)
+                        ? legacyOptimized.call(modelMessages)
                         : callOpenRouter(model.id, modelMessages, 2048),
                     isOptimized(model) ? OPTIMIZED_TIMEOUT_MS : MODEL_TIMEOUT_MS,
                     model.shortName
                 );
+                const response = isOptimized(model) ? result.text : result;
                 
                 // Send progress update
                 res.write(`data: ${JSON.stringify({ 
                     progress: key,
-                    ...(isOptimized(model) ? { modelId: model.id, provider: 'Modal / Ollama', verified: true } : {}),
+                    ...(isOptimized(model) ? { modelId: model.id, provider: 'Modal / Ollama', gpu: result.metadata.gpu, verified: true } : {}),
                     message: `${model.emoji} ${model.shortName} complete ✓` 
                 })}\n\n`);
                 

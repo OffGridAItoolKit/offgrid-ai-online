@@ -226,6 +226,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 provider: 'Modal / Ollama',
                 model: data.model,
                 artifactDigest: data.artifactDigest,
+                gpu: data.gpu,
                 runtime: data.runtime,
                 settings: data.settings,
                 ...(reviewFormat ? { reviewFormat: data.reviewFormat } : {}),

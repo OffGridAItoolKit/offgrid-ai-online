@@ -13,7 +13,7 @@ class ApiTests(unittest.IsolatedAsyncioTestCase):
             return {"model": MODEL, "done": True, "done_reason": "stop", "response": "  Original text.  ",
                     "prompt_eval_count": 100, "eval_count": 30}
 
-        self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=create_api("0.21.0", generate)), base_url="http://test")
+        self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=create_api("0.21.0", generate, "NVIDIA A10")), base_url="http://test")
 
     async def asyncTearDown(self):
         await self.client.aclose()
@@ -24,6 +24,7 @@ class ApiTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(baseline.status_code, 200)
         self.assertEqual(offgrid.json()["text"], "  Original text.  ")
         self.assertEqual(offgrid.json()["artifactDigest"], ARTIFACT)
+        self.assertEqual(offgrid.json()["gpu"], "NVIDIA A10")
         a, b = self.calls
         self.assertEqual(a.pop("system"), "")
         self.assertEqual(b.pop("system"), "OffGrid instructions")

@@ -93,6 +93,16 @@ test('mode, prompt, rubric, validation, provider and model changes split configu
     assert.notEqual(A.series(run()), A.series(changed));
 });
 
+test('actual E4B GPU separates new runs without rewriting historical records', () => {
+    const current = run();
+    const historical = A.series(current);
+    current.answers[0].metadata.gpu = 'NVIDIA L4';
+    const l4 = A.series(current);
+    current.answers[0].metadata.gpu = 'NVIDIA A10';
+    assert.notEqual(l4, A.series(current));
+    delete current.answers[0].metadata.gpu;
+    assert.equal(A.series(current), historical);
+});
 test('absent Council protocol preserves existing judge fingerprints; new protocol splits old Council', () => {
     assert.equal(
         A.series(run()),

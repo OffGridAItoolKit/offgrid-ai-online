@@ -79,7 +79,7 @@ image = (
 app = modal.App("offgrid-gemma4-e4b-pilot")
 
 
-def create_api(runtime, generate):
+def create_api(runtime, generate, gpu=None):
     """Small fixed interface: no model pulls, arbitrary options, history, or public Ollama API."""
     import asyncio
     import base64
@@ -90,7 +90,7 @@ def create_api(runtime, generate):
 
     @api.get("/health")
     async def health():
-        return {"model": MODEL, "artifactDigest": ARTIFACT, "runtime": runtime, "verified": True}
+        return {"model": MODEL, "artifactDigest": ARTIFACT, "runtime": runtime, "gpu": gpu, "verified": True}
 
     @api.post("/generate")
     async def respond(request: Request):
@@ -147,14 +147,14 @@ def create_api(runtime, generate):
             finish = "context_limit"
         return {"text": data.get("response", ""), "finishReason": finish if data.get("done") else "incomplete",
                 "model": data.get("model"), "artifactDigest": ARTIFACT,
-                "runtime": runtime, "verified": data.get("model") == MODEL,
+                "runtime": runtime, "gpu": gpu, "verified": data.get("model") == MODEL,
                 "settings": {**options, "think": False},
                 **({"reviewFormat": review_format} if review_format else {}),
                 "usage": {k: data.get(k) for k in ("prompt_eval_count", "eval_count", "total_duration", "load_duration", "eval_duration")}}
     return api
 
 
-@app.cls(image=image, gpu="L4", cpu=4, memory=16384, min_containers=0, max_containers=1,
+@app.cls(image=image, gpu=["L4", "A10"], cpu=4, memory=16384, min_containers=0, max_containers=1,
          scaledown_window=180, timeout=140, startup_timeout=180, retries=0)
 @modal.concurrent(max_inputs=2)
 class E4B:
@@ -167,6 +167,10 @@ class E4B:
         manifest = json.loads(Path(f"{MODELS_PATH}/manifests/registry.ollama.ai/library/gemma4/e4b").read_text())
         assert manifest["config"]["digest"] == CONFIG
         assert manifest["layers"][0]["digest"] == ARTIFACT
+        self.gpu = subprocess.check_output(
+            ["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"], text=True, timeout=10
+        ).strip()
+        print("E4B worker GPU:", self.gpu, flush=True)
         self.runtime_log = open('/tmp/offgrid-ollama.log', 'w')
         self.process = subprocess.Popen(["ollama", "serve"], stdout=self.runtime_log, stderr=self.runtime_log)
         for _ in range(120):
@@ -204,4 +208,4 @@ class E4B:
                 response.raise_for_status()
                 return response.json()
 
-        return create_api(self.runtime, generate)
+        return create_api(self.runtime, generate, self.gpu)
