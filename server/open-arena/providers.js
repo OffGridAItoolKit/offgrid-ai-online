@@ -174,7 +174,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
             },
         };
     }
-    async function modal(request, grading, signal) {
+    async function modal(request, grading, signal, reviewFormat) {
         const started = Date.now();
         const { data, transport, failed } = await post(
             `${config.modalUrl.replace(/\/$/, '')}/generate`,
@@ -183,7 +183,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 system: request.system || '',
                 image: request.image,
                 grading,
-                ...(grading ? { reviewFormat: FORMAT } : {}),
+                ...(reviewFormat ? { reviewFormat } : {}),
                 seed: request.settings?.seed || 0,
             },
             {
@@ -217,7 +217,7 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 data.model === 'gemma4:e4b' &&
                 data.artifactDigest === E4B_DIGEST &&
                 data.runtime === '0.33.3' &&
-                (!grading || data.reviewFormat === FORMAT) &&
+                (!grading || data.reviewFormat === reviewFormat) &&
                 data.verified === true &&
                 Object.entries(expected).every(
                     ([key, value]) => data.settings?.[key] === value,
@@ -226,9 +226,10 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 provider: 'Modal / Ollama',
                 model: data.model,
                 artifactDigest: data.artifactDigest,
+                gpu: data.gpu,
                 runtime: data.runtime,
                 settings: data.settings,
-                ...(grading ? { reviewFormat: data.reviewFormat } : {}),
+                ...(reviewFormat ? { reviewFormat: data.reviewFormat } : {}),
                 usage: data.usage,
                 elapsedMs: Date.now() - started,
                 transport,
@@ -249,9 +250,9 @@ function createProviders(config, fetchImpl = fetch, sleep) {
                 ? modal(request, false, signal)
                 : openRouter(model.model, request, false, signal, options);
         },
-        review(model, request, signal) {
+        review(model, request, signal, { legacyArena = false } = {}) {
             return model.pair === 'e4b'
-                ? modal(request, true, signal)
+                ? modal(request, true, signal, legacyArena ? undefined : FORMAT)
                 : openRouter(model.model, request, true, signal);
         },
     };

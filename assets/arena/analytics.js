@@ -69,6 +69,7 @@
             item.metadata?.runtime,
             item.metadata?.artifactDigest,
             withoutSeed(item.metadata?.settings),
+            ...(item.metadata?.gpu ? [item.metadata.gpu] : []),
         ];
         return JSON.stringify(
             canonical([
