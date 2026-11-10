@@ -5428,7 +5428,10 @@ Mobile app output requirements:
         function showSaveModal(options = {}) {
             // Auto-generate title from first user message
             const firstUserMsg = conversationHistory.find(m => m.role === 'user');
-            const autoTitle = options.title || (firstUserMsg
+            const last = conversationHistory.at(-1);
+            const recentVisual = last?.model === 'OffGrid AI Image Studio' && last.image && last.image === onlineStudioState?.image;
+            const guide = options.fieldGuide || (recentVisual ? onlineStudioState : null);
+            const autoTitle = (guide && fieldGuideTitle(guide)) || options.title || (firstUserMsg
                 ? firstUserMsg.content.substring(0, 60).replace(/[^a-zA-Z0-9\s]/g, '').trim()
                 : 'Conversation');
             
@@ -5436,6 +5439,7 @@ Mobile app output requirements:
             const overlay = document.createElement('div');
             overlay.className = 'save-modal-overlay';
             overlay.id = 'saveModal';
+            if (guide) overlay.fieldGuide = { answer: guide.answer, image: guide.image };
             
             if (isMobile) {
                 // Mobile: streamlined PDF-focused save experience
@@ -5722,6 +5726,26 @@ Mobile app output requirements:
             return frontmatter + content;
         }
 
+        function fieldGuideTitle(guide) {
+            const heading = (guide.answer || '').trimStart().match(/^#{1,6}[ \t]+(.+?)[ \t]*$/m);
+            if (heading?.index === 0 && (!guide.title || guide.title === guide.sourcePrompt)) return heading[1];
+            return guide.title || 'OffGrid AI Field Guide';
+        }
+
+        function savedFieldGuideMarkdown(guide, title, category, tags, imageFile) {
+            const metadata = ['---', 'title: ' + JSON.stringify(title), 'date: ' + new Date().toISOString(),
+                'source: online-image-studio', 'category: ' + JSON.stringify(category)];
+            const labels = tags.split(',').map(tag => tag.trim()).filter(Boolean);
+            if (labels.length) metadata.push('tags: ' + JSON.stringify(labels));
+            if (imageFile) metadata.push('images:', '  - ' + JSON.stringify(imageFile));
+            let answer = (guide.answer || '').trim();
+            const first = answer.match(/^#{1,6}[ \t]+([^\n]+)(?:\n|$)/);
+            if (first && first[1].trim() === title) answer = answer.slice(first[0].length).trimStart();
+            const visual = imageFile ? './' + imageFile : guide.image;
+            return [...metadata, '---', '', '# ' + title, '', answer, '',
+                '![Field guide illustration](' + visual + ')', ''].join('\n');
+        }
+
         function generateImageStudioFieldGuideMarkdown(title, category) {
             const now = new Date();
             const isoDate = now.toISOString();
@@ -5755,9 +5779,9 @@ Mobile app output requirements:
         }
 
         // Extract chat images so Knowledge Base saves use sibling image files instead of base64 markdown.
-        function extractBase64Images() {
+        function extractBase64Images(messages = conversationHistory) {
             const images = [];
-            conversationHistory.forEach(msg => {
+            messages.forEach(msg => {
                 if (!msg.image || !msg.image.startsWith('data:image/')) return;
                 const formatMatch = msg.image.match(/data:image\/([^;]+);/);
                 const rawFormat = formatMatch ? formatMatch[1].toLowerCase() : 'png';
@@ -5801,7 +5825,8 @@ Mobile app output requirements:
             closeOnlineImageStudio();
             showSaveModal({
                 title: onlineStudioState.title || 'OffGrid AI Visual Guide',
-                category: onlineStudioState.category || 'Other'
+                category: onlineStudioState.category || 'Other',
+                fieldGuide: onlineStudioState
             });
         }
 
@@ -5847,9 +5872,10 @@ Mobile app output requirements:
 
             addOnlineStudioResultToChat();
 
-            const title = onlineStudioState.title || 'OffGrid AI Visual Guide';
+            const title = IS_PHONE_SURFACE ? (onlineStudioState.title || 'OffGrid AI Visual Guide') : fieldGuideTitle(onlineStudioState);
             const category = onlineStudioState.category || 'Other';
-            const markdownContent = generateImageStudioFieldGuideMarkdown(title, category);
+            const markdownContent = IS_PHONE_SURFACE ? generateImageStudioFieldGuideMarkdown(title, category)
+                : savedFieldGuideMarkdown(onlineStudioState, title, category, '');
             const pdfBtn = document.getElementById('onlineStudioPdfBtn');
             const statusEl = document.getElementById('onlineStudioStatus');
 
@@ -5937,7 +5963,11 @@ Mobile app output requirements:
             const baseName = filename.replace('.md', '');
 
             // Check if conversation contains uploaded images
-            const embeddedImages = extractBase64Images();
+            const guide = document.getElementById('saveModal')?.fieldGuide;
+            const embeddedImages = guide ? extractBase64Images([{ role: 'assistant', image: guide.image }]) : extractBase64Images();
+            const markdown = imageFiles => guide
+                ? savedFieldGuideMarkdown(guide, title, category, tags, imageFiles?.[0])
+                : generateMarkdownContent(title, category, tags, imageFiles);
             const hasImages = embeddedImages.length > 0;
 
             if ('showDirectoryPicker' in window) {
@@ -5953,7 +5983,7 @@ Mobile app output requirements:
                 }
                 category = destination.path === '.' ? destination.name : destination.path;
                 const imageFilenames = embeddedImages.map((img, i) => `${baseName}-img-${i + 1}.${img.format}`);
-                const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
+                const markdownContent = markdown(imageFilenames);
                 const save = document.getElementById('kbWriteFilesBtn');
                 kbFolderBusy = true;
                 if (save) save.disabled = true;
@@ -5980,7 +6010,7 @@ Mobile app output requirements:
                 const imageFilenames = embeddedImages.map((img, i) => 
                     `${baseName}-img-${i + 1}.${img.format}`
                 );
-                const markdownContent = generateMarkdownContent(title, category, tags, imageFilenames);
+                const markdownContent = markdown(imageFilenames);
 
                 // Fallback: download .md + image files separately
                 const mdBlob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
@@ -6013,7 +6043,7 @@ Mobile app output requirements:
 
             } else {
                 // NO IMAGES: single .md file save
-                const markdownContent = generateMarkdownContent(title, category, tags);
+                const markdownContent = markdown();
 
                 if ('showSaveFilePicker' in window) {
                     try {
@@ -6053,7 +6083,8 @@ Mobile app output requirements:
             const category = document.getElementById('saveCategory')?.value || 'Other';
             const tags = document.getElementById('saveTags')?.value || '';
             
-            const markdownContent = generateMarkdownContent(title, category, tags);
+            const guide = document.getElementById('saveModal')?.fieldGuide;
+            const markdownContent = guide ? savedFieldGuideMarkdown(guide, title, category, tags) : generateMarkdownContent(title, category, tags);
             
             // Close whichever modal is open (save modal or upsell modal)
             closeSaveModal();

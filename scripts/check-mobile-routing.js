@@ -6,9 +6,8 @@ const path = require('node:path');
 const { outsideDesktopKBSave } = require('./kb-save-release-scope');
 
 const root = path.resolve(__dirname, '..');
-// Production immediately before the desktop KB-folder correction, including
-// App Store launch links and all previously released mobile/browser safeguards.
-const BASELINE = '2dfabdf7efbdc50d906ab77942a34f2af2539d2e';
+// Pin the deployed source immediately before the field-guide formatting change.
+const BASELINE = '53c9e18a954dd5564d073bb75452b8acc7f71c14';
 const customerWeb = {
     isCustomer: true,
     experience: 'online',

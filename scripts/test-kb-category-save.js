@@ -10,7 +10,7 @@ const { outsideDesktopKBSave } = require('./kb-save-release-scope');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const names = ['resolveKBDirectory', 'refreshKBFolderOptions', 'pickKBDirectory', 'confirmKBBundleOverwrite', 'writeKBBundle',
     'executeSave', 'generateMarkdownContent', 'extractBase64Images', 'dataUrlToBlob', 'generateFilename',
-    'saveOnlineStudioToKnowledgeBase'];
+    'saveOnlineStudioToKnowledgeBase', 'fieldGuideTitle', 'savedFieldGuideMarkdown'];
 function extract(name) {
     const start = html.search(new RegExp(`^        (?:async )?function ${name}\\(`, 'm'));
     assert.notEqual(start, -1, `Missing ${name}`);
@@ -133,9 +133,18 @@ test('actual desktop and phone dialogs keep quoted and HTML-like titles in input
             refreshKBFolderOptions() {}, closeSaveModal() {},
             setTimeout: callback => callback()
         });
-        vm.runInContext(extract('showSaveModal'), context);
+        vm.runInContext(extract('fieldGuideTitle') + '\n' + extract('showSaveModal'), context);
         context.showSaveModal({ title: 'Ordinary shelter title' });
         context.showSaveModal({ title: unsafeTitle });
+        const guide = {title:'Make a lesson',sourcePrompt:'Make a lesson',answer:'## Geometry',image:'guide.png'};
+        context.onlineStudioState = guide;
+        context.conversationHistory.push({role:'assistant',model:'OffGrid AI Image Studio',image:guide.image});
+        context.showSaveModal();
+        assert.equal(overlays.at(-1).input.value,'Geometry');
+        assert.equal(overlays.at(-1).fieldGuide.image,guide.image);
+        context.conversationHistory.push({role:'user',content:'A different chat'});
+        context.showSaveModal();
+        assert.equal(overlays.at(-1).fieldGuide,undefined);
         assert.equal(overlays[1].input.value, unsafeTitle, 'Preserve the full title as text');
         assert.equal(overlays[1].innerHTML, overlays[0].innerHTML,
             'User title must not affect element or attribute construction');
@@ -390,4 +399,29 @@ test('unsupported browsers still download both siblings with explicit placement 
     await h.context.executeSave();
     assert.deepEqual(h.downloads, ['Shelter-guide.md', 'Shelter-guide-img-1.png']);
     assert.match(h.toasts.at(-1)[1], /Move ALL/);
+});
+
+test('Studio field guide writes only the selected guide and its illustration, including nested categories', async () => {
+    const nested = directory('Geometry'), kb = directory('Saved Knowledge Base', { Lessons: directory('Lessons', {Geometry:nested}) });
+    const h = harness({selected:kb});
+    const guide = {title:'Make a lesson', sourcePrompt:'Make a lesson', answer:'## Habitat design\n\n1. First step\n   - Nested bullet', image:'data:image/png;base64,aGk='};
+    h.context.onlineStudioState = guide;
+    await h.context.saveOnlineStudioToKnowledgeBase();
+    assert.equal(h.modalOptions[0].fieldGuide, guide);
+    assert.equal(h.context.fieldGuideTitle(guide), 'Habitat design');
+    h.elements.saveModal = {fieldGuide:guide};
+    h.elements.saveTitle.value='Habitat design';
+    await h.context.pickKBDirectory();
+    h.elements.saveCategory.value='Lessons/Geometry';
+    await h.context.executeSave();
+    const md=nested.files.get('Habitat-design.md');
+    assert.match(md,/source: online-image-studio/);
+    assert.ok(md.includes('# Habitat design\n\n1. First step\n   - Nested bullet'));
+    assert.ok(md.includes('(./Habitat-design-img-1.png)'));
+    assert.deepEqual([...nested.files.keys()],['Habitat-design-img-1.png','Habitat-design.md']);
+    assert.doesNotMatch(md,/## User|## OffGrid AI|Make a lesson|emergency shelter|Prioritize insulation|data:image/);
+    assert.match(h.context.savedFieldGuideMarkdown(guide,'My title','Lessons','',null), /# My title\n\n## Habitat design/);
+    assert.match(h.context.savedFieldGuideMarkdown(guide,'My title','Lessons','',null), /data:image\/png/);
+    delete h.elements.saveModal;
+    assert.match(h.context.generateMarkdownContent('Chat','Other',''),/## User[\s\S]*## OffGrid AI/);
 });
