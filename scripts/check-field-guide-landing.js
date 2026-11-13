@@ -36,7 +36,7 @@ const checks = [
     ['official store badges', html.includes('download-on-the-app-store/black/en-us') && html.includes('en_badge_web_generic.png')],
     ['mobile swipe gallery', html.includes('scroll-snap-type: x mandatory') && html.includes('Swipe through the examples')],
     ['small-phone feature fallback', html.includes('@media (max-width: 370px)')],
-    ['online/offline product distinction', html.includes('FieldGuide is online. ToolKit is built for offline use.')],
+    ['online/offline product distinction', html.includes('read the PDFs you saved') && html.includes('the USB ToolKit runs AI') && html.includes('href="https://offgridaitoolkit.com/"')],
     ['dedicated Formspree support endpoint', html.includes('action="https://formspree.io/f/xqpkevea"') && !html.includes('/f/xzebpnoz')],
     ['accessible support form status', html.includes('id="support-form"') && html.includes('aria-live="polite"') && html.includes('role="status"')],
     ['support contact and privacy guidance', html.includes('support@offgridaitoolkit.com') && html.includes('Please do not include passwords')],
