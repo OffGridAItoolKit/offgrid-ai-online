@@ -117,44 +117,22 @@ async function main() {
         checks += 1;
         console.log(`PASS: ${label}`);
     }
-    await withServer(async ({ base, request, page }) => {
-        const mobileHtml = fs.readFileSync(path.join(root, 'mobile.html'), 'utf8');
-        for (const route of ['/mobile', '/mobile/']) {
-            await check(`${route} serves only the browser customer experience`, async () => {
-                const html = await page(route);
-                assert.deepEqual(pageConfig(html, route), customerWeb);
-                assert.equal(html, injectConfig(mobileHtml, customerWeb));
-            });
-            await check(`${route} loads its separate browser stylesheet`, async () => {
-                const html = await page(route);
-                const stylesheet = html.match(/<link\b[^>]*rel="stylesheet"[^>]*href="([^"]+)"/);
-                assert.ok(stylesheet, `${route} must link its stylesheet`);
-                assert.equal(stylesheet[1], '/mobile.css?v=20260920');
-                const url = new URL(stylesheet[1], `${base}${route}`);
-                const response = await request(`${url.pathname}${url.search}`);
-                assert.equal(response.status, 200);
-                assert.match(response.headers.get('content-type') || '', /^text\/css\b/);
-                assert.ok(Buffer.from(await response.arrayBuffer()).equals(fs.readFileSync(path.join(root, 'mobile.css'))));
+    await withServer(async ({ request, page }) => {
+        for (const route of ['/mobile', '/mobile/', '/mobile?surface=app&platform=ios']) {
+            await check(`${route} sends QR visitors to the FieldGuide download page`, async () => {
+                const response = await request(route);
+                assert.equal(response.status, 302);
+                assert.equal(response.headers.get('location'), 'https://offgridai.guide/');
             });
         }
-        for (const query of [
-            '?surface=app&platform=ios&apiBase=production',
-            '?surface=app&platform=android&apiBase=production',
-            '?surface=desktop&platform=windows&apiBase=https%3A%2F%2Fexample.com',
-            '?surface=app&surface=web&platform=ios&platform=android&apiBase=production&apiBase=unknown',
-        ]) {
-            await check(`/mobile${query} cannot select native app mode or a remote API`, async () => {
-                assert.deepEqual(pageConfig(await page(`/mobile${query}`), query), customerWeb);
+        for (const platform of ['ios', 'android']) {
+            const route = `/online?surface=app&platform=${platform}`;
+            await check(`${platform} retains its native app entry point`, async () => {
+                const config = pageConfig(await page(route), route);
+                assert.equal(config.surface, 'app');
+                assert.equal(config.platform, platform);
             });
         }
-        await check('/mobile preserves the optional single-image preview rollback', async () => {
-            assert.deepEqual(pageConfig(await page('/mobile?preview=single-image'), '/mobile'), {
-                ...customerWeb, features: { multiImagePreview: false, prioritizedPrompts: false }
-            });
-        });
-        await check('duplicate preview options do not activate single-image rollback', async () => {
-            assert.deepEqual(pageConfig(await page('/mobile?preview=single-image&preview=unknown'), '/mobile'), customerWeb);
-        });
         for (const route of ['/mobile/ready-made-prompts', '/mobile/ready-made-prompts/']) {
             await check(`${route} serves the browser prompt page`, async () => {
                 assert.equal(await page(route), fs.readFileSync(path.join(root, 'mobile-ready-made-prompts.html'), 'utf8'));

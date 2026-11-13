@@ -2760,7 +2760,7 @@ app.get('/mobile/ready-made-prompts', (req, res) => {
 });
 
 app.get('/mobile', (req, res) => {
-    serveWithExperience(req, res, true, 'mobile.html');
+    res.redirect(302, 'https://offgridai.guide/');
 });
 
 // Prospect experience - free demo with sales messaging
